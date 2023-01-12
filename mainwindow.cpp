@@ -3,10 +3,10 @@
 #include "folder_tree.h"
 #include "views_handler.h"
 
-QSharedPointer<Views_handler> view_handler;
+QSharedPointer<ViewsHandler> view_handler;
 
 void setup_views(Ui::MainWindow &ui){
-    view_handler = Views_handler::get_instance(ui);
+    view_handler = ViewsHandler::getInstance(ui);
 }
 
 MainWindow::MainWindow(QWidget *parent)

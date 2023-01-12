@@ -1,13 +1,84 @@
 #include "views_handler.h"
 
+#include <QTextStream>
 
-
-void Views_handler::init_models()
+QString ViewsHandler::getSavedPath()
 {
-    model_tree.setRootPath(QDir::homePath());
+    QFile configFile("config.txt");
+    return getFileContent(configFile);
 }
 
-void Views_handler::init_views(Ui::MainWindow &ui)
+void ViewsHandler::initModels()
 {
-    ui.ui_tree_view->setModel(&model_tree);
+    modelTree.setRootPath(getSavedPath());
+    modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
+}
+
+void ViewsHandler::initViews(Ui::MainWindow &ui)
+{
+    initTreeView(ui);
+    viewText = ui.uiTextView;
+}
+
+void ViewsHandler::initTreeView(Ui::MainWindow &ui)
+{
+    ui.uiTreeView->setModel(&modelTree);
+    ui.uiTreeView->setColumnHidden(1,true);
+    ui.uiTreeView->setHeaderHidden(true);
+    ui.uiTreeView->setRootIndex(modelTree.index(getSavedPath()));
+
+    for(int column = 1; column < modelTree.columnCount(); column ++)
+    {
+        ui.uiTreeView->setColumnHidden(column,true);
+    }
+}
+
+void ViewsHandler::initConnection(Ui::MainWindow &ui)
+{
+    QObject::connect(ui.uiTreeView, SIGNAL(pressed(QModelIndex)),
+                      this, SLOT(fileDisplay(QModelIndex)));
+
+    QObject::connect(ui.uiTextView,SIGNAL(textChanged()),
+                     this, SLOT(fileSave()));
+}
+
+QString ViewsHandler::getFileContent(QFile& file)
+{
+    QString content;
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream stream(&file);
+            while (!stream.atEnd())
+            {
+                QString line = stream.readLine();
+                content.append(line);
+            }
+    }
+    file.close();
+    return content;
+}
+
+void ViewsHandler::fileDisplay(const QModelIndex& index)
+{
+    viewText->clear();
+    fileInfo = modelTree.fileInfo(index);
+    QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
+    QString fullContent = getFileContent(*file.get());
+    viewText->setText(fullContent);
+    viewText->update();
+}
+
+void ViewsHandler::fileSave()
+{
+    if(!viewText->hasFocus())
+        return;
+
+    QString fullContent = viewText->toMarkdown();
+    QFile file(fileInfo.absoluteFilePath());
+    if(file.open(QFile::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream<<fullContent;
+        file.close();
+    }
 }

@@ -16,10 +16,17 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTreeView" name="ui_tree_view"/>
-    </item>
-    <item>
-     <widget class="QTextEdit" name="textEdit"/>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QTreeView" name="uiTreeView"/>
+      <widget class="QTextEdit" name="uiTextView">
+       <property name="markdown">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
