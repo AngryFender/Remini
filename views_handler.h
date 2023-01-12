@@ -29,6 +29,7 @@ private:
 
     QFileSystemModel modelTree;
     QTextEdit* viewText;
+    QTreeView* viewTree;
     QFileInfo fileInfo;
 
     QString getSavedPath();

@@ -17,6 +17,7 @@ void ViewsHandler::initModels()
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
     initTreeView(ui);
+    viewTree = ui.uiTreeView;
     viewText = ui.uiTextView;
 }
 
@@ -26,7 +27,7 @@ void ViewsHandler::initTreeView(Ui::MainWindow &ui)
     ui.uiTreeView->setColumnHidden(1,true);
     ui.uiTreeView->setHeaderHidden(true);
     ui.uiTreeView->setRootIndex(modelTree.index(getSavedPath()));
-
+    ui.uiTreeView->setRootIsDecorated(false);
     for(int column = 1; column < modelTree.columnCount(); column ++)
     {
         ui.uiTreeView->setColumnHidden(column,true);
@@ -60,6 +61,15 @@ QString ViewsHandler::getFileContent(QFile& file)
 
 void ViewsHandler::fileDisplay(const QModelIndex& index)
 {
+    if(viewTree->isExpanded(index))
+    {
+        viewTree->collapse(index);
+    }
+    else
+    {
+        viewTree->expand(index);
+    }
+
     viewText->clear();
     fileInfo = modelTree.fileInfo(index);
     QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));

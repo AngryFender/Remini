@@ -14,14 +14,51 @@
    <string>Remini</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTreeView" name="uiTreeView"/>
+      <property name="handleWidth">
+       <number>2</number>
+      </property>
+      <widget class="QTreeView" name="uiTreeView">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="lineWidth">
+        <number>0</number>
+       </property>
+      </widget>
       <widget class="QTextEdit" name="uiTextView">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
        <property name="markdown">
         <string notr="true"/>
        </property>
@@ -30,7 +67,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>
