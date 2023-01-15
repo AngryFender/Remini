@@ -49,11 +49,8 @@ QString ViewsHandler::getFileContent(QFile& file)
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QTextStream stream(&file);
-            while (!stream.atEnd())
-            {
-                QString line = stream.readLine();
-                content.append(line);
-            }
+        content = stream.readAll();
+
     }
     file.close();
     return content;
@@ -83,7 +80,7 @@ void ViewsHandler::fileSave()
     if(!viewText->hasFocus())
         return;
 
-    QString fullContent = viewText->toMarkdown();
+    QString fullContent = viewText->toPlainText();
     QFile file(fileInfo.absoluteFilePath());
     if(file.open(QFile::WriteOnly))
     {
