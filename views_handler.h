@@ -3,8 +3,8 @@
 #include <QFileSystemModel>
 #include <QSharedPointer>
 #include <QTreeWidgetItem>
+#include <mkedit.h>
 
-#include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
 class ViewsHandler: public QObject
@@ -28,7 +28,7 @@ private:
     }
 
     QFileSystemModel modelTree;
-    QTextEdit* viewText;
+    MkEdit* viewText;
     QTreeView* viewTree;
     QFileInfo fileInfo;
 

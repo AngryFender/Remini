@@ -55,7 +55,7 @@
         <number>0</number>
        </property>
       </widget>
-      <widget class="QTextEdit" name="uiTextView">
+      <widget class="MkEdit" name="uiTextView">
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
        </property>
@@ -68,6 +68,13 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MkEdit</class>
+   <extends>QTextEdit</extends>
+   <header location="global">mkedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

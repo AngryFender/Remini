@@ -41,6 +41,7 @@ void ViewsHandler::initConnection(Ui::MainWindow &ui)
 
     QObject::connect(ui.uiTextView,SIGNAL(textChanged()),
                      this, SLOT(fileSave()));
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -72,6 +73,7 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
     QString fullContent = getFileContent(*file.get());
     viewText->setText(fullContent);
+    viewText->setTitle(fileInfo.fileName());
     viewText->update();
 }
 

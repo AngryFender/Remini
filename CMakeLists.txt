@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -21,6 +22,8 @@ set(PROJECT_SOURCES
         mainwindow.ui
         views_handler.h
         views_handler.cpp
+        mkedit.h
+        mkedit.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -47,6 +50,7 @@ else()
 endif()
 
 target_link_libraries(Remini PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(Remini PRIVATE Qt6::WebEngineWidgets)
 
 set_target_properties(Remini PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
@@ -55,6 +59,7 @@ set_target_properties(Remini PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Remini)

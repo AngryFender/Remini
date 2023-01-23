@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "folder_tree.h"
 #include "views_handler.h"
 
 QSharedPointer<ViewsHandler> view_handler;
