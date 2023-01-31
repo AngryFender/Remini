@@ -16,30 +16,41 @@ void ViewsHandler::initModels()
 
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
-    initTreeView(ui);
     viewTree = ui.uiTreeView;
     viewText = ui.uiTextView;
+    viewTitle = ui.uiTitle;
+
+    initTreeView();
+    initTitleView();
 }
 
-void ViewsHandler::initTreeView(Ui::MainWindow &ui)
+void ViewsHandler::initTreeView()
 {
-    ui.uiTreeView->setModel(&modelTree);
-    ui.uiTreeView->setColumnHidden(1,true);
-    ui.uiTreeView->setHeaderHidden(true);
-    ui.uiTreeView->setRootIndex(modelTree.index(getSavedPath()));
-    ui.uiTreeView->setRootIsDecorated(false);
+    viewTree->setModel(&modelTree);
+    viewTree->setColumnHidden(1,true);
+    viewTree->setHeaderHidden(true);
+    viewTree->setRootIndex(modelTree.index(getSavedPath()));
+    viewTree->setRootIsDecorated(false);
     for(int column = 1; column < modelTree.columnCount(); column ++)
     {
-        ui.uiTreeView->setColumnHidden(column,true);
+        viewTree->setColumnHidden(column,true);
     }
 }
 
-void ViewsHandler::initConnection(Ui::MainWindow &ui)
+void ViewsHandler::initTitleView()
 {
-    QObject::connect(ui.uiTreeView, SIGNAL(pressed(QModelIndex)),
+    QFont font(FONT_FAMILY);
+    font.setPointSize( 18 );
+    font.setWeight( QFont::Bold );
+    viewTitle->setFont( font );
+}
+
+void ViewsHandler::initConnection()
+{
+    QObject::connect(viewTree, SIGNAL(pressed(QModelIndex)),
                       this, SLOT(fileDisplay(QModelIndex)));
 
-    QObject::connect(ui.uiTextView,SIGNAL(textChanged()),
+    QObject::connect(viewText,SIGNAL(textChanged()),
                      this, SLOT(fileSave()));
 
 }
@@ -73,7 +84,7 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
     QString fullContent = getFileContent(*file.get());
     viewText->setText(fullContent);
-    viewText->setTitle(fileInfo.fileName());
+    viewTitle->setText(fileInfo.fileName());
     viewText->update();
 }
 

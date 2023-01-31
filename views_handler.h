@@ -6,6 +6,7 @@
 #include <mkedit.h>
 
 #include "./ui_mainwindow.h"
+#define FONT_FAMILY "Helvetica [Adobe]"
 
 class ViewsHandler: public QObject
 {
@@ -22,21 +23,24 @@ public:
 
 private:
     ViewsHandler(Ui::MainWindow &ui){
+
         initModels();
         initViews(ui);
-        initConnection(ui);
+        initConnection();
     }
 
     QFileSystemModel modelTree;
     MkEdit* viewText;
+    QLabel* viewTitle;
     QTreeView* viewTree;
     QFileInfo fileInfo;
 
     QString getSavedPath();
     void initModels();
     void initViews(Ui::MainWindow &ui);
-    void initTreeView(Ui::MainWindow &ui);
-    void initConnection(Ui::MainWindow &ui);
+    void initTreeView();
+    void initTitleView();
+    void initConnection();
     QString getFileContent(QFile& file);
 
 signals:

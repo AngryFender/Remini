@@ -24,6 +24,8 @@ set(PROJECT_SOURCES
         views_handler.cpp
         mkedit.h
         mkedit.cpp
+        highlighter.h
+        highlighter.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

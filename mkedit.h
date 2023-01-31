@@ -5,14 +5,12 @@
 #include <QObject>
 #include <QWidget>
 #include <QPainter>
+#include <Highlighter.h>
+#include <QRegularExpressionMatch>
+#include <QtGui>
 
-
-#define TITLE_X 15
-#define TITLE_Y 15
-#define TITLE_SIZE 14
-
-#define TEXT_X 25
-#define TEXT_Y 30
+#define TEXT_X 0
+#define TEXT_Y 0
 #define TEXT_SIZE 10
 
 
@@ -21,25 +19,40 @@ class MkEdit : public QTextEdit
     Q_OBJECT
 public:
     MkEdit(QWidget *parent = nullptr):QTextEdit(parent){
-        pTitle.setX(TITLE_X);
-        pTitle.setY(TITLE_Y);
-        fTitle.setPointSize(TITLE_SIZE);
 
         rText.setTop(TEXT_Y);
         rText.setLeft(TEXT_X);
         rText.setSize(this->size());
         fText.setPointSize(TEXT_SIZE);
-    }
+        highlighter.setDocument(this->document());
 
+        setTabStopDistance(20);
+        regexCodeBlock.setPattern("^```$");
+        widthCodeBlock = this->width() - this->width()-10;
+        heightCodeBlock = this->height();
+        penCodeBlock.setColor(Qt::gray);
+        penCodeBlock.setWidth(1);
+    }
     void paintEvent(QPaintEvent *event);
-    void setTitle(QString title);
+    void keyPressEvent(QKeyEvent *event);
+    void resizeEvent(QResizeEvent *event);
+
+
+    void numberListDetect();
+    int numberListGetSpaces(const QString &text);
+    QString numberListGetNextNumber(const QString &text);
+
+    void codeBockDetect();
+
 private:
-    QString title;
-    QPoint pTitle;
-    QRect rTitle;
-    QFont fTitle;
+    QRegularExpression regexNumbering;
+    QRegularExpression regexCodeBlock;
+    Highlighter highlighter;
     QRect rText;
     QFont fText;
+    int widthCodeBlock;
+    int heightCodeBlock;
+    QPen penCodeBlock;
 };
 
 #endif // MKEDIT_H
