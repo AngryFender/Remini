@@ -1,17 +1,21 @@
 #ifndef MKEDIT_H
 #define MKEDIT_H
 
-#include <QTextEdit>
 #include <QObject>
 #include <QWidget>
 #include <QPainter>
 #include <Highlighter.h>
 #include <QRegularExpressionMatch>
-#include <QtGui>
+#include <QTextDocument>
+#include <QRubberBand>
 
 #define TEXT_X 0
 #define TEXT_Y 0
 #define TEXT_SIZE 10
+#define PADDING 10
+
+#define BLOCKRADIUS 6
+#define CODE_SIZE 10
 
 
 class MkEdit : public QTextEdit
@@ -20,18 +24,24 @@ class MkEdit : public QTextEdit
 public:
     MkEdit(QWidget *parent = nullptr):QTextEdit(parent){
 
-        rText.setTop(TEXT_Y);
-        rText.setLeft(TEXT_X);
-        rText.setSize(this->size());
+        setStyleSheet("QTextEdit { padding-left:10; padding-top:10; padding-bottom:10; padding-right:10}");
         fText.setPointSize(TEXT_SIZE);
-        highlighter.setDocument(this->document());
+
+        //highlighter.setDocument(this->document());
 
         setTabStopDistance(20);
-        regexCodeBlock.setPattern("^```$");
-        widthCodeBlock = this->width() - this->width()-10;
+        regexCodeBlock.setPattern("^```+.*");
+        regexStartBlock.setPattern("```[a-zA-Z0-9]+");
+        widthCodeBlock = this->width() - this->width()-10-PADDING;
         heightCodeBlock = this->height();
-        penCodeBlock.setColor(Qt::gray);
-        penCodeBlock.setWidth(1);
+
+        penCodeBlock.setWidthF(0.5);
+        penCodeBlock.setStyle(Qt::SolidLine);
+        penCodeBlock.setColor(QColor(194,201,207));
+
+        QObject::connect(this,SIGNAL(cursorPositionChanged()),
+                         this, SLOT(cursorPositionChanged()));
+
     }
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
@@ -47,12 +57,25 @@ public:
 private:
     QRegularExpression regexNumbering;
     QRegularExpression regexCodeBlock;
-    Highlighter highlighter;
-    QRect rText;
+    QRegularExpression regexStartBlock;
+    //Highlighter highlighter;
     QFont fText;
     int widthCodeBlock;
     int heightCodeBlock;
     QPen penCodeBlock;
+    int positionStartBlock;
+    int positionEndBlock;
+    QRubberBand *rb;
+
+    int savedBlockNumber;
+ public slots:
+    void cursorPositionChanged();
+
+public:
+signals:
+   void sendUpdateMkGui( QTextDocument *doc, int blockNumber);
+
+
 };
 
 #endif // MKEDIT_H

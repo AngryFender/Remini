@@ -27,17 +27,15 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     }
 
-    classFormat.setForeground(Qt::darkMagenta);
-    rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
-    rule.format = classFormat;
 
-    rule.format.setFontPointSize(15);
-    m_format = rule.format;
+    //rule.format.setFontPointSize(15);
+    m_format.setFontPointSize(15);
     highlightingRules.append(rule);
 
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::darkMagenta);
-    m_regex = QRegularExpression(QStringLiteral("#([A-Za-z0-9]+( [A-Za-z0-9]+)+)$"));
+//    m_regex =QRegularExpression(QStringLiteral("#[^\\s+#]+.*"));
+    m_regex =QRegularExpression(QStringLiteral("^#[^\\s#]+.*"));    //markdown heading 1
     rule.format = classFormat;
     rule.format.setFontPointSize(15);
     highlightingRules.append(rule);
@@ -67,6 +65,14 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     commentStartExpression = QRegularExpression(QStringLiteral("/\\*"));
     commentEndExpression = QRegularExpression(QStringLiteral("\\*/"));
+
+    headingFormat.setFontPointSize(1);
+    headingFormat.setForeground(Qt::white);
+
+    formatBlock.setFontPointSize(1);
+    formatBlock.setForeground(Qt::white);
+    regexCodeBlock.setPattern("^```+.*");
+
 }
 
 void Highlighter::highlightBlock(const QString &text)
@@ -104,7 +110,29 @@ void Highlighter::highlightBlock(const QString &text)
         QRegularExpressionMatch match = i.next();
         int start = match.capturedStart();
         int end = match.capturedEnd();
-        setFormat(start, 1, QColor(Qt::white));
+
+        setFormat(start, 1,headingFormat);
         setFormat(start+1, end - start, m_format);
     }
+
+
+//    bool cursorHide = this->document()->property("hideCursor").toBool();
+//    if(!cursorHide)
+//    {
+//        QRegularExpressionMatchIterator itMatchBlock = regexCodeBlock.globalMatch(text);
+//        while (itMatchBlock.hasNext())
+//        {
+//            QRegularExpressionMatch match = itMatchBlock.next();
+//            int start = match.capturedStart();
+//            int end = match.capturedEnd();
+
+//            setFormat(start, 3,headingFormat);
+//            setFormat(start+3, end - start, this->formatNormal);
+//        }
+//    }
+}
+
+void Highlighter::setView(QTextEdit *textEdit)
+{
+    this->textEdit = textEdit;
 }

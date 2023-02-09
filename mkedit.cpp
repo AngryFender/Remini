@@ -1,32 +1,60 @@
+#include "blockdata.h"
 #include "mkedit.h"
+
 
 void MkEdit::paintEvent(QPaintEvent *e)
 {
-
     QPainter painter(viewport());
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::NonCosmeticBrushPatterns);
 
     QTextBlock block = this->document()->begin();
     bool drawBlock = false;
     int xBlock, yBlock;
     while (block.isValid()) {
-        QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
-        if(matchCodeBlock.hasMatch()){
+        QTextBlockUserData* data =block.userData();
 
-            if(!drawBlock){
+        BlockData* blockData = static_cast<BlockData*>(data);
+        if(blockData){
+            if(blockData->getStart() == block.blockNumber()){
                 xBlock = block.layout()->position().x()-2;
                 yBlock = block.layout()->position().y();
-                drawBlock = true;
-            }else{
-                drawBlock = false;
+                positionStartBlock = block.blockNumber();
+            }
+
+            if(blockData->getFinish() == block.blockNumber()){
+                positionEndBlock = block.blockNumber();
                 int height = block.layout()->position().y() - yBlock +TEXT_SIZE;
                 painter.setPen(penCodeBlock);
-                painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,5,5);
+                painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
+                painter.drawLine(xBlock,yBlock+TEXT_SIZE+7,widthCodeBlock,yBlock+TEXT_SIZE+7);
             }
+
+//            if(!drawBlock){
+//                //this->document().
+//                xBlock = block.layout()->position().x()-2;
+//                yBlock = block.layout()->position().y();
+//                positionStartBlock = block.blockNumber();
+//                drawBlock = true;
+//            }else{
+//                drawBlock = false;
+//                positionEndBlock = block.blockNumber();
+//                int height = block.layout()->position().y() - yBlock +TEXT_SIZE;
+//                painter.setPen(penCodeBlock);
+//                painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
+//                painter.drawLine(xBlock,yBlock+TEXT_SIZE+7,widthCodeBlock,yBlock+TEXT_SIZE+7);
+//            }
         }
         block = block.next();
     }
     QTextEdit::paintEvent(e);
+    //this->document()->drawContents(&painter,this->frameRect());
+}
+
+void MkEdit::resizeEvent(QResizeEvent *event)
+{
+    QTextEdit::resizeEvent(event);
+    widthCodeBlock = this->width()-15-PADDING;
+    heightCodeBlock = this->height();
 }
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
@@ -37,13 +65,10 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
         numberListDetect();
         codeBockDetect();
     }
-}
 
-void MkEdit::resizeEvent(QResizeEvent *event)
-{
-    QTextEdit::resizeEvent(event);
-    widthCodeBlock = this->width()-15;
-    heightCodeBlock = this->height();
+//    else if((event->key() == Qt::Key_Up)|| (event->key() == Qt::Key_Down)){
+//        cursorPositionChanged();
+//    }
 }
 
 void MkEdit::numberListDetect()
@@ -94,20 +119,28 @@ QString MkEdit::numberListGetNextNumber(const QString &text)
 
 void MkEdit::codeBockDetect()
 {
+    QTextCursor cursor = textCursor();
+    int currentLineNumber = cursor.blockNumber();
+    QTextBlock currentLine = this->document()->findBlockByNumber(currentLineNumber-1);
+    QString lineText = currentLine.text();
 
+    QRegularExpressionMatch matchCodeBlock = regexStartBlock.match(lineText);
+    if(matchCodeBlock.hasMatch()){
+        cursor.insertText("```");
+    }
+}
 
+void MkEdit::cursorPositionChanged()
+{
 
-//    cursor.beginEditBlock();
-//    cursor.insertText("Your text here");
+    int currentBlockNumber = textCursor().blockNumber();
 
-//    QTextBlockFormat format;
-//    format.setTopBorder(1, Qt::SolidLine);
-//    format.setBottomBorder(1, Qt::SolidLine);
-//    format.setLeftBorder(1, Qt::SolidLine);
-//    format.setRightBorder(1, Qt::SolidLine);
+    if(savedBlockNumber != currentBlockNumber){
+        savedBlockNumber = currentBlockNumber;
+        emit sendUpdateMkGui( this->document(), currentBlockNumber);
+        this->update();
 
-//    cursor.setBlockFormat(format);
-//    cursor.endEditBlock();
+    }
 }
 
 

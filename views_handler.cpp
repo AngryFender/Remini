@@ -22,6 +22,10 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
 
     initTreeView();
     initTitleView();
+
+    viewText->setAttribute(Qt::WA_OpaquePaintEvent,false);
+    viewText->setDocument(&mkGuiDocument);
+    highlighter.setDocument(&mkGuiDocument);
 }
 
 void ViewsHandler::initTreeView()
@@ -43,6 +47,7 @@ void ViewsHandler::initTitleView()
     font.setPointSize( 18 );
     font.setWeight( QFont::Bold );
     viewTitle->setFont( font );
+    viewTitle->setStyleSheet("QLabel { padding-left:10; padding-right:10}");
 }
 
 void ViewsHandler::initConnection()
@@ -52,6 +57,10 @@ void ViewsHandler::initConnection()
 
     QObject::connect(viewText,SIGNAL(textChanged()),
                      this, SLOT(fileSave()));
+
+    QObject::connect(viewText,SIGNAL(sendUpdateMkGui( QTextDocument* , int)),
+                     &mkGuiDocument,SLOT(updateMkGui( QTextDocument* , int)));
+
 
 }
 
@@ -79,26 +88,34 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
         viewTree->expand(index);
     }
 
-    viewText->clear();
+    //viewText->clear();
     fileInfo = modelTree.fileInfo(index);
+    if (!fileInfo.isFile())
+        return;
+
     QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
     QString fullContent = getFileContent(*file.get());
-    viewText->setText(fullContent);
+
+    mkGuiDocument.clear();
+    mkGuiDocument.setPlainText(fullContent);
+    //mkDocument.duplicateMkTextDoc(&mkGuiDocument);
+    //viewText->setText(fullContent);
     viewTitle->setText(fileInfo.fileName());
     viewText->update();
 }
 
 void ViewsHandler::fileSave()
 {
-    if(!viewText->hasFocus())
-        return;
+//    if(!viewText->hasFocus())
+//        return;
 
-    QString fullContent = viewText->toPlainText();
-    QFile file(fileInfo.absoluteFilePath());
-    if(file.open(QFile::WriteOnly))
-    {
-        QTextStream stream(&file);
-        stream<<fullContent;
-        file.close();
-    }
+//    QString fullContent = viewText->toPlainText();
+//    //QString fullContent = mkGuiDocument.toPlainText();
+//    QFile file(fileInfo.absoluteFilePath());
+//    if(file.open(QFile::WriteOnly))
+//    {
+//        QTextStream stream(&file);
+//        stream<<fullContent;
+//        file.close();
+//    }
 }

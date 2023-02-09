@@ -1,5 +1,6 @@
 #ifndef VIEWS_HANDLER_H
 #define VIEWS_HANDLER_H
+#include <MkTextDocument.h>
 #include <QFileSystemModel>
 #include <QSharedPointer>
 #include <QTreeWidgetItem>
@@ -42,6 +43,8 @@ private:
     void initTitleView();
     void initConnection();
     QString getFileContent(QFile& file);
+    MkTextDocument mkGuiDocument;
+    Highlighter highlighter;
 
 signals:
     void load_text(QString text);

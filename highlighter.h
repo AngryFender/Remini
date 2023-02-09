@@ -4,17 +4,20 @@
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
 #include <QRegularExpression>
+#include <QTextEdit>
+#include <QTextDocument>
 
 class Highlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 public:
     explicit Highlighter(QTextDocument *parent = nullptr);
-
+    void setView(QTextEdit *view);
 protected:
     void highlightBlock(const QString &text) override;
-
 private:
+    QTextEdit *textEdit;
+
     struct HighlightingRule
     {
         QRegularExpression pattern;
@@ -27,6 +30,7 @@ private:
 
     QRegularExpression commentStartExpression;
     QRegularExpression commentEndExpression;
+    QRegularExpression regexCodeBlock;
 
     QTextCharFormat keywordFormat;
     QTextCharFormat classFormat;
@@ -34,6 +38,12 @@ private:
     QTextCharFormat multiLineCommentFormat;
     QTextCharFormat quotationFormat;
     QTextCharFormat functionFormat;
+    QTextCharFormat headingFormat;
+
+    QTextCharFormat formatBlock;
+    QTextCharFormat formatNormal;
+
+    QTextDocument *doc;
 };
 
 #endif // HIGHLIGHTER_H
