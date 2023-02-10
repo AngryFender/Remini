@@ -8,7 +8,7 @@
 #include <QRegularExpressionMatch>
 #include <QPageRanges>
 #include <blockdata.h>
-#include <QQueue>
+#include <codebox.h>
 class MkTextDocument : public QTextDocument
 {
     Q_OBJECT
@@ -17,6 +17,7 @@ public:
     void setPlainText(const QString &text);
 public slots:
     void  updateMkGui(QTextDocument *doc, int blockNumber);
+    void  KeyEnterPressedHandle(int blockNumber);
     //void updateGui();
 
  private:
@@ -25,7 +26,7 @@ public slots:
     BlockData blockData;
 
     void hideSymbols(QTextBlock block,const QString &symbol);
-    void showSymbols(QTextBlock block,const QString &symbol);
+    void showSymbols(CodeBox* blockData, QTextBlock block,const QString &symbol);
 };
 
 #endif // MKTEXTDOCUMENT_H

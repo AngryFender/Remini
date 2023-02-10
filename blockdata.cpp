@@ -2,44 +2,60 @@
 
 BlockData::BlockData()
 {
-    start = 0;
-    finish = 0;
+    guiId = 1;
 }
 
-void BlockData::insert(int cursorPosition, QString symbol)
+int BlockData::addCodeBox()
 {
-    data.insert(cursorPosition,symbol);
+    int id = codeBoxes.size() +1;
+    CodeBox box(id);
+    codeBoxes.push_back(box);
+    return id;
 }
 
-void BlockData::setRange(int start, int finish)
+CodeBox *BlockData::addCodeBoxBack()
 {
-    this->start = start;
-    this->finish = finish;
+    int id = codeBoxes.size() +1;
+    CodeBox box(id);
+    codeBoxes.push_back(box);
+    return &codeBoxes.back();
 }
 
-void BlockData::setStart(int start)
+CodeBox *BlockData::getCodeBox(int id)
 {
-    this->start = start;
-}
-void BlockData::setFinish(int finish)
-{
-    this->finish = finish;
-}
-
-int BlockData::getStart()
-{
-    QMutexLocker ml(&mMutex);
-    return start;
+    for(auto &box: codeBoxes){
+        if(id == box.getId()){
+            return &box;
+        }
+    }
+    return nullptr;
 }
 
-int BlockData::getFinish()
+CodeBox *BlockData::getGuiCodeBox()
 {
-    QMutexLocker ml(&mMutex);
-    return finish;
+    return getCodeBox(guiId);
 }
 
-QMap<int, QString> BlockData::getMap()
+void BlockData::removeCodeBox(int id)
 {
-    return data;
+
 }
+
+void BlockData::incrementGuiId()
+{
+    if(++guiId){
+        guiId = 1;
+    }
+}
+
+void BlockData::clear()
+{
+    codeBoxes.clear();
+}
+
+QVector<CodeBox> *BlockData::getBoxes()
+{
+    return &codeBoxes;
+}
+
 

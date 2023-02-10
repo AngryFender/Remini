@@ -17,21 +17,23 @@ void MkTextDocument::setPlainText(const QString &text)
         return;
 
     bool openBlock = false;
-    QQueue<QTextBlock> queBlocks;                                                           //list of all blocks inside the codeblock
+
+    int startNumber= 0;
+    CodeBox * codebox = nullptr;
     for(QTextBlock tBlock = this->begin(); tBlock != this->end(); tBlock = tBlock.next()){
 
         QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(tBlock.text());
         if(matchCodeBlock.hasMatch()){
             tBlock.setUserData(&blockData);
-            queBlocks.append(tBlock);
 
             if(!openBlock){
                 openBlock = true;
-                blockData.setStart(tBlock.blockNumber());
+                codebox = blockData.addCodeBoxBack();
+                codebox->setStart(tBlock.blockNumber());
             }
             else{
                 openBlock = false;
-                blockData.setFinish(tBlock.blockNumber());
+                codebox->setFinish(tBlock.blockNumber());
             }
 
             hideSymbols(tBlock,"```");
@@ -40,7 +42,6 @@ void MkTextDocument::setPlainText(const QString &text)
         else{
             if(openBlock){
                 tBlock.setUserData(&blockData);
-                queBlocks.append(tBlock);
             }
         }
     }
@@ -49,29 +50,41 @@ void MkTextDocument::setPlainText(const QString &text)
 void MkTextDocument::updateMkGui( QTextDocument *doc, int blockNumber)
 {
     qDebug()<<"blocknumber = "<<blockNumber;
-   if(doc->isEmpty())
+    if(doc->isEmpty())
         return;
-
-
-   QTextBlock block = this->findBlockByLineNumber(blockNumber);
-   QTextBlockUserData* data =block.userData();
-
-   BlockData* blockData = static_cast<BlockData*>(data);
-
-//   qDebug()<<blockData->getStart()<<" start and finish "<< blockData->getFinish();
-//   blockData.
-   if(blockData){
-
-        QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
-        if(matchCodeBlock.hasMatch()){
-            hideSymbols( block, "```");
+    QTextBlock tblock = this->begin();
+    CodeBox *box;
+    int codeId = 1;
+    while (tblock.isValid()) {
+        QTextBlockUserData* data =tblock.userData();
+        BlockData* blockData = dynamic_cast<BlockData*>(data);
+        if(blockData){
+            box = blockData->getCodeBox(codeId);
+            if(blockNumber >= box->getStart() && (blockNumber <= box->getFinish())){
+                showSymbols( box, tblock, "```");
+            }else{
+                hideSymbols( tblock, "```");
+            }
+            if(box->getFinish()==tblock.blockNumber()){
+                codeId++;
+            }
         }
-        else
-        {
-            showSymbols( block, "```");
-        }
-   }
+        tblock = tblock.next();
+    }
 }
+
+void MkTextDocument::KeyEnterPressedHandle(int blockNumber)
+{
+    qDebug()<<"Enter Key Pressed "<<blockNumber;
+    QTextBlock tblock = this->begin();
+    while (tblock.isValid()) {
+        QTextBlockUserData* data =tblock.userData();
+        BlockData* blockData = dynamic_cast<BlockData*>(data);
+        hideSymbols( tblock, "```");
+        tblock = tblock.next();
+    }
+}
+
 
 void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
 {
@@ -83,45 +96,28 @@ void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
     editCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     editCursor.removeSelectedText();
 
+    qDebug()<<"block text = " << block.text() <<" new text = "<< textBlock;
+
     editCursor.insertText(textBlock);
 }
 
-void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
+void MkTextDocument::showSymbols(CodeBox* blockData, QTextBlock block, const QString &symbol)
 {
-    QString newText= block.text().prepend(symbol);
+    //avoid prepending more than 3 ```
+    QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
+    if(matchCodeBlock.hasMatch()){
+        return;
+    }
+
+    //only prepending the start and end of the codeblocks
     QTextCursor editCursor(block);
-    editCursor.movePosition(QTextCursor::StartOfBlock);
-    editCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-    editCursor.removeSelectedText();
-
-    editCursor.insertText(newText);
+    if(blockData->getStart() == editCursor.blockNumber() ||
+       blockData->getFinish() == editCursor.blockNumber())
+    {
+        QString newText= block.text().prepend(symbol);
+        editCursor.movePosition(QTextCursor::StartOfBlock);
+        editCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        editCursor.removeSelectedText();
+        editCursor.insertText(newText);
+    }
 }
-
-
-
-//if(doc->isEmpty())
-//    return;
-
-//QTextCursor cursor(doc);
-//for(QTextBlock it = this->begin(); it != this->end(); it = it.next()){
-//    QString textBlock = it.text();
-//    QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(it.text());
-//    if(matchCodeBlock.hasMatch()){
-//        for(const auto &par: codeBlockPosList){
-//            if(par.contains(blockNumber)){
-
-//                for(int line = par.firstPage(); line <=par.lastPage();++line){
-//                    QTextBlock selectText = doc->findBlockByLineNumber(blockNumber);
-//                    QTextCursor selectCursor(selectText);
-//                    cursor.movePosition(QTextCursor::StartOfBlock);
-//                    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-//                    cursor.removeSelectedText();
-//                    cursor.insertText(textBlock);
-//                }
-//                break;
-//            }
-//        }
-//    }
-
-//}
-

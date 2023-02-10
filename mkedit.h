@@ -8,6 +8,8 @@
 #include <QRegularExpressionMatch>
 #include <QTextDocument>
 #include <QRubberBand>
+#include <codebox.h>
+#include <QMutex>
 
 #define TEXT_X 0
 #define TEXT_Y 0
@@ -68,12 +70,15 @@ private:
     QRubberBand *rb;
 
     int savedBlockNumber;
+
+    QMutex mutex;
  public slots:
     void cursorPositionChanged();
 
 public:
 signals:
-   void sendUpdateMkGui( QTextDocument *doc, int blockNumber);
+    void keyEnterPressed(int blockNumber);
+    void sendUpdateMkGui( QTextDocument *doc, int blockNumber);
 
 
 };

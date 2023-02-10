@@ -1,3 +1,4 @@
+
 #include "views_handler.h"
 
 #include <QTextStream>
@@ -60,6 +61,9 @@ void ViewsHandler::initConnection()
 
     QObject::connect(viewText,SIGNAL(sendUpdateMkGui( QTextDocument* , int)),
                      &mkGuiDocument,SLOT(updateMkGui( QTextDocument* , int)));
+
+    QObject::connect(viewText,SIGNAL(keyEnterPressed(int)),
+                     &mkGuiDocument,SLOT(KeyEnterPressedHandle(int )));
 
 
 }

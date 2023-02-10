@@ -10,44 +10,36 @@ void MkEdit::paintEvent(QPaintEvent *e)
     QTextBlock block = this->document()->begin();
     bool drawBlock = false;
     int xBlock, yBlock;
+    CodeBox *box = nullptr;
+
+    int codeId = 1;
     while (block.isValid()) {
+
         QTextBlockUserData* data =block.userData();
 
         BlockData* blockData = static_cast<BlockData*>(data);
         if(blockData){
-            if(blockData->getStart() == block.blockNumber()){
+            blockData->getBoxes();
+
+            box = blockData->getCodeBox(codeId);
+            if(box->getStart() == block.blockNumber()){
                 xBlock = block.layout()->position().x()-2;
                 yBlock = block.layout()->position().y();
                 positionStartBlock = block.blockNumber();
             }
 
-            if(blockData->getFinish() == block.blockNumber()){
+            if(box->getFinish() == block.blockNumber()){
                 positionEndBlock = block.blockNumber();
-                int height = block.layout()->position().y() - yBlock +TEXT_SIZE;
+                int height = block.layout()->position().y() - yBlock +(int)TEXT_SIZE;
                 painter.setPen(penCodeBlock);
                 painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
                 painter.drawLine(xBlock,yBlock+TEXT_SIZE+7,widthCodeBlock,yBlock+TEXT_SIZE+7);
+                codeId++;
             }
-
-//            if(!drawBlock){
-//                //this->document().
-//                xBlock = block.layout()->position().x()-2;
-//                yBlock = block.layout()->position().y();
-//                positionStartBlock = block.blockNumber();
-//                drawBlock = true;
-//            }else{
-//                drawBlock = false;
-//                positionEndBlock = block.blockNumber();
-//                int height = block.layout()->position().y() - yBlock +TEXT_SIZE;
-//                painter.setPen(penCodeBlock);
-//                painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
-//                painter.drawLine(xBlock,yBlock+TEXT_SIZE+7,widthCodeBlock,yBlock+TEXT_SIZE+7);
-//            }
         }
         block = block.next();
     }
     QTextEdit::paintEvent(e);
-    //this->document()->drawContents(&painter,this->frameRect());
 }
 
 void MkEdit::resizeEvent(QResizeEvent *event)
@@ -59,16 +51,17 @@ void MkEdit::resizeEvent(QResizeEvent *event)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
-    QTextEdit::keyPressEvent(event);
-    if( (event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return))
+//    if( (event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return))
     {
-        numberListDetect();
-        codeBockDetect();
+        int currentBlockNumber = textCursor().blockNumber();
+//        emit keyEnterPressed(currentBlockNumber);
+//        numberListDetect();
+//        codeBockDetect();
     }
 
-//    else if((event->key() == Qt::Key_Up)|| (event->key() == Qt::Key_Down)){
-//        cursorPositionChanged();
-//    }
+    QTextEdit::keyPressEvent(event);
+
+
 }
 
 void MkEdit::numberListDetect()
@@ -132,7 +125,7 @@ void MkEdit::codeBockDetect()
 
 void MkEdit::cursorPositionChanged()
 {
-
+    qDebug()<<" Cursor Position Changed";
     int currentBlockNumber = textCursor().blockNumber();
 
     if(savedBlockNumber != currentBlockNumber){

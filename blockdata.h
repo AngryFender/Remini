@@ -3,24 +3,31 @@
 
 #include <QMutex>
 #include <QTextBlockUserData>
+#include <QVectorIterator>
+#include <codebox.h>
 
 class BlockData : public QTextBlockUserData
 {
 public:
     BlockData();
-    void insert(int cursorPosition, QString symbol);
-    void setRange(int start, int finish);
-    void setStart(int start);
-    void setFinish(int finish);
+    int addCodeBox();
+    CodeBox *addCodeBoxBack();
+    CodeBox *getCodeBox(int id);
+    CodeBox *getGuiCodeBox();
 
-    int getStart();
-    int getFinish();
-    QMap<int, QString> getMap();
+    void removeCodeBox(int id);
+
+    void incrementGuiId();
+    void clear();
+
+    QVector<CodeBox> *getBoxes();
+
+
 private:
-    QMap<int, QString> data;
-    int start;
-    int finish;
-    QMutex mMutex;
+    QVector<CodeBox> codeBoxes;
+    int guiId;
+
+
 };
 
 #endif // BLOCKDATA_H
