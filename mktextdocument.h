@@ -21,12 +21,19 @@ public slots:
     //void updateGui();
 
  private:
+    struct CheckBlock{
+        int start = 0;
+        int end = 0;
+    };
+
     QRegularExpression regexCodeBlock;
     QList<QPageRanges> codeBlockPosList;
-    BlockData blockData;
 
+    void showCursoredBlock(int blockNumber, int start, int end, const QString &symbol);
     void hideSymbols(QTextBlock block,const QString &symbol);
-    void showSymbols(CodeBox* blockData, QTextBlock block,const QString &symbol);
+    void showSymbols(QTextBlock block,const QString &symbol);
+
+
 };
 
 #endif // MKTEXTDOCUMENT_H

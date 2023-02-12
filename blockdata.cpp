@@ -2,60 +2,28 @@
 
 BlockData::BlockData()
 {
-    guiId = 1;
+    status = content;
+    show = false;
 }
 
-int BlockData::addCodeBox()
+BlockData::statusID BlockData::getStatus() const
 {
-    int id = codeBoxes.size() +1;
-    CodeBox box(id);
-    codeBoxes.push_back(box);
-    return id;
+    return status;
 }
 
-CodeBox *BlockData::addCodeBoxBack()
+void BlockData::setStatus(statusID newStatus)
 {
-    int id = codeBoxes.size() +1;
-    CodeBox box(id);
-    codeBoxes.push_back(box);
-    return &codeBoxes.back();
+    status = newStatus;
 }
 
-CodeBox *BlockData::getCodeBox(int id)
+bool BlockData::isShowing()
 {
-    for(auto &box: codeBoxes){
-        if(id == box.getId()){
-            return &box;
-        }
-    }
-    return nullptr;
+    return show;
 }
 
-CodeBox *BlockData::getGuiCodeBox()
+void BlockData::showNow(bool show)
 {
-    return getCodeBox(guiId);
-}
-
-void BlockData::removeCodeBox(int id)
-{
-
-}
-
-void BlockData::incrementGuiId()
-{
-    if(++guiId){
-        guiId = 1;
-    }
-}
-
-void BlockData::clear()
-{
-    codeBoxes.clear();
-}
-
-QVector<CodeBox> *BlockData::getBoxes()
-{
-    return &codeBoxes;
+    this->show = show;
 }
 
 

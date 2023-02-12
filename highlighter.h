@@ -12,6 +12,8 @@ class Highlighter : public QSyntaxHighlighter
     Q_OBJECT
 public:
     explicit Highlighter(QTextDocument *parent = nullptr);
+
+
     void setView(QTextEdit *view);
 protected:
     void highlightBlock(const QString &text) override;

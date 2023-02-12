@@ -10,6 +10,7 @@
 #include <QRubberBand>
 #include <codebox.h>
 #include <QMutex>
+#include <mktextdocument.h>
 
 #define TEXT_X 0
 #define TEXT_Y 0
@@ -70,13 +71,14 @@ private:
     QRubberBand *rb;
 
     int savedBlockNumber;
-
+    MkTextDocument defaultDoc;
     QMutex mutex;
  public slots:
     void cursorPositionChanged();
 
 public:
 signals:
+
     void keyEnterPressed(int blockNumber);
     void sendUpdateMkGui( QTextDocument *doc, int blockNumber);
 

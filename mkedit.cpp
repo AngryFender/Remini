@@ -15,20 +15,21 @@ void MkEdit::paintEvent(QPaintEvent *e)
     int codeId = 1;
     while (block.isValid()) {
 
+        if(!block.userData()){
+            block = block.next();
+            continue;
+        }
         QTextBlockUserData* data =block.userData();
 
         BlockData* blockData = static_cast<BlockData*>(data);
         if(blockData){
-            blockData->getBoxes();
-
-            box = blockData->getCodeBox(codeId);
-            if(box->getStart() == block.blockNumber()){
+            if(blockData->getStatus()==BlockData::start){
                 xBlock = block.layout()->position().x()-2;
                 yBlock = block.layout()->position().y();
                 positionStartBlock = block.blockNumber();
             }
 
-            if(box->getFinish() == block.blockNumber()){
+            if(blockData->getStatus()==BlockData::end){
                 positionEndBlock = block.blockNumber();
                 int height = block.layout()->position().y() - yBlock +(int)TEXT_SIZE;
                 painter.setPen(penCodeBlock);
@@ -51,16 +52,16 @@ void MkEdit::resizeEvent(QResizeEvent *event)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
-//    if( (event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return))
+
+    if( (event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return))
     {
-        int currentBlockNumber = textCursor().blockNumber();
-//        emit keyEnterPressed(currentBlockNumber);
+        //int currentBlockNumber = textCursor().blockNumber();
+//        emit keyEnterPressed(textCursor().blockNumber());
 //        numberListDetect();
 //        codeBockDetect();
     }
 
     QTextEdit::keyPressEvent(event);
-
 
 }
 

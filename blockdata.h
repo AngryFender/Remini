@@ -9,25 +9,21 @@
 class BlockData : public QTextBlockUserData
 {
 public:
+    enum statusID{
+        start,
+        content,
+        end
+    } ;
+
     BlockData();
-    int addCodeBox();
-    CodeBox *addCodeBoxBack();
-    CodeBox *getCodeBox(int id);
-    CodeBox *getGuiCodeBox();
-
-    void removeCodeBox(int id);
-
-    void incrementGuiId();
-    void clear();
-
-    QVector<CodeBox> *getBoxes();
-
+    statusID getStatus() const;
+    void setStatus(statusID newStatus);
+    bool isShowing();
+    void showNow(bool show);
 
 private:
-    QVector<CodeBox> codeBoxes;
-    int guiId;
-
-
+    statusID status;
+    bool show;
 };
 
 #endif // BLOCKDATA_H
