@@ -10,17 +10,10 @@ void MkEdit::paintEvent(QPaintEvent *e)
     QTextBlock block = this->document()->begin();
     bool drawBlock = false;
     int xBlock, yBlock;
-    CodeBox *box = nullptr;
 
     int codeId = 1;
     while (block.isValid()) {
-
-        if(!block.userData()){
-            block = block.next();
-            continue;
-        }
         QTextBlockUserData* data =block.userData();
-
         BlockData* blockData = static_cast<BlockData*>(data);
         if(blockData){
             if(blockData->getStatus()==BlockData::start){
@@ -52,17 +45,10 @@ void MkEdit::resizeEvent(QResizeEvent *event)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
-
-    if( (event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return))
-    {
-        //int currentBlockNumber = textCursor().blockNumber();
-//        emit keyEnterPressed(textCursor().blockNumber());
-//        numberListDetect();
-//        codeBockDetect();
-    }
-
     QTextEdit::keyPressEvent(event);
-
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return){
+        numberListDetect();
+    }
 }
 
 void MkEdit::numberListDetect()
@@ -126,12 +112,11 @@ void MkEdit::codeBockDetect()
 
 void MkEdit::cursorPositionChanged()
 {
-    qDebug()<<" Cursor Position Changed";
     int currentBlockNumber = textCursor().blockNumber();
 
     if(savedBlockNumber != currentBlockNumber){
         savedBlockNumber = currentBlockNumber;
-        emit sendUpdateMkGui( this->document(), currentBlockNumber);
+        emit cursorPosChanged( this->document(), currentBlockNumber);
         this->update();
 
     }

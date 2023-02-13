@@ -8,7 +8,7 @@
 #include <QRegularExpressionMatch>
 #include <QPageRanges>
 #include <blockdata.h>
-#include <codebox.h>
+
 class MkTextDocument : public QTextDocument
 {
     Q_OBJECT
@@ -16,9 +16,8 @@ public:
     explicit MkTextDocument(QObject *parent = nullptr);
     void setPlainText(const QString &text);
 public slots:
-    void  updateMkGui(QTextDocument *doc, int blockNumber);
+    void  cursorPosChangedHandle(QTextDocument *doc, int blockNumber);
     void  KeyEnterPressedHandle(int blockNumber);
-    //void updateGui();
 
  private:
     struct CheckBlock{

@@ -59,8 +59,8 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,SIGNAL(textChanged()),
                      this, SLOT(fileSave()));
 
-    QObject::connect(viewText,SIGNAL(sendUpdateMkGui( QTextDocument* , int)),
-                     &mkGuiDocument,SLOT(updateMkGui( QTextDocument* , int)));
+    QObject::connect(viewText,SIGNAL(cursorPosChanged( QTextDocument* , int)),
+                     &mkGuiDocument,SLOT(cursorPosChangedHandle( QTextDocument* , int)));
 
     QObject::connect(viewText,SIGNAL(keyEnterPressed(int)),
                      &mkGuiDocument,SLOT(KeyEnterPressedHandle(int )));

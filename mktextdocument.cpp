@@ -29,14 +29,16 @@ void MkTextDocument::setPlainText(const QString &text)
             if(!openBlock){
                 openBlock = true;
                 blockData->setStatus(BlockData::start);
+                qDebug()<<"Start Block number = "<< tBlock.blockNumber() << tBlock.text();
             }
             else{
                 openBlock = false;
                 blockData->setStatus(BlockData::end);
+                qDebug()<<"End Block number = "<< tBlock.blockNumber() << tBlock.text();
             }
 
             hideSymbols(tBlock,"```");
-            qDebug()<<"Block number = "<< tBlock.blockNumber() << tBlock.text();
+
         }
         else{
             if(openBlock){
@@ -45,18 +47,17 @@ void MkTextDocument::setPlainText(const QString &text)
                 tBlock.setUserData(blockData);
             }
         }
+
     }
 }
 
-void MkTextDocument::updateMkGui( QTextDocument *doc, int blockNumber)
+void MkTextDocument::cursorPosChangedHandle( QTextDocument *doc, int blockNumber)
 {
-    qDebug()<<"blocknumber = "<<blockNumber;
     if(doc->isEmpty())
         return;
 
     QTextBlock tblock = this->begin();
     CheckBlock checkBlock;
-
 
     while (tblock.isValid()) {
         QTextBlockUserData* data =tblock.userData();
@@ -70,9 +71,15 @@ void MkTextDocument::updateMkGui( QTextDocument *doc, int blockNumber)
             else if(blockData->getStatus()==BlockData::end)
             {
                 checkBlock.end = tblock.blockNumber();
-                showCursoredBlock(blockNumber, checkBlock.start, checkBlock.end, "```");
+                if(blockNumber >= checkBlock.start && blockNumber <= checkBlock.end){
+                    showSymbols(this->findBlockByNumber(checkBlock.start), "```");
+                    showSymbols(this->findBlockByNumber(checkBlock.end), "```");
+                }
+                else{
+                    hideSymbols(this->findBlockByNumber(checkBlock.start),"```");
+                    hideSymbols(this->findBlockByNumber(checkBlock.end),"```");
+                }
             }
-
         }
         tblock = tblock.next();
     }
@@ -100,16 +107,15 @@ void MkTextDocument::showCursoredBlock(int blockNumber, int start, int end, cons
         return;
     }
 
-    if(blockNumber <start){
-        return;
+    if(blockNumber >= start && blockNumber <= end){
+            showSymbols(this->findBlock(start), symbol);
+            showSymbols(this->findBlock(end), symbol);
     }
-
-    if(blockNumber <end){
-        return;
-    }
-
-    for(int blockNo = start; blockNo <= end; blockNo ++){
-        showSymbols(this->findBlock(blockNo), symbol);
+    else{
+        QTextBlock startBlock = this->findBlock(start);
+        QTextBlock endBlock = this->findBlock(end);
+            hideSymbols(startBlock,symbol);
+            hideSymbols(endBlock,symbol);
     }
 }
 
@@ -123,8 +129,6 @@ void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
     editCursor.movePosition(QTextCursor::StartOfBlock);
     editCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     editCursor.removeSelectedText();
-
-    qDebug()<<"block text = " << block.text() <<" new text = "<< textBlock;
 
     editCursor.insertText(textBlock);
 }

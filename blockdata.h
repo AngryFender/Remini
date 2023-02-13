@@ -4,7 +4,6 @@
 #include <QMutex>
 #include <QTextBlockUserData>
 #include <QVectorIterator>
-#include <codebox.h>
 
 class BlockData : public QTextBlockUserData
 {

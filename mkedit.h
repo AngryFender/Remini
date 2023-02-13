@@ -8,7 +8,6 @@
 #include <QRegularExpressionMatch>
 #include <QTextDocument>
 #include <QRubberBand>
-#include <codebox.h>
 #include <QMutex>
 #include <mktextdocument.h>
 
@@ -29,8 +28,6 @@ public:
 
         setStyleSheet("QTextEdit { padding-left:10; padding-top:10; padding-bottom:10; padding-right:10}");
         fText.setPointSize(TEXT_SIZE);
-
-        //highlighter.setDocument(this->document());
 
         setTabStopDistance(20);
         regexCodeBlock.setPattern("^```+.*");
@@ -61,7 +58,6 @@ private:
     QRegularExpression regexNumbering;
     QRegularExpression regexCodeBlock;
     QRegularExpression regexStartBlock;
-    //Highlighter highlighter;
     QFont fText;
     int widthCodeBlock;
     int heightCodeBlock;
@@ -80,7 +76,7 @@ public:
 signals:
 
     void keyEnterPressed(int blockNumber);
-    void sendUpdateMkGui( QTextDocument *doc, int blockNumber);
+    void cursorPosChanged( QTextDocument *doc, int blockNumber);
 
 
 };
