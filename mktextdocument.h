@@ -15,10 +15,11 @@ class MkTextDocument : public QTextDocument
 public:
     explicit MkTextDocument(QObject *parent = nullptr);
     void setPlainText(const QString &text);
+    QString toPlainText();
 public slots:
-    void  cursorPosChangedHandle(QTextDocument *doc, int blockNumber);
-    void  KeyEnterPressedHandle(int blockNumber);
-
+    void cursorPosChangedHandle(bool hasSelection, int blockNumber);
+    void showAllCodeBlocksHandle();
+    void hideAllCodeBlocksHandle(bool hasSelection, int blockNumber);
  private:
     struct CheckBlock{
         int start = 0;
@@ -27,11 +28,11 @@ public slots:
 
     QRegularExpression regexCodeBlock;
     QList<QPageRanges> codeBlockPosList;
+    int cursorPosition;
 
     void showCursoredBlock(int blockNumber, int start, int end, const QString &symbol);
     void hideSymbols(QTextBlock block,const QString &symbol);
     void showSymbols(QTextBlock block,const QString &symbol);
-
 
 };
 

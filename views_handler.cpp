@@ -56,15 +56,17 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, SIGNAL(pressed(QModelIndex)),
                       this, SLOT(fileDisplay(QModelIndex)));
 
-    QObject::connect(viewText,SIGNAL(textChanged()),
+    QObject::connect(viewText,SIGNAL(contentChanged()),
                      this, SLOT(fileSave()));
 
-    QObject::connect(viewText,SIGNAL(cursorPosChanged( QTextDocument* , int)),
-                     &mkGuiDocument,SLOT(cursorPosChangedHandle( QTextDocument* , int)));
+    QObject::connect(viewText,SIGNAL(cursorPosChanged(bool,int)),
+                     &mkGuiDocument,SLOT(cursorPosChangedHandle(bool,int)));
 
-    QObject::connect(viewText,SIGNAL(keyEnterPressed(int)),
-                     &mkGuiDocument,SLOT(KeyEnterPressedHandle(int )));
+    QObject::connect(viewText,SIGNAL(showAllCodeBlocks()),
+                     &mkGuiDocument,SLOT(showAllCodeBlocksHandle()));
 
+    QObject::connect(viewText,SIGNAL(hideAllCodeBlocks(bool,int)),
+                     &mkGuiDocument,SLOT(hideAllCodeBlocksHandle(bool,int)));
 
 }
 
@@ -110,16 +112,16 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
 
 void ViewsHandler::fileSave()
 {
-//    if(!viewText->hasFocus())
-//        return;
+    if(!viewText->hasFocus())
+        return;
 
-//    QString fullContent = viewText->toPlainText();
-//    //QString fullContent = mkGuiDocument.toPlainText();
-//    QFile file(fileInfo.absoluteFilePath());
-//    if(file.open(QFile::WriteOnly))
-//    {
-//        QTextStream stream(&file);
-//        stream<<fullContent;
-//        file.close();
-//    }
+    QString fullContent = viewText->toPlainText();
+    //QString fullContent = mkGuiDocument.toPlainText();
+    QFile file(fileInfo.absoluteFilePath());
+    if(file.open(QFile::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream<<fullContent;
+        file.close();
+    }
 }

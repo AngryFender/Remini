@@ -43,12 +43,26 @@ void MkEdit::resizeEvent(QResizeEvent *event)
     heightCodeBlock = this->height();
 }
 
+QString MkEdit::toPlainText()
+{
+    int cursorPosition = this->textCursor().position();
+
+    emit showAllCodeBlocks();
+    QString content = QTextEdit::toPlainText();
+
+    emit hideAllCodeBlocks( textCursor().hasSelection(), textCursor().blockNumber());
+    this->textCursor().setPosition(cursorPosition);
+
+    return content;
+}
+
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
     QTextEdit::keyPressEvent(event);
     if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return){
         numberListDetect();
     }
+    emit contentChanged();
 }
 
 void MkEdit::numberListDetect()
@@ -110,16 +124,20 @@ void MkEdit::codeBockDetect()
     }
 }
 
-void MkEdit::cursorPositionChanged()
+void MkEdit::cursorPositionChangedHandle()
 {
     int currentBlockNumber = textCursor().blockNumber();
 
     if(savedBlockNumber != currentBlockNumber){
         savedBlockNumber = currentBlockNumber;
-        emit cursorPosChanged( this->document(), currentBlockNumber);
+        emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber);
         this->update();
-
     }
+}
+
+void MkEdit::textChangedHandle()
+{
+
 }
 
 

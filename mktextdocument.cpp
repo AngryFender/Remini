@@ -51,9 +51,34 @@ void MkTextDocument::setPlainText(const QString &text)
     }
 }
 
-void MkTextDocument::cursorPosChangedHandle( QTextDocument *doc, int blockNumber)
+QString MkTextDocument::toPlainText()
 {
-    if(doc->isEmpty())
+
+    QTextBlock tblock = this->begin();
+    int currentBlockNumber = this->cursorPosition;
+
+    //show all ```
+    while (tblock.isValid()) {
+        QTextBlockUserData* data =tblock.userData();
+        BlockData* blockData = dynamic_cast<BlockData*>(data);
+        if(blockData)
+        {
+            if(blockData->getStatus()==BlockData::start || blockData->getStatus()==BlockData::end)
+            {
+                showSymbols(tblock, "```");
+            }
+        }
+        tblock = tblock.next();
+    }
+
+    QString contents = QTextDocument::toPlainText();
+
+    return contents;
+}
+
+void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
+{
+    if(this->isEmpty())
         return;
 
     QTextBlock tblock = this->begin();
@@ -76,8 +101,10 @@ void MkTextDocument::cursorPosChangedHandle( QTextDocument *doc, int blockNumber
                     showSymbols(this->findBlockByNumber(checkBlock.end), "```");
                 }
                 else{
-                    hideSymbols(this->findBlockByNumber(checkBlock.start),"```");
-                    hideSymbols(this->findBlockByNumber(checkBlock.end),"```");
+                    if(!hasSelection){
+                        hideSymbols(this->findBlockByNumber(checkBlock.start),"```");
+                        hideSymbols(this->findBlockByNumber(checkBlock.end),"```");
+                    }
                 }
             }
         }
@@ -85,20 +112,28 @@ void MkTextDocument::cursorPosChangedHandle( QTextDocument *doc, int blockNumber
     }
 }
 
-void MkTextDocument::KeyEnterPressedHandle(int blockNumber)
+void MkTextDocument::showAllCodeBlocksHandle()
 {
-    qDebug()<<"Enter Key Pressed "<<blockNumber;
-//    QTextBlock tblock = this->begin();
-//    this->clear();
-//    while (tblock.isValid()) {
-////        QTextBlockUserData* data =tblock.userData();
-//        QTextBlockUserData *d=  tblock.userData();
+    QTextBlock tblock = this->begin();
 
-////        updateMkGui( this, blockNumber);
-//        //BlockData* blockData = dynamic_cast<BlockData*>(data);
+    //show all ```
+    while (tblock.isValid()) {
+        QTextBlockUserData* data =tblock.userData();
+        BlockData* blockData = dynamic_cast<BlockData*>(data);
+        if(blockData)
+        {
+            if(blockData->getStatus()==BlockData::start || blockData->getStatus()==BlockData::end)
+            {
+                showSymbols(tblock, "```");
+            }
+        }
+        tblock = tblock.next();
+    }
+}
 
-//        tblock = tblock.next();
-    //    }
+void MkTextDocument::hideAllCodeBlocksHandle(bool hasSelection, int blockNumber)
+{
+    cursorPosChangedHandle(hasSelection, blockNumber);
 }
 
 void MkTextDocument::showCursoredBlock(int blockNumber, int start, int end, const QString &symbol)

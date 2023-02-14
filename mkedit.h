@@ -40,13 +40,16 @@ public:
         penCodeBlock.setColor(QColor(194,201,207));
 
         QObject::connect(this,SIGNAL(cursorPositionChanged()),
-                         this, SLOT(cursorPositionChanged()));
+                         this, SLOT(cursorPositionChangedHandle()));
+
+        QObject::connect(this,SIGNAL(textChanged()),
+                         this, SLOT(textChangedHandle()));
 
     }
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *event);
-
+    QString toPlainText();
 
     void numberListDetect();
     int numberListGetSpaces(const QString &text);
@@ -64,20 +67,20 @@ private:
     QPen penCodeBlock;
     int positionStartBlock;
     int positionEndBlock;
-    QRubberBand *rb;
 
     int savedBlockNumber;
-    MkTextDocument defaultDoc;
-    QMutex mutex;
- public slots:
-    void cursorPositionChanged();
 
-public:
+ public slots:
+    void cursorPositionChangedHandle();
+    void textChangedHandle();
+
+ public:
 signals:
 
-    void keyEnterPressed(int blockNumber);
-    void cursorPosChanged( QTextDocument *doc, int blockNumber);
-
+    void cursorPosChanged(bool hasSelection, int blockNumber );
+    void contentChanged();
+    void showAllCodeBlocks();
+    void hideAllCodeBlocks(bool hasSelection, int blockNumber );
 
 };
 
