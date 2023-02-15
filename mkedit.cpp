@@ -1,4 +1,5 @@
 #include "blockdata.h"
+#include "linedata.h"
 #include "mkedit.h"
 
 
@@ -9,12 +10,12 @@ void MkEdit::paintEvent(QPaintEvent *e)
 
     QTextBlock block = this->document()->begin();
     bool drawBlock = false;
-    int xBlock, yBlock;
+    int xBlock =0, yBlock =0;
 
     int codeId = 1;
     while (block.isValid()) {
         QTextBlockUserData* data =block.userData();
-        BlockData* blockData = static_cast<BlockData*>(data);
+        BlockData* blockData = dynamic_cast<BlockData*>(data);
         if(blockData){
             if(blockData->getStatus()==BlockData::start){
                 xBlock = block.layout()->position().x()-2;
@@ -24,11 +25,22 @@ void MkEdit::paintEvent(QPaintEvent *e)
 
             if(blockData->getStatus()==BlockData::end){
                 positionEndBlock = block.blockNumber();
-                int height = block.layout()->position().y() - yBlock +(int)TEXT_SIZE;
+                int height = block.layout()->position().y() - yBlock + TEXT_SIZE;
                 painter.setPen(penCodeBlock);
                 painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
                 painter.drawLine(xBlock,yBlock+TEXT_SIZE+7,widthCodeBlock,yBlock+TEXT_SIZE+7);
                 codeId++;
+            }
+        }else{
+            LineData* lineData = dynamic_cast<LineData*>(data);
+            if(lineData){
+                if(lineData->getStatus() == LineData::horizontalLine){
+                    int lineX1 = block.layout()->position().x()-2;
+                    int lineY1 = block.layout()->position().y()+(TEXT_SIZE*4/3);
+                    int lineX2 = block.layout()->position().x()-2+widthCodeBlock;
+                    painter.setPen(penCodeBlock);
+                    painter.drawLine(lineX1,lineY1,lineX2,lineY1);
+                }
             }
         }
         block = block.next();

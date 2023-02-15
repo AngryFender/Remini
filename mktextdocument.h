@@ -8,6 +8,7 @@
 #include <QRegularExpressionMatch>
 #include <QPageRanges>
 #include <blockdata.h>
+#include <linedata.h>
 
 class MkTextDocument : public QTextDocument
 {
@@ -27,6 +28,7 @@ public slots:
     };
 
     QRegularExpression regexCodeBlock;
+    QRegularExpression regexHorizontalLine;
     QList<QPageRanges> codeBlockPosList;
     int cursorPosition;
 

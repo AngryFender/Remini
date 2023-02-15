@@ -4,9 +4,8 @@ MkTextDocument::MkTextDocument(QObject *parent)
     : QTextDocument{parent}
 {
     regexCodeBlock.setPattern("```");
-//    QObject::connect(this,SIGNAL(textChanged()),
-//                     this, SLOT(fileSave()));
-
+    regexHorizontalLine.setPattern("---");
+//    regexHorizontalLine.setPattern("/---\\s*.*[^\\s]/");
 }
 
 void MkTextDocument::setPlainText(const QString &text)
@@ -36,7 +35,6 @@ void MkTextDocument::setPlainText(const QString &text)
                 blockData->setStatus(BlockData::end);
                 qDebug()<<"End Block number = "<< tBlock.blockNumber() << tBlock.text();
             }
-
             hideSymbols(tBlock,"```");
 
         }
@@ -45,17 +43,22 @@ void MkTextDocument::setPlainText(const QString &text)
                 BlockData *blockData = new BlockData;
                 blockData->setStatus(BlockData::content);
                 tBlock.setUserData(blockData);
+            }else{
+                QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
+                if(matchHorizontalLine.hasMatch()){
+                    LineData *lineData = new LineData;
+                    lineData->setStatus(LineData::horizontalLine);
+                    tBlock.setUserData(lineData);
+                    hideSymbols(tBlock,lineData->getSymbol());
+                }
             }
         }
-
     }
 }
 
 QString MkTextDocument::toPlainText()
 {
-
     QTextBlock tblock = this->begin();
-    int currentBlockNumber = this->cursorPosition;
 
     //show all ```
     while (tblock.isValid()) {
@@ -68,11 +71,17 @@ QString MkTextDocument::toPlainText()
                 showSymbols(tblock, "```");
             }
         }
+        else
+        {
+            LineData* lineData = dynamic_cast<LineData*>(data);
+            if(lineData){
+                showSymbols(tblock, lineData->getSymbol());
+            }
+        }
         tblock = tblock.next();
     }
 
     QString contents = QTextDocument::toPlainText();
-
     return contents;
 }
 
@@ -108,6 +117,18 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
                 }
             }
         }
+        else{
+            LineData* lineData = dynamic_cast<LineData*>(data);
+            if(lineData){
+                if(blockNumber == tblock.blockNumber()){
+                    showSymbols(tblock, lineData->getSymbol());
+                }else{
+                    if(!hasSelection){
+                        hideSymbols(tblock, lineData->getSymbol());
+                    }
+                }
+            }
+        }
         tblock = tblock.next();
     }
 }
@@ -125,6 +146,11 @@ void MkTextDocument::showAllCodeBlocksHandle()
             if(blockData->getStatus()==BlockData::start || blockData->getStatus()==BlockData::end)
             {
                 showSymbols(tblock, "```");
+            }
+        }else{
+            LineData* lineData = dynamic_cast<LineData*>(data);
+            if(lineData){
+                showSymbols(tblock, lineData->getSymbol());
             }
         }
         tblock = tblock.next();
@@ -158,7 +184,8 @@ void MkTextDocument::showCursoredBlock(int blockNumber, int start, int end, cons
 void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
 {
     QString textBlock = block.text();
-    textBlock.replace(regexCodeBlock,"");
+    QRegularExpression regex(symbol);
+    textBlock.replace(regex,"");
 
     QTextCursor editCursor(block);
     editCursor.movePosition(QTextCursor::StartOfBlock);
@@ -171,7 +198,8 @@ void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
 void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
 {
     //avoid prepending more than 3 ```
-    QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
+    QRegularExpression regex(symbol);
+    QRegularExpressionMatch matchCodeBlock = regex.match(block.text());
     if(matchCodeBlock.hasMatch()){
         return;
     }

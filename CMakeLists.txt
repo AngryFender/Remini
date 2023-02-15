@@ -29,6 +29,8 @@ set(PROJECT_SOURCES
         mktextdocument.cpp
         blockdata.h
         blockdata.cpp
+        linedata.h
+        linedata.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

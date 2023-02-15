@@ -3,7 +3,6 @@
 BlockData::BlockData()
 {
     status = content;
-    show = false;
 }
 
 BlockData::statusID BlockData::getStatus() const
@@ -15,15 +14,3 @@ void BlockData::setStatus(statusID newStatus)
 {
     status = newStatus;
 }
-
-bool BlockData::isShowing()
-{
-    return show;
-}
-
-void BlockData::showNow(bool show)
-{
-    this->show = show;
-}
-
-

@@ -17,12 +17,9 @@ public:
     BlockData();
     statusID getStatus() const;
     void setStatus(statusID newStatus);
-    bool isShowing();
-    void showNow(bool show);
 
 private:
     statusID status;
-    bool show;
 };
 
 #endif // BLOCKDATA_H
