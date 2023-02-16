@@ -42,20 +42,10 @@ public:
         QObject::connect(this,SIGNAL(cursorPositionChanged()),
                          this, SLOT(cursorPositionChangedHandle()));
 
-        QObject::connect(this,SIGNAL(textChanged()),
-                         this, SLOT(textChangedHandle()));
-
     }
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *event);
-    QString toPlainText();
-
-    void numberListDetect();
-    int numberListGetSpaces(const QString &text);
-    QString numberListGetNextNumber(const QString &text);
-
-    void codeBockDetect();
 
 private:
     QRegularExpression regexNumbering;
@@ -65,23 +55,22 @@ private:
     int widthCodeBlock;
     int heightCodeBlock;
     QPen penCodeBlock;
-    int positionStartBlock;
-    int positionEndBlock;
-
     int savedBlockNumber;
+
+    void quoteLeftKey();
 
  public slots:
     void cursorPositionChangedHandle();
-    void textChangedHandle();
 
  public:
 signals:
-
     void cursorPosChanged(bool hasSelection, int blockNumber );
-    void contentChanged();
-    void showAllCodeBlocks();
-    void hideAllCodeBlocks(bool hasSelection, int blockNumber );
+    void fileSave();
+    void enterKeyPressed(int blockNumber);
+    void quoteLeftKeyPressed(int blockNumber,bool &success);
 
+    void removeAllMkData();
+    void applyAllMkData(bool hasSelection, int blockNumber);
 };
 
 #endif // MKEDIT_H

@@ -56,17 +56,23 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, SIGNAL(pressed(QModelIndex)),
                       this, SLOT(fileDisplay(QModelIndex)));
 
-    QObject::connect(viewText,SIGNAL(contentChanged()),
-                     this, SLOT(fileSave()));
+    QObject::connect(viewText,SIGNAL(fileSave()),
+                     this, SLOT(fileSaveHandle()));
 
     QObject::connect(viewText,SIGNAL(cursorPosChanged(bool,int)),
                      &mkGuiDocument,SLOT(cursorPosChangedHandle(bool,int)));
 
-    QObject::connect(viewText,SIGNAL(showAllCodeBlocks()),
-                     &mkGuiDocument,SLOT(showAllCodeBlocksHandle()));
+    QObject::connect(viewText,SIGNAL(enterKeyPressed(int)),
+                     &mkGuiDocument,SLOT(enterKeyPressedHandle(int)));
 
-    QObject::connect(viewText,SIGNAL(hideAllCodeBlocks(bool,int)),
-                     &mkGuiDocument,SLOT(hideAllCodeBlocksHandle(bool,int)));
+    QObject::connect(viewText,SIGNAL(quoteLeftKeyPressed(int,bool&)),
+                     &mkGuiDocument,SLOT(quoteLeftKeyPressedHandle(int,bool&)));
+
+    QObject::connect(viewText,SIGNAL(removeAllMkData()),
+                     &mkGuiDocument,SLOT(removeAllMkDataHandle()));
+
+    QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int)),
+                     &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int)));
 
 }
 
@@ -94,7 +100,6 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
         viewTree->expand(index);
     }
 
-    //viewText->clear();
     fileInfo = modelTree.fileInfo(index);
     if (!fileInfo.isFile())
         return;
@@ -104,19 +109,16 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
 
     mkGuiDocument.clear();
     mkGuiDocument.setPlainText(fullContent);
-    //mkDocument.duplicateMkTextDoc(&mkGuiDocument);
-    //viewText->setText(fullContent);
     viewTitle->setText(fileInfo.fileName());
     viewText->update();
 }
 
-void ViewsHandler::fileSave()
+void ViewsHandler::fileSaveHandle()
 {
     if(!viewText->hasFocus())
         return;
 
     QString fullContent = viewText->toPlainText();
-    //QString fullContent = mkGuiDocument.toPlainText();
     QFile file(fileInfo.absoluteFilePath());
     if(file.open(QFile::WriteOnly))
     {

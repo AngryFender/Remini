@@ -17,8 +17,12 @@ public:
     statusID getStatus() const;
     void setStatus(statusID newStatus);
     QString getSymbol();
+    bool getDraw() const;
+    void setDraw(bool newDraw);
+
 private:
     statusID status;
+    bool draw;
 };
 
 #endif // LINEDATA_H

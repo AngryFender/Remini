@@ -52,7 +52,7 @@ signals:
 
 private slots:
     void fileDisplay(const QModelIndex& index);
-    void fileSave();
+    void fileSaveHandle();
 };
 
 #endif // VIEWS_HANDLER_H

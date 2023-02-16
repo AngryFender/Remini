@@ -3,6 +3,7 @@
 LineData::LineData()
 {
     status = horizontalLine;
+    draw = true;
 }
 
 LineData::statusID LineData::getStatus() const
@@ -24,4 +25,14 @@ QString LineData::getSymbol()
     case heading3:return "###"; break;
     default:return "";
     }
+}
+
+bool LineData::getDraw() const
+{
+    return draw;
+}
+
+void LineData::setDraw(bool newDraw)
+{
+    draw = newDraw;
 }

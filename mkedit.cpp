@@ -20,11 +20,9 @@ void MkEdit::paintEvent(QPaintEvent *e)
             if(blockData->getStatus()==BlockData::start){
                 xBlock = block.layout()->position().x()-2;
                 yBlock = block.layout()->position().y();
-                positionStartBlock = block.blockNumber();
             }
 
             if(blockData->getStatus()==BlockData::end){
-                positionEndBlock = block.blockNumber();
                 int height = block.layout()->position().y() - yBlock + TEXT_SIZE;
                 painter.setPen(penCodeBlock);
                 painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
@@ -34,7 +32,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
         }else{
             LineData* lineData = dynamic_cast<LineData*>(data);
             if(lineData){
-                if(lineData->getStatus() == LineData::horizontalLine){
+                if(lineData->getStatus() == LineData::horizontalLine && lineData->getDraw()){
                     int lineX1 = block.layout()->position().x()-2;
                     int lineY1 = block.layout()->position().y()+(TEXT_SIZE*4/3);
                     int lineX2 = block.layout()->position().x()-2+widthCodeBlock;
@@ -55,84 +53,30 @@ void MkEdit::resizeEvent(QResizeEvent *event)
     heightCodeBlock = this->height();
 }
 
-QString MkEdit::toPlainText()
-{
-    int cursorPosition = this->textCursor().position();
-
-    emit showAllCodeBlocks();
-    QString content = QTextEdit::toPlainText();
-
-    emit hideAllCodeBlocks( textCursor().hasSelection(), textCursor().blockNumber());
-    this->textCursor().setPosition(cursorPosition);
-
-    return content;
-}
-
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
+    emit removeAllMkData();
+
     QTextEdit::keyPressEvent(event);
-    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return){
-        numberListDetect();
+
+    switch(event->key()){
+    case Qt::Key_Enter:
+    case Qt::Key_Return: emit enterKeyPressed(this->textCursor().blockNumber()); break;
+    case Qt::Key_QuoteLeft: quoteLeftKey(); break;
     }
-    emit contentChanged();
+
+    emit fileSave(); //save file
+    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber());
 }
 
-void MkEdit::numberListDetect()
+void MkEdit::quoteLeftKey()
 {
-    QTextCursor cursor = textCursor();
-    int currentLineNumber = cursor.blockNumber();
-    QTextBlock currentLine = this->document()->findBlockByNumber(currentLineNumber-1);
-    QString lineText = currentLine.text();
-
-    QStringList patterns = {"\\s+[0-9]+\\.\\s([A-Za-z0-9]+( [A-Za-z0-9]+)+)",   //look for " 10. abc123 abc123" , "   1. abc123 abc"
-                                "[0-9]+\\.\\s([A-Za-z0-9]+( [A-Za-z0-9]+)+)",   //look for " 10. abc123 abc123" , "   1. abc123 abc"
-                            "\\s+[0-9]+\\.\\s[A-Za-z0-9]+",                     //look for "10. abc123 abc123"  , "1. abc123 abc"
-                                "[0-9]+\\.\\s[A-Za-z0-9]+",                     //look for "10. abc123"         , "1. abc123"
-                            "\\s+[0-9]+\\.\\s+",                                //look for " 1. "
-                                "[0-9]+\\.\\s+"};                               //look for "1. "
-    for(QString &pattern :patterns){
-        regexNumbering.setPattern(pattern);
-        QRegularExpressionMatch matchNumbering = regexNumbering.match(lineText);
-        if(matchNumbering.hasMatch()){
-            int spaces = numberListGetSpaces(matchNumbering.captured(0));
-            cursor.insertText(QString("").leftJustified(spaces,' '));
-            cursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
-            return;
-        }
-    }
-}
-
-int MkEdit::numberListGetSpaces(const QString &text)
-{
-    regexNumbering.setPattern("^\\s+"); //look for spaces
-    QRegularExpressionMatch matchSpace = regexNumbering.match(text);
-    if (matchSpace.hasMatch()){
-        return matchSpace.captured(0).length();
-    }
-    return 0;
-}
-
-QString MkEdit::numberListGetNextNumber(const QString &text)
-{
-    regexNumbering.setPattern("[0-9]+"); //look for numbers
-    QRegularExpressionMatch matchSpace = regexNumbering.match(text);
-    if (matchSpace.hasMatch()){
-        int number =  matchSpace.captured(0).toInt();
-        return QString::number(number+1)+". ";
-    }
-    return "";
-}
-
-void MkEdit::codeBockDetect()
-{
-    QTextCursor cursor = textCursor();
-    int currentLineNumber = cursor.blockNumber();
-    QTextBlock currentLine = this->document()->findBlockByNumber(currentLineNumber-1);
-    QString lineText = currentLine.text();
-
-    QRegularExpressionMatch matchCodeBlock = regexStartBlock.match(lineText);
-    if(matchCodeBlock.hasMatch()){
-        cursor.insertText("```");
+    bool success =false;
+    emit quoteLeftKeyPressed(this->textCursor().blockNumber(),success);
+    if(success){
+        QTextCursor textCursor = this->textCursor();
+        textCursor.movePosition(QTextCursor::PreviousBlock);
+        this->setTextCursor(textCursor);
     }
 }
 
@@ -146,10 +90,4 @@ void MkEdit::cursorPositionChangedHandle()
         this->update();
     }
 }
-
-void MkEdit::textChangedHandle()
-{
-
-}
-
 
