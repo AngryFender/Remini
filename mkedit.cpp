@@ -6,7 +6,9 @@
 void MkEdit::paintEvent(QPaintEvent *e)
 {
     QPainter painter(viewport());
-    painter.setRenderHint(QPainter::NonCosmeticBrushPatterns);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::TextAntialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     QTextBlock block = this->document()->begin();
     bool drawBlock = false;
@@ -43,6 +45,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
         }
         block = block.next();
     }
+
     QTextEdit::paintEvent(e);
 }
 
@@ -51,6 +54,20 @@ void MkEdit::resizeEvent(QResizeEvent *event)
     QTextEdit::resizeEvent(event);
     widthCodeBlock = this->width()-15-PADDING;
     heightCodeBlock = this->height();
+}
+
+void MkEdit::wheelEvent(QWheelEvent *e)
+{
+    if (e->modifiers() == Qt::ControlModifier) {
+        int zoomDelta = e->angleDelta().y();
+        if (zoomDelta > 0) {
+           this->zoomIn();
+        } else {
+           this->zoomOut();
+        }
+    }else{
+        QTextEdit::wheelEvent(e);
+    }
 }
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
@@ -90,4 +107,3 @@ void MkEdit::cursorPositionChangedHandle()
         this->update();
     }
 }
-

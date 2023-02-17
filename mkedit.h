@@ -35,6 +35,7 @@ public:
         widthCodeBlock = this->width() - this->width()-10-PADDING;
         heightCodeBlock = this->height();
 
+
         penCodeBlock.setWidthF(0.5);
         penCodeBlock.setStyle(Qt::SolidLine);
         penCodeBlock.setColor(QColor(194,201,207));
@@ -42,12 +43,17 @@ public:
         QObject::connect(this,SIGNAL(cursorPositionChanged()),
                          this, SLOT(cursorPositionChangedHandle()));
 
+        font.setFamily("roboto");
+        font.setStretch(QFont::Unstretched);
+        font.setWeight(QFont::Normal);
+        this->setFont(font);
     }
-    void paintEvent(QPaintEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void resizeEvent(QResizeEvent *event);
+    void paintEvent(QPaintEvent *event) override;
+    void keyPressEvent(QKeyEvent *event)override;
+    void resizeEvent(QResizeEvent *event)override;
+    void wheelEvent(QWheelEvent *e)override;
 
-private:
+    QFont font;
     QRegularExpression regexNumbering;
     QRegularExpression regexCodeBlock;
     QRegularExpression regexStartBlock;

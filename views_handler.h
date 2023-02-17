@@ -24,7 +24,6 @@ public:
 
 private:
     ViewsHandler(Ui::MainWindow &ui){
-
         initModels();
         initViews(ui);
         initConnection();
@@ -36,11 +35,12 @@ private:
     QTreeView* viewTree;
     QFileInfo fileInfo;
 
+    QFont fontUi;
     QString getSavedPath();
     void initModels();
     void initViews(Ui::MainWindow &ui);
     void initTreeView();
-    void initTitleView();
+    void initFontDefault();
     void initConnection();
     QString getFileContent(QFile& file);
     MkTextDocument mkGuiDocument;

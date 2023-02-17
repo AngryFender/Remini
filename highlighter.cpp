@@ -114,22 +114,6 @@ void Highlighter::highlightBlock(const QString &text)
         setFormat(start, 1,headingFormat);
         setFormat(start+1, end - start, m_format);
     }
-
-
-//    bool cursorHide = this->document()->property("hideCursor").toBool();
-//    if(!cursorHide)
-//    {
-//        QRegularExpressionMatchIterator itMatchBlock = regexCodeBlock.globalMatch(text);
-//        while (itMatchBlock.hasNext())
-//        {
-//            QRegularExpressionMatch match = itMatchBlock.next();
-//            int start = match.capturedStart();
-//            int end = match.capturedEnd();
-
-//            setFormat(start, 3,headingFormat);
-//            setFormat(start+3, end - start, this->formatNormal);
-//        }
-//    }
 }
 
 void Highlighter::setView(QTextEdit *textEdit)

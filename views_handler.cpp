@@ -21,12 +21,12 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     viewText = ui.uiTextView;
     viewTitle = ui.uiTitle;
 
+    initFontDefault();
     initTreeView();
-    initTitleView();
 
-    viewText->setAttribute(Qt::WA_OpaquePaintEvent,false);
     viewText->setDocument(&mkGuiDocument);
     highlighter.setDocument(&mkGuiDocument);
+
 }
 
 void ViewsHandler::initTreeView()
@@ -42,12 +42,21 @@ void ViewsHandler::initTreeView()
     }
 }
 
-void ViewsHandler::initTitleView()
+void ViewsHandler::initFontDefault()
 {
-    QFont font(FONT_FAMILY);
-    font.setPointSize( 18 );
-    font.setWeight( QFont::Bold );
-    viewTitle->setFont( font );
+    fontUi.setFamily("roboto");
+    fontUi.setStretch(QFont::Unstretched);
+    fontUi.setWeight(QFont::Normal);
+    fontUi.setPointSize(10);
+    viewText->setFont(fontUi);
+    viewTree->setFont(fontUi);
+
+    QFont fontTitle;
+    fontTitle.setFamily(fontUi.family());
+    fontTitle.setPointSize(fontUi.pointSize()*2);
+    fontTitle.setWeight(QFont::DemiBold);
+
+    viewTitle->setFont(fontTitle);
     viewTitle->setStyleSheet("QLabel { padding-left:10; padding-right:10}");
 }
 

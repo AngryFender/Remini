@@ -3,8 +3,8 @@
 MkTextDocument::MkTextDocument(QObject *parent)
     : QTextDocument{parent}
 {
-    regexCodeBlock.setPattern("```");
-    regexHorizontalLine.setPattern("---");
+    regexCodeBlock.setPattern(CODEBLOCK_SYMBOL);
+    regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
 }
 
 void MkTextDocument::setPlainText(const QString &text)
@@ -37,13 +37,13 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
             {
                 checkBlock.end = tblock.blockNumber();
                 if(blockNumber >= checkBlock.start && blockNumber <= checkBlock.end){
-                    showSymbols(this->findBlockByNumber(checkBlock.start), "```");
-                    showSymbols(this->findBlockByNumber(checkBlock.end), "```");
+                    showSymbols(this->findBlockByNumber(checkBlock.start), CODEBLOCK_SYMBOL);
+                    showSymbols(this->findBlockByNumber(checkBlock.end), CODEBLOCK_SYMBOL);
                 }
                 else{
                     if(!hasSelection){
-                        hideSymbols(this->findBlockByNumber(checkBlock.start),"```");
-                        hideSymbols(this->findBlockByNumber(checkBlock.end),"```");
+                        hideSymbols(this->findBlockByNumber(checkBlock.start), CODEBLOCK_SYMBOL);
+                        hideSymbols(this->findBlockByNumber(checkBlock.end), CODEBLOCK_SYMBOL);
                     }
                 }
             }
@@ -84,7 +84,7 @@ void MkTextDocument::showAllCodeBlocksHandle()
         {
             if(blockData->getStatus()==BlockData::start || blockData->getStatus()==BlockData::end)
             {
-                showSymbols(tblock, "```");
+                showSymbols(tblock, CODEBLOCK_SYMBOL);
             }
         }else{
             LineData* lineData = dynamic_cast<LineData*>(data);
@@ -126,8 +126,8 @@ void MkTextDocument::identifyUserData()
             else{
                 openBlock = false;
                 blockData->setStatus(BlockData::end);
-                hideSymbols(tBlock,"```");
-                hideSymbols(startBlock,"```");
+                hideSymbols(tBlock, CODEBLOCK_SYMBOL);
+                hideSymbols(startBlock, CODEBLOCK_SYMBOL);
             }
         }
         else{
@@ -215,9 +215,9 @@ void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
 
     QRegularExpressionMatch matchCodeBlockSymbol = regexCodeBlock.match(currentBlock.text());
     if(matchCodeBlockSymbol.hasMatch()){
-            editCursor.insertText("```");
+            editCursor.insertText(CODEBLOCK_SYMBOL);
             editCursor.insertBlock();
-            editCursor.insertText("```");
+            editCursor.insertText(CODEBLOCK_SYMBOL);
             success = true;
     }else{
         success = false;
@@ -260,7 +260,7 @@ void MkTextDocument::numberListDetect(int blockNumber)
 
 void MkTextDocument::isUserDataStillValidHandle(int blockNumber)
 {
-    QTextBlock tblock = this->findBlockByNumber(blockNumber);       qDebug()<<"- "<<tblock.text();
+    QTextBlock tblock = this->findBlockByNumber(blockNumber);
     QTextBlockUserData* data =tblock.userData();
     BlockData* blockData = dynamic_cast<BlockData*>(data);
     if(blockData){
@@ -274,7 +274,6 @@ void MkTextDocument::isUserDataStillValidHandle(int blockNumber)
             if(lineData->getStatus()== LineData::horizontalLine){
                 QRegularExpressionMatch matchLine = regexHorizontalLine.match(tblock.text());
                 if (!matchLine.hasMatch()){
-                    qDebug()<<"- "<<lineData->getSymbol();
                     tblock.setUserData(nullptr);
                 }
             }

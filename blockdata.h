@@ -1,9 +1,9 @@
 #ifndef BLOCKDATA_H
 #define BLOCKDATA_H
 
-#include <QMutex>
 #include <QTextBlockUserData>
-#include <QVectorIterator>
+
+#define CODEBLOCK_SYMBOL "```"
 
 class BlockData : public QTextBlockUserData
 {
