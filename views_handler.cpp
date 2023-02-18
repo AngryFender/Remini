@@ -17,16 +17,18 @@ void ViewsHandler::initModels()
 
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
+    ui.uiSplitter->setStretchFactor(1,0);
+    ui.uiSplitter->setStretchFactor(0,1);
     viewTree = ui.uiTreeView;
     viewText = ui.uiTextView;
     viewTitle = ui.uiTitle;
 
-    initFontDefault();
     initTreeView();
 
     viewText->setDocument(&mkGuiDocument);
     highlighter.setDocument(&mkGuiDocument);
 
+    initFontDefault();
 }
 
 void ViewsHandler::initTreeView()
@@ -47,12 +49,17 @@ void ViewsHandler::initFontDefault()
     fontUi.setFamily("roboto");
     fontUi.setStretch(QFont::Unstretched);
     fontUi.setWeight(QFont::Normal);
-    fontUi.setPointSize(10);
+    fontUi.setPointSize(13);
     viewText->setFont(fontUi);
-    viewTree->setFont(fontUi);
+
+    QFont fontTree;
+    fontTree.setFamily("roboto");
+    fontTree.setPointSize(10);
+    fontTree.setWeight(QFont::Light);
+    viewTree->setFont(fontTree);
 
     QFont fontTitle;
-    fontTitle.setFamily(fontUi.family());
+    fontTitle.setFamily("roboto");
     fontTitle.setPointSize(fontUi.pointSize()*2);
     fontTitle.setWeight(QFont::DemiBold);
 
@@ -118,7 +125,7 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
 
     mkGuiDocument.clear();
     mkGuiDocument.setPlainText(fullContent);
-    viewTitle->setText(fileInfo.fileName());
+    viewTitle->setText(fileInfo.baseName());
     viewText->update();
 }
 

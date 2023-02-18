@@ -20,9 +20,7 @@ public:
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber);
     void removeAllMkDataHandle();
-    void showAllCodeBlocksHandle();
     void applyAllMkDataHandle(bool hasSelection, int blockNumber);
-    void hideAllCodeBlocksHandle(bool hasSelection, int blockNumber);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
     void isUserDataStillValidHandle(int blockNumber);
@@ -43,6 +41,7 @@ public slots:
 
     void showCursoredBlock(int blockNumber, int start, int end, const QString &symbol);
     void hideSymbols(QTextBlock block,const QString &symbol);
+    void showAllSymbols();
     void showSymbols(QTextBlock block,const QString &symbol);
 
     void autoCompleteCodeBlock(int blockNumber,bool &success);

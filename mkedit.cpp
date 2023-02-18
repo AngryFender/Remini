@@ -13,30 +13,31 @@ void MkEdit::paintEvent(QPaintEvent *e)
     QTextBlock block = this->document()->begin();
     bool drawBlock = false;
     int xBlock =0, yBlock =0;
-
-    int codeId = 1;
+    int fontSize = this->currentFont().pointSize();
+    int scrollPos = this->verticalScrollBar()->value();
     while (block.isValid()) {
         QTextBlockUserData* data =block.userData();
         BlockData* blockData = dynamic_cast<BlockData*>(data);
         if(blockData){
             if(blockData->getStatus()==BlockData::start){
                 xBlock = block.layout()->position().x()-2;
-                yBlock = block.layout()->position().y();
+                yBlock = block.layout()->position().y()-scrollPos-2;
             }
+            else if(blockData->getStatus()==BlockData::end){
+                int height = block.layout()->position().y() - yBlock + (fontSize*0.2)-scrollPos;
 
-            if(blockData->getStatus()==BlockData::end){
-                int height = block.layout()->position().y() - yBlock + TEXT_SIZE;
+                QBrush brushDefault(QColor(194,201,207));
+                painter.setBrush(brushDefault);
                 painter.setPen(penCodeBlock);
                 painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
-                painter.drawLine(xBlock,yBlock+TEXT_SIZE+7,widthCodeBlock,yBlock+TEXT_SIZE+7);
-                codeId++;
+                //painter.drawLine(xBlock,yBlock+this->fontPointSize()*2,widthCodeBlock,yBlock+this->fontPointSize()*2);
             }
         }else{
             LineData* lineData = dynamic_cast<LineData*>(data);
             if(lineData){
                 if(lineData->getStatus() == LineData::horizontalLine && lineData->getDraw()){
                     int lineX1 = block.layout()->position().x()-2;
-                    int lineY1 = block.layout()->position().y()+(TEXT_SIZE*4/3);
+                    int lineY1 = block.layout()->position().y()+fontSize-scrollPos;
                     int lineX2 = block.layout()->position().x()-2+widthCodeBlock;
                     painter.setPen(penCodeBlock);
                     painter.drawLine(lineX1,lineY1,lineX2,lineY1);
@@ -52,7 +53,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
 void MkEdit::resizeEvent(QResizeEvent *event)
 {
     QTextEdit::resizeEvent(event);
-    widthCodeBlock = this->width()-15-PADDING;
+    widthCodeBlock = this->width()-15-PADDING - this->verticalScrollBar()->width();
     heightCodeBlock = this->height();
 }
 

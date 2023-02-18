@@ -68,11 +68,11 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
 
 void MkTextDocument::removeAllMkDataHandle()
 {
-    showAllCodeBlocksHandle();
+    showAllSymbols();
     stripUserData();
 }
 
-void MkTextDocument::showAllCodeBlocksHandle()
+void MkTextDocument::showAllSymbols()
 {
     QTextBlock tblock = this->begin();
 
@@ -99,11 +99,6 @@ void MkTextDocument::showAllCodeBlocksHandle()
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber)
 {
     identifyUserData();
-    cursorPosChangedHandle(hasSelection, blockNumber);
-}
-
-void MkTextDocument::hideAllCodeBlocksHandle(bool hasSelection, int blockNumber)
-{
     cursorPosChangedHandle(hasSelection, blockNumber);
 }
 
@@ -215,10 +210,9 @@ void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
 
     QRegularExpressionMatch matchCodeBlockSymbol = regexCodeBlock.match(currentBlock.text());
     if(matchCodeBlockSymbol.hasMatch()){
-            editCursor.insertText(CODEBLOCK_SYMBOL);
-            editCursor.insertBlock();
-            editCursor.insertText(CODEBLOCK_SYMBOL);
-            success = true;
+        editCursor.insertText(CODEBLOCK_SYMBOL);
+        editCursor.insertBlock();
+        success = true;
     }else{
         success = false;
     }
