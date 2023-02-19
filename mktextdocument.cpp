@@ -148,6 +148,9 @@ void MkTextDocument::stripUserData()
     bool openBlock = false;
     for(QTextBlock tBlock = this->begin(); tBlock != this->end(); tBlock = tBlock.next()){
         tBlock.setUserData(nullptr);
+        QTextCursor tcursor(tBlock);
+        QTextBlockFormat blockFormat ;
+        tcursor.setBlockFormat(blockFormat);
     }
 }
 

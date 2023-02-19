@@ -10,12 +10,14 @@ void MkEdit::paintEvent(QPaintEvent *e)
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-    QTextBlock block = this->document()->begin();
     bool drawBlock = false;
     int xBlock =0, yBlock =0;
     int fontSize = this->currentFont().pointSize();
     int scrollPos = this->verticalScrollBar()->value();
+
+    QTextBlock block = this->document()->begin();
     while (block.isValid()) {
+
         QTextBlockUserData* data =block.userData();
         BlockData* blockData = dynamic_cast<BlockData*>(data);
         if(blockData){
@@ -24,13 +26,17 @@ void MkEdit::paintEvent(QPaintEvent *e)
                 yBlock = block.layout()->position().y()-scrollPos-2;
             }
             else if(blockData->getStatus()==BlockData::end){
-                int height = block.layout()->position().y() - yBlock + (fontSize*0.2)-scrollPos;
+                int height = block.layout()->position().y() - yBlock + (fontSize*0.4)-scrollPos;
 
                 QBrush brushDefault(QColor(194,201,207));
                 painter.setBrush(brushDefault);
                 painter.setPen(penCodeBlock);
                 painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
-                //painter.drawLine(xBlock,yBlock+this->fontPointSize()*2,widthCodeBlock,yBlock+this->fontPointSize()*2);
+            }else{
+                QTextCursor tcursor(block);
+                QTextBlockFormat blockFormat = tcursor.blockFormat();
+                blockFormat.setLeftMargin(fontSize);
+                tcursor.setBlockFormat(blockFormat);
             }
         }else{
             LineData* lineData = dynamic_cast<LineData*>(data);
@@ -73,6 +79,11 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
+    switch(event->modifiers()){
+        case Qt::CTRL:
+        case Qt::ALT:QTextEdit::keyPressEvent(event);return;
+    }
+
     emit removeAllMkData();
 
     QTextEdit::keyPressEvent(event);
