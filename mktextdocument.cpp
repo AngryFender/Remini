@@ -106,6 +106,8 @@ void MkTextDocument::identifyUserData()
 {
     bool openBlock = false;
     QTextBlock startBlock;
+    QTextBlockFormat blockFormat;
+
     for(QTextBlock tBlock = this->begin(); tBlock != this->end(); tBlock = tBlock.next()){
 
         QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(tBlock.text());
@@ -130,6 +132,11 @@ void MkTextDocument::identifyUserData()
                 BlockData *blockData = new BlockData;
                 blockData->setStatus(BlockData::content);
                 tBlock.setUserData(blockData);
+
+                QTextCursor tcursor(tBlock);
+                blockFormat = tcursor.blockFormat();
+                blockFormat.setLeftMargin(this->defaultFont().pointSize());
+                tcursor.mergeBlockFormat(blockFormat);
             }else{
                 QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
                 if(matchHorizontalLine.hasMatch()){

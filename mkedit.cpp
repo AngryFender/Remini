@@ -14,6 +14,8 @@ void MkEdit::paintEvent(QPaintEvent *e)
     int xBlock =0, yBlock =0;
     int fontSize = this->currentFont().pointSize();
     int scrollPos = this->verticalScrollBar()->value();
+//    QTextCursor tcursor;
+    QTextBlockFormat blockFormat;
 
     QTextBlock block = this->document()->begin();
     while (block.isValid()) {
@@ -28,15 +30,10 @@ void MkEdit::paintEvent(QPaintEvent *e)
             else if(blockData->getStatus()==BlockData::end){
                 int height = block.layout()->position().y() - yBlock + (fontSize*0.4)-scrollPos;
 
-                QBrush brushDefault(QColor(194,201,207));
+                QBrush brushDefault(QColor(30,30,30));
                 painter.setBrush(brushDefault);
                 painter.setPen(penCodeBlock);
                 painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
-            }else{
-                QTextCursor tcursor(block);
-                QTextBlockFormat blockFormat = tcursor.blockFormat();
-                blockFormat.setLeftMargin(fontSize);
-                tcursor.setBlockFormat(blockFormat);
             }
         }else{
             LineData* lineData = dynamic_cast<LineData*>(data);
@@ -72,6 +69,8 @@ void MkEdit::wheelEvent(QWheelEvent *e)
         } else {
            this->zoomOut();
         }
+        emit removeAllMkData();
+        emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber());
     }else{
         QTextEdit::wheelEvent(e);
     }
