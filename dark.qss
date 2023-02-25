@@ -1,0 +1,92 @@
+QMainWindow {
+	background-color:#353535;
+}
+QDialog {
+	background-color:#353535;
+}
+QColorDialog {
+	background-color:#353535;
+}
+QTextEdit {
+	background-color:#353535;
+	color: white;
+	selection-background-color: #3379B7;
+	padding-left:15; padding-top:10; padding-bottom:10; padding-right:10
+}
+QLineEdit {
+	border-width: 1px; border-radius: 4px;
+	border-color: rgb(58, 58, 58);
+	border-style: inset;
+	padding: 0 8px;
+	background:#353535;
+	selection-background-color:#007b50;
+	selection-color: #FFFFFF;
+}
+QLabel {
+	background:#353535;
+	color: white;
+	padding-left:10; padding-right:10; padding-top:10; 
+}
+QTreeView {
+    background-color: #353535;
+    color: white; /* set the text color to white */
+    image: none;
+}
+QTreeView::item:selected {
+    background-color:#707070;
+    color: white;
+    image: none;
+}
+QSplitter::handle {
+    background-color: #707070;
+}
+
+QSplitter::handle:horizontal {
+    width: 2px;
+}
+
+QSplitter::handle:vertical {
+    height: 2px;
+}
+
+QScrollBar:vertical {
+    background: transparent;
+    width: 8px; /* Set the width of the scrollbar */
+    margin: 0px 0px 0px 0px; /* Set the margin */
+}
+
+QScrollBar::handle:vertical {
+    background: gray;
+    border-radius: 2px; /* Set the border radius of the handle */
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar:horizontal {
+	background: transparent;
+    border: none;
+    height: 8px;
+}
+
+QScrollBar::handle:horizontal {
+    background: gray;
+    border-radius: 4px;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    height: 0px;
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: none;
+}

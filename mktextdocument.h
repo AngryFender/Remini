@@ -23,7 +23,6 @@ public slots:
     void applyAllMkDataHandle(bool hasSelection, int blockNumber);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
-    void isUserDataStillValidHandle(int blockNumber);
  private:
     struct CheckBlock{
         int start = 0;
@@ -39,7 +38,6 @@ public slots:
     void identifyUserData();
     void stripUserData();
 
-    void showCursoredBlock(int blockNumber, int start, int end, const QString &symbol);
     void hideSymbols(QTextBlock block,const QString &symbol);
     void showAllSymbols();
     void showSymbols(QTextBlock block,const QString &symbol);

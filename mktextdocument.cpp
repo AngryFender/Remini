@@ -161,25 +161,6 @@ void MkTextDocument::stripUserData()
     }
 }
 
-void MkTextDocument::showCursoredBlock(int blockNumber, int start, int end, const QString &symbol)
-{
-    if(start > end ){
-        return;
-    }
-
-    if(blockNumber >= start && blockNumber <= end){
-            showSymbols(this->findBlock(start), symbol);
-            showSymbols(this->findBlock(end), symbol);
-    }
-    else{
-        QTextBlock startBlock = this->findBlock(start);
-        QTextBlock endBlock = this->findBlock(end);
-            hideSymbols(startBlock,symbol);
-            hideSymbols(endBlock,symbol);
-    }
-}
-
-
 void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
 {
     QString textBlock = block.text();
@@ -258,29 +239,6 @@ void MkTextDocument::numberListDetect(int blockNumber)
             editCursor.insertText(QString("").leftJustified(spaces,' '));
             editCursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
             return;
-        }
-    }
-}
-
-void MkTextDocument::isUserDataStillValidHandle(int blockNumber)
-{
-    QTextBlock tblock = this->findBlockByNumber(blockNumber);
-    QTextBlockUserData* data =tblock.userData();
-    BlockData* blockData = dynamic_cast<BlockData*>(data);
-    if(blockData){
-        if(blockData->getStatus()==BlockData::start){
-
-        }
-
-    }else{
-        LineData* lineData = dynamic_cast<LineData*>(data);
-        if(lineData){
-            if(lineData->getStatus()== LineData::horizontalLine){
-                QRegularExpressionMatch matchLine = regexHorizontalLine.match(tblock.text());
-                if (!matchLine.hasMatch()){
-                    tblock.setUserData(nullptr);
-                }
-            }
         }
     }
 }

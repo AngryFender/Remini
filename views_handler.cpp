@@ -17,8 +17,6 @@ void ViewsHandler::initModels()
 
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
-    ui.uiSplitter->setStretchFactor(1,0);
-    ui.uiSplitter->setStretchFactor(0,1);
     viewTree = ui.uiTreeView;
     viewText = ui.uiTextView;
     viewTitle = ui.uiTitle;
@@ -64,7 +62,6 @@ void ViewsHandler::initFontDefault()
     fontTitle.setWeight(QFont::DemiBold);
 
     viewTitle->setFont(fontTitle);
-    viewTitle->setStyleSheet("QLabel { padding-left:10; padding-right:10}");
 }
 
 void ViewsHandler::initConnection()
@@ -125,6 +122,8 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
 
     mkGuiDocument.clear();
     mkGuiDocument.setPlainText(fullContent);
+
+    viewText->update();
     viewTitle->setText(fileInfo.baseName());
     viewText->update();
 }

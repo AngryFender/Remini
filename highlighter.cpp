@@ -5,7 +5,8 @@ Highlighter::Highlighter(QTextDocument *parent)
 {
     HighlightingRule rule;
 
-    keywordFormat.setForeground(Qt::darkBlue);
+    //keywordFormat.setForeground(QColor("#FF9991"));
+    keywordFormat.setForeground(mKeywordColor);
     keywordFormat.setFontWeight(QFont::Bold);
     const QString keywordPatterns[] = {
         QStringLiteral("\\bchar\\b"), QStringLiteral("\\bclass\\b"), QStringLiteral("\\bconst\\b"),
@@ -33,14 +34,14 @@ Highlighter::Highlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     classFormat.setFontWeight(QFont::Bold);
-    classFormat.setForeground(Qt::darkMagenta);
+    classFormat.setForeground(QColor("#EDCAE7"));
 //    m_regex =QRegularExpression(QStringLiteral("#[^\\s+#]+.*"));
     m_regex =QRegularExpression(QStringLiteral("^#[^\\s#]+.*"));    //markdown heading 1
     rule.format = classFormat;
     rule.format.setFontPointSize(15);
     highlightingRules.append(rule);
 
-    classFormat.setForeground(Qt::blue);
+    classFormat.setForeground(QColor("#FAB733"));
     rule.pattern = QRegularExpression(QStringLiteral("-[a-zA-Z]+"));
     rule.format = classFormat;
     highlightingRules.append(rule);
@@ -52,13 +53,14 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     multiLineCommentFormat.setForeground(Qt::gray);
 
-    quotationFormat.setForeground(Qt::darkGreen);
+    quotationFormat.setForeground(QColor("#92DEE4"));
     rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
     rule.format = quotationFormat;
     highlightingRules.append(rule);
 
     functionFormat.setFontItalic(true);
-    functionFormat.setForeground(Qt::blue);
+    //functionFormat.setForeground(QColor("#D291BC"));
+    functionFormat.setForeground(mMethodColor);
     rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
     rule.format = functionFormat;
     highlightingRules.append(rule);
@@ -81,6 +83,7 @@ void Highlighter::highlightBlock(const QString &text)
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         while (matchIterator.hasNext()) {
             QRegularExpressionMatch match = matchIterator.next();
+                keywordFormat.setForeground(mKeywordColor);
             setFormat(match.capturedStart(), match.capturedLength(), rule.format);
         }
     }
@@ -119,4 +122,71 @@ void Highlighter::highlightBlock(const QString &text)
 void Highlighter::setView(QTextEdit *textEdit)
 {
     this->textEdit = textEdit;
+}
+
+QColor Highlighter::typeColor() const
+{
+    return mTypeColor;
+}
+
+QColor Highlighter::methodColor() const
+{
+    return mMethodColor;
+}
+
+QColor Highlighter::argumentColor() const
+{
+    return mArgumentColor;
+}
+
+QColor Highlighter::commentColor() const
+{
+    return mCommentColor;
+}
+
+QColor Highlighter::quoteColor() const
+{
+    return mQuoteColor;
+}
+
+QColor Highlighter::keywordColor() const
+{
+    return mKeywordColor;
+}
+
+void Highlighter::setTypeColor(const QColor &color)
+{
+    mTypeColor = color;
+    emit typeColorChanged(color);
+}
+
+void Highlighter::setMethodColor(const QColor &color)
+{
+    mMethodColor = color;
+    emit methodColorChanged(color);
+}
+
+void Highlighter::setArgumentColor(const QColor &color)
+{
+    mArgumentColor = color;
+    emit argumentColorChanged(color);
+}
+
+void Highlighter::setCommentColor(const QColor &color)
+{
+    mCommentColor = color;
+    emit commentColorChanged(color);
+}
+
+void Highlighter::setQuoteColor(const QColor &color)
+{
+    mQuoteColor = color;
+    emit quoteColorChanged(color);
+}
+
+void Highlighter::keywordColor(const QColor &color)
+{
+    mKeywordColor = color;
+    rehighlight();
+    emit keywordColorChanged(color);
 }

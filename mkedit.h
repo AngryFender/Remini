@@ -18,38 +18,35 @@
 class MkEdit : public QTextEdit
 {
     Q_OBJECT
+    Q_PROPERTY(QColor blockColor READ blockColor WRITE blockColor NOTIFY blockColorChanged)
+
 public:
     MkEdit(QWidget *parent = nullptr):QTextEdit(parent){
-
-        setStyleSheet("QTextEdit { padding-left:10; padding-top:10; padding-bottom:10; padding-right:10}");
 
         setTabStopDistance(20);
         regexCodeBlock.setPattern("^```+.*");
         regexStartBlock.setPattern("```[a-zA-Z0-9]+");
-        widthCodeBlock = this->width() - this->width()-10-PADDING;
-        heightCodeBlock = this->height();
 
-//        brushDefault.setColor(QColor(194,201,207));
-
-
-        penCodeBlock.setWidthF(0.5);
+        penCodeBlock.setWidthF(1);
         penCodeBlock.setStyle(Qt::SolidLine);
-        penCodeBlock.setColor(QColor(194,201,207));
 
         QObject::connect(this,SIGNAL(cursorPositionChanged()),
                          this, SLOT(cursorPositionChangedHandle()));
+
     }
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event)override;
     void resizeEvent(QResizeEvent *event)override;
     void wheelEvent(QWheelEvent *e)override;
+    QColor blockColor() const;
+    void blockColor(const QColor& color);
 
-//    QBrush brushDefault;
+ private:
+    QColor codeBlockColor;
     QRegularExpression regexNumbering;
     QRegularExpression regexCodeBlock;
     QRegularExpression regexStartBlock;
     int widthCodeBlock;
-    int heightCodeBlock;
     QPen penCodeBlock;
     int savedBlockNumber;
 
@@ -57,8 +54,8 @@ public:
 
  public slots:
     void cursorPositionChangedHandle();
+//    void blockColorChangedHandle(const QColor& color);
 
- public:
 signals:
     void cursorPosChanged(bool hasSelection, int blockNumber );
     void fileSave();
@@ -67,6 +64,7 @@ signals:
 
     void removeAllMkData();
     void applyAllMkData(bool hasSelection, int blockNumber);
+    void blockColorChanged(const QColor& color);
 };
 
 #endif // MKEDIT_H
