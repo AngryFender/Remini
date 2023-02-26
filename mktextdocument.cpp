@@ -5,6 +5,8 @@ MkTextDocument::MkTextDocument(QObject *parent)
 {
     regexCodeBlock.setPattern(CODEBLOCK_SYMBOL);
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
+
+    this->setUndoRedoEnabled(false);
 }
 
 void MkTextDocument::setPlainText(const QString &text)
@@ -14,6 +16,12 @@ void MkTextDocument::setPlainText(const QString &text)
 
     QTextDocument::setPlainText(text);
     identifyUserData();
+}
+
+void MkTextDocument::setUndoRedoText(const QString &text)
+{
+    QTextDocument::clear();
+    QTextDocument::setPlainText(text);
 }
 
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)

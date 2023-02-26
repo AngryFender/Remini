@@ -31,6 +31,8 @@ set(PROJECT_SOURCES
         blockdata.cpp
         linedata.h
         linedata.cpp
+        editcommand.h
+        editcommand.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

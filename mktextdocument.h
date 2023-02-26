@@ -16,6 +16,8 @@ class MkTextDocument : public QTextDocument
 public:
     explicit MkTextDocument(QObject *parent = nullptr);
     void setPlainText(const QString &text);
+    void setUndoRedoText(const QString &text);
+
 
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber);
@@ -23,6 +25,7 @@ public slots:
     void applyAllMkDataHandle(bool hasSelection, int blockNumber);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
+
  private:
     struct CheckBlock{
         int start = 0;
@@ -47,6 +50,7 @@ public slots:
     void numberListDetect(int blockNumber);
     int numberListGetSpaces(const QString &text);
     QString numberListGetNextNumber(const QString &text);
+
 
 };
 

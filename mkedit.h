@@ -9,6 +9,8 @@
 #include <QTextDocument>
 #include <mktextdocument.h>
 #include <QScrollBar>
+#include <QUndoStack>
+#include <editcommand.h>
 
 #define TEXT_X 0
 #define TEXT_Y 0
@@ -33,6 +35,8 @@ public:
         QObject::connect(this,SIGNAL(cursorPositionChanged()),
                          this, SLOT(cursorPositionChangedHandle()));
 
+        this->setUndoRedoEnabled(false);
+
     }
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event)override;
@@ -49,11 +53,14 @@ public:
     int widthCodeBlock;
     QPen penCodeBlock;
     int savedBlockNumber;
+    QUndoStack undoStack;
 
     void quoteLeftKey();
 
  public slots:
     void cursorPositionChangedHandle();
+    void undo();
+    void redo();
 //    void blockColorChangedHandle(const QColor& color);
 
 signals:

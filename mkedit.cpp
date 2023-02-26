@@ -76,23 +76,43 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
-    switch(event->modifiers()){
-        case Qt::CTRL:
-        case Qt::ALT:QTextEdit::keyPressEvent(event);return;
+    switch(event->key()){
+    case Qt::Key_Shift:
+    case Qt::Key_Control:
+    case Qt::Key_Alt:QTextEdit::keyPressEvent(event);return;
     }
 
     emit removeAllMkData();
+
+    QString oldText = this->document()->toPlainText();
+    int oldCursorPos = this->textCursor().position();
+
+    bool undoRedo = false;
 
     QTextEdit::keyPressEvent(event);
 
     switch(event->key()){
     case Qt::Key_Enter:
-    case Qt::Key_Return: emit enterKeyPressed(this->textCursor().blockNumber()); break;
+    case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber()); break;
     case Qt::Key_QuoteLeft: quoteLeftKey(); break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoRedo = true; break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoRedo = true; break;
+    default: break;
+    }
+
+    int newBlockNumber = this->textCursor().blockNumber();
+
+    QTextCursor textCursor = this->textCursor();
+    if(!undoRedo){
+        EditCommand *edit = new EditCommand(this,this->document(),this->document()->toPlainText(),
+                                            this->textCursor().position(),
+                                            oldText, oldCursorPos);
+
+        undoStack.push(edit);
     }
 
     emit fileSave(); //save file
-    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber());
+    emit applyAllMkData( this->textCursor().hasSelection(), newBlockNumber);
 }
 
 void MkEdit::quoteLeftKey()
@@ -118,6 +138,20 @@ void MkEdit::blockColor(const QColor &color)
         emit blockColorChanged(codeBlockColor);
         update();
     }
+}
+
+void MkEdit::undo()
+{
+    qDebug()<<"cursor number"<< this->textCursor().position();
+
+    qDebug()<<undoStack.count();
+    undoStack.undo();
+}
+
+void MkEdit::redo()
+{
+    qDebug()<<"cursor number"<< this->textCursor().position();
+    undoStack.redo();
 }
 
 void MkEdit::cursorPositionChangedHandle()
