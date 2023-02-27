@@ -8,8 +8,7 @@ EditCommand::EditCommand(QTextEdit *view, QTextDocument *doc, QString text, int 
     this->cursorPos = cursorPos;
 
     this->oldText = oldText;
-    this->oldCursorPos = oldCursorPos;
-    qDebug()<<"New EditCommand "<<"text "<< text<< " oldText "<<oldText;
+    this->oldCursorPos = oldCursorPos;   
 }
 
 void EditCommand::undo()
@@ -23,5 +22,9 @@ void EditCommand::undo()
 
 void EditCommand::redo()
 {
-//    doc->setUndoRedoText(text);
+    qDebug()<<"text "<< text <<" pos " << cursorPos << " oldText "<<oldText << "old pos" << oldCursorPos ;
+    doc->setUndoRedoText(text);
+    QTextCursor textCursor = view->textCursor();
+    textCursor.setPosition(cursorPos);
+    view->setTextCursor(textCursor);
 }

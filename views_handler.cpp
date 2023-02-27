@@ -87,6 +87,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int)),
                      &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int)));
 
+    QObject::connect(&mkGuiDocument,SIGNAL(clearUndoStack()),
+                     viewText,SLOT(clearUndoStackHandle()));
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)

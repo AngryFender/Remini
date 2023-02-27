@@ -51,6 +51,9 @@ public slots:
     int numberListGetSpaces(const QString &text);
     QString numberListGetNextNumber(const QString &text);
 
+signals:
+    emit void clearUndoStack();
+
 
 };
 

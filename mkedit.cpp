@@ -154,6 +154,11 @@ void MkEdit::redo()
     undoStack.redo();
 }
 
+void MkEdit::clearUndoStackHandle()
+{
+    undoStack.clear();
+}
+
 void MkEdit::cursorPositionChangedHandle()
 {
     int currentBlockNumber = textCursor().blockNumber();

@@ -16,6 +16,8 @@ void MkTextDocument::setPlainText(const QString &text)
 
     QTextDocument::setPlainText(text);
     identifyUserData();
+
+    emit clearUndoStack();
 }
 
 void MkTextDocument::setUndoRedoText(const QString &text)

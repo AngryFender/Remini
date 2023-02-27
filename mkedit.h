@@ -61,6 +61,8 @@ public:
     void cursorPositionChangedHandle();
     void undo();
     void redo();
+    void clearUndoStackHandle();
+
 //    void blockColorChangedHandle(const QColor& color);
 
 signals:
