@@ -56,6 +56,7 @@ public:
     QUndoStack undoStack;
 
     void quoteLeftKey();
+//    void selectAll();
 
  public slots:
     void cursorPositionChangedHandle();
@@ -72,7 +73,7 @@ signals:
     void quoteLeftKeyPressed(int blockNumber,bool &success);
 
     void removeAllMkData();
-    void applyAllMkData(bool hasSelection, int blockNumber);
+    void applyAllMkData(bool hasSelection, int blockNumber, bool showAll);
     void blockColorChanged(const QColor& color);
 };
 

@@ -15,7 +15,7 @@ void MkTextDocument::setPlainText(const QString &text)
         return;
 
     QTextDocument::setPlainText(text);
-    identifyUserData();
+    identifyUserData(false);
 
     emit clearUndoStack();
 }
@@ -106,13 +106,13 @@ void MkTextDocument::showAllSymbols()
     }
 }
 
-void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber)
+void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll)
 {
-    identifyUserData();
+    identifyUserData(showAll);
     cursorPosChangedHandle(hasSelection, blockNumber);
 }
 
-void MkTextDocument::identifyUserData()
+void MkTextDocument::identifyUserData(bool showAll)
 {
     bool openBlock = false;
     QTextBlock startBlock;
@@ -133,8 +133,10 @@ void MkTextDocument::identifyUserData()
             else{
                 openBlock = false;
                 blockData->setStatus(BlockData::end);
-                hideSymbols(tBlock, CODEBLOCK_SYMBOL);
-                hideSymbols(startBlock, CODEBLOCK_SYMBOL);
+                if(!showAll){
+                    hideSymbols(tBlock, CODEBLOCK_SYMBOL);
+                    hideSymbols(startBlock, CODEBLOCK_SYMBOL);
+                }
             }
         }
         else{
@@ -153,7 +155,9 @@ void MkTextDocument::identifyUserData()
                     LineData *lineData = new LineData;
                     lineData->setStatus(LineData::horizontalLine);
                     tBlock.setUserData(lineData);
-                    hideSymbols(tBlock,lineData->getSymbol());
+                    if(!showAll){
+                        hideSymbols(tBlock,lineData->getSymbol());
+                    }
                 }
             }
         }

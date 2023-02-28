@@ -22,7 +22,7 @@ public:
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber);
     void removeAllMkDataHandle();
-    void applyAllMkDataHandle(bool hasSelection, int blockNumber);
+    void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
 
@@ -38,7 +38,7 @@ public slots:
     QList<QPageRanges> codeBlockPosList;
     int cursorPosition;
 
-    void identifyUserData();
+    void identifyUserData(bool showAll);
     void stripUserData();
 
     void hideSymbols(QTextBlock block,const QString &symbol);

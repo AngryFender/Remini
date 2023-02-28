@@ -84,8 +84,8 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,SIGNAL(removeAllMkData()),
                      &mkGuiDocument,SLOT(removeAllMkDataHandle()));
 
-    QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int)),
-                     &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int)));
+    QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int,bool)),
+                     &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int,bool)));
 
     QObject::connect(&mkGuiDocument,SIGNAL(clearUndoStack()),
                      viewText,SLOT(clearUndoStackHandle()));

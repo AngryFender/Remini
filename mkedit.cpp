@@ -68,7 +68,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
            this->zoomOut();
         }
         emit removeAllMkData();
-        emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber());
+        emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), false);
     }else{
         QTextEdit::wheelEvent(e);
     }
@@ -79,7 +79,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     switch(event->key()){
     case Qt::Key_Shift:
     case Qt::Key_Control:
-    case Qt::Key_Alt:QTextEdit::keyPressEvent(event);return;
+    case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
+
     }
 
     emit removeAllMkData();
@@ -87,7 +88,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     QString oldText = this->document()->toPlainText();
     int oldCursorPos = this->textCursor().position();
 
-    bool undoRedo = false;
+    bool undoRedoSkip = false;
+    bool selectAll = false;
 
     QTextEdit::keyPressEvent(event);
 
@@ -95,15 +97,16 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Enter:
     case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber()); break;
     case Qt::Key_QuoteLeft: quoteLeftKey(); break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoRedo = true; break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoRedo = true; break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoRedoSkip = true; break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoRedoSkip = true; break;
+    case Qt::Key_A:         if( event->modifiers() == Qt::CTRL) selectAll = true; undoRedoSkip = true; break;
     default: break;
     }
 
     int newBlockNumber = this->textCursor().blockNumber();
 
     QTextCursor textCursor = this->textCursor();
-    if(!undoRedo){
+    if(!undoRedoSkip){
         EditCommand *edit = new EditCommand(this,this->document(),this->document()->toPlainText(),
                                             this->textCursor().position(),
                                             oldText, oldCursorPos);
@@ -112,7 +115,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     }
 
     emit fileSave(); //save file
-    emit applyAllMkData( this->textCursor().hasSelection(), newBlockNumber);
+    emit applyAllMkData( this->textCursor().hasSelection(), newBlockNumber, selectAll);
 }
 
 void MkEdit::quoteLeftKey()
