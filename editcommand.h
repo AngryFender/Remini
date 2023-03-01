@@ -5,6 +5,7 @@
 #include <QTextEdit>
 #include <mktextdocument.h>
 #include <QUndoCommand>
+#include <QScrollBar>
 
 class EditCommand : public QUndoCommand
 {

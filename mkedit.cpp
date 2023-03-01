@@ -104,8 +104,6 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     }
 
     int newBlockNumber = this->textCursor().blockNumber();
-
-    QTextCursor textCursor = this->textCursor();
     if(!undoRedoSkip){
         EditCommand *edit = new EditCommand(this,this->document(),this->document()->toPlainText(),
                                             this->textCursor().position(),
@@ -145,15 +143,11 @@ void MkEdit::blockColor(const QColor &color)
 
 void MkEdit::undo()
 {
-    qDebug()<<"cursor number"<< this->textCursor().position();
-
-    qDebug()<<undoStack.count();
     undoStack.undo();
 }
 
 void MkEdit::redo()
 {
-    qDebug()<<"cursor number"<< this->textCursor().position();
     undoStack.redo();
 }
 
