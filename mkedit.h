@@ -54,9 +54,11 @@ public:
     QPen penCodeBlock;
     int savedBlockNumber;
     QUndoStack undoStack;
+    UndoData undoData;
 
     void quoteLeftKey();
-//    void selectAll();
+    void preUndoSetup();
+    void postUndoSetup();
 
  public slots:
     void cursorPositionChangedHandle();

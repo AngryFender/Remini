@@ -85,35 +85,23 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
 
     emit removeAllMkData();
 
-    QString oldText = this->document()->toPlainText();
-    int oldCursorPos = this->textCursor().position();
-
-    bool undoRedoSkip = false;
-    bool selectAll = false;
-
+    preUndoSetup();
     QTextEdit::keyPressEvent(event);
-
     switch(event->key()){
     case Qt::Key_Enter:
     case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber()); break;
     case Qt::Key_QuoteLeft: quoteLeftKey(); break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoRedoSkip = true; break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoRedoSkip = true; break;
-    case Qt::Key_A:         if( event->modifiers() == Qt::CTRL) selectAll = true; undoRedoSkip = true; break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoData.undoRedoSkip = true; break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoData.undoRedoSkip = true; break;
+    case Qt::Key_A:         if( event->modifiers() == Qt::CTRL) undoData.selectAll = true; undoData.undoRedoSkip = true; break;
     default: break;
     }
 
-    int newBlockNumber = this->textCursor().blockNumber();
-    if(!undoRedoSkip){
-        EditCommand *edit = new EditCommand(this,this->document(),this->document()->toPlainText(),
-                                            this->textCursor().position(),
-                                            oldText, oldCursorPos);
+    int blockNumber = this->textCursor().blockNumber();
+    postUndoSetup();
 
-        undoStack.push(edit);
-    }
-
-    emit fileSave(); //save file
-    emit applyAllMkData( this->textCursor().hasSelection(), newBlockNumber, selectAll);
+    emit fileSave();
+    emit applyAllMkData( this->textCursor().hasSelection(), blockNumber, undoData.selectAll);
 }
 
 void MkEdit::quoteLeftKey()
@@ -124,6 +112,29 @@ void MkEdit::quoteLeftKey()
         QTextCursor textCursor = this->textCursor();
         textCursor.movePosition(QTextCursor::PreviousBlock);
         this->setTextCursor(textCursor);
+    }
+}
+
+void MkEdit::preUndoSetup()
+{
+    undoData.view               = this;
+    undoData.doc                = this->document();
+    undoData.oldText            = this->document()->toPlainText();
+    undoData.oldCursorPos       = this->textCursor().position();
+    undoData.oldStartSelection  = this->textCursor().selectionStart();
+    undoData.oldEndSelection    = this->textCursor().selectionEnd();
+    undoData.undoRedoSkip       = false;
+    undoData.selectAll          = false;
+}
+
+void MkEdit::postUndoSetup()
+{
+    undoData.text               = this->document()->toPlainText();
+    undoData.cursorPos          = this->textCursor().position();
+
+    if(!undoData.undoRedoSkip){
+        EditCommand *edit = new EditCommand(undoData);
+        undoStack.push(edit);
     }
 }
 
