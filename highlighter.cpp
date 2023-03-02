@@ -42,7 +42,7 @@ Highlighter::Highlighter(QTextDocument *parent)
     highlightingRules.append(rule);
 
     classFormat.setForeground(QColor("#FAB733"));
-    rule.pattern = QRegularExpression(QStringLiteral("-[a-zA-Z]+"));
+    rule.pattern = QRegularExpression(QStringLiteral("(?<=\\s)--?[a-zA-Z0-9]+"));
     rule.format = classFormat;
     highlightingRules.append(rule);
 
