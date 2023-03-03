@@ -33,6 +33,7 @@ set(PROJECT_SOURCES
         linedata.cpp
         editcommand.h
         editcommand.cpp
+        theme.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

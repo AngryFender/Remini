@@ -1,5 +1,6 @@
  #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "theme.h"
 #include "views_handler.h"
 
 QSharedPointer<ViewsHandler> view_handler;
@@ -12,22 +13,32 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    QFile theme( "dark.qss" );
-    QString themeContents;
-    if ( theme.exists() )
-    {
-        theme.open( QFile::ReadOnly | QFile::Text );
-        QTextStream ts( &theme );
-        themeContents = ts.readAll();
-        this->setStyleSheet(themeContents);
-    }
     ui->setupUi(this);
     setup_views(*ui);
+
+    themeContents = darkTheme;
+    themeState = darkThemeState;
     this->setStyleSheet(themeContents);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_F12){
+        if (themeState == darkThemeState){
+            themeContents = lightTheme;
+            themeState = lightThemeState;
+        }else{
+            themeContents = darkTheme;
+            themeState = darkThemeState;
+        }
+        this->setStyleSheet(themeContents);
+    }
+
+    QMainWindow::keyPressEvent(event);
 }
 

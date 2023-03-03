@@ -15,7 +15,16 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void keyPressEvent(QKeyEvent *event)override;
+
 private:
+    enum ThemeState{
+        lightThemeState,
+        darkThemeState,
+    };
+
     Ui::MainWindow *ui;
+    QString themeContents;
+    ThemeState themeState;
 };
 #endif // MAINWINDOW_H

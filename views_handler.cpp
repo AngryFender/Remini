@@ -126,8 +126,9 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     mkGuiDocument.clear();
     mkGuiDocument.setPlainText(fullContent);
 
-    viewText->update();
     viewTitle->setText(fileInfo.baseName());
+    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     viewText->update();
 }
 
