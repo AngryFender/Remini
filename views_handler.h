@@ -5,6 +5,7 @@
 #include <QSharedPointer>
 #include <QTreeWidgetItem>
 #include <mkedit.h>
+#include <navigationview.h>
 
 #include "./ui_mainwindow.h"
 #define FONT_FAMILY "Helvetica [Adobe]"
@@ -32,7 +33,7 @@ private:
     QFileSystemModel modelTree;
     MkEdit* viewText;
     QLabel* viewTitle;
-    QTreeView* viewTree;
+    NavigationView* viewTree;
     QFileInfo fileInfo;
 
     QFont fontUi;
@@ -53,6 +54,8 @@ signals:
 private slots:
     void fileDisplay(const QModelIndex& index);
     void fileSaveHandle();
+    void createFileFolderHandler(QModelIndex& index);
+    void deleteFileFolderHandler(QModelIndex& index);
 
 //    void manageFilesHandle();
 };

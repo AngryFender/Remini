@@ -56,7 +56,7 @@
       <property name="handleWidth">
        <number>2</number>
       </property>
-      <widget class="QTreeView" name="uiTreeView">
+      <widget class="NavigationView" name="uiTreeView">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -166,7 +166,12 @@
   <customwidget>
    <class>MkEdit</class>
    <extends>QTextEdit</extends>
-   <header location="global">mkedit.h</header>
+   <header>mkedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>NavigationView</class>
+   <extends>QTreeView</extends>
+   <header location="global">navigationview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

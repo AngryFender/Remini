@@ -31,11 +31,9 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
 
 void ViewsHandler::initTreeView()
 {
+    modelTree.setReadOnly(false);
     viewTree->setModel(&modelTree);
-    viewTree->setColumnHidden(1,true);
-    viewTree->setHeaderHidden(true);
     viewTree->setRootIndex(modelTree.index(getSavedPath()));
-    viewTree->setRootIsDecorated(false);
     for(int column = 1; column < modelTree.columnCount(); column ++)
     {
         viewTree->setColumnHidden(column,true);
@@ -68,6 +66,12 @@ void ViewsHandler::initConnection()
 {
     QObject::connect(viewTree, SIGNAL(pressed(QModelIndex)),
                       this, SLOT(fileDisplay(QModelIndex)));
+
+    QObject::connect(viewTree, SIGNAL(createFileFolder(QModelIndex&)),
+                      this, SLOT(createFileFolderHandler(QModelIndex&)));
+
+    QObject::connect(viewTree, SIGNAL(deleteFileFolder(QModelIndex&)),
+                      this, SLOT(deleteFileFolderHandler(QModelIndex&)));
 
     QObject::connect(viewText,SIGNAL(fileSave()),
                      this, SLOT(fileSaveHandle()));
@@ -145,4 +149,16 @@ void ViewsHandler::fileSaveHandle()
         stream<<fullContent;
         file.close();
     }
+}
+
+void ViewsHandler::createFileFolderHandler(QModelIndex &index)
+{
+    QString filePath = modelTree.filePath(index);
+    QFile file(filePath+"\\Untitled.txt");
+    file.open(QIODevice::ReadWrite);
+}
+
+void ViewsHandler::deleteFileFolderHandler(QModelIndex &index)
+{
+    modelTree.remove(index);
 }
