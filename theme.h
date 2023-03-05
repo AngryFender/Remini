@@ -92,7 +92,8 @@ const QString lightTheme = QStringLiteral( "QMainWindow {"
                                            "    border-style: none;"
                                            "}");
 
-const QString darkTheme = QStringLiteral( "QMainWindow {"
+const QString darkTheme = QStringLiteral( "QMessageBox { background-color: #353535; } "
+                                          "QMainWindow {"
                                           "	background-color:#353535;"
                                           "	border-color: transparent"
                                           "}"

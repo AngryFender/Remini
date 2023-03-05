@@ -23,6 +23,7 @@ private:
     QAction deleteFileAction;
     QString newEntryName;
     QModelIndex lastClickedIndex;
+    QModelIndex recentlyCreatedFile;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -36,11 +37,13 @@ protected:
     void renameFile();
     void deleteFile();
     void folderChangedHandler();
-
+    void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
 signals:
     void createFile(QModelIndex &index, QString &name);
     void createFolder(QModelIndex &index, QString &name);
     void deleteFileFolder(QModelIndex &index);
+    void newFileCreated(const QModelIndex &index);
+
 };
 
 #endif // NAVIGATIONVIEW_H

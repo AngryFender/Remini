@@ -1,7 +1,4 @@
-
 #include "views_handler.h"
-
-#include <QTextStream>
 
 QString ViewsHandler::getSavedPath()
 {
@@ -74,7 +71,13 @@ void ViewsHandler::initConnection()
                      &modelTree, SLOT(createFolderHandler(QModelIndex&,QString&)));
 
     QObject::connect(viewTree, SIGNAL(deleteFileFolder(QModelIndex&)),
+                     this, SLOT(fileDeleteDialogue(QModelIndex&)));
+
+    QObject::connect(this, SIGNAL(fileDelete(QModelIndex&)),
                      &modelTree, SLOT(deleteFileFolderHandler(QModelIndex&)));
+
+    QObject::connect(viewTree, SIGNAL(newFileCreated(QModelIndex)),
+                     this, SLOT(fileDisplay(QModelIndex)));
 
     QObject::connect(viewText,SIGNAL(fileSave()),
                      this, SLOT(fileSaveHandle()));
@@ -144,3 +147,16 @@ void ViewsHandler::fileSaveHandle()
         file.close();
     }
 }
+
+void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
+{
+    QMessageBox confirmBox;
+    confirmBox.setWindowTitle("Delete");
+    confirmBox.setText("Are you sure you want to delete");
+    confirmBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    confirmBox.setDefaultButton(QMessageBox::No);
+    if(QMessageBox::Yes == confirmBox.exec()){
+        emit fileDelete(index);
+    }
+}
+

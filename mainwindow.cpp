@@ -5,8 +5,8 @@
 
 QSharedPointer<ViewsHandler> view_handler;
 
-void setup_views(Ui::MainWindow &ui){
-    view_handler = ViewsHandler::getInstance(ui);
+void setup_views(QWidget *parent, Ui::MainWindow &ui){
+    view_handler = ViewsHandler::getInstance(parent, ui);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setup_views(*ui);
+    setup_views(parent, *ui);
 
     themeContents = darkTheme;
     themeState = darkThemeState;

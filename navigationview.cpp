@@ -129,9 +129,18 @@ void NavigationView::folderChangedHandler()
 
         QString name = model()->data(fileIndex, Qt::DisplayRole).toString();
         if(name == newEntryName){
+            recentlyCreatedFile = fileIndex;
             this->edit(fileIndex);
             newEntryName = "";
             return;
         }
     }
+}
+
+void NavigationView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
+{
+    if(recentlyCreatedFile.isValid()){
+        emit newFileCreated(recentlyCreatedFile);
+    }
+    QTreeView::closeEditor(editor,hint);
 }
