@@ -67,11 +67,14 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, SIGNAL(pressed(QModelIndex)),
                       this, SLOT(fileDisplay(QModelIndex)));
 
-    QObject::connect(viewTree, SIGNAL(createFileFolder(QModelIndex&)),
-                      this, SLOT(createFileFolderHandler(QModelIndex&)));
+    QObject::connect(viewTree, SIGNAL(createFile(QModelIndex&,QString&)),
+                     &modelTree, SLOT(createFileHandler(QModelIndex&,QString&)));
+
+    QObject::connect(viewTree, SIGNAL(createFolder(QModelIndex&,QString&)),
+                     &modelTree, SLOT(createFolderHandler(QModelIndex&,QString&)));
 
     QObject::connect(viewTree, SIGNAL(deleteFileFolder(QModelIndex&)),
-                      this, SLOT(deleteFileFolderHandler(QModelIndex&)));
+                     &modelTree, SLOT(deleteFileFolderHandler(QModelIndex&)));
 
     QObject::connect(viewText,SIGNAL(fileSave()),
                      this, SLOT(fileSaveHandle()));
@@ -109,17 +112,13 @@ QString ViewsHandler::getFileContent(QFile& file)
     return content;
 }
 
+void ViewsHandler::uniqueName(QString &fullName)
+{
+
+}
+
 void ViewsHandler::fileDisplay(const QModelIndex& index)
 {
-    if(viewTree->isExpanded(index))
-    {
-        viewTree->collapse(index);
-    }
-    else
-    {
-        viewTree->expand(index);
-    }
-
     fileInfo = modelTree.fileInfo(index);
     if (!fileInfo.isFile())
         return;
@@ -149,16 +148,4 @@ void ViewsHandler::fileSaveHandle()
         stream<<fullContent;
         file.close();
     }
-}
-
-void ViewsHandler::createFileFolderHandler(QModelIndex &index)
-{
-    QString filePath = modelTree.filePath(index);
-    QFile file(filePath+"\\Untitled.txt");
-    file.open(QIODevice::ReadWrite);
-}
-
-void ViewsHandler::deleteFileFolderHandler(QModelIndex &index)
-{
-    modelTree.remove(index);
 }

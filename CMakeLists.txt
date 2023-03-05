@@ -36,6 +36,8 @@ set(PROJECT_SOURCES
         theme.h
         navigationview.h
         navigationview.cpp
+        navigationmodel.h
+        navigationmodel.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

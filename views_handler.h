@@ -1,11 +1,12 @@
 #ifndef VIEWS_HANDLER_H
 #define VIEWS_HANDLER_H
 #include <MkTextDocument.h>
-#include <QFileSystemModel>
+#include <QFileSystemWatcher>
 #include <QSharedPointer>
 #include <QTreeWidgetItem>
 #include <mkedit.h>
 #include <navigationview.h>
+#include <navigationmodel.h>
 
 #include "./ui_mainwindow.h"
 #define FONT_FAMILY "Helvetica [Adobe]"
@@ -30,7 +31,8 @@ private:
         initConnection();
     }
 
-    QFileSystemModel modelTree;
+    QFileSystemWatcher modelWatcher;
+    NavigationModel modelTree;
     MkEdit* viewText;
     QLabel* viewTitle;
     NavigationView* viewTree;
@@ -46,6 +48,7 @@ private:
     QString getFileContent(QFile& file);
     MkTextDocument mkGuiDocument;
     Highlighter highlighter;
+    void uniqueName(QString &fullName);
 
 signals:
     void load_text(QString text);
@@ -54,8 +57,6 @@ signals:
 private slots:
     void fileDisplay(const QModelIndex& index);
     void fileSaveHandle();
-    void createFileFolderHandler(QModelIndex& index);
-    void deleteFileFolderHandler(QModelIndex& index);
 
 //    void manageFilesHandle();
 };
