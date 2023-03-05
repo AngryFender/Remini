@@ -7,9 +7,7 @@
 #include <mkedit.h>
 #include <navigationview.h>
 #include <navigationmodel.h>
-
 #include "./ui_mainwindow.h"
-#define FONT_FAMILY "Helvetica [Adobe]"
 
 class ViewsHandler: public QObject
 {
@@ -48,7 +46,6 @@ private:
     QString getFileContent(QFile& file);
     MkTextDocument mkGuiDocument;
     Highlighter highlighter;
-    void uniqueName(QString &fullName);
 
 signals:
     void load_text(QString text);
@@ -57,8 +54,6 @@ signals:
 private slots:
     void fileDisplay(const QModelIndex& index);
     void fileSaveHandle();
-
-//    void manageFilesHandle();
 };
 
 #endif // VIEWS_HANDLER_H

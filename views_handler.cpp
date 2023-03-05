@@ -112,11 +112,6 @@ QString ViewsHandler::getFileContent(QFile& file)
     return content;
 }
 
-void ViewsHandler::uniqueName(QString &fullName)
-{
-
-}
-
 void ViewsHandler::fileDisplay(const QModelIndex& index)
 {
     fileInfo = modelTree.fileInfo(index);
