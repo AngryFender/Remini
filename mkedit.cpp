@@ -80,6 +80,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Shift:
     case Qt::Key_Control:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
+    case Qt::Key_V:
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}
     }
 
