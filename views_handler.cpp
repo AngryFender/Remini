@@ -61,6 +61,9 @@ void ViewsHandler::initFontDefault()
 
 void ViewsHandler::initConnection()
 {
+    QObject::connect(viewText,SIGNAL(syntaxColorUpdate(HighlightColor&)),
+                     &highlighter,SLOT(syntaxColorUpdateHandler(HighlightColor&)));
+
     QObject::connect(viewTree, SIGNAL(pressed(QModelIndex)),
                       this, SLOT(fileDisplay(QModelIndex)));
 

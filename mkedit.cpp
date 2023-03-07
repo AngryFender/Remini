@@ -2,6 +2,37 @@
 #include "linedata.h"
 #include "mkedit.h"
 
+MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
+
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    undoAction.setText("Undo         Ctrl+Z");
+    redoAction.setText("Redo          Ctrl+Y");
+    copyTextAction.setText("Copy          Ctrl+C");
+    pasteTextAction.setText("Paste          Ctrl+Y");
+    deleteTextAction.setText("Delete        Del");
+    selectAllAction.setText("Select All    Ctrl+A");
+
+    connect(&undoAction, SIGNAL(triggered()), this, SLOT(undo()));
+    connect(&redoAction, SIGNAL(triggered()), this, SLOT(redo()));
+    connect(&copyTextAction, SIGNAL(triggered()), this, SLOT(copy()));
+    connect(&pasteTextAction, SIGNAL(triggered()), this, SLOT(paste()));
+    connect(&deleteTextAction, SIGNAL(triggered()), this, SLOT(deleteText()));
+    connect(&selectAllAction, SIGNAL(triggered()), this, SLOT(selectAll()));
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(contextMenuHandler(QPoint)));
+
+    setTabStopDistance(20);
+    regexCodeBlock.setPattern("^```+.*");
+    regexStartBlock.setPattern("```[a-zA-Z0-9]+");
+
+    penCodeBlock.setWidthF(1);
+    penCodeBlock.setStyle(Qt::SolidLine);
+
+    QObject::connect(this,SIGNAL(cursorPositionChanged()),
+                     this, SLOT(cursorPositionChangedHandle()));
+
+    this->setUndoRedoEnabled(false);
+}
 
 void MkEdit::paintEvent(QPaintEvent *e)
 {
@@ -139,6 +170,31 @@ void MkEdit::postUndoSetup()
     }
 }
 
+void MkEdit::contextMenuHandler(QPoint pos)
+{
+    QMenu menu(this);
+    menu.addAction(&undoAction);
+    menu.addAction(&redoAction);
+    menu.addSeparator();
+    menu.addAction(&copyTextAction);
+    menu.addAction(&pasteTextAction);
+    menu.addAction(&deleteTextAction);
+    menu.addSeparator();
+    menu.addAction(&selectAllAction);
+    menu.exec(viewport()->mapToGlobal(pos));
+}
+
+void MkEdit::deleteText()
+{
+    preUndoSetup();
+
+    QTextCursor cursor = this->textCursor();
+    cursor.removeSelectedText();
+
+    postUndoSetup();
+    emit fileSave();
+}
+
 QColor MkEdit::blockColor() const
 {
     return codeBlockColor;
@@ -151,6 +207,80 @@ void MkEdit::blockColor(const QColor &color)
         emit blockColorChanged(codeBlockColor);
         update();
     }
+}
+
+void MkEdit::insertFromMimeData(const QMimeData *source)
+{
+    emit removeAllMkData();
+    preUndoSetup();
+
+    QTextEdit::insertFromMimeData(source);
+
+    int savedBlockNumber = this->textCursor().blockNumber();
+    postUndoSetup();
+    emit fileSave();
+    emit applyAllMkData( this->textCursor().hasSelection(), savedBlockNumber, undoData.selectAll);
+}
+
+QColor MkEdit::getTypeColor() const
+{
+    return syntaxColor.type;
+}
+
+QColor MkEdit::getMethodColor() const
+{
+    return syntaxColor.method;
+}
+
+QColor MkEdit::getArgumentColor() const
+{
+    return syntaxColor.argument;
+}
+
+QColor MkEdit::getCommentColor() const
+{
+    return syntaxColor.comment;
+}
+
+QColor MkEdit::getQuoteColor() const
+{
+    return syntaxColor.quote;
+}
+
+QColor MkEdit::getKeywordColor() const
+{
+    return syntaxColor.keyword;
+}
+
+void MkEdit::setTypeColor(const QColor &color)
+{
+    syntaxColor.type = color;
+}
+
+void MkEdit::setMethodColor(const QColor &color)
+{
+    syntaxColor.method = color;
+}
+
+void MkEdit::setArgumentColor(const QColor &color)
+{
+    syntaxColor.argument = color;
+}
+
+void MkEdit::setCommentColor(const QColor &color)
+{
+    syntaxColor.comment = color;
+}
+
+void MkEdit::setQuoteColor(const QColor &color)
+{
+    syntaxColor.quote = color;
+}
+
+void MkEdit::setKeywordColor(const QColor &color)
+{
+    syntaxColor.keyword = color;
+    emit syntaxColorUpdate(syntaxColor);
 }
 
 void MkEdit::undo()

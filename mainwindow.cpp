@@ -1,13 +1,4 @@
- #include "mainwindow.h"
-#include "./ui_mainwindow.h"
-#include "theme.h"
-#include "views_handler.h"
-
-QSharedPointer<ViewsHandler> view_handler;
-
-void setup_views(QWidget *parent, Ui::MainWindow &ui){
-    view_handler = ViewsHandler::getInstance(parent, ui);
-}
+#include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -40,5 +31,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     }
 
     QMainWindow::keyPressEvent(event);
+}
+
+void MainWindow::setup_views(QWidget *parent, Ui::MainWindow &ui)
+{
+    view_handler = ViewsHandler::getInstance(parent, ui);
 }
 

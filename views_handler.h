@@ -3,7 +3,6 @@
 #include <MkTextDocument.h>
 #include <QSharedPointer>
 #include <QTreeWidgetItem>
-#include <QDialog>
 #include <QMessageBox>
 #include <mkedit.h>
 #include <navigationview.h>

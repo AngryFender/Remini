@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "./ui_mainwindow.h"
+#include "views_handler.h"
+#include "theme.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,5 +29,8 @@ private:
     Ui::MainWindow *ui;
     QString themeContents;
     ThemeState themeState;
+    QSharedPointer<ViewsHandler> view_handler;
+
+    void setup_views(QWidget *parent, Ui::MainWindow &ui);
 };
 #endif // MAINWINDOW_H

@@ -1,7 +1,18 @@
 #ifndef THEME_H
 #define THEME_H
 
+#include <QColor>
 #include <QString>
+
+struct HighlightColor
+{
+    QColor type;
+    QColor method;
+    QColor argument;
+    QColor comment;
+    QColor quote;
+    QColor keyword;
+};
 
 const QString lightTheme = QStringLiteral( "QMainWindow {"
                                            "	background-color:#f4f2f1;"
@@ -21,7 +32,12 @@ const QString lightTheme = QStringLiteral( "QMainWindow {"
                                            "}"
                                            "MkEdit{"
                                            "	qproperty-blockColor: #e8e4e1;"
-                                           "}"
+                                           "    qproperty-methodColor: #9696fd;"
+                                           "    qproperty-typeColor: #D291BC;"
+                                           "    qproperty-argumentColor: #fd96c1;"
+                                           "    qproperty-commentColor: #D291BC;"
+                                           "    qproperty-quoteColor: #81b01e;"
+                                           "    qproperty-keywordColor: #fd96a7;"
                                            "}"
                                            "QTreeView {"
                                            "    background-color: #f4f2f1;"
@@ -36,7 +52,7 @@ const QString lightTheme = QStringLiteral( "QMainWindow {"
                                            "	padding-left:10; padding-right:10; padding-top:10; "
                                            "}"
                                            "QSplitter::handle {"
-                                           "    background-color: #adacac;"
+                                           "    background-color: #f4f2f1;"
                                            "}"
                                            ""
                                            "QSplitter::handle:horizontal {"
@@ -112,6 +128,12 @@ const QString darkTheme = QStringLiteral( "QMessageBox { background-color: #3535
                                           "}"
                                           "MkEdit{"
                                           "    qproperty-blockColor: #1E1E1E;"
+                                          "    qproperty-methodColor: #D291BC;"
+                                          "    qproperty-typeColor: #D291BC;"
+                                          "    qproperty-argumentColor: #fdfd96;"
+                                          "    qproperty-commentColor: gray4;"
+                                          "    qproperty-quoteColor: #92DEE4;"
+                                          "    qproperty-keywordColor: #FF9991;"
                                           "}"
                                           "QLabel {"
                                           "	background:#353535;"
