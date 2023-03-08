@@ -41,7 +41,11 @@ void NavigationModel::createFolderHandler(QModelIndex &index, QString &name)
 
 void NavigationModel::deleteFileFolderHandler(QModelIndex &index)
 {
-    this->remove(index);
+    QString fullFileName = QFileSystemModel::filePath(index);
+    QFile file(fullFileName);
+    if(file.exists()){
+        file.moveToTrash();
+    }
 }
 
 void NavigationModel::uniqueFileName(QFile &file, QString &name, QString &type, const QString &path)

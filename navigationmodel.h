@@ -16,7 +16,6 @@ public slots:
 signals:
     void folderChanged();
 private:
-    QString lastPath;
     void uniqueFileName(QFile &file, QString &name, QString &type, const QString &path);
     void uniqueFolderName(QDir &dir, QString &name, const QString &path);
 };
