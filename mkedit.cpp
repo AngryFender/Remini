@@ -11,13 +11,15 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     pasteTextAction.setText("Paste          Ctrl+Y");
     deleteTextAction.setText("Delete        Del");
     selectAllAction.setText("Select All    Ctrl+A");
+    selectBlockAction.setText("Select Block");
 
-    connect(&undoAction, SIGNAL(triggered()), this, SLOT(undo()));
-    connect(&redoAction, SIGNAL(triggered()), this, SLOT(redo()));
+    connect(&undoAction, SIGNAL(triggered()), this, SLOT(undoContextMenu()));
+    connect(&redoAction, SIGNAL(triggered()), this, SLOT(redoContextMenu()));
     connect(&copyTextAction, SIGNAL(triggered()), this, SLOT(copy()));
     connect(&pasteTextAction, SIGNAL(triggered()), this, SLOT(paste()));
-    connect(&deleteTextAction, SIGNAL(triggered()), this, SLOT(deleteText()));
+    connect(&deleteTextAction, SIGNAL(triggered()), this, SLOT(deleteContextMenu()));
     connect(&selectAllAction, SIGNAL(triggered()), this, SLOT(selectAll()));
+    connect(&selectBlockAction, SIGNAL(triggered()), this, SLOT(selectBlock()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(contextMenuHandler(QPoint)));
 
@@ -55,7 +57,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
         if(blockData){
             if(blockData->getStatus()==BlockData::start){
                 xBlock = block.layout()->position().x()-2;
-                yBlock = block.layout()->position().y()-scrollPos-2;
+                yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4);
             }
             else if(blockData->getStatus()==BlockData::end){
                 int height = block.layout()->position().y() - yBlock + (fontSize*0.4)-scrollPos;
@@ -172,6 +174,11 @@ void MkEdit::postUndoSetup()
 
 void MkEdit::contextMenuHandler(QPoint pos)
 {
+    contextMenuPos = pos;
+    QTextCursor cursor = this->cursorForPosition(contextMenuPos);
+    bool rightClockOnCodeBlock = false;
+    emit checkRightClockOnCodeBlock(cursor.blockNumber(),rightClockOnCodeBlock);
+
     QMenu menu(this);
     menu.addAction(&undoAction);
     menu.addAction(&redoAction);
@@ -181,18 +188,46 @@ void MkEdit::contextMenuHandler(QPoint pos)
     menu.addAction(&deleteTextAction);
     menu.addSeparator();
     menu.addAction(&selectAllAction);
+    if(rightClockOnCodeBlock)menu.addAction(&selectBlockAction);
     menu.exec(viewport()->mapToGlobal(pos));
 }
 
-void MkEdit::deleteText()
+void MkEdit::undoContextMenu()
 {
-    preUndoSetup();
+    QKeyEvent keyPress(QKeyEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier);
+    keyPressEvent(&keyPress);
+}
 
-    QTextCursor cursor = this->textCursor();
-    cursor.removeSelectedText();
+void MkEdit::redoContextMenu()
+{
+    QKeyEvent keyPress(QKeyEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier);
+    keyPressEvent(&keyPress);
+}
 
-    postUndoSetup();
-    emit fileSave();
+void MkEdit::deleteContextMenu()
+{
+    QKeyEvent keyPress(QKeyEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier);
+    keyPressEvent(&keyPress);
+}
+
+void MkEdit::selectBlock()
+{
+    QTextCursor cursor = this->cursorForPosition(contextMenuPos);
+
+    int startPos = 0;
+    int endPos = 0;
+    emit selectBlockCopy(cursor.blockNumber(), startPos, endPos);
+
+    if(startPos == endPos){
+        return;
+    }
+
+    cursor.setPosition(startPos);
+    cursor.setPosition(endPos,QTextCursor::KeepAnchor);
+
+    this->setTextCursor(cursor);
+
+    copy();
 }
 
 QColor MkEdit::blockColor() const

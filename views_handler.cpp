@@ -73,6 +73,12 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, SIGNAL(createFolder(QModelIndex&,QString&)),
                      &modelTree, SLOT(createFolderHandler(QModelIndex&,QString&)));
 
+    QObject::connect(viewText, SIGNAL(checkRightClockOnCodeBlock(int, bool&)),
+                     &mkGuiDocument, SLOT(checkRightClockOnCodeBlockHandle(int, bool&)));
+
+    QObject::connect(viewText, SIGNAL(selectBlockCopy(int, int&, int&)),
+                     &mkGuiDocument, SLOT(selectBlockCopyHandle(int, int&, int&)));
+
     QObject::connect(viewTree, SIGNAL(deleteFileFolder(QModelIndex&)),
                      this, SLOT(fileDeleteDialogue(QModelIndex&)));
 

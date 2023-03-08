@@ -128,11 +128,13 @@ void MkTextDocument::identifyUserData(bool showAll)
             if(!openBlock){
                 openBlock = true;
                 blockData->setStatus(BlockData::start);
+                setCodeBlockMargin(tBlock, blockFormat, this->defaultFont().pointSize()*3/4,this->defaultFont().pointSize());
                 startBlock = tBlock;
             }
             else{
                 openBlock = false;
                 blockData->setStatus(BlockData::end);
+                setCodeBlockMargin(tBlock, blockFormat, this->defaultFont().pointSize()*3/4);
                 if(!showAll){
                     hideSymbols(tBlock, CODEBLOCK_SYMBOL);
                     hideSymbols(startBlock, CODEBLOCK_SYMBOL);
@@ -144,11 +146,7 @@ void MkTextDocument::identifyUserData(bool showAll)
                 BlockData *blockData = new BlockData;
                 blockData->setStatus(BlockData::content);
                 tBlock.setUserData(blockData);
-
-                QTextCursor tcursor(tBlock);
-                blockFormat = tcursor.blockFormat();
-                blockFormat.setLeftMargin(this->defaultFont().pointSize());
-                tcursor.mergeBlockFormat(blockFormat);
+                setCodeBlockMargin(tBlock, blockFormat, this->defaultFont().pointSize()*5/3);
             }else{
                 QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
                 if(matchHorizontalLine.hasMatch()){
@@ -162,6 +160,15 @@ void MkTextDocument::identifyUserData(bool showAll)
             }
         }
     }
+}
+
+void MkTextDocument::setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin, int topMargin)
+{
+    QTextCursor cursor(block);
+    blockFormat = cursor.blockFormat();
+    blockFormat.setLeftMargin(leftMargin);
+    if(topMargin != 0) blockFormat.setTopMargin(topMargin);
+    cursor.mergeBlockFormat(blockFormat);
 }
 
 void MkTextDocument::stripUserData()
@@ -223,6 +230,20 @@ void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
     }
 }
 
+BlockData* MkTextDocument::checkValidCodeBlock(QTextBlock &block)
+{
+    if(!block.isValid())
+        return nullptr;
+
+    QTextBlockUserData* data =block.userData();
+    BlockData* blockData = dynamic_cast<BlockData*>(data);
+    if(blockData){
+        return blockData;
+    }
+
+    return nullptr;
+}
+
 void MkTextDocument::enterKeyPressedHandle(int blockNumber)
 {
     numberListDetect(blockNumber);
@@ -231,6 +252,42 @@ void MkTextDocument::enterKeyPressedHandle(int blockNumber)
 void MkTextDocument::quoteLeftKeyPressedHandle(int blockNumber,bool &success)
 {
     autoCompleteCodeBlock(blockNumber,success);
+}
+
+void MkTextDocument::checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid)
+{
+    QTextBlock codeBlockSuspect = this->findBlockByNumber(blockNumber);
+    BlockData* blockData = checkValidCodeBlock(codeBlockSuspect);
+    if(blockData)
+        valid = true;
+    else
+        valid = false;
+}
+
+void MkTextDocument::selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos)
+{
+    QTextBlock currentBlock = this->findBlockByNumber(blockNumber);
+    BlockData* blockData = checkValidCodeBlock(currentBlock);
+    if(blockData){
+        if(blockData->getStatus()==BlockData::end || blockData->getStatus()==BlockData::content){
+            while(blockData->getStatus()!=BlockData::start){
+                currentBlock = currentBlock.previous();
+                blockData = checkValidCodeBlock(currentBlock);
+            }
+        }
+        if(blockData->getStatus()==BlockData::start){
+            startPos = currentBlock.next().position();
+            while(blockData->getStatus()!=BlockData::end){
+                currentBlock = currentBlock.next();
+                blockData = checkValidCodeBlock(currentBlock);
+                if(!blockData){
+                    endPos = startPos;
+                    return;
+                }
+            }
+            endPos = currentBlock.previous().position()+currentBlock.previous().length()-1;
+        }
+    }
 }
 
 void MkTextDocument::numberListDetect(int blockNumber)

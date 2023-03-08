@@ -78,10 +78,16 @@ protected:
     QAction pasteTextAction;
     QAction deleteTextAction;
     QAction selectAllAction;
+    QAction selectBlockAction;
+    QPoint contextMenuPos;
+    int contextMenuBlockNum;
 
  public slots:
     void contextMenuHandler(QPoint pos);
-    void deleteText();
+    void undoContextMenu();
+    void redoContextMenu();
+    void deleteContextMenu();
+    void selectBlock();
     void cursorPositionChangedHandle();
     void undo();
     void redo();
@@ -92,6 +98,8 @@ signals:
     void fileSave();
     void enterKeyPressed(int blockNumber);
     void quoteLeftKeyPressed(int blockNumber,bool &success);
+    void checkRightClockOnCodeBlock(int blockNumber, bool &valid);
+    void selectBlockCopy(int blockNumber, int &startPos, int &endPos);
 
     void removeAllMkData();
     void applyAllMkData(bool hasSelection, int blockNumber, bool showAll);

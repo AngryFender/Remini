@@ -25,6 +25,8 @@ public slots:
     void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
+    void checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid);
+    void selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos);
 
  private:
     struct CheckBlock{
@@ -39,6 +41,7 @@ public slots:
     int cursorPosition;
 
     void identifyUserData(bool showAll);
+    void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin, int topMargin = 0);
     void stripUserData();
 
     void hideSymbols(QTextBlock block,const QString &symbol);
@@ -46,6 +49,7 @@ public slots:
     void showSymbols(QTextBlock block,const QString &symbol);
 
     void autoCompleteCodeBlock(int blockNumber,bool &success);
+    BlockData* checkValidCodeBlock(QTextBlock &block);
 
     void numberListDetect(int blockNumber);
     int numberListGetSpaces(const QString &text);
