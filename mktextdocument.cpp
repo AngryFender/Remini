@@ -290,6 +290,16 @@ void MkTextDocument::selectBlockCopyHandle(int blockNumber, int &startPos, int &
     }
 }
 
+void MkTextDocument::duplicateLine(int blockNumber)
+{
+    QTextBlock currentBlock = this->findBlockByNumber(blockNumber);
+    QTextCursor editCursor(currentBlock);
+    QString lineText = currentBlock.text();
+    editCursor.movePosition(QTextCursor::EndOfBlock);
+    editCursor.insertBlock();
+    editCursor.insertText(lineText);
+}
+
 void MkTextDocument::numberListDetect(int blockNumber)
 {
     QTextCursor editCursor(this->findBlockByNumber(blockNumber));

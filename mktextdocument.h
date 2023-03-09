@@ -27,6 +27,7 @@ public slots:
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
     void checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid);
     void selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos);
+    void duplicateLine(int blockNumber);
 
  private:
     struct CheckBlock{

@@ -125,6 +125,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Enter:
     case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber()); break;
     case Qt::Key_QuoteLeft: quoteLeftKey(); break;
+    case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) emit duplicateLine(this->textCursor().blockNumber());; break;
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoData.undoRedoSkip = true; break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoData.undoRedoSkip = true; break;
     case Qt::Key_A:         if( event->modifiers() == Qt::CTRL) undoData.selectAll = true; undoData.undoRedoSkip = true; break;

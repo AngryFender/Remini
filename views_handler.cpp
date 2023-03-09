@@ -79,8 +79,12 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText, SIGNAL(selectBlockCopy(int, int&, int&)),
                      &mkGuiDocument, SLOT(selectBlockCopyHandle(int, int&, int&)));
 
+    QObject::connect(viewText, SIGNAL(duplicateLine(int)),
+                     &mkGuiDocument, SLOT(duplicateLine(int)));
+
     QObject::connect(viewTree, SIGNAL(deleteFileFolder(QModelIndex&)),
                      this, SLOT(fileDeleteDialogue(QModelIndex&)));
+
 
     QObject::connect(this, SIGNAL(fileDelete(QModelIndex&)),
                      &modelTree, SLOT(deleteFileFolderHandler(QModelIndex&)));
