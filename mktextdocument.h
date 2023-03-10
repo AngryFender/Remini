@@ -42,7 +42,7 @@ public slots:
     int cursorPosition;
 
     void identifyUserData(bool showAll);
-    void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin, int topMargin = 0);
+    void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
     void stripUserData();
 
     void hideSymbols(QTextBlock block,const QString &symbol);

@@ -114,6 +114,7 @@ void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bo
 
 void MkTextDocument::identifyUserData(bool showAll)
 {
+    int fontSize =this->defaultFont().pointSize();
     bool openBlock = false;
     QTextBlock startBlock;
     QTextBlockFormat blockFormat;
@@ -128,13 +129,13 @@ void MkTextDocument::identifyUserData(bool showAll)
             if(!openBlock){
                 openBlock = true;
                 blockData->setStatus(BlockData::start);
-                setCodeBlockMargin(tBlock, blockFormat, this->defaultFont().pointSize()*3/4,this->defaultFont().pointSize());
+                setCodeBlockMargin(tBlock, blockFormat, fontSize*3/4, fontSize, fontSize);
                 startBlock = tBlock;
             }
             else{
                 openBlock = false;
                 blockData->setStatus(BlockData::end);
-                setCodeBlockMargin(tBlock, blockFormat, this->defaultFont().pointSize()*3/4);
+                setCodeBlockMargin(tBlock, blockFormat, fontSize*3/4, fontSize);
                 if(!showAll){
                     hideSymbols(tBlock, CODEBLOCK_SYMBOL);
                     hideSymbols(startBlock, CODEBLOCK_SYMBOL);
@@ -146,7 +147,7 @@ void MkTextDocument::identifyUserData(bool showAll)
                 BlockData *blockData = new BlockData;
                 blockData->setStatus(BlockData::content);
                 tBlock.setUserData(blockData);
-                setCodeBlockMargin(tBlock, blockFormat, this->defaultFont().pointSize()*5/3);
+                setCodeBlockMargin(tBlock, blockFormat, fontSize*5/3, fontSize);
             }else{
                 QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
                 if(matchHorizontalLine.hasMatch()){
@@ -162,12 +163,13 @@ void MkTextDocument::identifyUserData(bool showAll)
     }
 }
 
-void MkTextDocument::setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin, int topMargin)
+void MkTextDocument::setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin)
 {
     QTextCursor cursor(block);
     blockFormat = cursor.blockFormat();
     blockFormat.setLeftMargin(leftMargin);
     if(topMargin != 0) blockFormat.setTopMargin(topMargin);
+    blockFormat.setRightMargin(rightMargin);
     cursor.mergeBlockFormat(blockFormat);
 }
 
