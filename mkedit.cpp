@@ -119,6 +119,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
     case Qt::Key_V:
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}
+    case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}
     }
 
     emit removeAllMkData();
@@ -152,6 +153,13 @@ void MkEdit::quoteLeftKey()
         textCursor.movePosition(QTextCursor::PreviousBlock);
         this->setTextCursor(textCursor);
     }
+}
+
+void MkEdit::smartSelectionSetup()
+{
+    QTextCursor cursor = this->textCursor();
+    emit smartSelection(this->textCursor().blockNumber(), cursor);
+    this->setTextCursor(cursor);
 }
 
 void MkEdit::preUndoSetup()

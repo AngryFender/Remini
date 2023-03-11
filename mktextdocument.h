@@ -7,6 +7,9 @@
 #include <QRegularExpressionMatchIterator>
 #include <QRegularExpressionMatch>
 #include <QPageRanges>
+#include <QString>
+#include <QStringList>
+#include <QRegularExpression>
 #include <blockdata.h>
 #include <linedata.h>
 
@@ -27,7 +30,8 @@ public slots:
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
     void checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid);
     void selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos);
-    void duplicateLine(int blockNumber);
+    void duplicateLineHandle(int blockNumber);
+    void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
 
  private:
     struct CheckBlock{

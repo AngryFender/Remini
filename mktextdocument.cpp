@@ -292,7 +292,7 @@ void MkTextDocument::selectBlockCopyHandle(int blockNumber, int &startPos, int &
     }
 }
 
-void MkTextDocument::duplicateLine(int blockNumber)
+void MkTextDocument::duplicateLineHandle(int blockNumber)
 {
     QTextBlock currentBlock = this->findBlockByNumber(blockNumber);
     QTextCursor editCursor(currentBlock);
@@ -300,6 +300,145 @@ void MkTextDocument::duplicateLine(int blockNumber)
     editCursor.movePosition(QTextCursor::EndOfBlock);
     editCursor.insertBlock();
     editCursor.insertText(lineText);
+}
+
+void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
+{
+    QTextBlock currentBlock = this->findBlockByNumber(blockNumber);
+    QString lineText = currentBlock.text();
+    int currentBlockPos = currentBlock.position();
+    int start = cursor.selectionStart() - currentBlockPos;
+    int end = cursor.selectionEnd() - currentBlockPos;
+
+    int lastCharacter = lineText.length();
+    QChar firstCharacterCheck;
+    QChar endCharacterCheck;
+
+    if(!cursor.hasSelection()){
+        cursor.movePosition(QTextCursor::StartOfWord);
+        cursor.movePosition(QTextCursor::EndOfWord,QTextCursor::KeepAnchor);
+        return;
+    }
+
+    if((start >0)&&(end<lastCharacter)){
+        firstCharacterCheck = lineText.at(start-1);
+        endCharacterCheck = lineText.at(end) ;
+        if(((firstCharacterCheck == '\"')&&(endCharacterCheck == '\"'))||
+           ((firstCharacterCheck == '{')&&(endCharacterCheck == '}'))||
+           ((firstCharacterCheck == '(')&&(endCharacterCheck == ')'))||
+           ((firstCharacterCheck == '[')&&(endCharacterCheck == ']'))){
+            if(start > 0) start--;
+            if(end < lastCharacter) end++;
+
+            cursor.setPosition(start+ currentBlockPos);
+            cursor.setPosition(end + currentBlockPos,QTextCursor::KeepAnchor);
+            return;
+        }
+
+        if(((firstCharacterCheck == '{')&&(endCharacterCheck == '\"'))||
+        ((firstCharacterCheck == '{')&&(endCharacterCheck == ')'))||
+        ((firstCharacterCheck == '{')&&(endCharacterCheck == ']'))||
+        ((firstCharacterCheck == '(')&&(endCharacterCheck == '\"')) ||
+        ((firstCharacterCheck == '(')&&(endCharacterCheck == '}')) ||
+        ((firstCharacterCheck == '(')&&(endCharacterCheck == ']')) ||
+        ((firstCharacterCheck == '[')&&(endCharacterCheck == '\"')) ||
+        ((firstCharacterCheck == '[')&&(endCharacterCheck == ')')) ||
+        ((firstCharacterCheck == '[')&&(endCharacterCheck == ']'))){
+            if(end < lastCharacter) end++;
+
+            cursor.setPosition(start+ currentBlockPos);
+            cursor.setPosition(end + currentBlockPos,QTextCursor::KeepAnchor);
+            return;
+        }
+
+        if(((firstCharacterCheck == '\"')&&(endCharacterCheck == '}'))||
+        ((firstCharacterCheck == '\"')&&(endCharacterCheck == ')'))||
+        ((firstCharacterCheck == '\"')&&(endCharacterCheck == ']'))||
+        ((firstCharacterCheck == '}')&&(endCharacterCheck == '\"'))||
+        ((firstCharacterCheck == '}')&&(endCharacterCheck == ')'))||
+        ((firstCharacterCheck == '}')&&(endCharacterCheck == ']'))||
+        ((firstCharacterCheck == ')')&&(endCharacterCheck == '\"')) ||
+        ((firstCharacterCheck == ')')&&(endCharacterCheck == '}')) ||
+        ((firstCharacterCheck == ')')&&(endCharacterCheck == ']')) ||
+        ((firstCharacterCheck == ']')&&(endCharacterCheck == '\"')) ||
+        ((firstCharacterCheck == ']')&&(endCharacterCheck == ')')) ||
+        ((firstCharacterCheck == ']')&&(endCharacterCheck == ']'))){
+            if(start > 0) start--;
+
+            cursor.setPosition(start+ currentBlockPos);
+            cursor.setPosition(end + currentBlockPos,QTextCursor::KeepAnchor);
+            return;
+        }
+    }
+
+    //skip spaces on the left side of the selection
+    while(start >0){
+        start--;
+        if(!lineText.at(start).isSpace())
+            break;
+    }
+
+    while(start >=0){
+        if(lineText.at(start)== QChar('\"')){
+            if(!(cursor.selectedText().contains("\""))){
+                firstCharacterCheck = '\"'; break;
+            }
+        }else if(lineText.at(start)== QChar('{')){
+            if(!(cursor.selectedText().contains("{")||cursor.selectedText().contains("}"))){
+                firstCharacterCheck = '{'; break;
+            }
+        }else if(lineText.at(start)== QChar('(')){
+            if(!(cursor.selectedText().contains("(")||cursor.selectedText().contains(")"))){
+                firstCharacterCheck = '('; break;
+            }
+        }else if(lineText.at(start)== QChar('[')){
+            if(!(cursor.selectedText().contains("[")||cursor.selectedText().contains("]"))){
+                firstCharacterCheck = '['; break;
+            }
+        }else if(lineText.at(start).isSpace()){
+            firstCharacterCheck = ' ';break;
+        }
+        start--;
+    }
+    start++;
+
+
+    if(end < lastCharacter){
+        //sometimes selection can start at the middle of a word
+        if(lineText.at(end).isSpace()){
+            //skip spaces on the left side of the selection
+            while(end< lastCharacter){
+                end++;
+                if(!lineText.at(end).isSpace())
+                    break;
+            }
+        }
+    }
+
+    while(end < lastCharacter){
+        if(lineText.at(end)== QChar('\"')){
+            if(!(cursor.selectedText().contains("\""))){
+                endCharacterCheck = '\"'; break;
+            }
+        }else if(lineText.at(end)== QChar('}')){
+            if(!(cursor.selectedText().contains("{")||cursor.selectedText().contains("}"))){
+                endCharacterCheck = '}'; break;
+            }
+        }else if(lineText.at(end)== QChar(')')){
+            if(!(cursor.selectedText().contains("(")||cursor.selectedText().contains(")"))){
+                endCharacterCheck = ')'; break;
+            }
+        }else if(lineText.at(end)== QChar(']')){
+            if(!(cursor.selectedText().contains("[")||cursor.selectedText().contains("]"))){
+                endCharacterCheck = ']'; break;
+            }
+        }else if(lineText.at(end).isSpace()){
+            endCharacterCheck = ' ';break;
+        }
+        end++;
+    }
+    cursor.setPosition(start+ currentBlockPos);
+    cursor.setPosition(end + currentBlockPos,QTextCursor::KeepAnchor);
 }
 
 void MkTextDocument::numberListDetect(int blockNumber)

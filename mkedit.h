@@ -69,6 +69,7 @@ protected:
 
 
     void quoteLeftKey();
+    void smartSelectionSetup();
     void preUndoSetup();
     void postUndoSetup();
 
@@ -101,6 +102,7 @@ signals:
     void checkRightClockOnCodeBlock(int blockNumber, bool &valid);
     void selectBlockCopy(int blockNumber, int &startPos, int &endPos);
     void duplicateLine(int blockNumber);
+    void smartSelection(int blockNumber, QTextCursor &cursor);
 
     void removeAllMkData();
     void applyAllMkData(bool hasSelection, int blockNumber, bool showAll);
