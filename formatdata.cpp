@@ -49,6 +49,11 @@ void FormatData::addFormat(int start, int end, QString &symbol)
     positions.append(new PositionData(end,symbol));
 }
 
+bool FormatData::isEmpty()
+{
+    return positions.empty();
+}
+
 bool &FormatData::isHidden()
 {
     return hidden;

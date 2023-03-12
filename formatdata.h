@@ -54,6 +54,7 @@ public:
     QVector<PositionData*>::Iterator pos_previous(QVector<PositionData*>::Iterator it) {return it--;};
     QVector<PositionData*>::Iterator pos_end() {return positions.end();};
 
+    bool isEmpty();
     bool& isHidden();
     void setHidden(bool hide);
 

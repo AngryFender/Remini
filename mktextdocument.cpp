@@ -5,7 +5,7 @@ MkTextDocument::MkTextDocument(QObject *parent)
 {
     regexCodeBlock.setPattern(CODEBLOCK_SYMBOL);
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
-    regexBoldA.setPattern("\\*\\*");
+    regexBoldA.setPattern("(?<!\\*)\\*\\*(?!\\*{1,2})");
     regexBoldU.setPattern(BOLD_SYMBOL_U);
 
     this->setUndoRedoEnabled(false);
@@ -220,26 +220,28 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll)
                     startBoldPos = index1;
                 }else{
                     endBoldPos = index1;
-                    formatData->addFormat(startBoldPos, endBoldPos, testSym);
-                    startBoldPos = -1;
+                    if(endBoldPos-startBoldPos>2){
+                        formatData->addFormat(startBoldPos, endBoldPos, testSym);
+                        startBoldPos = -1;
+                    }
                 }
             }
             index1++;
             index2++;
         }
-        block.setUserData(formatData);
-
-        if(!showAll){
-            if(!formatData->isHidden()){
-                //hide symbols, start at the end to avoid changing position of the symbols
-                for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
-                {
-                    hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+        if(!formatData->isEmpty()){
+            block.setUserData(formatData);
+            if(!showAll){
+                if(!formatData->isHidden()){
+                    //hide symbols, start at the end to avoid changing position of the symbols
+                    for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
+                    {
+                        hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+                    }
+                    formatData->setHidden(true);
                 }
-                formatData->setHidden(true);
             }
         }
-
     }
 }
 
@@ -281,7 +283,7 @@ void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
 void MkTextDocument::hideSymbolsAtPos(QTextBlock &block, int pos, const QString &symbol)
 {
     QString text = block.text();
-    if(pos>=text.length())
+    if((pos+1)>=text.length())
         return;
 
     QTextCursor cursor(block);
