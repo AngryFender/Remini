@@ -5,6 +5,8 @@ MkTextDocument::MkTextDocument(QObject *parent)
 {
     regexCodeBlock.setPattern(CODEBLOCK_SYMBOL);
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
+    regexBoldA.setPattern("\\*\\*");
+    regexBoldU.setPattern(BOLD_SYMBOL_U);
 
     this->setUndoRedoEnabled(false);
 }
@@ -71,6 +73,28 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
                     }
                 }
             }
+            FormatData* formatData = dynamic_cast<FormatData*>(data);
+            if(formatData){
+                if(blockNumber == tblock.blockNumber()){
+                    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
+                    {
+                        showSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
+                    }
+                    formatData->setHidden(false);
+                }
+                else{
+                    if(!hasSelection){
+                        if(!formatData->isHidden()){
+                            //hide symbols, start at the end to avoid changing position of the symbols
+                            for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
+                            {
+                                hideSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
+                            }
+                            formatData->setHidden(true);
+                        }
+                    }
+                }
+            }
         }
         tblock = tblock.next();
     }
@@ -100,6 +124,17 @@ void MkTextDocument::showAllSymbols()
             LineData* lineData = dynamic_cast<LineData*>(data);
             if(lineData){
                 showSymbols(tblock, lineData->getSymbol());
+            }
+
+            FormatData* formatData = dynamic_cast<FormatData*>(data);
+            if(formatData){
+                if(formatData->isHidden()){
+                    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
+                    {
+                        showSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
+                    }
+                    formatData->setHidden(false);
+                }
             }
         }
         tblock = tblock.next();
@@ -158,8 +193,51 @@ void MkTextDocument::identifyUserData(bool showAll)
                         hideSymbols(tBlock,lineData->getSymbol());
                     }
                 }
+                identifyFormatData(tBlock, showAll);
             }
         }
+    }
+}
+
+void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll)
+{
+    QRegularExpressionMatch matchBoldA = regexBoldA.match(block.text());
+    QRegularExpressionMatch matchBoldU = regexBoldU.match(block.text());
+    if(matchBoldA.hasMatch()||matchBoldU.hasMatch()){
+        FormatData *formatData = new FormatData;
+        QString text = block.text();
+        int index1 = 0;
+        int index2 = index1+1;
+        int startBoldPos = -1;
+        int endBoldPos =-1;
+        //identify
+        while(index2<text.length()){
+            QString testSym=  QString(text.at(index1)) + QString(text.at(index2));
+            if(testSym == BOLD_SYMBOL_A){
+                if(startBoldPos == -1){
+                    startBoldPos = index1;
+                }else{
+                    endBoldPos = index1;
+                    formatData->addFormat(startBoldPos, endBoldPos, testSym);
+                    startBoldPos = -1;
+                }
+            }
+            index1++;
+            index2++;
+        }
+        block.setUserData(formatData);
+
+        if(!showAll){
+            if(!formatData->isHidden()){
+                //hide symbols, start at the end to avoid changing position of the symbols
+                for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
+                {
+                    hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+                }
+                formatData->setHidden(true);
+            }
+        }
+
     }
 }
 
@@ -198,6 +276,24 @@ void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
     editCursor.insertText(textBlock);
 }
 
+void MkTextDocument::hideSymbolsAtPos(QTextBlock &block, int pos, const QString &symbol)
+{
+    QString text = block.text();
+    if(pos>=text.length())
+        return;
+
+    QTextCursor cursor(block);
+    cursor.setPosition(block.position()+pos);
+
+    QString testSym = QString(text.at(pos)) + QString(text.at(pos+1));
+    //check if the position really has those symbols, they may be already hidden
+    if(testSym == symbol){
+        for(int i = 0; i < symbol.length(); i++){
+            cursor.deleteChar();
+        }
+    }
+}
+
 void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
 {
     //avoid prepending more than 3 ```
@@ -215,6 +311,14 @@ void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
     editCursor.removeSelectedText();
     editCursor.insertText(newText);
 
+}
+
+void MkTextDocument::showSymbolsAtPos(QTextBlock &block, int pos, const QString &symbol)
+{
+    qDebug()<<"pos = "<<pos<<" symbol "<<symbol;
+    QTextCursor cursor(block);
+    cursor.setPosition(block.position()+pos);
+    cursor.insertText(symbol);
 }
 
 void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)

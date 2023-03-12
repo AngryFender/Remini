@@ -12,6 +12,7 @@
 #include <QRegularExpression>
 #include <blockdata.h>
 #include <linedata.h>
+#include <formatdata.h>
 
 class MkTextDocument : public QTextDocument
 {
@@ -42,16 +43,21 @@ public slots:
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
+    QRegularExpression regexBoldA;
+    QRegularExpression regexBoldU;
     QList<QPageRanges> codeBlockPosList;
     int cursorPosition;
 
     void identifyUserData(bool showAll);
+    void identifyFormatData(QTextBlock &block, bool showAll);
     void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
     void stripUserData();
 
     void hideSymbols(QTextBlock block,const QString &symbol);
+    void hideSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
     void showAllSymbols();
     void showSymbols(QTextBlock block,const QString &symbol);
+    void showSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
 
     void autoCompleteCodeBlock(int blockNumber,bool &success);
     BlockData* checkValidCodeBlock(QTextBlock &block);

@@ -38,6 +38,8 @@ set(PROJECT_SOURCES
         navigationview.cpp
         navigationmodel.h
         navigationmodel.cpp
+        formatdata.h
+        formatdata.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
