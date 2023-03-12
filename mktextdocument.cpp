@@ -76,11 +76,13 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
             FormatData* formatData = dynamic_cast<FormatData*>(data);
             if(formatData){
                 if(blockNumber == tblock.blockNumber()){
-                    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-                    {
-                        showSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
+                    if(formatData->isHidden()){
+                        for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
+                        {
+                            showSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
+                        }
+                        formatData->setHidden(false);
                     }
-                    formatData->setHidden(false);
                 }
                 else{
                     if(!hasSelection){
@@ -315,7 +317,6 @@ void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
 
 void MkTextDocument::showSymbolsAtPos(QTextBlock &block, int pos, const QString &symbol)
 {
-    qDebug()<<"pos = "<<pos<<" symbol "<<symbol;
     QTextCursor cursor(block);
     cursor.setPosition(block.position()+pos);
     cursor.insertText(symbol);
