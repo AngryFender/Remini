@@ -406,8 +406,8 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
     if(end < lastCharacter){
         //sometimes selection can start at the middle of a word
         if(lineText.at(end).isSpace()){
-            //skip spaces on the left side of the selection
-            while(end< lastCharacter){
+            //skip spaces on the right side of the selection
+            while(end< (lastCharacter-1)){
                 end++;
                 if(!lineText.at(end).isSpace())
                     break;
