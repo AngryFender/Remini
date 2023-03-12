@@ -7,20 +7,28 @@
 #define BOLD_SYMBOL_A "**"
 #define BOLD_SYMBOL_U "__"
 #define ITALIC_SYMBOL_A "*"
-#define ITALIC_SYMBOL_B "_"
+#define ITALIC_SYMBOL_U "_"
 #define STRIKETHROUGH_SYMBOL "~~"
 
 class FragmentData{
 public:
-    FragmentData(int start, int end, QString symbol){
+    enum FormatSymbol{
+        BOLD,
+        ITALIC,
+        STRIKETHROUGH,
+    };
+    FragmentData(int start, int end, FormatSymbol status){
         this->start = start;
         this->end = end;
-        this->symbol = symbol;
+        this->status = status;
     }
+    int getStart();
+    int getEnd();
+    FormatSymbol getStatus();
 private:
     int start;
     int end;
-    QString symbol;
+    FormatSymbol status;
 };
 
 class PositionData{

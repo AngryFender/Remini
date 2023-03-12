@@ -44,7 +44,16 @@ FormatData::~FormatData()
 
 void FormatData::addFormat(int start, int end, QString &symbol)
 {
-    formats.append(new FragmentData(start,end,symbol));
+    FragmentData::FormatSymbol status;
+    if(symbol == BOLD_SYMBOL_A || symbol == BOLD_SYMBOL_U){
+        status = FragmentData::BOLD;
+    }else if(symbol == ITALIC_SYMBOL_A || symbol == ITALIC_SYMBOL_U){
+        status = FragmentData::ITALIC;
+    }else{
+        status = FragmentData::STRIKETHROUGH;
+    }
+
+    formats.append(new FragmentData(start,end,status));
     positions.append(new PositionData(start,symbol));
     positions.append(new PositionData(end,symbol));
 }
@@ -62,4 +71,19 @@ bool &FormatData::isHidden()
 void FormatData::setHidden(bool hide)
 {
     this->hidden = hide;
+}
+
+int FragmentData::getStart()
+{
+    return start;
+}
+
+int FragmentData::getEnd()
+{
+    return end;
+}
+
+FragmentData::FormatSymbol FragmentData::getStatus()
+{
+    return status;
 }

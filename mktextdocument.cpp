@@ -145,11 +145,11 @@ void MkTextDocument::showAllSymbols()
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll)
 {
-    identifyUserData(showAll);
+    identifyUserData(showAll, blockNumber);
     cursorPosChangedHandle(hasSelection, blockNumber);
 }
 
-void MkTextDocument::identifyUserData(bool showAll)
+void MkTextDocument::identifyUserData(bool showAll, int blockNumber)
 {
     int fontSize =this->defaultFont().pointSize();
     bool openBlock = false;
@@ -195,13 +195,13 @@ void MkTextDocument::identifyUserData(bool showAll)
                         hideSymbols(tBlock,lineData->getSymbol());
                     }
                 }
-                identifyFormatData(tBlock, showAll);
+                identifyFormatData(tBlock, showAll, blockNumber);
             }
         }
     }
 }
 
-void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll)
+void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int blockNumber)
 {
     QRegularExpressionMatch matchBoldA = regexBoldA.match(block.text());
     QRegularExpressionMatch matchBoldU = regexBoldU.match(block.text());
@@ -231,8 +231,12 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll)
         }
         if(!formatData->isEmpty()){
             block.setUserData(formatData);
+            for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
+            {
+                applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
+            }
             if(!showAll){
-                if(!formatData->isHidden()){
+                if(blockNumber != block.blockNumber() && !formatData->isHidden()){
                     //hide symbols, start at the end to avoid changing position of the symbols
                     for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
                     {
@@ -264,6 +268,17 @@ void MkTextDocument::stripUserData()
         QTextBlockFormat blockFormat ;
         tcursor.setBlockFormat(blockFormat);
     }
+}
+
+void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status)
+{
+    QTextCharFormat format;
+    format.setFontWeight(QFont::ExtraBold);
+
+    QTextCursor cursor(block);
+    cursor.setPosition(block.position()+start);
+    cursor.setPosition(block.position()+end, QTextCursor::KeepAnchor);
+    cursor.mergeCharFormat(format);
 }
 
 void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)

@@ -48,11 +48,12 @@ public slots:
     QList<QPageRanges> codeBlockPosList;
     int cursorPosition;
 
-    void identifyUserData(bool showAll);
-    void identifyFormatData(QTextBlock &block, bool showAll);
+    void identifyUserData(bool showAll, int blockNumber=0);
+    void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0);
     void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
     void stripUserData();
 
+    void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
     void hideSymbols(QTextBlock block,const QString &symbol);
     void hideSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
     void showAllSymbols();
