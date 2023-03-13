@@ -9,6 +9,12 @@ MkTextDocument::MkTextDocument(QObject *parent)
     regexBoldU.setPattern(BOLD_SYMBOL_U);
 
     this->setUndoRedoEnabled(false);
+
+    boldALoc.symbol = BOLD_SYMBOL_A;
+    boldULoc.symbol = BOLD_SYMBOL_U;
+    italicALoc.symbol = ITALIC_SYMBOL_A;
+    italicULoc.symbol = ITALIC_SYMBOL_U;
+
 }
 
 void MkTextDocument::setPlainText(const QString &text)
@@ -210,22 +216,12 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int bloc
         QString text = block.text();
         int index1 = 0;
         int index2 = index1+1;
-        int startBoldPos = -1;
-        int endBoldPos =-1;
-        //identify
+
+        resetFormatLocation();
         while(index2<text.length()){
             QString testSym=  QString(text.at(index1)) + QString(text.at(index2));
-            if(testSym == BOLD_SYMBOL_A){
-                if(startBoldPos == -1){
-                    startBoldPos = index1;
-                }else{
-                    endBoldPos = index1;
-                    if(endBoldPos-startBoldPos>2){
-                        formatData->addFormat(startBoldPos, endBoldPos, testSym);
-                        startBoldPos = -1;
-                    }
-                }
-            }
+            identifyFormatLocation(testSym, index1, boldALoc, formatData);
+            identifyFormatLocation(testSym, index1, boldULoc, formatData);
             index1++;
             index2++;
         }
@@ -244,6 +240,21 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int bloc
                     }
                     formatData->setHidden(true);
                 }
+            }
+        }
+    }
+}
+
+void MkTextDocument::identifyFormatLocation(QString &text, int index, FormatLocation &location, FormatData *format)
+{
+    if(location.symbol == text){
+        if(location.start == -1){
+            location.start = index;
+        }else{
+            location.end = index;
+            if(location.end-location.start>2){
+                format->addFormat(location.start, location.end, location.symbol);
+                location.reset();
             }
         }
     }
@@ -561,6 +572,14 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
     }
     cursor.setPosition(start+ currentBlockPos);
     cursor.setPosition(end + currentBlockPos,QTextCursor::KeepAnchor);
+}
+
+void MkTextDocument::resetFormatLocation()
+{
+    boldALoc.reset();
+    boldULoc.reset();
+    italicALoc.reset();
+    italicULoc.reset();
 }
 
 void MkTextDocument::numberListDetect(int blockNumber)

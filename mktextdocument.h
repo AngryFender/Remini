@@ -40,6 +40,21 @@ public slots:
         int end = 0;
     };
 
+    struct FormatLocation{
+        int start = -1;
+        int end =-1;
+        QString symbol;
+
+        void reset(){
+            start = -1;
+            end =-1;
+        }
+    };
+    FormatLocation boldALoc;
+    FormatLocation boldULoc;
+    FormatLocation italicALoc;
+    FormatLocation italicULoc;
+
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
@@ -48,8 +63,10 @@ public slots:
     QList<QPageRanges> codeBlockPosList;
     int cursorPosition;
 
+    void resetFormatLocation();
     void identifyUserData(bool showAll, int blockNumber=0);
     void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0);
+    void identifyFormatLocation(QString &text, int index, FormatLocation &location, FormatData *format);
     void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
     void stripUserData();
 
