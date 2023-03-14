@@ -65,6 +65,9 @@ public:
     bool isEmpty();
     bool& isHidden();
     void setHidden(bool hide);
+    int positionsCount(){
+        return positions.count();
+    }
 
 private:
     QVector<FragmentData*> formats;

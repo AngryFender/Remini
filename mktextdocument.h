@@ -50,23 +50,23 @@ public slots:
             end =-1;
         }
     };
-    FormatLocation boldALoc;
-    FormatLocation boldULoc;
-    FormatLocation italicALoc;
-    FormatLocation italicULoc;
+    FormatLocation locBoldA;
+    FormatLocation locBoldU;
+    FormatLocation locItalicA;
+    FormatLocation locItalicU;
+    FormatLocation locStrike;
 
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
-    QRegularExpression regexBoldA;
-    QRegularExpression regexBoldU;
-    QList<QPageRanges> codeBlockPosList;
     int cursorPosition;
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, int blockNumber=0);
     void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0);
-    void identifyFormatLocation(QString &text, int index, FormatLocation &location, FormatData *format);
+    QString convertCharacterToSymbol(QString single);
+    void identifyDoubleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format);
+    void identifySingleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format);
     void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
     void stripUserData();
 

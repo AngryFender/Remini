@@ -5,15 +5,14 @@ MkTextDocument::MkTextDocument(QObject *parent)
 {
     regexCodeBlock.setPattern(CODEBLOCK_SYMBOL);
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
-    regexBoldA.setPattern("(?<!\\*)\\*\\*(?!\\*{1,2})");
-    regexBoldU.setPattern(BOLD_SYMBOL_U);
 
     this->setUndoRedoEnabled(false);
 
-    boldALoc.symbol = BOLD_SYMBOL_A;
-    boldULoc.symbol = BOLD_SYMBOL_U;
-    italicALoc.symbol = ITALIC_SYMBOL_A;
-    italicULoc.symbol = ITALIC_SYMBOL_U;
+    locBoldA.symbol = BOLD_SYMBOL_A;
+    locBoldU.symbol = BOLD_SYMBOL_U;
+    locItalicA.symbol = ITALIC_SYMBOL_A;
+    locItalicU.symbol = ITALIC_SYMBOL_U;
+    locStrike.symbol = STRIKETHROUGH_SYMBOL;
 
 }
 
@@ -209,43 +208,162 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber)
 
 void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int blockNumber)
 {
-    QRegularExpressionMatch matchBoldA = regexBoldA.match(block.text());
-    QRegularExpressionMatch matchBoldU = regexBoldU.match(block.text());
-    if(matchBoldA.hasMatch()||matchBoldU.hasMatch()){
-        FormatData *formatData = new FormatData;
-        QString text = block.text();
-        int index1 = 0;
-        int index2 = index1+1;
+    FormatData *formatData = new FormatData;
+    QString text = block.text();
+    int index1 = 0;
+    int index2 = index1+1;
+    int index3 = index2+1;
 
-        resetFormatLocation();
-        while(index2<text.length()){
-            QString testSym=  QString(text.at(index1)) + QString(text.at(index2));
-            identifyFormatLocation(testSym, index1, boldALoc, formatData);
-            identifyFormatLocation(testSym, index1, boldULoc, formatData);
-            index1++;
-            index2++;
-        }
-        if(!formatData->isEmpty()){
-            block.setUserData(formatData);
-            for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
-            {
-                applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
-            }
-            if(!showAll){
-                if(blockNumber != block.blockNumber() && !formatData->isHidden()){
-                    //hide symbols, start at the end to avoid changing position of the symbols
-                    for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
-                    {
-                        hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+    resetFormatLocation();
+
+    int len = text.length();
+    while(index1<text.length()){
+        QString char1, char2, char3;
+
+        char1 = convertCharacterToSymbol(text.at(index1));
+        if(char1 != ""){
+            if(index2 >= len){
+                char2 = "";
+                char3 = "";
+            }else{
+                char2 = convertCharacterToSymbol(text.at(index2));
+                if(char2 !=""){
+                    if(index3>= len){
+                        char3 = "";
+                    }else{
+                        char3 = convertCharacterToSymbol(text.at(index3));
                     }
-                    formatData->setHidden(true);
                 }
+            }
+        }
+        QString test = char1+char2+char3;
+
+        if(test != ""){
+            if(test == "_**" || test == "**_" || test == "***" || test == "___"){
+                index1+=3; index2+=3; index3+=3;
+                continue;
+            }else if(test == ITALIC_SYMBOL_A){
+                if(locItalicA.start == -1){
+                    locItalicA.start = index1;
+                }else{
+                    locItalicA.end = index1;
+                    if(locItalicA.end-locItalicA.start>1){
+                        locItalicA.symbol = ITALIC_SYMBOL_A;
+                        formatData->addFormat(locItalicA.start, locItalicA.end, locItalicA.symbol);
+                        locItalicA.reset();
+                    }
+                }
+            }else if(test == ITALIC_SYMBOL_U){
+                if(locItalicU.start == -1){
+                   locItalicU.start = index1;
+                }else{
+                    locItalicU.end = index1;
+                    if(locItalicU.end-locItalicU.start>1){
+                        locItalicU.symbol = ITALIC_SYMBOL_U;
+                        formatData->addFormat(locItalicU.start, locItalicU.end, locItalicU.symbol);
+                        locItalicU.reset();
+                    }
+                }
+            }else if(test == BOLD_SYMBOL_A){
+                if(locBoldA.start == -1){
+                    locBoldA.start = index1;
+                    index1+=2; index2+=2; index3+=2;
+                    continue;
+                }else{
+                    locBoldA.end = index1;
+                    if(locBoldA.end-locBoldA.start>1){
+                        locBoldA.symbol = BOLD_SYMBOL_A;
+                        formatData->addFormat(locBoldA.start, locBoldA.end, locBoldA.symbol);
+                        locBoldA.reset();
+                        index1+=2; index2+=2; index3+=2;
+                        continue;
+                    }
+                }
+            }else if(test == BOLD_SYMBOL_U){
+                if(locBoldU.start == -1){
+                    locBoldU.start = index1;
+                    index1+=2; index2+=2; index3+=2;
+                    continue;
+                }else{
+                    locBoldU.end = index1;
+                    if(locBoldU.end-locBoldU.start>1){
+                        locBoldU.symbol = BOLD_SYMBOL_U;
+                        formatData->addFormat(locBoldU.start, locBoldU.end, locBoldU.symbol);
+                        locBoldU.reset();
+                        index1+=2; index2+=2; index3+=2;
+                        continue;
+                    }
+                }
+            }else if(test == STRIKETHROUGH_SYMBOL){
+                if(locStrike.start == -1){
+                    locStrike.start = index1;
+                    index1+=2; index2+=2; index3+=2;
+                    continue;
+                }else{
+                    locStrike.end = index1;
+                    if(locStrike.end-locStrike.start>1){
+                        locStrike.symbol = STRIKETHROUGH_SYMBOL;
+                        formatData->addFormat(locStrike.start, locStrike.end, locStrike.symbol);
+                        locStrike.reset();
+                        index1+=2; index2+=2; index3+=2;
+                        continue;
+                    }
+                }
+            }
+        }
+        index1++;
+        index2++;
+        index3++;
+    }
+
+    if(!formatData->isEmpty()){
+        block.setUserData(formatData);
+        for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
+        {
+            applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
+        }
+        if(!showAll){
+            if(blockNumber != block.blockNumber() && !formatData->isHidden()){
+                //hide symbols, start at the end to avoid changing position of the symbols
+                for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
+                {
+                    hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+                }
+                formatData->setHidden(true);
             }
         }
     }
 }
 
-void MkTextDocument::identifyFormatLocation(QString &text, int index, FormatLocation &location, FormatData *format)
+QString MkTextDocument::convertCharacterToSymbol(QString single)
+{
+    QString result = "";
+    if(single =="*"){
+        result = "*";
+    }else if (single == "_"){
+        result = "_";
+    }else if (single == "~"){
+        result = "~";
+    }
+    return result;
+}
+
+void MkTextDocument::identifyDoubleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format)
+{
+    if(location.symbol == text){
+        if(location.start == -1){
+            location.start = index;
+        }else{
+            location.end = index;
+            if(location.end-location.start>2){
+                format->addFormat(location.start, location.end, location.symbol);
+                location.reset();
+            }
+        }
+    }
+}
+
+void MkTextDocument::identifySingleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format)
 {
     if(location.symbol == text){
         if(location.start == -1){
@@ -284,7 +402,12 @@ void MkTextDocument::stripUserData()
 void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status)
 {
     QTextCharFormat format;
-    format.setFontWeight(QFont::ExtraBold);
+
+    switch(status){
+    case FragmentData::BOLD:format.setFontWeight(QFont::ExtraBold);break;
+    case FragmentData::ITALIC:format.setFontItalic(true);break;;
+    case FragmentData::STRIKETHROUGH:format.setFontStrikeOut(true);break;
+    }
 
     QTextCursor cursor(block);
     cursor.setPosition(block.position()+start);
@@ -308,19 +431,11 @@ void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
 
 void MkTextDocument::hideSymbolsAtPos(QTextBlock &block, int pos, const QString &symbol)
 {
-    QString text = block.text();
-    if((pos+1)>=text.length())
-        return;
-
     QTextCursor cursor(block);
     cursor.setPosition(block.position()+pos);
 
-    QString testSym = QString(text.at(pos)) + QString(text.at(pos+1));
-    //check if the position really has those symbols, they may be already hidden
-    if(testSym == symbol){
-        for(int i = 0; i < symbol.length(); i++){
-            cursor.deleteChar();
-        }
+    for(int i = 0; i < symbol.length(); i++){
+        cursor.deleteChar();
     }
 }
 
@@ -576,10 +691,10 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 
 void MkTextDocument::resetFormatLocation()
 {
-    boldALoc.reset();
-    boldULoc.reset();
-    italicALoc.reset();
-    italicULoc.reset();
+    locBoldA.reset();
+    locBoldU.reset();
+    locItalicA.reset();
+    locItalicU.reset();
 }
 
 void MkTextDocument::numberListDetect(int blockNumber)
