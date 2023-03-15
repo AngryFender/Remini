@@ -6,7 +6,7 @@ PositionData::PositionData(int position, QString symbol){
     this->hidden = false;
 }
 
-int PositionData::getPos(){
+int PositionData::getPos() const{
     return position;
 }
 
@@ -71,6 +71,11 @@ bool &FormatData::isHidden()
 void FormatData::setHidden(bool hide)
 {
     this->hidden = hide;
+}
+
+void FormatData::sortAscendingPos()
+{
+    std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
 }
 
 int FragmentData::getStart()

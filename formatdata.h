@@ -35,16 +35,20 @@ class PositionData{
 public:
     PositionData(int position, QString symbol);
 
-    int getPos();
+    int getPos() const;
     QString &getSymbol();
 
     bool& isHidden();
     void setHidden(bool hide);
+
 private:
     int position;
     QString symbol;
     bool hidden;
 };
+
+
+
 
 class FormatData : public QTextBlockUserData
 {
@@ -67,6 +71,12 @@ public:
     void setHidden(bool hide);
     int positionsCount(){
         return positions.count();
+    }
+    void sortAscendingPos();
+
+    static bool sortAscendingStartPos(const PositionData* f1, const PositionData* f2)
+    {
+        return(f1->getPos() < f2->getPos());
     }
 
 private:

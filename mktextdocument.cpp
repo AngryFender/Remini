@@ -239,10 +239,15 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int bloc
         QString test = char1+char2+char3;
 
         if(test != ""){
-            if(test == "_**" || test == "**_" || test == "***" || test == "___"){
+            if(test == "_**"){
+                test = "_";
+            }else if(test == "**_"){
+                test = "**";
+            }else if(test == "***" || test == "___"){
                 index1+=3; index2+=3; index3+=3;
                 continue;
-            }else if(test == ITALIC_SYMBOL_A){
+            }
+            if(test == ITALIC_SYMBOL_A){
                 if(locItalicA.start == -1){
                     locItalicA.start = index1;
                 }else{
@@ -322,6 +327,7 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int bloc
         {
             applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
         }
+        formatData->sortAscendingPos();
         if(!showAll){
             if(blockNumber != block.blockNumber() && !formatData->isHidden()){
                 //hide symbols, start at the end to avoid changing position of the symbols
