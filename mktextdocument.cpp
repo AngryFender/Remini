@@ -43,6 +43,11 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
 
     while (tblock.isValid()) {
         QTextBlockUserData* data =tblock.userData();
+        if(data == nullptr){
+            tblock = tblock.next();
+            continue;
+        }
+
         BlockData* blockData = dynamic_cast<BlockData*>(data);
         if(blockData)
         {

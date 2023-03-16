@@ -21,10 +21,13 @@ public:
     QString getSymbol();
     bool getDraw() const;
     void setDraw(bool newDraw);
+    void setHidden(bool hidden);
+    bool isHidden();
 
 private:
     statusID status;
     bool draw;
+    bool hidden;
 };
 
 #endif // LINEDATA_H

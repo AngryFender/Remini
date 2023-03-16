@@ -36,3 +36,13 @@ void LineData::setDraw(bool newDraw)
 {
     draw = newDraw;
 }
+
+void LineData::setHidden(bool hidden)
+{
+    this->hidden = hidden;
+}
+
+bool LineData::isHidden()
+{
+    return hidden;
+}

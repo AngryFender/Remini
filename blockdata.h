@@ -17,9 +17,12 @@ public:
     BlockData();
     statusID getStatus() const;
     void setStatus(statusID newStatus);
+    void setHidden(bool hidden);
+    bool isHidden();
 
 private:
     statusID status;
+    bool hidden;
 };
 
 #endif // BLOCKDATA_H

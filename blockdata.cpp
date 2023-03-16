@@ -14,3 +14,13 @@ void BlockData::setStatus(statusID newStatus)
 {
     status = newStatus;
 }
+
+void BlockData::setHidden(bool hidden)
+{
+    this->hidden = hidden;
+}
+
+bool BlockData::isHidden()
+{
+    return hidden;
+}
