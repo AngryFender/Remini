@@ -67,6 +67,10 @@ public slots:
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, int blockNumber=0);
+
+    void identifyMKData(bool showAll, int blockNumber=0);
+    void identifyReverseMKData(bool showAll, int blockNumber=0);
+
     void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0);
     QString convertCharacterToSymbol(QString single);
     void identifyDoubleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format);

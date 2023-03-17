@@ -3,7 +3,7 @@
 MkTextDocument::MkTextDocument(QObject *parent)
     : QTextDocument{parent}
 {
-    regexCodeBlock.setPattern(CODEBLOCK_SYMBOL);
+    regexCodeBlock.setPattern(CODEBLOCK__START_SYMBOL);
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
 
     this->setUndoRedoEnabled(false);
@@ -23,6 +23,10 @@ void MkTextDocument::setPlainText(const QString &text)
 
     QTextDocument::setPlainText(text);
     identifyUserData(false);
+
+    controller.setUpperBlockNumber(this->blockCount());
+//    identifyMKData(false, 0);
+//    identifyReverseMKData(false, 0);
 
     emit clearUndoStack();
 }
@@ -59,13 +63,13 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
             {
                 checkBlock.end = tblock.blockNumber();
                 if(blockNumber >= checkBlock.start && blockNumber <= checkBlock.end){
-                    showSymbols(this->findBlockByNumber(checkBlock.start), CODEBLOCK_SYMBOL);
-                    showSymbols(this->findBlockByNumber(checkBlock.end), CODEBLOCK_SYMBOL);
+                    showSymbols(this->findBlockByNumber(checkBlock.start), CODEBLOCK__START_SYMBOL);
+                    showSymbols(this->findBlockByNumber(checkBlock.end), CODEBLOCK__START_SYMBOL);
                 }
                 else{
                     if(!hasSelection){
-                        hideSymbols(this->findBlockByNumber(checkBlock.start), CODEBLOCK_SYMBOL);
-                        hideSymbols(this->findBlockByNumber(checkBlock.end), CODEBLOCK_SYMBOL);
+                        hideSymbols(this->findBlockByNumber(checkBlock.start), CODEBLOCK__START_SYMBOL);
+                        hideSymbols(this->findBlockByNumber(checkBlock.end), CODEBLOCK__START_SYMBOL);
                     }
                 }
             }
@@ -130,7 +134,7 @@ void MkTextDocument::showAllSymbols()
         {
             if(blockData->getStatus()==BlockData::start || blockData->getStatus()==BlockData::end)
             {
-                showSymbols(tblock, CODEBLOCK_SYMBOL);
+                showSymbols(tblock, CODEBLOCK__START_SYMBOL);
             }
         }else{
             LineData* lineData = dynamic_cast<LineData*>(data);
@@ -184,8 +188,8 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber)
                 blockData->setStatus(BlockData::end);
                 setCodeBlockMargin(tBlock, blockFormat, fontSize*3/4, fontSize);
                 if(!showAll){
-                    hideSymbols(tBlock, CODEBLOCK_SYMBOL);
-                    hideSymbols(startBlock, CODEBLOCK_SYMBOL);
+                    hideSymbols(tBlock, CODEBLOCK__START_SYMBOL);
+                    hideSymbols(startBlock, CODEBLOCK__START_SYMBOL);
                 }
             }
         }
@@ -195,17 +199,84 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber)
                 blockData->setStatus(BlockData::content);
                 tBlock.setUserData(blockData);
                 setCodeBlockMargin(tBlock, blockFormat, fontSize*5/3, fontSize);
-            }else{
-                QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
-                if(matchHorizontalLine.hasMatch()){
-                    LineData *lineData = new LineData;
-                    lineData->setStatus(LineData::horizontalLine);
-                    tBlock.setUserData(lineData);
-                    if(!showAll){
-                        hideSymbols(tBlock,lineData->getSymbol());
-                    }
+            }
+//            else{
+//                QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
+//                if(matchHorizontalLine.hasMatch()){
+//                    LineData *lineData = new LineData;
+//                    lineData->setStatus(LineData::horizontalLine);
+//                    tBlock.setUserData(lineData);
+//                    if(!showAll){
+//                        hideSymbols(tBlock,lineData->getSymbol());
+//                    }
+//                }
+//                identifyFormatData(tBlock, showAll, blockNumber);
+//            }
+        }
+    }
+}
+
+void MkTextDocument::identifyMKData(bool showAll, int blockNumber)
+{
+    int fontSize =this->defaultFont().pointSize();
+    bool openBlock = false;
+    QTextBlock startBlock;
+    QTextBlockFormat blockFormat;
+
+    for(int index = controller.getLowerBlockNumber(); index < controller.getUpperBlockNumber(); index++){
+        QTextBlock block = this->findBlockByNumber(index);
+        QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
+        if(matchCodeBlock.hasMatch()){
+            BlockData *blockData = new BlockData;
+            block.setUserData(blockData);
+
+            if(!openBlock){
+                openBlock = true;
+                blockData->setStatus(BlockData::start);
+                setCodeBlockMargin(block, blockFormat, fontSize*3/4, fontSize, fontSize);
+                startBlock = block;
+            }
+            else{
+                openBlock = false;
+                blockData->setStatus(BlockData::end);
+                setCodeBlockMargin(block, blockFormat, fontSize*3/4, fontSize);
+                if(!showAll){
+                    hideSymbols(block, CODEBLOCK__START_SYMBOL);
+                    hideSymbols(startBlock, CODEBLOCK__START_SYMBOL);
                 }
-                identifyFormatData(tBlock, showAll, blockNumber);
+            }
+        }
+    }
+}
+
+void MkTextDocument::identifyReverseMKData(bool showAll, int blockNumber)
+{
+    int fontSize =this->defaultFont().pointSize();
+    bool openBlock = false;
+    QTextBlock startBlock;
+    QTextBlockFormat blockFormat;
+
+    for(int index = controller.getUpperBlockNumber(); index >= controller.getLowerBlockNumber(); index--){
+        QTextBlock block = this->findBlockByNumber(index);
+        QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
+        if(matchCodeBlock.hasMatch()){
+            BlockData *blockData = new BlockData;
+            block.setUserData(blockData);
+
+            if(!openBlock){
+                openBlock = true;
+                blockData->setStatus(BlockData::end);
+                setCodeBlockMargin(block, blockFormat, fontSize*3/4, fontSize, fontSize);
+                startBlock = block;
+            }
+            else{
+                openBlock = false;
+                blockData->setStatus(BlockData::start);
+                setCodeBlockMargin(block, blockFormat, fontSize*3/4, fontSize);
+                if(!showAll){
+                    hideSymbols(block, CODEBLOCK__START_SYMBOL);
+                    hideSymbols(startBlock, CODEBLOCK__START_SYMBOL);
+                }
             }
         }
     }
@@ -483,7 +554,7 @@ void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
 
     QRegularExpressionMatch matchCodeBlockSymbol = regexCodeBlock.match(currentBlock.text());
     if(matchCodeBlockSymbol.hasMatch()){
-        editCursor.insertText(CODEBLOCK_SYMBOL);
+        editCursor.insertText(CODEBLOCK__START_SYMBOL);
         editCursor.insertBlock();
         success = true;
     }else{
