@@ -88,9 +88,11 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, SIGNAL(deleteFileFolder(QModelIndex&)),
                      this, SLOT(fileDeleteDialogue(QModelIndex&)));
 
-
     QObject::connect(this, SIGNAL(fileDelete(QModelIndex&)),
                      &modelTree, SLOT(deleteFileFolderHandler(QModelIndex&)));
+
+    QObject::connect(viewTree, SIGNAL(openLocation(QModelIndex&)),
+                     &modelTree, SLOT(openLocationHandler(QModelIndex&)));
 
     QObject::connect(viewTree, SIGNAL(newFileCreated(QModelIndex)),
                      this, SLOT(fileDisplay(QModelIndex)));

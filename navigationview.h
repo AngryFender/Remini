@@ -21,6 +21,7 @@ private:
     QAction addFolderAction ;
     QAction renameFileAction;
     QAction deleteFileAction;
+    QAction openLocationAction ;
     QString newEntryName;
     QModelIndex lastClickedIndex;
     QModelIndex recentlyCreatedFile;
@@ -36,6 +37,7 @@ protected:
     void addFolder();
     void renameFile();
     void deleteFile();
+    void openFileFolder();
     void folderChangedHandler();
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
 signals:
@@ -43,6 +45,7 @@ signals:
     void createFolder(QModelIndex &index, QString &name);
     void deleteFileFolder(QModelIndex &index);
     void newFileCreated(const QModelIndex &index);
+    void openLocation(QModelIndex &index);
 
 };
 

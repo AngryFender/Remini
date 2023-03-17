@@ -12,13 +12,16 @@ NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
     addFolderAction.setText("Add Folder");
     renameFileAction.setText("Rename");
     deleteFileAction.setText("Delete");
+    openLocationAction.setText("Open Location");
 
     connect(&addFileAction, SIGNAL(triggered()), this, SLOT(addFile()));
     connect(&addFolderAction, SIGNAL(triggered()), this, SLOT(addFolder()));
     connect(&renameFileAction, SIGNAL(triggered()), this, SLOT(renameFile()));
     connect(&deleteFileAction, SIGNAL(triggered()), this, SLOT(deleteFile()));
+    connect(&openLocationAction, SIGNAL(triggered()), this, SLOT(openFileFolder()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(ContextMenuHandler(QPoint)));
+
 }
 
 void NavigationView::mousePressEvent(QMouseEvent *event)
@@ -65,6 +68,7 @@ void NavigationView::ContextMenuHandler(QPoint pos)
     if(!index.isValid()){
         menu.addAction(&addFileAction);
         menu.addAction(&addFolderAction);
+        menu.addAction(&openLocationAction);
         menu.exec(viewport()->mapToGlobal(pos));
         return;
     }
@@ -82,6 +86,7 @@ void NavigationView::ContextMenuHandler(QPoint pos)
     }
     menu.addAction(&renameFileAction);
     menu.addAction(&deleteFileAction);
+    menu.addAction(&openLocationAction);
     menu.exec(viewport()->mapToGlobal(pos));
 }
 
@@ -113,6 +118,12 @@ void NavigationView::deleteFile()
     for(auto index: indexes){
         emit deleteFileFolder(index);
     }
+}
+
+void NavigationView::openFileFolder()
+{
+    auto index = lastClickedIndex;
+    emit openLocation(index);
 }
 
 void NavigationView::folderChangedHandler()
