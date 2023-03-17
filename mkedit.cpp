@@ -33,6 +33,9 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     QObject::connect(this,SIGNAL(cursorPositionChanged()),
                      this, SLOT(cursorPositionChangedHandle()));
 
+    QObject::connect(this->verticalScrollBar(),SIGNAL(valueChanged(int)),
+                     this, SLOT(scrollValueUpdateHandle(int)));
+
     this->setUndoRedoEnabled(false);
 }
 
@@ -344,6 +347,15 @@ void MkEdit::redo()
 void MkEdit::clearUndoStackHandle()
 {
     undoStack.clear();
+}
+
+void MkEdit::scrollValueUpdateHandle(int value)
+{
+    int max = this->verticalScrollBar()->maximum();
+    int min = this->verticalScrollBar()->minimum();
+    int range = max - min;
+    double percent = 100.00 * ((double)value - (double)min) / (double)range;
+    emit scrollPercentUpdate(percent);
 }
 
 void MkEdit::cursorPositionChangedHandle()

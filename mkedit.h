@@ -93,8 +93,10 @@ protected:
     void undo();
     void redo();
     void clearUndoStackHandle();
+    void scrollValueUpdateHandle(int value);
 
 signals:
+    void scrollPercentUpdate(int percent);
     void cursorPosChanged(bool hasSelection, int blockNumber );
     void fileSave();
     void enterKeyPressed(int blockNumber);

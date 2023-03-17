@@ -1,6 +1,8 @@
 #ifndef MKTEXTDOCUMENT_H
 #define MKTEXTDOCUMENT_H
 
+#include "blockcontroller.h"
+
 #include <QTextDocument>
 #include <QTextBlock>
 #include <QObject>
@@ -33,6 +35,7 @@ public slots:
     void selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos);
     void duplicateLineHandle(int blockNumber);
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
+    void scrollPercentUpdateHandle(int percent);
 
  private:
     struct CheckBlock{
@@ -59,6 +62,7 @@ public slots:
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
+    BlockController controller;
     int cursorPosition;
 
     void resetFormatLocation();

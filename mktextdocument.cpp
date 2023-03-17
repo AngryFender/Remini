@@ -700,6 +700,11 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
     cursor.setPosition(end + currentBlockPos,QTextCursor::KeepAnchor);
 }
 
+void MkTextDocument::scrollPercentUpdateHandle(int percent)
+{
+    controller.scrollUpdated(this->blockCount(), this->lastBlock().blockNumber(), percent);
+}
+
 void MkTextDocument::resetFormatLocation()
 {
     locBoldA.reset();
