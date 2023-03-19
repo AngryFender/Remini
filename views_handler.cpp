@@ -115,8 +115,8 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int,bool)),
                      &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int,bool)));
 
-    QObject::connect(viewText,SIGNAL(scrollPercentUpdate(int)),
-                     &mkGuiDocument,SLOT(scrollPercentUpdateHandle(int)));
+    QObject::connect(viewText,SIGNAL(scrollPercentUpdate(double)),
+                     &mkGuiDocument,SLOT(scrollPercentUpdateHandle(double)));
 
     QObject::connect(&mkGuiDocument,SIGNAL(clearUndoStack()),
                      viewText,SLOT(clearUndoStackHandle()));

@@ -96,7 +96,7 @@ protected:
     void scrollValueUpdateHandle(int value);
 
 signals:
-    void scrollPercentUpdate(int percent);
+    void scrollPercentUpdate(double percent);
     void cursorPosChanged(bool hasSelection, int blockNumber );
     void fileSave();
     void enterKeyPressed(int blockNumber);

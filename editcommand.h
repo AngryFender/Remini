@@ -18,6 +18,7 @@ struct UndoData{
     int oldEndSelection;
     bool undoRedoSkip;
     bool selectAll;
+    int scrollValue;
 };
 
 class EditCommand : public QUndoCommand
@@ -36,6 +37,7 @@ private:
     MkTextDocument *doc;
     QString text;
     int cursorPos;
+    int scrollValue;
 
     QString oldText;
     int oldCursorPos;

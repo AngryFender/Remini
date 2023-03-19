@@ -4,6 +4,7 @@ MkTextDocument::MkTextDocument(QObject *parent)
     : QTextDocument{parent}
 {
     regexCodeBlock.setPattern(CODEBLOCK__START_SYMBOL);
+    regexCodeEndBlock.setPattern(CODEBLOCK_END_SYMBOL);
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
 
     this->setUndoRedoEnabled(false);
@@ -24,7 +25,7 @@ void MkTextDocument::setPlainText(const QString &text)
     QTextDocument::setPlainText(text);
     identifyUserData(false);
 
-    controller.setUpperBlockNumber(this->blockCount());
+//    controller.setUpperBlockNumber(this->blockCount());
 //    identifyMKData(false, 0);
 //    identifyReverseMKData(false, 0);
 
@@ -119,7 +120,7 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber)
 void MkTextDocument::removeAllMkDataHandle()
 {
     showAllSymbols();
-    stripUserData();
+//    stripUserData();
 }
 
 void MkTextDocument::showAllSymbols()
@@ -153,22 +154,27 @@ void MkTextDocument::showAllSymbols()
                 }
             }
         }
+        tblock.setUserData(nullptr);
+        QTextCursor tcursor(tblock);
+        QTextBlockFormat blockFormat ;
+        tcursor.setBlockFormat(blockFormat);
         tblock = tblock.next();
     }
 }
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll)
 {
-    identifyUserData(showAll, blockNumber);
-    cursorPosChangedHandle(hasSelection, blockNumber);
+    identifyUserData(showAll, blockNumber, hasSelection);
+//    cursorPosChangedHandle(hasSelection, blockNumber);
 }
 
-void MkTextDocument::identifyUserData(bool showAll, int blockNumber)
+void MkTextDocument::identifyUserData(bool showAll, int blockNumber, bool hasSelection)
 {
     int fontSize =this->defaultFont().pointSize();
     bool openBlock = false;
     QTextBlock startBlock;
     QTextBlockFormat blockFormat;
+    CheckBlock checkBlock;
 
     for(QTextBlock tBlock = this->begin(); tBlock != this->end(); tBlock = tBlock.next()){
 
@@ -182,14 +188,27 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber)
                 blockData->setStatus(BlockData::start);
                 setCodeBlockMargin(tBlock, blockFormat, fontSize*3/4, fontSize, fontSize);
                 startBlock = tBlock;
+                checkBlock.start = tBlock.blockNumber();
             }
             else{
                 openBlock = false;
+                checkBlock.end = tBlock.blockNumber();
                 blockData->setStatus(BlockData::end);
                 setCodeBlockMargin(tBlock, blockFormat, fontSize*3/4, fontSize);
-                if(!showAll){
-                    hideSymbols(tBlock, CODEBLOCK__START_SYMBOL);
-                    hideSymbols(startBlock, CODEBLOCK__START_SYMBOL);
+                if(showAll){
+                    showSymbols(startBlock, CODEBLOCK__START_SYMBOL);
+                    showSymbols(tBlock, CODEBLOCK__START_SYMBOL);
+                }else {
+                    if(blockNumber >= checkBlock.start && blockNumber <= checkBlock.end){
+                        showSymbols(startBlock, CODEBLOCK__START_SYMBOL);
+                        showSymbols(tBlock, CODEBLOCK__START_SYMBOL);
+                    }
+                    else{
+                        if(!hasSelection){
+                            hideSymbols(startBlock, CODEBLOCK__START_SYMBOL);
+                            hideSymbols(tBlock, CODEBLOCK__START_SYMBOL);
+                        }
+                    }
                 }
             }
         }
@@ -200,18 +219,28 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber)
                 tBlock.setUserData(blockData);
                 setCodeBlockMargin(tBlock, blockFormat, fontSize*5/3, fontSize);
             }
-//            else{
-//                QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
-//                if(matchHorizontalLine.hasMatch()){
-//                    LineData *lineData = new LineData;
-//                    lineData->setStatus(LineData::horizontalLine);
-//                    tBlock.setUserData(lineData);
-//                    if(!showAll){
-//                        hideSymbols(tBlock,lineData->getSymbol());
-//                    }
-//                }
-//                identifyFormatData(tBlock, showAll, blockNumber);
-//            }
+            else{
+                QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
+                if(matchHorizontalLine.hasMatch()){
+                    LineData *lineData = new LineData;
+                    lineData->setStatus(LineData::horizontalLine);
+                    tBlock.setUserData(lineData);
+                    if(showAll){
+                        showSymbols(tBlock, lineData->getSymbol());
+                    }else{
+                        if(blockNumber == tBlock.blockNumber()){
+                            lineData->setDraw(false);
+                            showSymbols(tBlock, lineData->getSymbol());
+                        }else{
+                            if(!hasSelection){
+                                lineData->setDraw(true);
+                                hideSymbols(tBlock, lineData->getSymbol());
+                            }
+                        }
+                    }
+                }
+                identifyFormatData(tBlock, showAll, blockNumber, hasSelection);
+            }
         }
     }
 }
@@ -223,6 +252,7 @@ void MkTextDocument::identifyMKData(bool showAll, int blockNumber)
     QTextBlock startBlock;
     QTextBlockFormat blockFormat;
 
+    qDebug()<<"going down range "<<controller.getLowerBlockNumber()<< " "<<controller.getUpperBlockNumber();
     for(int index = controller.getLowerBlockNumber(); index < controller.getUpperBlockNumber(); index++){
         QTextBlock block = this->findBlockByNumber(index);
         QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
@@ -247,6 +277,17 @@ void MkTextDocument::identifyMKData(bool showAll, int blockNumber)
             }
         }
     }
+
+    for(int index = controller.getLowerBlockNumber(); index >= controller.getSavedLowerBlockNumber(); index--){
+//        qDebug()<<"remove from "<<index;
+        QTextBlock block = this->findBlockByNumber(index);
+        block.setUserData(nullptr);
+        QTextCursor tcursor(block);
+        QTextBlockFormat blockFormat ;
+        tcursor.setBlockFormat(blockFormat);
+    }
+
+    controller.setSavedLowerBlockNumber(controller.getLowerBlockNumber());
 }
 
 void MkTextDocument::identifyReverseMKData(bool showAll, int blockNumber)
@@ -256,6 +297,7 @@ void MkTextDocument::identifyReverseMKData(bool showAll, int blockNumber)
     QTextBlock startBlock;
     QTextBlockFormat blockFormat;
 
+    qDebug()<<"going up range "<<controller.getLowerBlockNumber()<< " "<<controller.getUpperBlockNumber();
     for(int index = controller.getUpperBlockNumber(); index >= controller.getLowerBlockNumber(); index--){
         QTextBlock block = this->findBlockByNumber(index);
         QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
@@ -280,9 +322,20 @@ void MkTextDocument::identifyReverseMKData(bool showAll, int blockNumber)
             }
         }
     }
+
+    for(int index = controller.getUpperBlockNumber(); index < controller.getSavedUpperBlockNumber(); index++){
+//                qDebug()<<"going up remove from "<<index;
+        QTextBlock block = this->findBlockByNumber(index);
+        block.setUserData(nullptr);
+        QTextCursor tcursor(block);
+        QTextBlockFormat blockFormat ;
+        tcursor.setBlockFormat(blockFormat);
+    }
+
+    controller.setSavedUpperBlockNumber(controller.getUpperBlockNumber());
 }
 
-void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int blockNumber)
+void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int blockNumber,bool hasSelection)
 {
     FormatData *formatData = new FormatData;
     QString text = block.text();
@@ -404,16 +457,38 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int bloc
             applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
         }
         formatData->sortAscendingPos();
-        if(!showAll){
-            if(blockNumber != block.blockNumber() && !formatData->isHidden()){
-                //hide symbols, start at the end to avoid changing position of the symbols
-                for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
+        if(showAll){
+            if(formatData->isHidden()){
+                for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
                 {
-                    hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+                    showSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
                 }
-                formatData->setHidden(true);
+                formatData->setHidden(false);
+            }
+        }else{
+            if(blockNumber == block.blockNumber()){
+                if(formatData->isHidden()){
+                    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
+                    {
+                        showSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+                    }
+                    formatData->setHidden(false);
+                }
+            }
+            else{
+                if(!hasSelection){
+                    if(!formatData->isHidden()){
+                        //hide symbols, start at the end to avoid changing position of the symbols
+                        for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
+                        {
+                            hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+                        }
+                        formatData->setHidden(true);
+                    }
+                }
             }
         }
+
     }
 }
 
@@ -771,9 +846,15 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
     cursor.setPosition(end + currentBlockPos,QTextCursor::KeepAnchor);
 }
 
-void MkTextDocument::scrollPercentUpdateHandle(int percent)
+void MkTextDocument::scrollPercentUpdateHandle(double percent)
 {
     controller.scrollUpdated(this->blockCount(), this->lastBlock().blockNumber(), percent);
+//    qDebug()<<"block count = "<<this->blockCount()<<" last block = "<<this->lastBlock().blockNumber()<<"percent ="<<percent;
+    if(controller.isScrollingDown()){
+//        identifyMKData(false, 0);
+    }else{
+//        identifyReverseMKData(false, 0);
+    }
 }
 
 void MkTextDocument::resetFormatLocation()

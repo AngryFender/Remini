@@ -35,7 +35,7 @@ public slots:
     void selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos);
     void duplicateLineHandle(int blockNumber);
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
-    void scrollPercentUpdateHandle(int percent);
+    void scrollPercentUpdateHandle(double percent);
 
  private:
     struct CheckBlock{
@@ -60,18 +60,19 @@ public slots:
     FormatLocation locStrike;
 
     QRegularExpression regexCodeBlock;
+    QRegularExpression regexCodeEndBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
     BlockController controller;
     int cursorPosition;
 
     void resetFormatLocation();
-    void identifyUserData(bool showAll, int blockNumber=0);
+    void identifyUserData(bool showAll, int blockNumber=0, bool hasSelection = false);
 
     void identifyMKData(bool showAll, int blockNumber=0);
     void identifyReverseMKData(bool showAll, int blockNumber=0);
 
-    void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0);
+    void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0, bool hasSelection = false);
     QString convertCharacterToSymbol(QString single);
     void identifyDoubleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format);
     void identifySingleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format);

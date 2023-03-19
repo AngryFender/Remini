@@ -125,10 +125,12 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}
     }
 
+    undoData.scrollValue = this->verticalScrollBar()->sliderPosition();
     emit removeAllMkData();
 
     preUndoSetup();
     QTextEdit::keyPressEvent(event);
+
     switch(event->key()){
     case Qt::Key_Enter:
     case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber()); break;
@@ -143,8 +145,10 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     int blockNumber = this->textCursor().blockNumber();
     postUndoSetup();
 
-    emit fileSave();
+//    emit fileSave();
     emit applyAllMkData( this->textCursor().hasSelection(), blockNumber, undoData.selectAll);
+    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+    this->ensureCursorVisible();
 }
 
 void MkEdit::quoteLeftKey()

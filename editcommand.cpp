@@ -17,16 +17,17 @@ EditCommand::EditCommand(UndoData &data)
     this->doc = dynamic_cast<MkTextDocument*>(data.doc);
     this->text = data.text;
     this->cursorPos = data.cursorPos;
+    this->scrollValue = data.scrollValue;
 
     this->oldText = data.oldText;
     this->oldCursorPos = data.oldCursorPos;
     this->oldStartSelection = data.oldStartSelection;
     this->oldEndSelection = data.oldEndSelection;
+
 }
 
 void EditCommand::undo()
 {
-    int sliderValue = view->verticalScrollBar()->sliderPosition();
     doc->setUndoRedoText(oldText);
     QTextCursor textCursor = view->textCursor();
     if(oldCursorPos == oldStartSelection){
@@ -37,15 +38,12 @@ void EditCommand::undo()
         textCursor.setPosition(oldEndSelection,QTextCursor::KeepAnchor);
     }
     view->setTextCursor(textCursor);
-    view->verticalScrollBar()->setSliderPosition(sliderValue);
 }
 
 void EditCommand::redo()
 {
-    int sliderValue = view->verticalScrollBar()->sliderPosition();
     doc->setUndoRedoText(text);
     QTextCursor textCursor = view->textCursor();
     textCursor.setPosition(cursorPos);
     view->setTextCursor(textCursor);
-    view->verticalScrollBar()->setSliderPosition(sliderValue);
 }
