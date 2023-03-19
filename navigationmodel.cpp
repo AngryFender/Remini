@@ -48,6 +48,22 @@ void NavigationModel::deleteFileFolderHandler(QModelIndex &index)
     }
 }
 
+void NavigationModel::openLocationHandler(QModelIndex &index)
+{
+    QString folderPath;
+
+    if(!index.isValid()){
+        folderPath = this->rootPath();
+    }else{
+        QFileInfo fileInfo = this->fileInfo(index);
+        if (!fileInfo.isDir()) {
+            fileInfo.setFile(fileInfo.absoluteFilePath());
+        }
+        folderPath = fileInfo.absolutePath();
+    }
+    QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
+}
+
 void NavigationModel::uniqueFileName(QFile &file, QString &name, QString &type, const QString &path)
 {
     file.setFileName(path+name+type);

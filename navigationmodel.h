@@ -2,6 +2,8 @@
 #define NAVIGATIONMODEL_H
 
 #include <QFileSystemModel>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QObject>
 
 class NavigationModel : public QFileSystemModel
@@ -13,6 +15,7 @@ public slots:
     void createFileHandler(QModelIndex& index, QString &name);
     void createFolderHandler(QModelIndex& index, QString &name);
     void deleteFileFolderHandler(QModelIndex& index);
+    void openLocationHandler(QModelIndex& index);
 signals:
     void folderChanged();
 private:
