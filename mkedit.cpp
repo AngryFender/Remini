@@ -64,7 +64,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
                     yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4);
                 }
                 else if(blockData->getStatus()==BlockData::end){
-                    int height = block.layout()->position().y() - yBlock + (fontSize*0.4)-scrollPos;
+                    int height = block.layout()->position().y() - yBlock + (fontSize*0.6)-scrollPos;
 
                     QBrush brushDefault(codeBlockColor);
                     painter.setBrush(brushDefault);
@@ -118,6 +118,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
 {
     QElapsedTimer timer;
     timer.start();
+
     switch(event->key()){
     case Qt::Key_Shift:
     case Qt::Key_Control:
