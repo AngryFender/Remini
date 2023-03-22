@@ -83,6 +83,8 @@ protected:
     QPoint contextMenuPos;
     int contextMenuBlockNum;
 
+    QRect getVisibleRect();
+
  public slots:
     void contextMenuHandler(QPoint pos);
     void undoContextMenu();
@@ -96,8 +98,7 @@ protected:
     void scrollValueUpdateHandle(int value);
 
 signals:
-    void scrollPercentUpdate(double percent);
-    void cursorPosChanged(bool hasSelection, int blockNumber );
+    void cursorPosChanged(bool hasSelection, int blockNumber, QRect rect);
     void fileSave();
     void enterKeyPressed(int blockNumber);
     void quoteLeftKeyPressed(int blockNumber,bool &success);
@@ -105,9 +106,10 @@ signals:
     void selectBlockCopy(int blockNumber, int &startPos, int &endPos);
     void duplicateLine(int blockNumber);
     void smartSelection(int blockNumber, QTextCursor &cursor);
+    void drawTextBlocks(bool hasSelection, int blockNumber, bool showAll, QRect rect);
 
     void removeAllMkData();
-    void applyAllMkData(bool hasSelection, int blockNumber, bool showAll);
+    void applyAllMkData(bool hasSelection, int blockNumber, bool showAll, QRect rect);
     void blockColorChanged(const QColor& color);
     void syntaxColorUpdate(HighlightColor& colors);
 

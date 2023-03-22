@@ -1,8 +1,6 @@
 #ifndef MKTEXTDOCUMENT_H
 #define MKTEXTDOCUMENT_H
 
-#include "blockcontroller.h"
-
 #include <QTextDocument>
 #include <QTextBlock>
 #include <QObject>
@@ -15,6 +13,8 @@
 #include <blockdata.h>
 #include <linedata.h>
 #include <formatdata.h>
+#include <QAbstractTextDocumentLayout>
+#include <QQueue>
 
 class MkTextDocument : public QTextDocument
 {
@@ -23,24 +23,32 @@ public:
     explicit MkTextDocument(QObject *parent = nullptr);
     void setPlainText(const QString &text);
     void setUndoRedoText(const QString &text);
-
+    void clear() override;
 
 public slots:
-    void cursorPosChangedHandle(bool hasSelection, int blockNumber);
+    void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect);
     void removeAllMkDataHandle();
-    void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll);
+    void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll, QRect rect);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
     void checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid);
     void selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos);
     void duplicateLineHandle(int blockNumber);
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
-    void scrollPercentUpdateHandle(double percent);
+    void drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect);
+
+    void showMKSymbolsFromSavedBlocks();
+    void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll);
 
  private:
     struct CheckBlock{
         int start = 0;
         int end = 0;
+    };
+
+    struct CheckingBlock{
+        QTextBlock start;
+        QTextBlock end;
     };
 
     struct FormatLocation{
@@ -63,19 +71,14 @@ public slots:
     QRegularExpression regexCodeEndBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
-    BlockController controller;
+    QQueue<QTextBlock> savedBlocks;
     int cursorPosition;
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, int blockNumber=0, bool hasSelection = false);
 
-    void identifyMKData(bool showAll, int blockNumber=0);
-    void identifyReverseMKData(bool showAll, int blockNumber=0);
-
     void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0, bool hasSelection = false);
     QString convertCharacterToSymbol(QString single);
-    void identifyDoubleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format);
-    void identifySingleSymbolLocation(QString &text, int index, FormatLocation &location, FormatData *format);
     void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
     void stripUserData();
 
@@ -83,6 +86,8 @@ public slots:
     void hideSymbols(QTextBlock block,const QString &symbol);
     void hideSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
     void showAllSymbols();
+
+    void showMissingSymbols();
     void showSymbols(QTextBlock block,const QString &symbol);
     void showSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
 
@@ -94,7 +99,7 @@ public slots:
     QString numberListGetNextNumber(const QString &text);
 
 signals:
-    emit void clearUndoStack();
+    void clearUndoStack();
 
 
 };

@@ -100,8 +100,8 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,SIGNAL(fileSave()),
                      this, SLOT(fileSaveHandle()));
 
-    QObject::connect(viewText,SIGNAL(cursorPosChanged(bool,int)),
-                     &mkGuiDocument,SLOT(cursorPosChangedHandle(bool,int)));
+    QObject::connect(viewText,SIGNAL(cursorPosChanged(bool,int,QRect)),
+                     &mkGuiDocument,SLOT(cursorPosChangedHandle(bool,int,QRect)));
 
     QObject::connect(viewText,SIGNAL(enterKeyPressed(int)),
                      &mkGuiDocument,SLOT(enterKeyPressedHandle(int)));
@@ -112,14 +112,14 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,SIGNAL(removeAllMkData()),
                      &mkGuiDocument,SLOT(removeAllMkDataHandle()));
 
-    QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int,bool)),
-                     &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int,bool)));
-
-    QObject::connect(viewText,SIGNAL(scrollPercentUpdate(double)),
-                     &mkGuiDocument,SLOT(scrollPercentUpdateHandle(double)));
+    QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int,bool,QRect)),
+                     &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int,bool,QRect)));
 
     QObject::connect(&mkGuiDocument,SIGNAL(clearUndoStack()),
                      viewText,SLOT(clearUndoStackHandle()));
+
+    QObject::connect(viewText,SIGNAL(drawTextBlocks(bool,int,bool,QRect)),
+                     &mkGuiDocument,SLOT(drawTextBlocksHandler(bool,int,bool,QRect)));
 
 }
 

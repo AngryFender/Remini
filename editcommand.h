@@ -24,9 +24,6 @@ struct UndoData{
 class EditCommand : public QUndoCommand
 {
 public:
-    EditCommand(QTextEdit *view,QTextDocument *doc, QString text, int cursorPos,
-                QString oldText, int oldCursorPos,
-                QUndoCommand *parent = nullptr);
     EditCommand(UndoData &data);
 
     void undo() override;
@@ -43,6 +40,7 @@ private:
     int oldCursorPos;
     int oldStartSelection;
     int oldEndSelection;
+    bool isConstructorRedo;
 };
 
 #endif // EDITCOMMAND_H

@@ -2,6 +2,8 @@
 #include "linedata.h"
 #include "mkedit.h"
 
+#include <QElapsedTimer>
+
 MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -103,8 +105,11 @@ void MkEdit::wheelEvent(QWheelEvent *e)
         } else {
            this->zoomOut();
         }
-        emit removeAllMkData();
-        emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), false);
+
+        QTextCursor cursor = this->cursorForPosition(QCursor::pos());
+        this->setTextCursor(cursor);
+        this->ensureCursorVisible();
+
     }else{
         QTextEdit::wheelEvent(e);
     }
@@ -112,6 +117,8 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
+    QElapsedTimer timer;
+    timer.start();
     switch(event->key()){
     case Qt::Key_Shift:
     case Qt::Key_Control:
@@ -125,7 +132,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}
     }
 
-    undoData.scrollValue = this->verticalScrollBar()->sliderPosition();
+    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
     emit removeAllMkData();
 
     preUndoSetup();
@@ -142,13 +149,15 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     default: break;
     }
 
-    int blockNumber = this->textCursor().blockNumber();
     postUndoSetup();
 
-//    emit fileSave();
-    emit applyAllMkData( this->textCursor().hasSelection(), blockNumber, undoData.selectAll);
+    emit fileSave();
+
+    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     this->ensureCursorVisible();
+    qDebug()<< "        time for key press "<<timer.elapsed();
+
 }
 
 void MkEdit::quoteLeftKey()
@@ -190,6 +199,13 @@ void MkEdit::postUndoSetup()
         EditCommand *edit = new EditCommand(undoData);
         undoStack.push(edit);
     }
+}
+
+QRect MkEdit::getVisibleRect()
+{
+    QRect visibleRect = this->viewport()->rect();
+    visibleRect.translate(this->horizontalScrollBar()->value(), this->verticalScrollBar()->value()); // translate the rectangle by the scroll bar offsets
+    return visibleRect;
 }
 
 void MkEdit::contextMenuHandler(QPoint pos)
@@ -271,10 +287,9 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 
     QTextEdit::insertFromMimeData(source);
 
-    int savedBlockNumber = this->textCursor().blockNumber();
     postUndoSetup();
     emit fileSave();
-    emit applyAllMkData( this->textCursor().hasSelection(), savedBlockNumber, undoData.selectAll);
+    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
 }
 
 QColor MkEdit::getTypeColor() const
@@ -351,15 +366,13 @@ void MkEdit::redo()
 void MkEdit::clearUndoStackHandle()
 {
     undoStack.clear();
+    emit cursorPosChanged(false, 0, getVisibleRect());
 }
 
 void MkEdit::scrollValueUpdateHandle(int value)
 {
-    int max = this->verticalScrollBar()->maximum();
-    int min = this->verticalScrollBar()->minimum();
-    int range = max - min;
-    double percent = 100.00 * ((double)value - (double)min) / (double)range;
-    emit scrollPercentUpdate(percent);
+    int currentBlockNumber = textCursor().blockNumber();
+    emit drawTextBlocks(textCursor().hasSelection(), currentBlockNumber,undoData.selectAll, getVisibleRect());
 }
 
 void MkEdit::cursorPositionChangedHandle()
@@ -367,8 +380,9 @@ void MkEdit::cursorPositionChangedHandle()
     int currentBlockNumber = textCursor().blockNumber();
 
     if(savedBlockNumber != currentBlockNumber){
+        qDebug()<<"save = " << savedBlockNumber <<" current = " << currentBlockNumber;
         savedBlockNumber = currentBlockNumber;
-        emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber);
+        emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect());
         this->update();
     }
 }

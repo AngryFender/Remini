@@ -1,16 +1,5 @@
 #include "editcommand.h"
 
-EditCommand::EditCommand(QTextEdit *view, QTextDocument *doc, QString text, int cursorPos, QString oldText, int oldCursorPos, QUndoCommand *parent):QUndoCommand(parent)
-{
-    this->view = view;
-    this->doc = dynamic_cast<MkTextDocument*>(doc);
-    this->text = text;
-    this->cursorPos = cursorPos;
-
-    this->oldText = oldText;
-    this->oldCursorPos = oldCursorPos;
-}
-
 EditCommand::EditCommand(UndoData &data)
 {
     this->view = data.view;
@@ -23,6 +12,7 @@ EditCommand::EditCommand(UndoData &data)
     this->oldCursorPos = data.oldCursorPos;
     this->oldStartSelection = data.oldStartSelection;
     this->oldEndSelection = data.oldEndSelection;
+    isConstructorRedo = true;
 
 }
 
@@ -42,8 +32,12 @@ void EditCommand::undo()
 
 void EditCommand::redo()
 {
-    doc->setUndoRedoText(text);
-    QTextCursor textCursor = view->textCursor();
-    textCursor.setPosition(cursorPos);
-    view->setTextCursor(textCursor);
+    if(isConstructorRedo){
+        isConstructorRedo = false;
+    }else{
+        doc->setUndoRedoText(text);
+        QTextCursor textCursor = view->textCursor();
+        textCursor.setPosition(cursorPos);
+        view->setTextCursor(textCursor);
+    }
 }

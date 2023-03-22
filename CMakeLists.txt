@@ -40,8 +40,6 @@ set(PROJECT_SOURCES
         navigationmodel.cpp
         formatdata.h
         formatdata.cpp
-        blockcontroller.h
-        blockcontroller.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
