@@ -1,8 +1,7 @@
+#include <QElapsedTimer>
 #include "blockdata.h"
 #include "linedata.h"
 #include "mkedit.h"
-
-#include <QElapsedTimer>
 
 MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
@@ -54,39 +53,42 @@ void MkEdit::paintEvent(QPaintEvent *e)
     int scrollPos = this->verticalScrollBar()->value();
     penCodeBlock.setColor(codeBlockColor);
 
+    QAbstractTextDocumentLayout* layout = this->document()->documentLayout();
+    QRect rect = getVisibleRect();
+
     QTextBlock block = this->document()->begin();
     while (block.isValid()) {
+        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > rect.top()){
+            QTextBlockUserData* data =block.userData();
+            BlockData* blockData = dynamic_cast<BlockData*>(data);
+            if(blockData){
+                if(blockData->getStatus()==BlockData::start){
+                    xBlock = block.layout()->position().x()-2;
+                    yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4);
+                }
+                else if(blockData->getStatus()==BlockData::end){
+                    int height = block.layout()->position().y() - yBlock + (fontSize*0.4)-scrollPos;
 
-        QTextBlockUserData* data =block.userData();
-        BlockData* blockData = dynamic_cast<BlockData*>(data);
-        if(blockData){
-            if(blockData->getStatus()==BlockData::start){
-                xBlock = block.layout()->position().x()-2;
-                yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4);
-            }
-            else if(blockData->getStatus()==BlockData::end){
-                int height = block.layout()->position().y() - yBlock + (fontSize*0.4)-scrollPos;
-
-                QBrush brushDefault(codeBlockColor);
-                painter.setBrush(brushDefault);
-                painter.setPen(penCodeBlock);
-                painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
-            }
-        }else{
-            LineData* lineData = dynamic_cast<LineData*>(data);
-            if(lineData){
-                if(lineData->getStatus() == LineData::horizontalLine && lineData->getDraw()){
-                    int lineX1 = block.layout()->position().x()-2;
-                    int lineY1 = block.layout()->position().y()+fontSize-scrollPos;
-                    int lineX2 = block.layout()->position().x()-2+widthCodeBlock;
+                    QBrush brushDefault(codeBlockColor);
+                    painter.setBrush(brushDefault);
                     painter.setPen(penCodeBlock);
-                    painter.drawLine(lineX1,lineY1,lineX2,lineY1);
+                    painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
+                }
+            }else{
+                LineData* lineData = dynamic_cast<LineData*>(data);
+                if(lineData){
+                    if(lineData->getStatus() == LineData::horizontalLine && lineData->getDraw()){
+                        int lineX1 = block.layout()->position().x()-2;
+                        int lineY1 = block.layout()->position().y()+fontSize-scrollPos;
+                        int lineX2 = block.layout()->position().x()-2+widthCodeBlock;
+                        painter.setPen(penCodeBlock);
+                        painter.drawLine(lineX1,lineY1,lineX2,lineY1);
+                    }
                 }
             }
         }
         block = block.next();
     }
-
     QTextEdit::paintEvent(e);
 }
 
@@ -156,7 +158,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     this->ensureCursorVisible();
-    qDebug()<< "        time for key press "<<timer.elapsed();
+    qDebug()<< ">>>time to process key press = "<<timer.elapsed();
 
 }
 
@@ -380,7 +382,6 @@ void MkEdit::cursorPositionChangedHandle()
     int currentBlockNumber = textCursor().blockNumber();
 
     if(savedBlockNumber != currentBlockNumber){
-        qDebug()<<"save = " << savedBlockNumber <<" current = " << currentBlockNumber;
         savedBlockNumber = currentBlockNumber;
         emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect());
         this->update();

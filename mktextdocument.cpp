@@ -1,5 +1,4 @@
 #include "mktextdocument.h"
-
 #include <QElapsedTimer>
 
 MkTextDocument::MkTextDocument(QObject *parent)
@@ -46,83 +45,7 @@ void MkTextDocument::clear()
 
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect)
 {
-    qDebug()<<" cusorPosChange";
     hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false);
-//    if(this->isEmpty())
-//        return;
-
-//    QTextBlock tblock = this->begin();
-//    CheckBlock checkBlock;
-
-//    while (tblock.isValid()) {
-//        QTextBlockUserData* data =tblock.userData();
-//        if(data == nullptr){
-//            tblock = tblock.next();
-//            continue;
-//        }
-
-//        BlockData* blockData = dynamic_cast<BlockData*>(data);
-//        if(blockData)
-//        {
-//            if(blockData->getStatus()==BlockData::start)
-//            {
-//                checkBlock.start = tblock.blockNumber();
-//            }
-//            else if(blockData->getStatus()==BlockData::end)
-//            {
-//                checkBlock.end = tblock.blockNumber();
-//                if(blockNumber >= checkBlock.start && blockNumber <= checkBlock.end){
-//                    showSymbols(this->findBlockByNumber(checkBlock.start), CODEBLOCK__START_SYMBOL);
-//                    showSymbols(this->findBlockByNumber(checkBlock.end), CODEBLOCK__START_SYMBOL);
-//                }
-//                else{
-//                    if(!hasSelection){
-//                        hideSymbols(this->findBlockByNumber(checkBlock.start), CODEBLOCK__START_SYMBOL);
-//                        hideSymbols(this->findBlockByNumber(checkBlock.end), CODEBLOCK__START_SYMBOL);
-//                    }
-//                }
-//            }
-//        }
-//        else{
-//            LineData* lineData = dynamic_cast<LineData*>(data);
-//            if(lineData){
-//                if(blockNumber == tblock.blockNumber()){
-//                    lineData->setDraw(false);
-//                    showSymbols(tblock, lineData->getSymbol());
-//                }else{
-//                    if(!hasSelection){
-//                        lineData->setDraw(true);
-//                        hideSymbols(tblock, lineData->getSymbol());
-//                    }
-//                }
-//            }
-//            FormatData* formatData = dynamic_cast<FormatData*>(data);
-//            if(formatData){
-//                if(blockNumber == tblock.blockNumber()){
-//                    if(formatData->isHidden()){
-//                        for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-//                        {
-//                            showSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
-//                        }
-//                        formatData->setHidden(false);
-//                    }
-//                }
-//                else{
-//                    if(!hasSelection){
-//                        if(!formatData->isHidden()){
-//                            //hide symbols, start at the end to avoid changing position of the symbols
-//                            for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
-//                            {
-//                                hideSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
-//                            }
-//                            formatData->setHidden(true);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        tblock = tblock.next();
-//    }
 }
 
 void MkTextDocument::removeAllMkDataHandle()
@@ -131,7 +54,7 @@ void MkTextDocument::removeAllMkDataHandle()
     timer.start();
     showMKSymbolsFromSavedBlocks();
     stripUserData();
-    qDebug()<<"stripped all MK data "<<timer.elapsed();
+    qDebug()<<"   stripped all MK data "<<timer.elapsed();
 }
 
 void MkTextDocument::showAllSymbols()
@@ -214,25 +137,17 @@ void MkTextDocument::showMissingSymbols()
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll,QRect rect)
 {
-    QElapsedTimer timer;
-    timer.start();
     identifyUserData(showAll, blockNumber, hasSelection);
     hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber, showAll);
-    qDebug()<<" applying all mk data"<< timer.elapsed();
-
-//    cursorPosChangedHandle(hasSelection, blockNumber);
 }
 
 void MkTextDocument::identifyUserData(bool showAll, int blockNumber, bool hasSelection)
 {
-//    int fontSize =this->defaultFont().pointSize();
     bool openBlock = false;
     QTextBlock startBlock;
     QTextBlockFormat blockFormat;
     CheckBlock checkBlock;
 
-    QElapsedTimer timer;
-    timer.start();
 
     for(QTextBlock tBlock = this->begin(); tBlock != this->end(); tBlock = tBlock.next()){
 
@@ -244,7 +159,6 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber, bool hasSel
             if(!openBlock){
                 openBlock = true;
                 blockData->setStatus(BlockData::start);
-//                setCodeBlockMargin(tBlock, blockFormat, fontSize*3/4, fontSize, fontSize);
                 startBlock = tBlock;
                 checkBlock.start = tBlock.blockNumber();
             }
@@ -252,22 +166,6 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber, bool hasSel
                 openBlock = false;
                 checkBlock.end = tBlock.blockNumber();
                 blockData->setStatus(BlockData::end);
-//                setCodeBlockMargin(tBlock, blockFormat, fontSize*3/4, fontSize);
-//                if(showAll){
-//                    showSymbols(startBlock, CODEBLOCK__START_SYMBOL);
-//                    showSymbols(tBlock, CODEBLOCK__START_SYMBOL);
-//                }else {
-//                    if(blockNumber >= checkBlock.start && blockNumber <= checkBlock.end){
-//                        showSymbols(startBlock, CODEBLOCK__START_SYMBOL);
-//                        showSymbols(tBlock, CODEBLOCK__START_SYMBOL);
-//                    }
-//                    else{
-//                        if(!hasSelection){
-//                            hideSymbols(startBlock, CODEBLOCK__START_SYMBOL);
-//                            hideSymbols(tBlock, CODEBLOCK__START_SYMBOL);
-//                        }
-//                    }
-//                }
             }
         }
         else{
@@ -275,7 +173,6 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber, bool hasSel
                 BlockData *blockData = new BlockData;
                 blockData->setStatus(BlockData::content);
                 tBlock.setUserData(blockData);
-//                setCodeBlockMargin(tBlock, blockFormat, fontSize*5/3, fontSize);
             }
             else{
                 QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
@@ -283,26 +180,11 @@ void MkTextDocument::identifyUserData(bool showAll, int blockNumber, bool hasSel
                     LineData *lineData = new LineData;
                     lineData->setStatus(LineData::horizontalLine);
                     tBlock.setUserData(lineData);
-//                    if(showAll){
-//                        showSymbols(tBlock, lineData->getSymbol());
-//                    }else{
-//                        if(blockNumber == tBlock.blockNumber()){
-//                            lineData->setDraw(false);
-//                            showSymbols(tBlock, lineData->getSymbol());
-//                        }else{
-//                            if(!hasSelection){
-//                                lineData->setDraw(true);
-//                                hideSymbols(tBlock, lineData->getSymbol());
-//                            }
-//                        }
-//                    }
                 }
-//                identifyFormatData(tBlock, showAll, blockNumber, hasSelection);
+                identifyFormatData(tBlock, showAll, blockNumber, hasSelection);
             }
         }
     }
-    qDebug() << timer.elapsed();
-
 }
 
 void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int blockNumber,bool hasSelection)
@@ -427,38 +309,6 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll,int bloc
             applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
         }
         formatData->sortAscendingPos();
-        if(showAll){
-            if(formatData->isHidden()){
-                for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-                {
-                    showSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
-                }
-                formatData->setHidden(false);
-            }
-        }else{
-            if(blockNumber == block.blockNumber()){
-                if(formatData->isHidden()){
-                    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-                    {
-                        showSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
-                    }
-                    formatData->setHidden(false);
-                }
-            }
-            else{
-                if(!hasSelection){
-                    if(!formatData->isHidden()){
-                        //hide symbols, start at the end to avoid changing position of the symbols
-                        for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
-                        {
-                            hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
-                        }
-                        formatData->setHidden(true);
-                    }
-                }
-            }
-        }
-
     }
 }
 
@@ -789,23 +639,14 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 
 void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect)
 {
-    QElapsedTimer timer;
-    timer.start();
-
     showMKSymbolsFromSavedBlocks();
-    qDebug()<<" drawTextBlockHandler "<<timer.elapsed();
     hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll);
-
-    qDebug()<<" time taken = "<<timer.elapsed();
 }
 
 void MkTextDocument::showMKSymbolsFromSavedBlocks()
 {
-    QString allBlocks;
     while(!savedBlocks.empty()){
-        QTextBlock block = savedBlocks.front();
-        int number = block.blockNumber();
-        allBlocks = allBlocks + ", "+ QString::number(number);
+        QTextBlock block = savedBlocks.takeFirst();
 
         QTextBlockUserData* data =block.userData();
         if(data == nullptr){
@@ -839,9 +680,7 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks()
                     }
             }
         }
-        savedBlocks.dequeue();
     }
-//    qDebug()<<"show "<<allBlocks;
 }
 
 void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll)
@@ -851,7 +690,6 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
     QAbstractTextDocumentLayout* layout = this->documentLayout();
     CheckingBlock checkBlock;
     QTextBlock block = this->firstBlock();
-    QString allBlocks;
 
     while(block.isValid()){
         if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > rect.top()){
@@ -932,11 +770,9 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                 }
             }
             savedBlocks.append(block);
-            allBlocks = allBlocks + ", "+ QString::number(block.blockNumber());
         }
         block = block.next();
     }
-//    qDebug()<<"hide "<<allBlocks;
 }
 
 
@@ -954,21 +790,13 @@ void MkTextDocument::numberListDetect(int blockNumber)
     QTextBlock currentBlock = this->findBlockByNumber(blockNumber-1);
     QString lineText = currentBlock.text();
 
-    QStringList patterns = {"\\s+[0-9]+\\.\\s([A-Za-z0-9]+( [A-Za-z0-9]+)+)",   //look for " 10. abc123 abc123" , "   1. abc123 abc"
-                                "[0-9]+\\.\\s([A-Za-z0-9]+( [A-Za-z0-9]+)+)",   //look for " 10. abc123 abc123" , "   1. abc123 abc"
-                            "\\s+[0-9]+\\.\\s[A-Za-z0-9]+",                     //look for "10. abc123 abc123"  , "1. abc123 abc"
-                                "[0-9]+\\.\\s[A-Za-z0-9]+",                     //look for "10. abc123"         , "1. abc123"
-                            "\\s+[0-9]+\\.\\s+",                                //look for " 1. "
-                                "[0-9]+\\.\\s+"};                               //look for "1. "
-    for(QString &pattern :patterns){
-        regexNumbering.setPattern(pattern);
-        QRegularExpressionMatch matchNumbering = regexNumbering.match(lineText);
-        if(matchNumbering.hasMatch()){
-            int spaces = numberListGetSpaces(matchNumbering.captured(0));
-            editCursor.insertText(QString("").leftJustified(spaces,' '));
-            editCursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
-            return;
-        }
+    regexNumbering.setPattern("^( {0,}|\\s{2,})\\d+\\.\\s*.*$");                    //look for " 10. abc123 abc123", "   1. abc123 abc"," 10. abc123 abc123","   1. abc123 abc","10. abc123 abc123","1. abc123 abc","10. abc123","1. abc123"," 1. ",
+    QRegularExpressionMatch matchNumbering = regexNumbering.match(lineText);
+    if(matchNumbering.hasMatch()){
+        int spaces = numberListGetSpaces(matchNumbering.captured(0));
+        editCursor.insertText(QString("").leftJustified(spaces,' '));
+        editCursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
+        return;
     }
 }
 
