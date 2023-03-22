@@ -25,9 +25,6 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
             this, SLOT(contextMenuHandler(QPoint)));
 
     setTabStopDistance(20);
-    regexCodeBlock.setPattern("^```+.*");
-    regexStartBlock.setPattern("```[a-zA-Z0-9]+");
-
     penCodeBlock.setWidthF(1);
     penCodeBlock.setStyle(Qt::SolidLine);
 

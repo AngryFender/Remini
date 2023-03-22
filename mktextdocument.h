@@ -6,7 +6,6 @@
 #include <QObject>
 #include <QRegularExpressionMatchIterator>
 #include <QRegularExpressionMatch>
-#include <QPageRanges>
 #include <QString>
 #include <QStringList>
 #include <QRegularExpression>
@@ -68,11 +67,9 @@ public slots:
     FormatLocation locStrike;
 
     QRegularExpression regexCodeBlock;
-    QRegularExpression regexCodeEndBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
     QQueue<QTextBlock> savedBlocks;
-    int cursorPosition;
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, int blockNumber=0, bool hasSelection = false);
@@ -85,9 +82,7 @@ public slots:
     void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
     void hideSymbols(QTextBlock block,const QString &symbol);
     void hideSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
-    void showAllSymbols();
 
-    void showMissingSymbols();
     void showSymbols(QTextBlock block,const QString &symbol);
     void showSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
 

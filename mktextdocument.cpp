@@ -4,8 +4,7 @@
 MkTextDocument::MkTextDocument(QObject *parent)
     : QTextDocument{parent}
 {
-    regexCodeBlock.setPattern(CODEBLOCK__START_SYMBOL);
-    regexCodeEndBlock.setPattern(CODEBLOCK_END_SYMBOL);
+    regexCodeBlock.setPattern(CODEBLOCK_SYMBOL);
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
 
     this->setUndoRedoEnabled(false);
@@ -55,84 +54,6 @@ void MkTextDocument::removeAllMkDataHandle()
     showMKSymbolsFromSavedBlocks();
     stripUserData();
     qDebug()<<"   stripped all MK data "<<timer.elapsed();
-}
-
-void MkTextDocument::showAllSymbols()
-{
-    QTextBlock tblock = this->begin();
-
-    //show all ```
-    while (tblock.isValid()) {
-        QTextBlockUserData* data =tblock.userData();
-        BlockData* blockData = dynamic_cast<BlockData*>(data);
-        if(blockData)
-        {
-            if(blockData->getStatus()==BlockData::start || blockData->getStatus()==BlockData::end)
-            {
-                showSymbols(tblock, CODEBLOCK__START_SYMBOL);
-            }
-        }else{
-            LineData* lineData = dynamic_cast<LineData*>(data);
-            if(lineData){
-                showSymbols(tblock, lineData->getSymbol());
-            }
-
-            FormatData* formatData = dynamic_cast<FormatData*>(data);
-            if(formatData){
-                if(formatData->isHidden()){
-                    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-                    {
-                        showSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
-                    }
-                    formatData->setHidden(false);
-                }
-            }
-        }
-        tblock.setUserData(nullptr);
-        QTextCursor tcursor(tblock);
-        QTextBlockFormat blockFormat ;
-        tcursor.setBlockFormat(blockFormat);
-        tblock = tblock.next();
-    }
-}
-
-void MkTextDocument::showMissingSymbols()
-{
-    QTextBlock tblock = this->begin();
-
-    //show all ```
-    while (tblock.isValid()) {
-        QTextBlockUserData* data =tblock.userData();
-        BlockData* blockData = dynamic_cast<BlockData*>(data);
-        if(blockData)
-        {
-            if(blockData->getStatus()==BlockData::start || blockData->getStatus()==BlockData::end)
-            {
-                showSymbols(tblock, CODEBLOCK__START_SYMBOL);
-            }
-        }else{
-            LineData* lineData = dynamic_cast<LineData*>(data);
-            if(lineData){
-                showSymbols(tblock, lineData->getSymbol());
-            }
-
-            FormatData* formatData = dynamic_cast<FormatData*>(data);
-            if(formatData){
-                if(formatData->isHidden()){
-                    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-                    {
-                        showSymbolsAtPos(tblock, (*it)->getPos(), (*it)->getSymbol());
-                    }
-                    formatData->setHidden(false);
-                }
-            }
-        }
-        tblock.setUserData(nullptr);
-        QTextCursor tcursor(tblock);
-        QTextBlockFormat blockFormat ;
-        tcursor.setBlockFormat(blockFormat);
-        tblock = tblock.next();
-        }
 }
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll,QRect rect)
@@ -419,7 +340,7 @@ void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
 
     QRegularExpressionMatch matchCodeBlockSymbol = regexCodeBlock.match(currentBlock.text());
     if(matchCodeBlockSymbol.hasMatch()){
-        editCursor.insertText(CODEBLOCK__START_SYMBOL);
+        editCursor.insertText(CODEBLOCK_SYMBOL);
         editCursor.insertBlock();
         success = true;
     }else{
@@ -659,25 +580,25 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks()
         {
             if(blockData->getStatus()!=BlockData::content)
             {
-                showSymbols(block, CODEBLOCK__START_SYMBOL);
-                showSymbols(block, CODEBLOCK__START_SYMBOL);
+                showSymbols(block, CODEBLOCK_SYMBOL);
+                showSymbols(block, CODEBLOCK_SYMBOL);
             }
         }
         else{
             LineData* lineData = dynamic_cast<LineData*>(data);
             if(lineData){
-                    lineData->setDraw(false);
-                    showSymbols(block, lineData->getSymbol());
+                lineData->setDraw(false);
+                showSymbols(block, lineData->getSymbol());
             }
             FormatData* formatData = dynamic_cast<FormatData*>(data);
             if(formatData){
-                    if(formatData->isHidden()){
-                        for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-                        {
-                            showSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
-                        }
-                        formatData->setHidden(false);
+                if(formatData->isHidden()){
+                    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
+                    {
+                        showSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
                     }
+                    formatData->setHidden(false);
+                }
             }
         }
     }
@@ -717,13 +638,13 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                     checkBlock.end = block;
                     setCodeBlockMargin(block, blockFormat, fontSize*3/4, fontSize);
                     if(blockNumber >= checkBlock.start.blockNumber() && blockNumber <= checkBlock.end.blockNumber()){
-                        showSymbols(checkBlock.start, CODEBLOCK__START_SYMBOL);
-                        showSymbols(checkBlock.end, CODEBLOCK__START_SYMBOL);
+                        showSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
+                        showSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
                     }
                     else{
                         if(!hasSelection){
-                            hideSymbols(checkBlock.start, CODEBLOCK__START_SYMBOL);
-                            hideSymbols(checkBlock.end, CODEBLOCK__START_SYMBOL);
+                            hideSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
+                            hideSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
                         }
                     }
                 }else{

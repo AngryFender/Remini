@@ -14,9 +14,6 @@
 #include <editcommand.h>
 #include <theme.h>
 
-#define TEXT_X 0
-#define TEXT_Y 0
-#define PADDING 10
 #define BLOCKRADIUS 3
 
 class MkEdit : public QTextEdit
@@ -57,16 +54,12 @@ protected:
 
  private:
     QColor codeBlockColor;
-    QRegularExpression regexNumbering;
-    QRegularExpression regexCodeBlock;
-    QRegularExpression regexStartBlock;
     int widthCodeBlock;
     QPen penCodeBlock;
     int savedBlockNumber;
     QUndoStack undoStack;
     UndoData undoData;
     HighlightColor syntaxColor;
-
 
     void quoteLeftKey();
     void smartSelectionSetup();
@@ -81,7 +74,6 @@ protected:
     QAction selectAllAction;
     QAction selectBlockAction;
     QPoint contextMenuPos;
-    int contextMenuBlockNum;
 
     QRect getVisibleRect();
 

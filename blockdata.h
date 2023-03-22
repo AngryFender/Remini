@@ -3,8 +3,7 @@
 
 #include <QTextBlockUserData>
 
-#define CODEBLOCK__START_SYMBOL "```"
-#define CODEBLOCK_END_SYMBOL "^```\\r?\\n?"
+#define CODEBLOCK_SYMBOL "```"
 
 class BlockData : public QTextBlockUserData
 {
