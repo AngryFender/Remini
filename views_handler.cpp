@@ -171,13 +171,19 @@ void ViewsHandler::fileSaveHandle()
 
 void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
 {
-    QMessageBox confirmBox;
-    confirmBox.setWindowTitle("Delete");
-    confirmBox.setText("Are you sure you want to delete");
-    confirmBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    confirmBox.setDefaultButton(QMessageBox::No);
-    if(QMessageBox::Yes == confirmBox.exec()){
+    if(parent == nullptr){
+        return;
+    }
+
+    QScopedPointer<QMessageBox> confirmBox(new QMessageBox(parent));
+    confirmBox->setStyleSheet(parent->styleSheet());
+    confirmBox->setWindowTitle("Delete");
+    confirmBox->setText("Are you sure you want to delete");
+    confirmBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    confirmBox->setDefaultButton(QMessageBox::No);
+    if(QMessageBox::Yes == confirmBox->exec()){
         emit fileDelete(index);
     }
+
 }
 
