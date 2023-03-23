@@ -63,6 +63,7 @@ protected:
 
     void quoteLeftKey();
     void smartSelectionSetup();
+    void tabKeyPressed();
     void preUndoSetup();
     void postUndoSetup();
 

@@ -24,7 +24,6 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(contextMenuHandler(QPoint)));
 
-    setTabStopDistance(20);
     penCodeBlock.setWidthF(1);
     penCodeBlock.setStyle(Qt::SolidLine);
 
@@ -33,6 +32,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
     QObject::connect(this->verticalScrollBar(),SIGNAL(valueChanged(int)),
                      this, SLOT(scrollValueUpdateHandle(int)));
+
 
     this->setUndoRedoEnabled(false);
 }
@@ -128,8 +128,17 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Down:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
     case Qt::Key_V:
-    case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}
-    case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}
+    case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}break;
+    case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}break;
+    case Qt::Key_Tab:       if( event->modifiers() == Qt::NoModifier){
+                                emit removeAllMkData();
+                                postUndoSetup();
+                                tabKeyPressed();
+                                emit fileSave();
+                                postUndoSetup();
+                                emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+                                return;
+                            }break;
     }
 
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
@@ -167,6 +176,7 @@ void MkEdit::quoteLeftKey()
     if(success){
         QTextCursor textCursor = this->textCursor();
         textCursor.movePosition(QTextCursor::PreviousBlock);
+        textCursor.movePosition(QTextCursor::EndOfBlock);
         this->setTextCursor(textCursor);
     }
 }
@@ -175,6 +185,13 @@ void MkEdit::smartSelectionSetup()
 {
     QTextCursor cursor = this->textCursor();
     emit smartSelection(this->textCursor().blockNumber(), cursor);
+    this->setTextCursor(cursor);
+}
+
+void MkEdit::tabKeyPressed()
+{
+    QTextCursor cursor = this->textCursor();
+    cursor.insertText("    ");
     this->setTextCursor(cursor);
 }
 
