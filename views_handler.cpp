@@ -19,10 +19,13 @@ void ViewsHandler::initModels()
 
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
+    viewSearch = ui.uiSearch;
     viewTree = ui.uiTreeView;
     viewText = ui.uiTextView;
     viewTitle = ui.uiTitle;
 
+
+    viewSearch->setPlaceholderText("Search Files...");
     initTreeView();
 
     viewText->setDocument(&mkGuiDocument);
@@ -126,6 +129,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,SIGNAL(drawTextBlocks(bool,int,bool,QRect)),
                      &mkGuiDocument,SLOT(drawTextBlocksHandler(bool,int,bool,QRect)));
 
+    QObject::connect(viewSearch,SIGNAL(textChanged(QString)),
+                     this,SLOT(searchFileHandle(QString)));
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -190,5 +196,14 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
         emit fileDelete(index);
     }
 
+}
+
+void ViewsHandler::searchFileHandle(const QString &filename)
+{
+    QStringList filters;
+    filters << filename+"*";
+    modelTree.setNameFilters(filters);
+    modelTree.setNameFilterDisables(false);
+    viewTree->expandAll();
 }
 

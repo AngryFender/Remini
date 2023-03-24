@@ -40,6 +40,7 @@ private:
     NavigationModel modelTree;
     MkEdit* viewText;
     QLabel* viewTitle;
+    QLineEdit* viewSearch;
     NavigationView* viewTree;
     QFileInfo fileInfo;
     QDialog fileDeleteConfirm;
@@ -64,6 +65,7 @@ private slots:
     void fileDisplay(const QModelIndex& index);
     void fileSaveHandle();
     void fileDeleteDialogue(QModelIndex& index);
+    void searchFileHandle(const QString &filename);
 };
 
 #endif // VIEWS_HANDLER_H
