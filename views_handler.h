@@ -8,6 +8,7 @@
 #include <navigationview.h>
 #include <navigationmodel.h>
 #include "./ui_mainwindow.h"
+#include "searchalldialog.h"
 
 class ViewsHandler: public QObject
 {
@@ -22,15 +23,20 @@ public:
         return handle;
     }
 
+public slots:
+    void startSearchAllHandle();
+
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         this->parent = parent;
+        searchAllView = new SearchAllDialog(this->parent);
         initModels();
         initViews(ui);
         initConnection();
     }
 
     QWidget * parent;
+    SearchAllDialog * searchAllView;
     NavigationModel modelTree;
     MkEdit* viewText;
     QLabel* viewTitle;

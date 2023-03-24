@@ -16,14 +16,13 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(shiftTimer,SIGNAL(timeout()),
                      this, SLOT(shiftTimerHandle()));
 
-    dialog = new Dialog(this);
-//    dialog->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    QObject::connect(this,SIGNAL(startSearchAll()),
+                     view_handler.get(),SLOT(startSearchAllHandle()));
 }
 
 MainWindow::~MainWindow()
 {
     delete shiftTimer;
-    delete dialog;
     delete ui;
 }
 
@@ -40,7 +39,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         this->setStyleSheet(themeContents);
     }else if(event->key() == Qt::Key_Shift){
         if(shiftTimer->isActive()){
-            openSearch();
+            emit startSearchAll();
         }
         shiftTimer->start(200);
     }
@@ -57,13 +56,3 @@ void MainWindow::setup_views(QWidget *parent, Ui::MainWindow &ui)
 {
     view_handler = ViewsHandler::getInstance(parent, ui);
 }
-
-void MainWindow::openSearch()
-{
-//    int nWidth = 300;
-//    int nHeight = 400;
-//    dialog->resize(nWidth,nHeight);
-    dialog->show();
-    qDebug()<<"searching now";
-}
-

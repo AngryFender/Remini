@@ -1,5 +1,10 @@
 #include "views_handler.h"
 
+void ViewsHandler::startSearchAllHandle()
+{
+    searchAllView->show();
+}
+
 QString ViewsHandler::getSavedPath()
 {
     QFile configFile("config.txt");

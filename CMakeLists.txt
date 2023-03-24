@@ -40,6 +40,8 @@ set(PROJECT_SOURCES
         navigationmodel.cpp
         formatdata.h
         formatdata.cpp
+        searchalldialog.h
+        searchalldialog.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
