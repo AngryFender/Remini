@@ -674,10 +674,6 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                 }
                 FormatData* formatData = dynamic_cast<FormatData*>(data);
                 if(formatData){
-                    for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
-                    {
-                        applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
-                    }
 
                     if(blockNumber == block.blockNumber()){
                         if(formatData->isHidden()){
@@ -687,11 +683,18 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                             }
                             formatData->setHidden(false);
                         }
+                        for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
+                        {
+                            applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
+                        }
                     }
                     else{
                         if(!hasSelection){
                             if(!formatData->isHidden()){
-
+                                for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
+                                {
+                                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
+                                }
                                 //hide symbols, start at the end to avoid changing position of the symbols
                                 for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
                                 {
