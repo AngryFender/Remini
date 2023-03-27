@@ -55,7 +55,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
 
     QTextBlock block = this->document()->begin();
     while (block.isValid()) {
-        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > rect.top()){
+        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
             QTextBlockUserData* data =block.userData();
             BlockData* blockData = dynamic_cast<BlockData*>(data);
             if(blockData){

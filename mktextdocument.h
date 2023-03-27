@@ -36,7 +36,7 @@ public slots:
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
     void drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect);
 
-    void showMKSymbolsFromSavedBlocks();
+    void showMKSymbolsFromSavedBlocks(QRect *rect = nullptr);
     void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll);
 
  private:

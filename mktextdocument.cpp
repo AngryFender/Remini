@@ -567,14 +567,20 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 
 void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect)
 {
-    showMKSymbolsFromSavedBlocks();
+    showMKSymbolsFromSavedBlocks(&rect);
     hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll);
 }
 
-void MkTextDocument::showMKSymbolsFromSavedBlocks()
+void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
 {
+    QAbstractTextDocumentLayout* layout = this->documentLayout();
+
     while(!savedBlocks.empty()){
         QTextBlock block = savedBlocks.takeFirst();
+
+        if((rect!=nullptr)&&( layout->blockBoundingRect(block).bottom() < (rect->bottom()+40) && layout->blockBoundingRect(block).top() > (rect->top()-15))){
+            continue;
+        }
 
         QTextBlockUserData* data =block.userData();
         if(data == nullptr){
@@ -619,7 +625,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
     QTextBlock block = this->firstBlock();
 
     while(block.isValid()){
-        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > rect.top()){
+        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
 
             QTextBlockUserData* data =block.userData();
             if(data == nullptr){
