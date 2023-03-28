@@ -578,9 +578,10 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
     while(!savedBlocks.empty()){
         QTextBlock block = savedBlocks.takeFirst();
 
-        if((rect!=nullptr)&&( layout->blockBoundingRect(block).bottom() < (rect->bottom()+40) && layout->blockBoundingRect(block).top() > (rect->top()-15))){
-            continue;
-        }
+//        if((optimiseScrolling)&&(rect!=nullptr)&&( layout->blockBoundingRect(block).bottom() < (rect->bottom()+40) && layout->blockBoundingRect(block).top() > (rect->top()-15))){
+//            qDebug()<<"optimise container size"<<savedBlocks.count();
+//            continue;
+//        }
 
         QTextBlockUserData* data =block.userData();
         if(data == nullptr){
