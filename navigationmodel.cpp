@@ -81,3 +81,22 @@ void NavigationModel::uniqueFolderName(QDir &dir, QString &name, const QString &
         uniqueFolderName(dir,name,path);
     }
 }
+
+QModelIndex NavivationProxyModel::setRootIndexFromPath(QString path)
+{
+    QFileSystemModel * model =  dynamic_cast<QFileSystemModel*>(this->sourceModel());
+    if(model) {
+        QModelIndex result = this->mapFromSource(model->index(path));
+        return result;
+    }
+    return QModelIndex();
+}
+
+bool NavivationProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    QFileSystemModel * model =  dynamic_cast<QFileSystemModel*>(this->sourceModel());
+    if(model) {
+            qDebug()<<"filtering folder = " << model->fileInfo(source_parent).filesystemAbsolutePath();
+    }
+    return true;
+}

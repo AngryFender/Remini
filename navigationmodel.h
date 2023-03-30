@@ -3,8 +3,19 @@
 
 #include <QFileSystemModel>
 #include <QDesktopServices>
+#include <QSortFilterProxyModel>
 #include <QUrl>
 #include <QObject>
+
+class NavivationProxyModel : public QSortFilterProxyModel{
+
+public:
+    QModelIndex setRootIndexFromPath(QString path);
+
+    // QSortFilterProxyModel interface
+protected:
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+};
 
 class NavigationModel : public QFileSystemModel
 {

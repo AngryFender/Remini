@@ -43,6 +43,10 @@ void ViewsHandler::initTreeView()
     {
         viewTree->setColumnHidden(column,true);
     }
+
+    modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
+    modelTree.setRootPath(getSavedPath());
+
 }
 
 void ViewsHandler::initFontDefault()
@@ -132,6 +136,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewSearch,SIGNAL(textChanged(QString)),
                      this,SLOT(searchFileHandle(QString)));
 
+    QObject::connect(&modelTree,SIGNAL(directoryLoaded(QString)),
+                     this,SLOT(navigationAllPathLoaded(QString)));
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -200,10 +207,25 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
 
 void ViewsHandler::searchFileHandle(const QString &filename)
 {
-    QStringList filters;
-    filters << filename+"*";
-    modelTree.setNameFilters(filters);
-    modelTree.setNameFilterDisables(false);
-    viewTree->expandAll();
+//    QStringList filters;
+//    filters << filename+"*";
+//    modelTree.setNameFilters(filters);
+//    modelTree.setNameFilterDisables(false);
+//    viewTree->expandAll();
+
+    modelTree.setRootPath(getSavedPath());
+
+//    proxyModel.setSourceModel(&modelTree);
+    //    viewTree->setModel(&proxyModel);
+}
+
+void ViewsHandler::navigationAllPathLoaded(QString path)
+{
+    qDebug()<<"all paths loaded "<< path;
+    proxyModel.setSourceModel(&modelTree);
+
+    viewTree->setModel(&proxyModel);
+
+    viewTree->setRootIndex(proxyModel.setRootIndexFromPath(getSavedPath()));
 }
 

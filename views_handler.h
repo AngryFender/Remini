@@ -30,7 +30,7 @@ private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         this->parent = parent;
         searchAllView = new SearchAllDialog(this->parent);
-        initModels();
+//        initModels();
         initViews(ui);
         initConnection();
     }
@@ -38,6 +38,7 @@ private:
     QWidget * parent;
     SearchAllDialog * searchAllView;
     NavigationModel modelTree;
+    NavivationProxyModel proxyModel;
     MkEdit* viewText;
     QLabel* viewTitle;
     QLineEdit* viewSearch;
@@ -66,6 +67,7 @@ private slots:
     void fileSaveHandle();
     void fileDeleteDialogue(QModelIndex& index);
     void searchFileHandle(const QString &filename);
+    void navigationAllPathLoaded(QString path);
 };
 
 #endif // VIEWS_HANDLER_H
