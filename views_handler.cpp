@@ -37,16 +37,8 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
 void ViewsHandler::initTreeView()
 {
     modelTree.setReadOnly(false);
-    viewTree->setModel(&modelTree);
-    viewTree->setRootIndex(modelTree.index(getSavedPath()));
-    for(int column = 1; column < modelTree.columnCount(); column ++)
-    {
-        viewTree->setColumnHidden(column,true);
-    }
-
     modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
     modelTree.setRootPath(getSavedPath());
-
 }
 
 void ViewsHandler::initFontDefault()
@@ -212,8 +204,12 @@ void ViewsHandler::searchFileHandle(const QString &filename)
 //    modelTree.setNameFilters(filters);
 //    modelTree.setNameFilterDisables(false);
 //    viewTree->expandAll();
+    qDebug()<<"search handle "<< filename;
 
-    modelTree.setRootPath(getSavedPath());
+    proxyModel.setFilterRegularExpression(filename);
+//    viewTree->setRootIndex(proxyModel.setRootIndexFromPath(getSavedPath()));
+    viewTree->expandAll();
+    viewTree->setRootIndex(proxyModel.mapFromSource(modelTree.index(getSavedPath())));
 
 //    proxyModel.setSourceModel(&modelTree);
     //    viewTree->setModel(&proxyModel);
@@ -223,9 +219,12 @@ void ViewsHandler::navigationAllPathLoaded(QString path)
 {
     qDebug()<<"all paths loaded "<< path;
     proxyModel.setSourceModel(&modelTree);
-
     viewTree->setModel(&proxyModel);
-
     viewTree->setRootIndex(proxyModel.setRootIndexFromPath(getSavedPath()));
+
+    for(int column = 1; column < proxyModel.columnCount(); column ++)
+    {
+        viewTree->setColumnHidden(column,true);
+    }
 }
 

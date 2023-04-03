@@ -15,6 +15,8 @@ public:
     // QSortFilterProxyModel interface
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+private:
+    bool processChildIndex(QFileSystemModel * model, int source_row, const QModelIndex &source_parent) const;
 };
 
 class NavigationModel : public QFileSystemModel
