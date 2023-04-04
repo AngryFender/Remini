@@ -5,6 +5,7 @@
 #include "./ui_mainwindow.h"
 #include "views_handler.h"
 #include <QTimer>
+#include <QStyleFactory>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

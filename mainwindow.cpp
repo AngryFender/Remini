@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     themeContents = darkTheme;
     themeState = darkThemeState;
+    QApplication::setStyle(QStyleFactory::create("fusion"));
     this->setStyleSheet(themeContents);
 
     shiftTimer = new QTimer(this);
@@ -32,9 +33,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         if (themeState == darkThemeState){
             themeContents = lightTheme;
             themeState = lightThemeState;
+            QApplication::setStyle(QStyleFactory::create("windowsvista"));
         }else{
             themeContents = darkTheme;
             themeState = darkThemeState;
+            QApplication::setStyle(QStyleFactory::create("fusion"));
         }
         this->setStyleSheet(themeContents);
     }else if(event->key() == Qt::Key_Shift){
