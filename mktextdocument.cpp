@@ -726,6 +726,7 @@ void MkTextDocument::resetFormatLocation()
     locBoldU.reset();
     locItalicA.reset();
     locItalicU.reset();
+    locStrike.reset();
 }
 
 void MkTextDocument::numberListDetect(int blockNumber)
