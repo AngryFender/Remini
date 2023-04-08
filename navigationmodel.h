@@ -12,11 +12,11 @@ class NavivationProxyModel : public QSortFilterProxyModel{
 public:
     QModelIndex setRootIndexFromPath(QString path);
 
-    // QSortFilterProxyModel interface
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 private:
     bool processChildIndex(QFileSystemModel * model, int source_row, const QModelIndex &source_parent) const;
+    bool isSubdirectory(const QString &subDirPath, const QString &parentDirPath) const;
 };
 
 class NavigationModel : public QFileSystemModel

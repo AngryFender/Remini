@@ -95,72 +95,67 @@ QModelIndex NavivationProxyModel::setRootIndexFromPath(QString path)
 bool NavivationProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
-    QModelIndex subParent = model->index(source_row,0,source_parent);
+    QModelIndex childIndex = model->index(source_row,0,source_parent);
 
     if(filterRegularExpression().pattern() == ""){
         return true;
     }
 
-    if(model) {
-        QFileInfo info = model->fileInfo(subParent);
-        QString fileName = info.fileName();
-        qDebug()<<"<<<<<<checking "<< fileName;
-        if(info.isFile()){
-            if(fileName.contains(filterRegularExpression().pattern())){
-                return true;
-            }else{
-                return false;
-            }
-        }
-
-        if(info.isDir())
-        {
-            QDir dir(info.absoluteFilePath());
-            if(dir.dirName().contains(filterRegularExpression().pattern())){
-                return true;
-            }
-
-            if(dir.isEmpty()){
-                return false;
-            }else{
-                dir.setFilter( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot );
-                int rowCount = dir.count();
-                qDebug()<<"row count = "<<rowCount;
-                for(int row = 0; row<rowCount; row++){
-                    QModelIndex childIndex = model->index(row,0,subParent);
-//                    if(!fileName.isEmpty()){
-                        qDebug()<<">>>>>> "<<row<<" child name"<< model->fileInfo(childIndex).fileName();
-//                    }
-                }
-
-                return true;
-            }
-        }
+    if(!model) {
+        return false;
     }
-    return false;
 
+    QString rootPath = model->rootPath()+"//";
+    QString infoPath = model->fileInfo(childIndex).absoluteFilePath();
 
+    if(!isSubdirectory(infoPath,rootPath)){
+        return true;
+    }
+
+    return processChildIndex( model, source_row, childIndex);
 }
 
 bool NavivationProxyModel::processChildIndex( QFileSystemModel* model, int source_row, const QModelIndex &source_parent) const
 {
     QFileInfo info = model->fileInfo(source_parent);
-    if(info.isDir()){
-        int rowCount = model->rowCount(source_parent);
-        bool show = false;
-        qDebug()<<info.filePath()<<rowCount;
-        for(int row = 0; row < rowCount ; row ++){
+    QString fileName = info.fileName();
 
-            QModelIndex childIndex = model->index(source_row,0,source_parent);
-            show = this->processChildIndex( model, row, childIndex);
-        }
-        return true;
-    }else if(info.isFile()){
-        if(model->fileInfo(source_parent).fileName().contains(filterRegularExpression())){
+    if(info.isFile()){
+        if(fileName.contains(filterRegularExpression().pattern())){
             return true;
+        }else{
+            return false;
         }
     }
 
+    if(info.isDir())
+    {
+        QDir dir(info.absoluteFilePath());
+        if(dir.isEmpty()){
+            return false;
+        }else{
+            dir.setFilter( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot );
+            int rowCount = dir.count();
+            bool childResult = false;
 
-    return true;
+            for(int row = 0; row<rowCount; row++){
+                QModelIndex childIndex = model->index(row,0,source_parent);
+                if(processChildIndex( model, row, childIndex)){
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool NavivationProxyModel::isSubdirectory(const QString &subDirPath, const QString &parentDirPath) const
+{
+    QDir subDir(subDirPath);
+    QDir parentDir(parentDirPath);
+
+    QString absoluteSubDirPath = subDir.absolutePath();
+    QString absoluteParentDirPath = parentDir.absolutePath();
+
+    return absoluteSubDirPath.startsWith(absoluteParentDirPath);
 }

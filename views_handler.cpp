@@ -199,28 +199,17 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
 
 void ViewsHandler::searchFileHandle(const QString &filename)
 {
-//    QStringList filters;
-//    filters << filename+"*";
-//    modelTree.setNameFilters(filters);
-//    modelTree.setNameFilterDisables(false);
-//    viewTree->expandAll();
-    qDebug()<<"search handle "<< filename;
-
+    viewTree->expandRecursively(viewTree->rootIndex());
     proxyModel.setFilterRegularExpression(filename);
-//    viewTree->setRootIndex(proxyModel.setRootIndexFromPath(getSavedPath()));
-    viewTree->expandAll();
-    viewTree->setRootIndex(proxyModel.mapFromSource(modelTree.index(getSavedPath())));
-
-//    proxyModel.setSourceModel(&modelTree);
-    //    viewTree->setModel(&proxyModel);
 }
 
 void ViewsHandler::navigationAllPathLoaded(QString path)
 {
-    qDebug()<<"all paths loaded "<< path;
     proxyModel.setSourceModel(&modelTree);
     viewTree->setModel(&proxyModel);
     viewTree->setRootIndex(proxyModel.setRootIndexFromPath(getSavedPath()));
+    viewTree->expandAll();
+    viewTree->collapseAll();
 
     for(int column = 1; column < proxyModel.columnCount(); column ++)
     {
