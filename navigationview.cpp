@@ -21,7 +21,18 @@ NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
     connect(&openLocationAction, SIGNAL(triggered()), this, SLOT(openFileFolder()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(ContextMenuHandler(QPoint)));
+    connect(&expandTimer,SIGNAL(timeout()), this, SLOT(expandTimerHandler()));
 
+}
+
+void NavigationView::expandEveryItems(QModelIndex &index)
+{
+    //DEBUG MODE WILL NEED MORE TIME PERIOD TO LOAD ALL ITEMS
+    this->expandAll();
+    this->expandRecursively(index);
+    this->expandToDepth(20);
+    if(!expandTimer.isActive())
+        expandTimer.start(TIME_PERIOD_FOR_EXPANSION);
 }
 
 void NavigationView::mousePressEvent(QMouseEvent *event)
@@ -54,6 +65,7 @@ void NavigationView::mouseDoubleClickEvent(QMouseEvent *event)
 void NavigationView::rowsInserted(const QModelIndex &parent, int start, int end)
 {
     QTreeView::rowsInserted(parent,start,end);
+
     if(!newEntryName.isEmpty())
         folderChangedHandler();
 }
@@ -73,12 +85,12 @@ void NavigationView::ContextMenuHandler(QPoint pos)
         return;
     }
 
-    QFileSystemModel *fileModel = qobject_cast<QFileSystemModel *>(this->model());
+   NavivationProxyModel *fileModel = qobject_cast<NavivationProxyModel *>(this->model());
 
     if(!fileModel)
         return;
 
-    QFileInfo fileInfo = fileModel->fileInfo(index);
+    QFileInfo fileInfo = fileModel->getFileInfoMappedToSource(index);
 
     if (fileInfo.isDir()) {
         menu.addAction(&addFileAction);
@@ -128,6 +140,7 @@ void NavigationView::openFileFolder()
 
 void NavigationView::folderChangedHandler()
 {
+
     QModelIndex index =lastClickedIndex;
     if(!index.isValid()){
         index = rootIndex();
@@ -140,7 +153,8 @@ void NavigationView::folderChangedHandler()
 
         QString name = model()->data(fileIndex, Qt::DisplayRole).toString();
         if(name == newEntryName){
-            recentlyCreatedFile = fileIndex;
+            this->setCurrentIndex(fileIndex);
+            emit newFileCreated(fileIndex);
             this->edit(fileIndex);
             newEntryName = "";
             return;
@@ -150,8 +164,13 @@ void NavigationView::folderChangedHandler()
 
 void NavigationView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
 {
-    if(recentlyCreatedFile.isValid()){
-        emit newFileCreated(recentlyCreatedFile);
-    }
+    QModelIndex selected = this->currentIndex();
     QTreeView::closeEditor(editor,hint);
+    emit newFileCreated(selected);
+}
+
+void NavigationView::expandTimerHandler()
+{
+    expandTimer.stop();
+    emit expansionComplete();
 }

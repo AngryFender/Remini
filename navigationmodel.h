@@ -9,8 +9,23 @@
 
 class NavivationProxyModel : public QSortFilterProxyModel{
 
+    Q_OBJECT
+
 public:
     QModelIndex setRootIndexFromPath(QString path);
+    QFileInfo getFileInfoMappedToSource(const QModelIndex &index);
+    QFileInfo getFileInfo(const QModelIndex &index);
+
+public slots:
+    void createFileHandler(QModelIndex& index, QString &name);
+    void createFolderHandler(QModelIndex& index, QString &name);
+    void deleteFileFolderHandler(QModelIndex& index);
+    void openLocationHandler(QModelIndex& index);
+signals:
+    void folderChanged();
+private:
+    void uniqueFileName(QFile &file, QString &name, QString &type, const QString &path);
+    void uniqueFolderName(QDir &dir, QString &name, const QString &path);
 
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;

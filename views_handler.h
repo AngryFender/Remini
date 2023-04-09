@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 #include <QTreeWidgetItem>
 #include <QMessageBox>
+#include <QMutex>
 #include <mkedit.h>
 #include <navigationview.h>
 #include <navigationmodel.h>
@@ -56,7 +57,8 @@ private:
     QString getFileContent(QFile& file);
     MkTextDocument mkGuiDocument;
     Highlighter highlighter;
-
+    QString searchedFilename;
+    QMutex fileSearchMutex;
 signals:
     void load_text(QString text);
     void clear_text();
@@ -68,6 +70,8 @@ private slots:
     void fileDeleteDialogue(QModelIndex& index);
     void searchFileHandle(const QString &filename);
     void navigationAllPathLoaded(QString path);
+    void navigationViewExpanded();
+
 };
 
 #endif // VIEWS_HANDLER_H
