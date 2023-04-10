@@ -10,14 +10,14 @@
 #include <navigationmodel.h>
 #include <QTimer>
 
-#define TIME_PERIOD_FOR_EXPANSION 600
+#define TIME_PERIOD_FOR_EXPANSION 100
 
 class NavigationView : public QTreeView
 {
     Q_OBJECT
 public:
     NavigationView(QWidget * parent);
-    void expandEveryItems(QModelIndex &index);
+    void expandEveryItems(QModelIndex index);
 private:
     QMenu menu;
     QAction addFileAction ;

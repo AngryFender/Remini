@@ -24,6 +24,8 @@ public slots:
     void createFolderHandler(QModelIndex& index, QString &name);
     void deleteFileFolderHandler(QModelIndex& index);
     void openLocationHandler(QModelIndex& index);
+    void createAllFoldersList(QModelIndex index, QStringList &listNames, QStringList &listPath);
+    void createAllFilesList(QModelIndex index, QStringList &listNames, QStringList &listPath);
 signals:
     void folderChanged();
 private:
@@ -33,7 +35,8 @@ private:
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 private:
-    bool processChildIndex(QFileSystemModel * model, int source_row, const QModelIndex &source_parent) const;
+
+    bool filterChildIndex(QFileSystemModel * model, int source_row, const QModelIndex &source_parent) const;
     bool isSubdirectory(const QString &subDirPath, const QString &parentDirPath) const;
 };
 

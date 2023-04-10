@@ -1,5 +1,7 @@
 #include "navigationmodel.h"
 
+#include <QDirIterator>
+
 
 NavigationProxyModel::NavigationProxyModel(QObject *parent):QSortFilterProxyModel(parent)
 {
@@ -121,6 +123,67 @@ void NavigationProxyModel::openLocationHandler(QModelIndex &index)
     }
     QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 }
+void NavigationProxyModel::createAllFoldersList(QModelIndex index, QStringList &listNames, QStringList &listPath)
+{
+    QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
+    if(!model) {
+        return;
+    }
+
+    QModelIndex rootIndex = this->mapToSource(index);
+    QFileInfo info = model->fileInfo(rootIndex);
+    QString path = info.absoluteFilePath();
+    if(info.isDir())
+    {
+        QDir dir(path);
+        if(dir.isEmpty()){
+            return;
+        }else{
+            dir.setFilter( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot );
+            if(model->hasChildren(rootIndex)){
+                QDirIterator di(path, QDir::Dirs, QDirIterator::Subdirectories);
+                while(di.hasNext()){
+                    di.next();
+                    if(di.fileInfo().isDir()){
+                        listNames.append(di.fileInfo().fileName());
+                        listPath.append(di.fileInfo().absoluteFilePath());
+                    }
+                }
+            }
+        }
+    }
+}
+
+void NavigationProxyModel::createAllFilesList(QModelIndex index, QStringList &listNames, QStringList &listPath)
+{
+    QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
+    if(!model) {
+        return;
+    }
+
+    QModelIndex rootIndex = this->mapToSource(index);
+    QFileInfo info = model->fileInfo(rootIndex);
+    QString path = info.absoluteFilePath();
+    if(info.isDir())
+    {
+        QDir dir(path);
+        if(dir.isEmpty()){
+            return;
+        }else{
+            dir.setFilter( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot );
+            if(model->hasChildren(rootIndex)){
+                QDirIterator di(path, QDir::Files, QDirIterator::Subdirectories);
+                while(di.hasNext()){
+                    di.next();
+                    if(di.fileInfo().isFile()){
+                        listNames.append(di.fileInfo().fileName());
+                        listPath.append(di.fileInfo().absoluteFilePath());
+                    }
+                }
+            }
+        }
+    }
+}
 
 void NavigationProxyModel::uniqueFileName(QFile &file, QString &name, QString &type, const QString &path)
 {
@@ -157,14 +220,14 @@ bool NavigationProxyModel::filterAcceptsRow(int source_row, const QModelIndex &s
     if(!isSubdirectory(infoPath,rootPath))
         return true;
 
-    return processChildIndex( model, source_row, childIndex);
+    return filterChildIndex( model, source_row, childIndex);
 }
 
-bool NavigationProxyModel::processChildIndex( QFileSystemModel* model, int source_row, const QModelIndex &source_parent) const
+bool NavigationProxyModel::filterChildIndex( QFileSystemModel* model, int source_row, const QModelIndex &source_parent) const
 {
     QFileInfo info = model->fileInfo(source_parent);
     QString fileName = info.fileName();
-    qDebug()<<" checking Name "<<fileName;
+//    qDebug()<<" checking Name "<<fileName;
 
     if(info.isFile()){
         if(fileName.contains(filterRegularExpression().pattern())){
@@ -186,7 +249,7 @@ bool NavigationProxyModel::processChildIndex( QFileSystemModel* model, int sourc
 
             for(int row = 0; row<rowCount; row++){
                 QModelIndex childIndex = model->index(row,0,source_parent);
-                if(processChildIndex( model, row, childIndex)){
+                if(filterChildIndex( model, row, childIndex)){
                     return true;
                 }
             }

@@ -1,10 +1,5 @@
 #include "views_handler.h"
 
-void ViewsHandler::startSearchAllHandle()
-{
-    searchAllView->show();
-}
-
 QString ViewsHandler::getSavedPath()
 {
     QFile configFile("config.txt");
@@ -138,7 +133,7 @@ void ViewsHandler::initConnection()
                      this,SLOT(navigationAllPathLoaded(QString)));
 
     QObject::connect(viewTree,SIGNAL(expansionComplete()),
-                     this,SLOT(navigationViewExpanded()));
+                     this,SLOT(navigationViewExpandedFilenameFilter()));
 
 
 }
@@ -219,8 +214,6 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
     if(QMessageBox::Yes == confirmBox->exec()){
         emit fileDelete(index);
     }
-    initTreeView();
-
 }
 
 void ViewsHandler::searchFileHandle(const QString &filename)
@@ -232,9 +225,15 @@ void ViewsHandler::searchFileHandle(const QString &filename)
         fileSearchMutex.unlock();
         return;
     }
-    QModelIndex rootIndex = viewTree->rootIndex();
-    viewTree->expandEveryItems(rootIndex);
     searchedFilename =filename;
+
+    QStringList listName, listPath;
+    proxyModel.createAllFoldersList(viewTree->rootIndex(), listName, listPath);
+    for(QString &filePath:listPath){
+        viewTree->setExpanded(proxyModel.mapFromSource(modelTree.index(filePath)),true);
+    }
+    //This will call a timer as delay to let all folders expand
+    viewTree->expandEveryItems(viewTree->rootIndex());
 }
 
 void ViewsHandler::navigationAllPathLoaded(QString path)
@@ -242,11 +241,20 @@ void ViewsHandler::navigationAllPathLoaded(QString path)
 //    qDebug()<<" all path loaded"<<path;
 }
 
-void ViewsHandler::navigationViewExpanded()
+void ViewsHandler::navigationViewExpandedFilenameFilter()
 {
     fileSearchMutex.lock();
     proxyModel.setFilterRegularExpression(searchedFilename);
     fileSearchMutex.unlock();
 }
 
-
+void ViewsHandler::startTextSearchInAllFilesHandle()
+{
+    textSearchAllView->show();
+    QStringList listName, listPath;
+    proxyModel.createAllFilesList(viewTree->rootIndex(), listName, listPath);
+    for(QString &name: listName){
+        qDebug()<<" list = "<<name;
+    }
+    qDebug()<<" total files found "<<listName.count();
+}

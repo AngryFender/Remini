@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
                      this, SLOT(shiftTimerHandle()));
 
     QObject::connect(this,SIGNAL(startSearchAll()),
-                     view_handler.get(),SLOT(startSearchAllHandle()));
+                     view_handler.get(),SLOT(startTextSearchInAllFilesHandle()));
 }
 
 MainWindow::~MainWindow()

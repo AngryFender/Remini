@@ -24,23 +24,24 @@ public:
         return handle;
     }
     ~ViewsHandler(){
-        delete searchAllView;
+        delete textSearchAllView;
     }
 
 public slots:
-    void startSearchAllHandle();
+    void startTextSearchInAllFilesHandle();
 
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
+        firstDirectoryLoad = true;
         this->parent = parent;
-        searchAllView = new SearchAllDialog(this->parent);
+        textSearchAllView = new SearchAllDialog(this->parent);
         initViews(ui);
         initConnection();
     }
 
 
     QWidget * parent;
-    SearchAllDialog * searchAllView;
+    SearchAllDialog * textSearchAllView;
     QFileSystemModel modelTree;
     NavigationProxyModel proxyModel;
     MkEdit* viewText;
@@ -61,6 +62,7 @@ private:
     Highlighter highlighter;
     QString searchedFilename;
     QMutex fileSearchMutex;
+    bool firstDirectoryLoad;
 signals:
     void load_text(QString text);
     void clear_text();
@@ -72,7 +74,7 @@ private slots:
     void fileDeleteDialogue(QModelIndex& index);
     void searchFileHandle(const QString &filename);
     void navigationAllPathLoaded(QString path);
-    void navigationViewExpanded();
+    void navigationViewExpandedFilenameFilter();
 
 };
 
