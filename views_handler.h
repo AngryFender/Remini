@@ -23,6 +23,9 @@ public:
         static QSharedPointer<ViewsHandler> handle{new ViewsHandler(parent,ui) };
         return handle;
     }
+    ~ViewsHandler(){
+        delete searchAllView;
+    }
 
 public slots:
     void startSearchAllHandle();
@@ -31,15 +34,15 @@ private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         this->parent = parent;
         searchAllView = new SearchAllDialog(this->parent);
-//        initModels();
         initViews(ui);
         initConnection();
     }
 
+
     QWidget * parent;
     SearchAllDialog * searchAllView;
-    NavigationModel modelTree;
-    NavivationProxyModel proxyModel;
+    QFileSystemModel modelTree;
+    NavigationProxyModel proxyModel;
     MkEdit* viewText;
     QLabel* viewTitle;
     QLineEdit* viewSearch;
@@ -49,7 +52,6 @@ private:
 
     QFont fontUi;
     QString getSavedPath();
-    void initModels();
     void initViews(Ui::MainWindow &ui);
     void initTreeView();
     void initFontDefault();

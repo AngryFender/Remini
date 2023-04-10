@@ -1,88 +1,12 @@
 #include "navigationmodel.h"
 
-NavigationModel::NavigationModel(QObject *parent)
-    : QFileSystemModel{parent}
+
+NavigationProxyModel::NavigationProxyModel(QObject *parent):QSortFilterProxyModel(parent)
 {
+
 }
 
-void NavigationModel::createFileHandler(QModelIndex &index, QString &name)
-{
-    QString fileName = "Untitled";
-    QString fileType = ".txt";
-    QString filePath;
-    if(index.isValid()){
-        filePath = this->filePath(index)+"/";
-    }else{
-        filePath = this->rootPath()+"/";
-    }
-
-    QFile file;
-    uniqueFileName(file,fileName,fileType,filePath);
-    file.open(QIODevice::ReadWrite);
-    file.close();
-    name = fileName+fileType;
-}
-
-void NavigationModel::createFolderHandler(QModelIndex &index, QString &name)
-{
-    QString folderName = "New Folder";
-    QString folderPath;
-    if(index.isValid()){
-        folderPath = this->filePath(index)+"/";
-    }else{
-        folderPath = this->rootPath()+"/";
-    }
-
-    QDir dir;
-    uniqueFolderName(dir,folderName, folderPath);
-    dir.mkdir(".");
-    name = folderName;
-}
-
-void NavigationModel::deleteFileFolderHandler(QModelIndex &index)
-{
-    qDebug()<<"deleting"<<index;
-    QString fullFileName = QFileSystemModel::filePath(index);
-    QFile file(fullFileName);
-    if(file.exists())
-        file.moveToTrash();
-}
-
-void NavigationModel::openLocationHandler(QModelIndex &index)
-{
-    QString folderPath;
-
-    if(!index.isValid()){
-        folderPath = this->rootPath();
-    }else{
-        QFileInfo fileInfo = this->fileInfo(index);
-        if (!fileInfo.isDir()) {
-            fileInfo.setFile(fileInfo.absoluteFilePath());
-        }
-        folderPath = fileInfo.absolutePath();
-    }
-    QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
-}
-
-void NavigationModel::uniqueFileName(QFile &file, QString &name, QString &type, const QString &path)
-{
-    file.setFileName(path+name+type);
-    if (file.exists()){
-        name = name+"_new";
-        uniqueFileName(file,name,type,path);
-    }
-}
-
-void NavigationModel::uniqueFolderName(QDir &dir, QString &name, const QString &path)
-{
-    dir.setPath(path+name);
-    if (dir.exists()){
-        name = name+"_new";
-        uniqueFolderName(dir,name,path);
-    }
-}
-
-QModelIndex NavivationProxyModel::setRootIndexFromPath(QString path)
+QModelIndex NavigationProxyModel::setRootIndexFromPath(QString path)
 {
     QFileSystemModel * model =  dynamic_cast<QFileSystemModel*>(this->sourceModel());
     if(model) {
@@ -92,24 +16,17 @@ QModelIndex NavivationProxyModel::setRootIndexFromPath(QString path)
     return QModelIndex();
 }
 
-QFileInfo NavivationProxyModel::getFileInfoMappedToSource(const QModelIndex &index)
+QFileInfo NavigationProxyModel::getFileInfoMappedToSource(const QModelIndex &index)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     if(!model)
         return QFileInfo();
 
-    try {
-        QModelIndex sourceIndex = this->mapToSource(index);
-        return model->fileInfo(sourceIndex);
-    } catch (...) {
-        return QFileInfo();
-    }
-
-
-
+    QModelIndex sourceIndex = this->mapToSource(index);
+    return model->fileInfo(sourceIndex);
 }
 
-QFileInfo NavivationProxyModel::getFileInfo(const QModelIndex &index)
+QFileInfo NavigationProxyModel::getFileInfo(const QModelIndex &index)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     if(!model)
@@ -118,7 +35,7 @@ QFileInfo NavivationProxyModel::getFileInfo(const QModelIndex &index)
     return model->fileInfo(index);
 }
 
-void NavivationProxyModel::createFileHandler(QModelIndex &index, QString &name)
+void NavigationProxyModel::createFileHandler(QModelIndex &index, QString &name)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     if(!model)
@@ -143,7 +60,7 @@ void NavivationProxyModel::createFileHandler(QModelIndex &index, QString &name)
     name = fileName+fileType;
 }
 
-void NavivationProxyModel::createFolderHandler(QModelIndex &index, QString &name)
+void NavigationProxyModel::createFolderHandler(QModelIndex &index, QString &name)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     if(!model)
@@ -165,9 +82,10 @@ void NavivationProxyModel::createFolderHandler(QModelIndex &index, QString &name
     uniqueFolderName(dir,folderName, folderPath);
     dir.mkdir(".");
     name = folderName;
+    emit model->directoryLoaded(model->rootPath());
 }
 
-void NavivationProxyModel::deleteFileFolderHandler(QModelIndex &index)
+void NavigationProxyModel::deleteFileFolderHandler(QModelIndex &index)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     if(!model)
@@ -176,23 +94,13 @@ void NavivationProxyModel::deleteFileFolderHandler(QModelIndex &index)
     QModelIndex sourceIndex = this->mapToSource(index);
     QFileInfo fileInfo = model->fileInfo(sourceIndex);
 
-    if(fileInfo.isFile()){
-        QString fullFileName = fileInfo.absoluteFilePath();
-        QFile file(fullFileName);
-        if(file.exists()){
-            file.moveToTrash();
-        }
-        return;
-    }
-
-    if(fileInfo.isDir()){
-        QString fullDirName = fileInfo.absoluteFilePath();
-                qDebug()<<"folder exists() "<< fullDirName;
-        QFile::moveToTrash(fullDirName);
-    }
+    QFile file(fileInfo.absoluteFilePath());
+    qDebug()<<"deleting this "<<fileInfo.absoluteFilePath();
+    if(file.exists())
+        file.moveToTrash();
 }
 
-void NavivationProxyModel::openLocationHandler(QModelIndex &index)
+void NavigationProxyModel::openLocationHandler(QModelIndex &index)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     if(!model)
@@ -214,7 +122,7 @@ void NavivationProxyModel::openLocationHandler(QModelIndex &index)
     QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 }
 
-void NavivationProxyModel::uniqueFileName(QFile &file, QString &name, QString &type, const QString &path)
+void NavigationProxyModel::uniqueFileName(QFile &file, QString &name, QString &type, const QString &path)
 {
     file.setFileName(path+name+type);
     if (file.exists()){
@@ -223,7 +131,7 @@ void NavivationProxyModel::uniqueFileName(QFile &file, QString &name, QString &t
     }
 }
 
-void NavivationProxyModel::uniqueFolderName(QDir &dir, QString &name, const QString &path)
+void NavigationProxyModel::uniqueFolderName(QDir &dir, QString &name, const QString &path)
 {
     dir.setPath(path+name);
     if (dir.exists()){
@@ -232,7 +140,7 @@ void NavivationProxyModel::uniqueFolderName(QDir &dir, QString &name, const QStr
     }
 }
 
-bool NavivationProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+bool NavigationProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     QModelIndex childIndex = model->index(source_row,0,source_parent);
@@ -252,7 +160,7 @@ bool NavivationProxyModel::filterAcceptsRow(int source_row, const QModelIndex &s
     return processChildIndex( model, source_row, childIndex);
 }
 
-bool NavivationProxyModel::processChildIndex( QFileSystemModel* model, int source_row, const QModelIndex &source_parent) const
+bool NavigationProxyModel::processChildIndex( QFileSystemModel* model, int source_row, const QModelIndex &source_parent) const
 {
     QFileInfo info = model->fileInfo(source_parent);
     QString fileName = info.fileName();
@@ -287,7 +195,7 @@ bool NavivationProxyModel::processChildIndex( QFileSystemModel* model, int sourc
     return false;
 }
 
-bool NavivationProxyModel::isSubdirectory(const QString &subDirPath, const QString &parentDirPath) const
+bool NavigationProxyModel::isSubdirectory(const QString &subDirPath, const QString &parentDirPath) const
 {
     QDir subDir(subDirPath);
     QDir parentDir(parentDirPath);

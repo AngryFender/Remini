@@ -85,7 +85,7 @@ void NavigationView::ContextMenuHandler(QPoint pos)
         return;
     }
 
-   NavivationProxyModel *fileModel = qobject_cast<NavivationProxyModel *>(this->model());
+    NavigationProxyModel *fileModel = qobject_cast<NavigationProxyModel *>(this->model());
 
     if(!fileModel)
         return;
