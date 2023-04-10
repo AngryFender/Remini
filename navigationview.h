@@ -7,14 +7,17 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QFileInfo>
-#include <QFileSystemModel>
+#include <navigationmodel.h>
+#include <QTimer>
+
+#define TIME_PERIOD_FOR_EXPANSION 600
 
 class NavigationView : public QTreeView
 {
     Q_OBJECT
 public:
     NavigationView(QWidget * parent);
-
+    void expandEveryItems(QModelIndex &index);
 private:
     QMenu menu;
     QAction addFileAction ;
@@ -24,7 +27,8 @@ private:
     QAction openLocationAction ;
     QString newEntryName;
     QModelIndex lastClickedIndex;
-    QModelIndex recentlyCreatedFile;
+    QTimer expandTimer;
+    QTimer fileFolderCreatedTimer;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -40,12 +44,14 @@ protected:
     void openFileFolder();
     void folderChangedHandler();
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
+    void expandTimerHandler();
 signals:
     void createFile(QModelIndex &index, QString &name);
     void createFolder(QModelIndex &index, QString &name);
     void deleteFileFolder(QModelIndex &index);
     void newFileCreated(const QModelIndex &index);
     void openLocation(QModelIndex &index);
+    void expansionComplete();
 
 };
 

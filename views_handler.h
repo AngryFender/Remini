@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 #include <QTreeWidgetItem>
 #include <QMessageBox>
+#include <QMutex>
 #include <mkedit.h>
 #include <navigationview.h>
 #include <navigationmodel.h>
@@ -22,6 +23,9 @@ public:
         static QSharedPointer<ViewsHandler> handle{new ViewsHandler(parent,ui) };
         return handle;
     }
+    ~ViewsHandler(){
+        delete searchAllView;
+    }
 
 public slots:
     void startSearchAllHandle();
@@ -30,14 +34,15 @@ private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         this->parent = parent;
         searchAllView = new SearchAllDialog(this->parent);
-        initModels();
         initViews(ui);
         initConnection();
     }
 
+
     QWidget * parent;
     SearchAllDialog * searchAllView;
-    NavigationModel modelTree;
+    QFileSystemModel modelTree;
+    NavigationProxyModel proxyModel;
     MkEdit* viewText;
     QLabel* viewTitle;
     QLineEdit* viewSearch;
@@ -47,7 +52,6 @@ private:
 
     QFont fontUi;
     QString getSavedPath();
-    void initModels();
     void initViews(Ui::MainWindow &ui);
     void initTreeView();
     void initFontDefault();
@@ -55,7 +59,8 @@ private:
     QString getFileContent(QFile& file);
     MkTextDocument mkGuiDocument;
     Highlighter highlighter;
-
+    QString searchedFilename;
+    QMutex fileSearchMutex;
 signals:
     void load_text(QString text);
     void clear_text();
@@ -66,6 +71,9 @@ private slots:
     void fileSaveHandle();
     void fileDeleteDialogue(QModelIndex& index);
     void searchFileHandle(const QString &filename);
+    void navigationAllPathLoaded(QString path);
+    void navigationViewExpanded();
+
 };
 
 #endif // VIEWS_HANDLER_H

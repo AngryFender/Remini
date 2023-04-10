@@ -11,12 +11,6 @@ QString ViewsHandler::getSavedPath()
     return getFileContent(configFile);
 }
 
-void ViewsHandler::initModels()
-{
-    modelTree.setRootPath(getSavedPath());
-    modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
-}
-
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
     viewSearch = ui.uiSearch;
@@ -37,9 +31,14 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
 void ViewsHandler::initTreeView()
 {
     modelTree.setReadOnly(false);
-    viewTree->setModel(&modelTree);
-    viewTree->setRootIndex(modelTree.index(getSavedPath()));
-    for(int column = 1; column < modelTree.columnCount(); column ++)
+    modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
+    modelTree.setRootPath(getSavedPath());
+
+    proxyModel.setSourceModel(&modelTree);
+    viewTree->setModel(&proxyModel);
+    viewTree->setRootIndex(proxyModel.setRootIndexFromPath(getSavedPath()));
+
+    for(int column = 1; column < proxyModel.columnCount(); column ++)
     {
         viewTree->setColumnHidden(column,true);
     }
@@ -76,10 +75,16 @@ void ViewsHandler::initConnection()
                       this, SLOT(fileDisplay(QModelIndex)));
 
     QObject::connect(viewTree, SIGNAL(createFile(QModelIndex&,QString&)),
-                     &modelTree, SLOT(createFileHandler(QModelIndex&,QString&)));
+                     &proxyModel, SLOT(createFileHandler(QModelIndex&,QString&)));
 
     QObject::connect(viewTree, SIGNAL(createFolder(QModelIndex&,QString&)),
-                     &modelTree, SLOT(createFolderHandler(QModelIndex&,QString&)));
+                     &proxyModel, SLOT(createFolderHandler(QModelIndex&,QString&)));
+
+    QObject::connect(this, SIGNAL(fileDelete(QModelIndex&)),
+                     &proxyModel, SLOT(deleteFileFolderHandler(QModelIndex&)));
+
+    QObject::connect(viewTree, SIGNAL(openLocation(QModelIndex&)),
+                     &proxyModel, SLOT(openLocationHandler(QModelIndex&)));
 
     QObject::connect(viewText, SIGNAL(checkRightClockOnCodeBlock(int,bool&)),
                      &mkGuiDocument, SLOT(checkRightClockOnCodeBlockHandle(int,bool&)));
@@ -96,11 +101,8 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, SIGNAL(deleteFileFolder(QModelIndex&)),
                      this, SLOT(fileDeleteDialogue(QModelIndex&)));
 
-    QObject::connect(this, SIGNAL(fileDelete(QModelIndex&)),
-                     &modelTree, SLOT(deleteFileFolderHandler(QModelIndex&)));
-
     QObject::connect(viewTree, SIGNAL(openLocation(QModelIndex&)),
-                     &modelTree, SLOT(openLocationHandler(QModelIndex&)));
+                     &proxyModel, SLOT(openLocationHandler(QModelIndex&)));
 
     QObject::connect(viewTree, SIGNAL(newFileCreated(QModelIndex)),
                      this, SLOT(fileDisplay(QModelIndex)));
@@ -132,6 +134,13 @@ void ViewsHandler::initConnection()
     QObject::connect(viewSearch,SIGNAL(textChanged(QString)),
                      this,SLOT(searchFileHandle(QString)));
 
+    QObject::connect(&modelTree,SIGNAL(directoryLoaded(QString)),
+                     this,SLOT(navigationAllPathLoaded(QString)));
+
+    QObject::connect(viewTree,SIGNAL(expansionComplete()),
+                     this,SLOT(navigationViewExpanded()));
+
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -149,8 +158,9 @@ QString ViewsHandler::getFileContent(QFile& file)
 
 void ViewsHandler::fileDisplay(const QModelIndex& index)
 {
-    fileInfo = modelTree.fileInfo(index);
-    if (!fileInfo.isFile())
+    QModelIndex sourceIndex = proxyModel.mapToSource(index);
+    fileInfo = modelTree.fileInfo(sourceIndex);
+    if (!fileInfo.isFile()|| !fileInfo.exists())
         return;
 
     QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
@@ -186,6 +196,20 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
         return;
     }
 
+    QFileInfo info = proxyModel.getFileInfoMappedToSource(index);
+    if(info.isDir()){
+        QDir dir(info.absoluteFilePath());
+        dir.setFilter( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot );
+        if(dir.count()){
+            QScopedPointer<QMessageBox> confirmBox(new QMessageBox(parent));
+            confirmBox->setWindowTitle("Unable to Delete");
+            confirmBox->setText("The folder is not empty           ");
+            confirmBox->setStandardButtons(QMessageBox::Ok);
+            confirmBox->exec();
+            return;
+        }
+    }
+
     QScopedPointer<QMessageBox> confirmBox(new QMessageBox(parent));
     confirmBox->setStyleSheet(parent->styleSheet());
     confirmBox->setWindowTitle("Delete");
@@ -195,15 +219,34 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
     if(QMessageBox::Yes == confirmBox->exec()){
         emit fileDelete(index);
     }
+    initTreeView();
 
 }
 
 void ViewsHandler::searchFileHandle(const QString &filename)
 {
-    QStringList filters;
-    filters << filename+"*";
-    modelTree.setNameFilters(filters);
-    modelTree.setNameFilterDisables(false);
-    viewTree->expandAll();
+    if(filename.isEmpty()){
+        fileSearchMutex.lock();
+        proxyModel.setFilterRegularExpression("");
+        searchedFilename = "";
+        fileSearchMutex.unlock();
+        return;
+    }
+    QModelIndex rootIndex = viewTree->rootIndex();
+    viewTree->expandEveryItems(rootIndex);
+    searchedFilename =filename;
 }
+
+void ViewsHandler::navigationAllPathLoaded(QString path)
+{
+//    qDebug()<<" all path loaded"<<path;
+}
+
+void ViewsHandler::navigationViewExpanded()
+{
+    fileSearchMutex.lock();
+    proxyModel.setFilterRegularExpression(searchedFilename);
+    fileSearchMutex.unlock();
+}
+
 
