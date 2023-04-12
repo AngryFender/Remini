@@ -7,6 +7,8 @@
 #include <QObject>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QKeyEvent>
+#include <QStandardItemModel>
 
 class SearchAllDialog : public QDialog
 {
@@ -14,10 +16,17 @@ class SearchAllDialog : public QDialog
 public:
     SearchAllDialog(QWidget*parent);
     ~SearchAllDialog();
+public slots:
+    void updateTextSearchViewHandle(QStandardItemModel *model);
+protected:
+    void keyPressEvent(QKeyEvent *event)override;
+
 private:
     QVBoxLayout * layout;
     QLineEdit * textView;
     QTreeView* searchView;
+signals:
+    void startSearch(QString &text);
 };
 
 #endif // SEARCHALLDIALOG_H

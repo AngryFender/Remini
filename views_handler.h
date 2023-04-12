@@ -5,9 +5,11 @@
 #include <QTreeWidgetItem>
 #include <QMessageBox>
 #include <QMutex>
+#include <QThread>
 #include <mkedit.h>
 #include <navigationview.h>
 #include <navigationmodel.h>
+#include "textsearchworker.h"
 #include "./ui_mainwindow.h"
 #include "searchalldialog.h"
 
@@ -37,11 +39,14 @@ private:
         textSearchAllView = new SearchAllDialog(this->parent);
         initViews(ui);
         initConnection();
+        textSearchWorker.moveToThread(&searchThread);
     }
 
 
-    QWidget * parent;
-    SearchAllDialog * textSearchAllView;
+    QWidget *parent;
+    QThread searchThread;
+    SearchAllDialog *textSearchAllView;
+    TextSearchWorker textSearchWorker;
     QFileSystemModel modelTree;
     NavigationProxyModel proxyModel;
     MkEdit* viewText;
@@ -75,6 +80,7 @@ private slots:
     void searchFileHandle(const QString &filename);
     void navigationAllPathLoaded(QString path);
     void navigationViewExpandedFilenameFilter();
+    void doSearchWork(QString &text);
 
 };
 

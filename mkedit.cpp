@@ -165,7 +165,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     this->ensureCursorVisible();
-    qDebug()<< ">>>time to process key press = "<<timer.elapsed();
+//    qDebug()<< ">>>time to process key press = "<<timer.elapsed();
 
 }
 

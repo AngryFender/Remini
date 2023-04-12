@@ -97,7 +97,6 @@ void NavigationProxyModel::deleteFileFolderHandler(QModelIndex &index)
     QFileInfo fileInfo = model->fileInfo(sourceIndex);
 
     QFile file(fileInfo.absoluteFilePath());
-    qDebug()<<"deleting this "<<fileInfo.absoluteFilePath();
     if(file.exists())
         file.moveToTrash();
 }
@@ -123,7 +122,7 @@ void NavigationProxyModel::openLocationHandler(QModelIndex &index)
     }
     QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 }
-void NavigationProxyModel::createAllFoldersList(QModelIndex index, QStringList &listNames, QStringList &listPath)
+void NavigationProxyModel::createAllFoldersList(QModelIndex index, QStringList &listPath)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     if(!model) {
@@ -145,7 +144,6 @@ void NavigationProxyModel::createAllFoldersList(QModelIndex index, QStringList &
                 while(di.hasNext()){
                     di.next();
                     if(di.fileInfo().isDir()){
-                        listNames.append(di.fileInfo().fileName());
                         listPath.append(di.fileInfo().absoluteFilePath());
                     }
                 }
@@ -154,13 +152,14 @@ void NavigationProxyModel::createAllFoldersList(QModelIndex index, QStringList &
     }
 }
 
-void NavigationProxyModel::createAllFilesList(QModelIndex index, QStringList &listNames, QStringList &listPath)
+void NavigationProxyModel::createAllFilesList(QModelIndex index, QStringList &listPath)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
     if(!model) {
         return;
     }
 
+    listPath.clear();
     QModelIndex rootIndex = this->mapToSource(index);
     QFileInfo info = model->fileInfo(rootIndex);
     QString path = info.absoluteFilePath();
@@ -176,7 +175,6 @@ void NavigationProxyModel::createAllFilesList(QModelIndex index, QStringList &li
                 while(di.hasNext()){
                     di.next();
                     if(di.fileInfo().isFile()){
-                        listNames.append(di.fileInfo().fileName());
                         listPath.append(di.fileInfo().absoluteFilePath());
                     }
                 }
@@ -227,7 +225,6 @@ bool NavigationProxyModel::filterChildIndex( QFileSystemModel* model, int source
 {
     QFileInfo info = model->fileInfo(source_parent);
     QString fileName = info.fileName();
-//    qDebug()<<" checking Name "<<fileName;
 
     if(info.isFile()){
         if(fileName.contains(filterRegularExpression().pattern())){

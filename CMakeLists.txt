@@ -42,6 +42,8 @@ set(PROJECT_SOURCES
         formatdata.cpp
         searchalldialog.h
         searchalldialog.cpp
+        textsearchworker.h
+        textsearchworker.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

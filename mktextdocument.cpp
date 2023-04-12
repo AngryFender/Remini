@@ -53,7 +53,6 @@ void MkTextDocument::removeAllMkDataHandle()
     timer.start();
     showMKSymbolsFromSavedBlocks();
     stripUserData();
-    qDebug()<<"   stripped all MK data "<<timer.elapsed();
 }
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll,QRect rect)
@@ -270,7 +269,7 @@ void MkTextDocument::updateSingleBlockMkFormat(int blockNumber)
     format.setFontItalic(false);
     format.setFontStrikeOut(false);
     cursor.setPosition(block.position());
-    cursor.setPosition(block.position()+block.length(), QTextCursor::KeepAnchor);
+    cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
     cursor.setCharFormat(format);
 }
 

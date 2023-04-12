@@ -135,6 +135,17 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree,SIGNAL(expansionComplete()),
                      this,SLOT(navigationViewExpandedFilenameFilter()));
 
+    QObject::connect(textSearchAllView, SIGNAL(startSearch(QString&)),
+                     this,SLOT(doSearchWork(QString&)));
+
+    QObject::connect(&searchThread, SIGNAL(started()),
+                     &textSearchWorker,SLOT(doWork()));
+
+    QObject::connect(&textSearchWorker,SIGNAL(finished()),
+                     &searchThread, SLOT(quit()));
+
+    QObject::connect(&textSearchWorker,SIGNAL(updateTextSearchView(QStandardItemModel*)),
+                     textSearchAllView, SLOT(updateTextSearchViewHandle(QStandardItemModel*)));
 
 }
 
@@ -227,8 +238,8 @@ void ViewsHandler::searchFileHandle(const QString &filename)
     }
     searchedFilename =filename;
 
-    QStringList listName, listPath;
-    proxyModel.createAllFoldersList(viewTree->rootIndex(), listName, listPath);
+    QStringList listPath;
+    proxyModel.createAllFoldersList(viewTree->rootIndex(), listPath);
     for(QString &filePath:listPath){
         viewTree->setExpanded(proxyModel.mapFromSource(modelTree.index(filePath)),true);
     }
@@ -248,13 +259,14 @@ void ViewsHandler::navigationViewExpandedFilenameFilter()
     fileSearchMutex.unlock();
 }
 
+void ViewsHandler::doSearchWork(QString &text)
+{
+    textSearchWorker.setText(text);
+    searchThread.start();
+}
+
 void ViewsHandler::startTextSearchInAllFilesHandle()
 {
     textSearchAllView->show();
-    QStringList listName, listPath;
-    proxyModel.createAllFilesList(viewTree->rootIndex(), listName, listPath);
-    for(QString &name: listName){
-        qDebug()<<" list = "<<name;
-    }
-    qDebug()<<" total files found "<<listName.count();
+    proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
 }

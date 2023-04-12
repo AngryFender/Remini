@@ -10,9 +10,26 @@ SearchAllDialog::SearchAllDialog(QWidget *parent):QDialog(parent)
 
     layout->addWidget(textView);
     layout->addWidget(searchView);
+
 }
 
 SearchAllDialog::~SearchAllDialog(){
     delete layout;
     delete textView;
+}
+
+void SearchAllDialog::updateTextSearchViewHandle(QStandardItemModel *model)
+{
+    searchView->setModel(model);
+}
+
+void SearchAllDialog::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Enter||
+        event->key() == Qt::Key_Return){
+
+        QString text = textView->text();
+        emit startSearch(text);
+    }
+    QDialog::keyPressEvent(event);
 }

@@ -24,8 +24,8 @@ public slots:
     void createFolderHandler(QModelIndex& index, QString &name);
     void deleteFileFolderHandler(QModelIndex& index);
     void openLocationHandler(QModelIndex& index);
-    void createAllFoldersList(QModelIndex index, QStringList &listNames, QStringList &listPath);
-    void createAllFilesList(QModelIndex index, QStringList &listNames, QStringList &listPath);
+    void createAllFoldersList(QModelIndex index, QStringList &listPath);
+    void createAllFilesList(QModelIndex index, QStringList &listPath);
 signals:
     void folderChanged();
 private:
