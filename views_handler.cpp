@@ -144,8 +144,11 @@ void ViewsHandler::initConnection()
     QObject::connect(&textSearchWorker,SIGNAL(finished()),
                      &searchThread, SLOT(quit()));
 
-    QObject::connect(&textSearchWorker,SIGNAL(updateTextSearchView(QStandardItemModel*)),
-                     textSearchAllView, SLOT(updateTextSearchViewHandle(QStandardItemModel*)));
+    QObject::connect(&textSearchWorker,SIGNAL(updateTextSearchView(QStandardItemModel*,int)),
+                     textSearchAllView, SLOT(updateTextSearchViewHandle(QStandardItemModel*,int)));
+
+    QObject::connect(textSearchAllView,SIGNAL(showSearchedTextInFile(QString&,int,int,int)),
+                     this,SLOT(displayTextSearchedFilePosition(QString&,int,int,int)));
 
 }
 
@@ -262,7 +265,37 @@ void ViewsHandler::navigationViewExpandedFilenameFilter()
 void ViewsHandler::doSearchWork(QString &text)
 {
     textSearchWorker.setText(text);
+    textSearchWorker.setRootPath(modelTree.rootPath());
     searchThread.start();
+}
+
+void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchTextLength,int blockNumber, int positionInBlock)
+{
+    fileInfo = QFileInfo(filePath);
+    if (!fileInfo.isFile()|| !fileInfo.exists())
+        return;
+
+    QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
+    QString fullContent = getFileContent(*file.get());
+
+    mkGuiDocument.clear();
+    mkGuiDocument.setPlainText(fullContent);
+
+    viewTitle->setText(fileInfo.baseName());
+    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    viewText->update();
+
+    QTextCursor cursor = viewText->textCursor();
+    QTextBlock block = mkGuiDocument.findBlockByNumber(blockNumber);
+
+    cursor.setPosition(block.position());
+    viewText->setTextCursor(cursor);
+
+    cursor.setPosition(block.position()+positionInBlock);
+    cursor.setPosition(block.position()+positionInBlock-searchTextLength,QTextCursor::KeepAnchor);
+    viewText->setTextCursor(cursor);
+
 }
 
 void ViewsHandler::startTextSearchInAllFilesHandle()

@@ -27,11 +27,6 @@ NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
 
 void NavigationView::expandEveryItems(QModelIndex index)
 {
-    //DEBUG MODE WILL NEED MORE TIME PERIOD TO LOAD ALL ITEMS
-//    qDebug()<<"expanding";
-//    this->expandAll();
-//    this->expandRecursively(index);
-//    this->expandToDepth(20);
     if(!expandTimer.isActive())
         expandTimer.start(TIME_PERIOD_FOR_EXPANSION);
 }

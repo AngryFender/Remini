@@ -5,10 +5,12 @@
 
 #include <QObject>
 #include <QFile>
+#include <QDir>
 #include <QTextStream>
 #include <QTextDocument>
 #include <QTextCursor>
 #include <QStandardItemModel>
+#include <QFileIconProvider>
 
 
 class TextSearchWorker : public QObject
@@ -18,21 +20,23 @@ public:
     explicit TextSearchWorker(QObject *parent = nullptr);
     QStringList &getListPaths();
     void setText(QString &text);
+    void setRootPath(QString text);
 
 public slots:
     void doWork();
 private:
     QStringList listPaths;
     QString text;
-    QList<int> listPositions;
+    QString rootPath;
     QStandardItemModel model;
+    QFileIconProvider iconProvider;
 
-    void findAllMatches(bool &appendItem,QStandardItem *item, int &row, QList<int> &list, QTextDocument &document, int startPosition, QString &text);
+    void findAllMatches(int &matchCount,QStandardItem *item, int &row, QTextDocument &document, int startPosition, QString &text);
     QString extractNeighbourWords(QTextDocument &document, int position);
 
 signals:
     void finished();
-    void updateTextSearchView(QStandardItemModel *model);
+    void updateTextSearchView(QStandardItemModel *model, int matchCount);
 };
 
 #endif // TEXTSEARCHWORKER_H
