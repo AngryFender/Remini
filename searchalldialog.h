@@ -14,6 +14,8 @@
 #include <QTreeView>
 #include <QLabel>
 
+#define KEY_PRESS_TIMEOUT 400
+
 class SearchAllDialog : public QDialog
 {
     Q_OBJECT
@@ -24,14 +26,15 @@ public:
 public slots:
     void updateTextSearchViewHandle(QStandardItemModel *model, int matchCount);
     void textSearchPositionSelected(const QModelIndex &index);
-protected:
-    void keyPressEvent(QKeyEvent *event)override;
+    void textSearchChanged(const QString &text);
+    void keyPressTimeoutHandle();
 
 private:
     QVBoxLayout * layout;
     QLineEdit * textView;
     QLabel *matchCountView;
     NavigationView * searchView;
+    QTimer keyPressTimer;
 signals:
     void startSearch(QString &text);
     void showSearchedTextInFile(QString &filePath,int searchTextLength, int blockNumber, int positionInBlock);

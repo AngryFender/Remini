@@ -15,8 +15,17 @@ SearchAllDialog::SearchAllDialog(QWidget *parent):QDialog(parent)
     layout->addWidget(matchCountView);
     layout->addWidget(searchView);
 
+    keyPressTimer.setInterval(KEY_PRESS_TIMEOUT);
+
     connect(searchView,SIGNAL(pressed(QModelIndex)),
             this,SLOT(textSearchPositionSelected(QModelIndex)));
+
+    connect(&keyPressTimer,SIGNAL(timeout()),
+            this,SLOT(keyPressTimeoutHandle()));
+
+    connect(textView,SIGNAL(textChanged(const QString &)),
+            this,SLOT(textSearchChanged(const QString &)));
+
 
 }
 
@@ -52,13 +61,14 @@ void SearchAllDialog::textSearchPositionSelected(const QModelIndex &index)
     emit showSearchedTextInFile(filePath, searchTextLength, blockNumber,positionInBlock);
 }
 
-void SearchAllDialog::keyPressEvent(QKeyEvent *event)
+void SearchAllDialog::textSearchChanged(const QString &text)
 {
-    if(event->key() == Qt::Key_Enter||
-        event->key() == Qt::Key_Return){
+    keyPressTimer.start();
+}
 
-        QString text = textView->text();
-        emit startSearch(text);
-    }
-    QDialog::keyPressEvent(event);
+void SearchAllDialog::keyPressTimeoutHandle()
+{
+    keyPressTimer.stop();
+    QString text = textView->text();
+    emit startSearch(text);
 }
