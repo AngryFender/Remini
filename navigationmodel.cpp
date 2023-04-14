@@ -224,7 +224,7 @@ bool NavigationProxyModel::filterAcceptsRow(int source_row, const QModelIndex &s
 bool NavigationProxyModel::filterChildIndex( QFileSystemModel* model, int source_row, const QModelIndex &source_parent) const
 {
     QFileInfo info = model->fileInfo(source_parent);
-    QString fileName = info.fileName();
+    QString fileName = info.fileName().toLower();
 
     if(info.isFile()){
         if(fileName.contains(filterRegularExpression().pattern())){

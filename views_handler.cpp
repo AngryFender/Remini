@@ -239,7 +239,7 @@ void ViewsHandler::searchFileHandle(const QString &filename)
         fileSearchMutex.unlock();
         return;
     }
-    searchedFilename =filename;
+    searchedFilename =filename.toLower();
 
     QStringList listPath;
     proxyModel.createAllFoldersList(viewTree->rootIndex(), listPath);
