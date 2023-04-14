@@ -7,12 +7,12 @@ SearchAllDialog::SearchAllDialog(QWidget *parent):QDialog(parent)
     textView = new QLineEdit(this);
     textView->setPlaceholderText("Search Texts");
     matchCountView = new QLabel(this);
-    matchCountView->setAlignment(Qt::AlignLeft);
+    matchCountView->setAlignment(Qt::AlignRight);
     searchView = new NavigationView(this);
 
 
     layout->addWidget(textView);
-    layout->addWidget(matchCountView);
+    layout->addWidget(matchCountView,Qt::AlignRight);
     layout->addWidget(searchView);
 
     keyPressTimer.setInterval(KEY_PRESS_TIMEOUT);
@@ -23,8 +23,8 @@ SearchAllDialog::SearchAllDialog(QWidget *parent):QDialog(parent)
     connect(&keyPressTimer,SIGNAL(timeout()),
             this,SLOT(keyPressTimeoutHandle()));
 
-    connect(textView,SIGNAL(textChanged(const QString &)),
-            this,SLOT(textSearchChanged(const QString &)));
+    connect(textView,SIGNAL(textChanged(QString)),
+            this,SLOT(textSearchChanged(QString)));
 
 
 }
@@ -42,7 +42,7 @@ void SearchAllDialog::show()
 
 void SearchAllDialog::updateTextSearchViewHandle(QStandardItemModel *model,int matchCount)
 {
-    matchCountView->setText(QString::number(matchCount)+": matches found");
+    matchCountView->setText(QString::number(matchCount)+" matches found");
 
     searchView->setModel(model);
     if(model->rowCount()<=2)
