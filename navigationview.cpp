@@ -2,9 +2,9 @@
 
 NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
 {
+
     this->setColumnHidden(1,true);
     this->setHeaderHidden(true);
-    this->setRootIsDecorated(false);
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
 
