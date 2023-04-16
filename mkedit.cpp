@@ -12,7 +12,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     pasteTextAction.setText("Paste          Ctrl+Y");
     deleteTextAction.setText("Delete        Del");
     selectAllAction.setText("Select All    Ctrl+A");
-    selectBlockAction.setText("Select Block");
+    selectBlockAction.setText("Copy Block");
 
     connect(&undoAction, SIGNAL(triggered()), this, SLOT(undoContextMenu()));
     connect(&redoAction, SIGNAL(triggered()), this, SLOT(redoContextMenu()));
@@ -233,6 +233,7 @@ void MkEdit::contextMenuHandler(QPoint pos)
     emit checkRightClockOnCodeBlock(cursor.blockNumber(),rightClockOnCodeBlock);
 
     QMenu menu(this);
+    if(rightClockOnCodeBlock)menu.addAction(&selectBlockAction);
     menu.addAction(&undoAction);
     menu.addAction(&redoAction);
     menu.addSeparator();
@@ -241,7 +242,6 @@ void MkEdit::contextMenuHandler(QPoint pos)
     menu.addAction(&deleteTextAction);
     menu.addSeparator();
     menu.addAction(&selectAllAction);
-    if(rightClockOnCodeBlock)menu.addAction(&selectBlockAction);
     menu.exec(viewport()->mapToGlobal(pos));
 }
 
