@@ -132,7 +132,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}break;
     case Qt::Key_Tab:       if( event->modifiers() == Qt::NoModifier){
                                 emit removeAllMkData();
-                                postUndoSetup();
+                                preUndoSetup();
                                 tabKeyPressed();
                                 emit fileSave();
                                 postUndoSetup();
