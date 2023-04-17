@@ -5,6 +5,8 @@
 
 MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
+    fileSaveTimer.setInterval(FILE_SAVE_TIMEOUT);
+
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     undoAction.setText("Undo         Ctrl+Z");
     redoAction.setText("Redo          Ctrl+Y");
@@ -23,6 +25,9 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     connect(&selectBlockAction, SIGNAL(triggered()), this, SLOT(selectBlock()));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(contextMenuHandler(QPoint)));
+
+    connect(&fileSaveTimer, &QTimer::timeout,
+            this, &MkEdit::fileSaveHandle);
 
     penCodeBlock.setWidthF(1);
     penCodeBlock.setStyle(Qt::SolidLine);
@@ -127,44 +132,34 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Left:
     case Qt::Key_Down:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
+    case Qt::Key_A:         if( event->modifiers() == Qt::CTRL) {undoData.selectAll = true; undoData.undoRedoSkip = true; QTextEdit::keyPressEvent(event);return;}break;
     case Qt::Key_V:
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}break;
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}break;
     case Qt::Key_Tab:       if( event->modifiers() == Qt::NoModifier){
-                                emit removeAllMkData();
-                                preUndoSetup();
+                                clearMkEffects();
                                 tabKeyPressed();
-                                emit fileSave();
-                                postUndoSetup();
-                                emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-                                return;
+                                fileSaveNow(); return;
                             }break;
     }
 
-    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
-    emit removeAllMkData();
-
-    preUndoSetup();
+    clearMkEffects();
     QTextEdit::keyPressEvent(event);
 
     switch(event->key()){
     case Qt::Key_Enter:
-    case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber()); break;
-    case Qt::Key_QuoteLeft: quoteLeftKey(); break;
-    case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) emit duplicateLine(this->textCursor().blockNumber());; break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoData.undoRedoSkip = true; break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoData.undoRedoSkip = true; break;
-    case Qt::Key_A:         if( event->modifiers() == Qt::CTRL) undoData.selectAll = true; undoData.undoRedoSkip = true; break;
+    case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber());
+    case Qt::Key_Backspace:
+    case Qt::Key_Space:     fileSaveNow(); return;
+    case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
+    case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoData.undoRedoSkip = true; fileSaveNow(); return;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoData.undoRedoSkip = true; fileSaveNow(); return;
+
     default: break;
     }
 
-    postUndoSetup();
-
-    emit fileSave();
-
-    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
-    this->ensureCursorVisible();
+    applyMkEffects();
 //    qDebug()<< ">>>time to process key press = "<<timer.elapsed();
 
 }
@@ -223,6 +218,32 @@ QRect MkEdit::getVisibleRect()
     QRect visibleRect = this->viewport()->rect();
     visibleRect.translate(this->horizontalScrollBar()->value(), this->verticalScrollBar()->value()); // translate the rectangle by the scroll bar offsets
     return visibleRect;
+}
+
+void MkEdit::clearMkEffects()
+{
+
+    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
+    emit removeAllMkData();
+    if(!fileSaveTimer.isActive()){
+        preUndoSetup();
+    }
+    fileSaveTimer.start();
+}
+
+void MkEdit::applyMkEffects()
+{
+    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+    this->ensureCursorVisible();
+}
+
+void MkEdit::fileSaveNow()
+{
+    fileSaveTimer.stop();
+    postUndoSetup();
+    emit fileSave();
+    applyMkEffects();
 }
 
 void MkEdit::contextMenuHandler(QPoint pos)
@@ -390,6 +411,15 @@ void MkEdit::scrollValueUpdateHandle(int value)
 {
     int currentBlockNumber = textCursor().blockNumber();
     emit drawTextBlocks(textCursor().hasSelection(), currentBlockNumber,undoData.selectAll, getVisibleRect());
+}
+
+void MkEdit::fileSaveHandle()
+{
+    fileSaveTimer.stop();
+    emit removeAllMkData();
+    postUndoSetup();
+    emit fileSave();
+    applyMkEffects();
 }
 
 void MkEdit::cursorPositionChangedHandle()

@@ -8,12 +8,14 @@
 #include <QRegularExpressionMatch>
 #include <QTextDocument>
 #include <QMenu>
+#include <QTimer>
 #include <mktextdocument.h>
 #include <QScrollBar>
 #include <QUndoStack>
 #include <editcommand.h>
 #include <theme.h>
 
+#define FILE_SAVE_TIMEOUT 300
 #define BLOCKRADIUS 3
 
 class MkEdit : public QTextEdit
@@ -60,6 +62,7 @@ protected:
     QUndoStack undoStack;
     UndoData undoData;
     HighlightColor syntaxColor;
+    QTimer fileSaveTimer;
 
     void quoteLeftKey();
     void smartSelectionSetup();
@@ -77,6 +80,9 @@ protected:
     QPoint contextMenuPos;
 
     QRect getVisibleRect();
+    void clearMkEffects();
+    void applyMkEffects();
+    void fileSaveNow();
 
  public slots:
     void contextMenuHandler(QPoint pos);
@@ -89,6 +95,9 @@ protected:
     void redo();
     void clearUndoStackHandle();
     void scrollValueUpdateHandle(int value);
+
+private slots:
+    void fileSaveHandle();
 
 signals:
     void cursorPosChanged(bool hasSelection, int blockNumber, QRect rect);
