@@ -8,6 +8,11 @@ QString ViewsHandler::getSavedPath()
 
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
+    QList<int> sizes;
+    sizes << NAVIGATION_RATIO << EDITOR_RAIO;
+    ui.splitter->setSizes(sizes);
+    ui.splitter->setCollapsible(1,false);
+
     viewSearch = ui.uiSearch;
     viewTree = ui.uiTreeView;
     viewText = ui.uiTextView;

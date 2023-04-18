@@ -13,6 +13,9 @@
 #include "./ui_mainwindow.h"
 #include "searchalldialog.h"
 
+#define NAVIGATION_RATIO 100
+#define EDITOR_RAIO 200
+
 class ViewsHandler: public QObject
 {
     Q_OBJECT
