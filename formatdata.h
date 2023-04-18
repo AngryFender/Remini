@@ -9,6 +9,12 @@
 #define ITALIC_SYMBOL_A "*"
 #define ITALIC_SYMBOL_U "_"
 #define STRIKETHROUGH_SYMBOL "~~"
+#define CHECK_SYMBOL_START "- ["
+#define CHECKED_SYMBOL_END "x] "
+#define UNCHECKED_SYMBOL_END " ] "
+
+#define CHECKED_PIC "✅"
+#define UNCHECKED_PIC "⬜"
 
 class FragmentData{
 public:
@@ -16,6 +22,9 @@ public:
         BOLD,
         ITALIC,
         STRIKETHROUGH,
+        CHECK_START,
+        CHECKED_END,
+        UNCHECKED_END
     };
     FragmentData(int start, int end, FormatSymbol status){
         this->start = start;
@@ -46,9 +55,6 @@ private:
     QString symbol;
     bool hidden;
 };
-
-
-
 
 class FormatData : public QTextBlockUserData
 {

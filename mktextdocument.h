@@ -65,6 +65,7 @@ public slots:
     FormatLocation locItalicA;
     FormatLocation locItalicU;
     FormatLocation locStrike;
+    FormatLocation locCheck;
 
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
@@ -75,7 +76,9 @@ public slots:
     void identifyUserData(bool showAll, int blockNumber=0, bool hasSelection = false);
 
     void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0, bool hasSelection = false);
-    QString convertCharacterToSymbol(QString single);
+    QString convertCharacterToSymbol(QChar single);
+    QString convertCharacterToCheckboxSymbol(QChar single);
+    QString composeSymbol(QString &text, int &index1, int &index2, int &index3);
     void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
     void stripUserData();
 

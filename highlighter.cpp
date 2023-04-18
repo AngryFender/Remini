@@ -38,16 +38,6 @@ void Highlighter::highlightBlock(const QString &text)
         setFormat(startIndex, commentLength, multiLineCommentFormat);
         startIndex = text.indexOf(commentStartExpression, startIndex + commentLength);
     }
-
-//    QRegularExpressionMatchIterator i = m_regex.globalMatch(text);
-//    while (i.hasNext()) {
-//        QRegularExpressionMatch match = i.next();
-//        int start = match.capturedStart();
-//        int end = match.capturedEnd();
-
-//        setFormat(start, 1,headingFormat);
-//        setFormat(start+1, end - start, m_format);
-//    }
 }
 
 void Highlighter::initColors()
@@ -76,21 +66,8 @@ void Highlighter::initColors()
     }
 
 
-//    rule.format.setFontPointSize(15);
-//    //m_format.setFontPointSize(15);
-//    highlightingRules.append(rule);
-
-//    classFormat.setFontWeight(QFont::Bold);
-//    classFormat.setForeground(QColor("#EDCAE7"));
-////    m_regex =QRegularExpression(QStringLiteral("#[^\\s+#]+.*"));
-////    m_regex =QRegularExpression(QStringLiteral("^#[^\\s#]+.*"));    //markdown heading 1
-//    rule.format = classFormat;
-//    rule.format.setFontPointSize(15);
-////    highlightingRules.append(rule);
-
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(syntaxColor.argument);
-//    rule.pattern = QRegularExpression(QStringLiteral("(?<=\\s)--?[a-zA-Z0-9]+"));
     rule.pattern = QRegularExpression(QStringLiteral("(?<=\\s)--?[a-zA-Z0-9_]+"));
     rule.format = classFormat;
     highlightingRules.append(rule);
@@ -103,7 +80,7 @@ void Highlighter::initColors()
     multiLineCommentFormat.setForeground(syntaxColor.comment);
 
     quotationFormat.setForeground(syntaxColor.quote);
-    rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
+    rule.pattern = QRegularExpression(QStringLiteral("\"(.*?)\""));
     rule.format = quotationFormat;
     highlightingRules.append(rule);
 
