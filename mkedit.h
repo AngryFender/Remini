@@ -53,6 +53,8 @@ public:
 
 protected:
     void insertFromMimeData(const QMimeData *source) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *e) override;
 
  private:
     QColor codeBlockColor;

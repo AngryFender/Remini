@@ -330,6 +330,25 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
 }
 
+void MkEdit::mousePressEvent(QMouseEvent *e)
+{
+    QTextEdit::mousePressEvent(e);
+    int yPos = this->verticalScrollBar()->value()+e->pos().y();
+    int xPos = this->horizontalScrollBar()->value()+e->pos().y();
+
+    //this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
+}
+
+void MkEdit::mouseMoveEvent(QMouseEvent *e)
+{
+    QTextEdit::mouseMoveEvent(e);
+    int yPos = this->verticalScrollBar()->value()+e->pos().y();
+    int xPos = this->horizontalScrollBar()->value()+e->pos().y();
+    qDebug()<<"x = "<<xPos<<" y = "<<yPos;
+
+    //this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
+}
+
 QColor MkEdit::getTypeColor() const
 {
     return syntaxColor.type;
