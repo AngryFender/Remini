@@ -36,6 +36,11 @@ FormatData::~FormatData()
     }
     formats.clear();
 
+    for(auto format:hiddenFormats){
+        delete format;
+    }
+    hiddenFormats.clear();
+
     for(auto pos:positions){
         delete pos;
     }
@@ -65,6 +70,19 @@ void FormatData::addFormat(int start, int end, QString &symbol)
     formats.append(new FragmentData(start,end,status));
     positions.append(new PositionData(start,symbol));
     positions.append(new PositionData(end,symbol));
+
+
+    int accumulate = 0;
+    if(!hiddenFormats.empty()){
+        accumulate = hiddenFormats.last()->getAccumulate();
+    }
+
+    int begin = start-accumulate;
+    int last = end-accumulate-symbol.length();
+    accumulate = accumulate+2*symbol.length();
+
+    hiddenFormats.append(new FragmentData(begin,last,status,accumulate));
+    qDebug()<<"start "<<start<<" end "<<end <<" len "<<symbol.length() << " begin "<<begin <<" last "<<last;
 }
 
 bool FormatData::isEmpty()
@@ -101,3 +119,9 @@ FragmentData::FormatSymbol FragmentData::getStatus()
 {
     return status;
 }
+
+int FragmentData::getAccumulate()
+{
+    return accumulate;
+}
+

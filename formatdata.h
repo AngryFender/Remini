@@ -31,12 +31,21 @@ public:
         this->end = end;
         this->status = status;
     }
+    FragmentData(int start, int end, FormatSymbol status, int accumulate){
+        this->start = start;
+        this->end = end;
+        this->status = status;
+        this->accumulate = accumulate;
+    }
+
     int getStart();
     int getEnd();
     FormatSymbol getStatus();
+    int getAccumulate();
 private:
     int start;
     int end;
+    int accumulate;
     FormatSymbol status;
 };
 
@@ -67,6 +76,10 @@ public:
     QVector<FragmentData*>::Iterator formats_next(QVector<FragmentData*>::Iterator it) {return it++;};
     QVector<FragmentData*>::Iterator formats_end() {return formats.end();};
 
+    QVector<FragmentData*>::Iterator hiddenFormats_begin() {return hiddenFormats.begin();};
+    QVector<FragmentData*>::Iterator hiddenFormats_next(QVector<FragmentData*>::Iterator it) {return it++;};
+    QVector<FragmentData*>::Iterator hiddenFormats_end() {return hiddenFormats.end();};
+
     QVector<PositionData*>::Iterator pos_begin() {return positions.begin();};
     QVector<PositionData*>::Iterator pos_next(QVector<PositionData*>::Iterator it) {return it++;};
     QVector<PositionData*>::Iterator pos_previous(QVector<PositionData*>::Iterator it) {return it--;};
@@ -87,6 +100,7 @@ public:
 
 private:
     QVector<FragmentData*> formats;
+    QVector<FragmentData*> hiddenFormats;
     QVector<PositionData*> positions;
     bool hidden;
 };

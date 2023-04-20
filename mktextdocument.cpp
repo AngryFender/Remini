@@ -384,6 +384,16 @@ void MkTextDocument::hideSymbolsAtPos(QTextBlock &block, int pos, const QString 
     }
 }
 
+void MkTextDocument::hideSymbolsAtPos(QString &text, int pos, const QString &symbol)
+{
+    text.remove(pos,symbol.length());
+    if(symbol == CHECKED_SYMBOL_END){
+        text.insert(pos,CHECKED_PIC);
+    }else if(symbol == UNCHECKED_SYMBOL_END){
+        text.insert(pos,UNCHECKED_PIC);
+    }
+}
+
 void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
 {
     //avoid prepending more than 3 ```
@@ -414,6 +424,15 @@ void MkTextDocument::showSymbolsAtPos(QTextBlock &block, int pos, const QString 
 
     cursor.insertText(symbol);    
 }
+
+void MkTextDocument::showSymbolsAtPos(QString &text, int pos, const QString &symbol)
+{
+    if(symbol == CHECKED_SYMBOL_END ||symbol == UNCHECKED_SYMBOL_END){
+        text.remove(pos,1);
+    }
+    text.insert(pos,symbol);
+}
+
 
 void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
 {
@@ -650,6 +669,10 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
 {
     QAbstractTextDocumentLayout* layout = this->documentLayout();
 
+    QElapsedTimer timer;
+
+//    timer.start();
+
     while(!savedBlocks.empty()){
         QTextBlock block = savedBlocks.takeFirst();
 
@@ -682,15 +705,20 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
             FormatData* formatData = dynamic_cast<FormatData*>(data);
             if(formatData){
                 if(formatData->isHidden()){
+                    QString textBlock = block.text();
                     for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
                     {
-                        showSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+                        showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
                     }
+                    QTextCursor cursor(block);
+                    cursor.select(QTextCursor::LineUnderCursor);
+                    cursor.insertText(textBlock);
                     formatData->setHidden(false);
                 }
             }
         }
     }
+//        qDebug()<< ">>>time to show = "<<timer.elapsed();
 }
 
 void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll)
@@ -700,6 +728,8 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
     CheckingBlock checkBlock;
     QTextBlock block = this->firstBlock();
 
+    QElapsedTimer timer;
+//    timer.start();
     while(block.isValid()){
         if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
 
@@ -759,10 +789,14 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
 
                     if(blockNumber == block.blockNumber()){
                         if(formatData->isHidden()){
+                            QString textBlock = block.text();
                             for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
                             {
-                                showSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
+                                showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
                             }
+                            QTextCursor cursor(block);
+                            cursor.select(QTextCursor::LineUnderCursor);
+                            cursor.insertText(textBlock);
                             formatData->setHidden(false);
                         }
                         for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
@@ -773,16 +807,26 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                     else{
                         if(!hasSelection){
                             if(!formatData->isHidden()){
-                                for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
+
+//                                for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
+//                                {
+//                                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
+//                                }
+                                //hide symbols, start at the end to avoid changing position of the symbols
+                                QString textBlock = block.text();
+                                for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
+                                {
+                                    hideSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
+                                }
+                                QTextCursor cursor(block);
+                                cursor.select(QTextCursor::LineUnderCursor);
+                                cursor.insertText(textBlock);
+                                formatData->setHidden(true);
+
+                                for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
                                 {
                                     applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
                                 }
-                                //hide symbols, start at the end to avoid changing position of the symbols
-                                for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
-                                {
-                                    hideSymbolsAtPos(block, (*it)->getPos(), (*it)->getSymbol());
-                                }
-                                formatData->setHidden(true);
                             }
                         }
                     }
@@ -792,6 +836,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
         }
         block = block.next();
     }
+//        qDebug()<< ">>>time to hide = "<<timer.elapsed();
 }
 
 

@@ -86,9 +86,11 @@ public slots:
     void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
     void hideSymbols(QTextBlock block,const QString &symbol);
     void hideSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
+    void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void showSymbols(QTextBlock block,const QString &symbol);
     void showSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
+    void showSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void autoCompleteCodeBlock(int blockNumber,bool &success);
     BlockData* checkValidCodeBlock(QTextBlock &block);
