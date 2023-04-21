@@ -13,8 +13,8 @@
 #define CHECKED_SYMBOL_END "x] "
 #define UNCHECKED_SYMBOL_END " ] "
 
-#define CHECKED_PIC "✅"
-#define UNCHECKED_PIC "⬜"
+#define CHECKED_PIC "☑"
+#define UNCHECKED_PIC "☐"
 
 class FragmentData{
 public:

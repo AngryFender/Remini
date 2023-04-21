@@ -36,6 +36,8 @@ private:
     QRegularExpression commentEndExpression;
     QRegularExpression regexCodeBlock;
 
+    QTextCharFormat tickMarkFormat;
+    QTextCharFormat unTickMarkFormat;
     QTextCharFormat keywordFormat;
     QTextCharFormat classFormat;
     QTextCharFormat singleLineCommentFormat;

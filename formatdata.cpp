@@ -76,13 +76,10 @@ void FormatData::addFormat(int start, int end, QString &symbol)
     if(!hiddenFormats.empty()){
         accumulate = hiddenFormats.last()->getAccumulate();
     }
-
     int begin = start-accumulate;
     int last = end-accumulate-symbol.length();
     accumulate = accumulate+2*symbol.length();
-
     hiddenFormats.append(new FragmentData(begin,last,status,accumulate));
-    qDebug()<<"start "<<start<<" end "<<end <<" len "<<symbol.length() << " begin "<<begin <<" last "<<last;
 }
 
 bool FormatData::isEmpty()

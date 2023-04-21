@@ -1,4 +1,5 @@
 #include "highlighter.h"
+#include <_mingw_mac.h>
 
 Highlighter::Highlighter(QObject *parent)
     : QSyntaxHighlighter(parent),initialised(false)
@@ -70,6 +71,18 @@ void Highlighter::initColors()
     classFormat.setForeground(syntaxColor.argument);
     rule.pattern = QRegularExpression(QStringLiteral("(?<=\\s)--?[a-zA-Z0-9_]+"));
     rule.format = classFormat;
+    highlightingRules.append(rule);
+
+    tickMarkFormat.setForeground(QColor(60,179,113));
+    tickMarkFormat.setFontWeight(QFont::ExtraBold);
+    rule.pattern = QRegularExpression(QStringLiteral("(☑|-\\s\\[x]\\s)"));
+    rule.format = tickMarkFormat;
+    highlightingRules.append(rule);
+
+    unTickMarkFormat.setForeground(QColor(219,112,147));
+    unTickMarkFormat.setFontWeight(QFont::ExtraBold);
+    rule.pattern = QRegularExpression(QStringLiteral("(☐|-\\s\\[\\s\\]\\s)"));
+    rule.format = unTickMarkFormat;
     highlightingRules.append(rule);
 
     singleLineCommentFormat.setForeground(syntaxColor.comment);
