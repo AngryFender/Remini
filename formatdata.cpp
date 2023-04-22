@@ -57,29 +57,28 @@ void FormatData::addFormat(int start, int end, QString &symbol)
     }else if (symbol == STRIKETHROUGH_SYMBOL){
         status = FragmentData::STRIKETHROUGH;
     }else if (symbol == CHECK_SYMBOL_START){
-        status = FragmentData::CHECK_START;
+        return;
     }else if (symbol == CHECKED_SYMBOL_END){
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,CHECKED_SYMBOL_END));
+        addHiddenFormat(start, end, 3, FragmentData::CHECKED_END);
         return;
     }else if (symbol == UNCHECKED_SYMBOL_END){
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,UNCHECKED_SYMBOL_END));
+        addHiddenFormat(start, end, 3, FragmentData::UNCHECKED_END);
         return;
     }
     formats.append(new FragmentData(start,end,status));
     positions.append(new PositionData(start,symbol));
     positions.append(new PositionData(end,symbol));
 
+    addHiddenFormat(start, end, symbol.length(), status);
+}
 
-    int accumulate = 0;
-    if(!hiddenFormats.empty()){
-        accumulate = hiddenFormats.last()->getAccumulate();
-    }
-    int begin = start-accumulate;
-    int last = end-accumulate-symbol.length();
-    accumulate = accumulate+2*symbol.length();
-    hiddenFormats.append(new FragmentData(begin,last,status,accumulate));
+bool FormatData::isHiddenFormatsEmpty() const
+{
+    return hiddenFormats.empty();
 }
 
 bool FormatData::isEmpty()
@@ -100,6 +99,24 @@ void FormatData::setHidden(bool hide)
 void FormatData::sortAscendingPos()
 {
     std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
+}
+
+void FormatData::addHiddenFormat(int start, int end, int length, FragmentData::FormatSymbol status)
+{
+    int accumulate = 0;
+    if(!hiddenFormats.empty()){
+        accumulate = hiddenFormats.last()->getAccumulate();
+    }
+    int begin = start-accumulate;
+    int last = end-accumulate-length;
+
+    if(status == FragmentData::CHECKED_END ||status == FragmentData::UNCHECKED_END){
+        accumulate = accumulate+CHECKED_FULL_COUNT;
+    }else{
+        accumulate = accumulate+2*length;
+    }
+
+    hiddenFormats.append(new FragmentData(begin,last,status,accumulate));
 }
 
 int FragmentData::getStart()

@@ -16,6 +16,8 @@
 #define CHECKED_PIC "☑"
 #define UNCHECKED_PIC "☐"
 
+#define CHECKED_FULL_COUNT 5
+
 class FragmentData{
 public:
     enum FormatSymbol{
@@ -85,6 +87,7 @@ public:
     QVector<PositionData*>::Iterator pos_previous(QVector<PositionData*>::Iterator it) {return it--;};
     QVector<PositionData*>::Iterator pos_end() {return positions.end();};
 
+    bool isHiddenFormatsEmpty() const;
     bool isEmpty();
     bool& isHidden();
     void setHidden(bool hide);
@@ -103,6 +106,8 @@ private:
     QVector<FragmentData*> hiddenFormats;
     QVector<PositionData*> positions;
     bool hidden;
+
+    void addHiddenFormat(int start, int end,int length, FragmentData::FormatSymbol status);
 };
 
 #endif // FORMATDATA_H

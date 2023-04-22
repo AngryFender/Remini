@@ -40,11 +40,6 @@ public slots:
     void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll);
 
  private:
-    struct CheckBlock{
-        int start = 0;
-        int end = 0;
-    };
-
     struct CheckingBlock{
         QTextBlock start;
         QTextBlock end;
