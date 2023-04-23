@@ -666,7 +666,7 @@ void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, b
 
 void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
 {
-    QAbstractTextDocumentLayout* layout = this->documentLayout();
+//    QAbstractTextDocumentLayout* layout = this->documentLayout();
 
     while(!savedBlocks.empty()){
         QTextBlock block = savedBlocks.takeFirst();
@@ -706,7 +706,8 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
                         showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
                     }
                     QTextCursor cursor(block);
-                    cursor.select(QTextCursor::LineUnderCursor);
+                    cursor.movePosition(QTextCursor::StartOfBlock);
+                    cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
                     cursor.insertText(textBlock);
                     formatData->setHidden(false);
                 }
@@ -788,7 +789,8 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                                 showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
                             }
                             QTextCursor cursor(block);
-                            cursor.select(QTextCursor::LineUnderCursor);
+                            cursor.movePosition(QTextCursor::StartOfBlock);
+                            cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
                             cursor.insertText(textBlock);
                             formatData->setHidden(false);
                         }
@@ -807,10 +809,10 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                                     hideSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
                                 }
                                 QTextCursor cursor(block);
-                                cursor.select(QTextCursor::BlockUnderCursor);
+                                cursor.movePosition(QTextCursor::StartOfBlock);
+                                cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
                                 cursor.insertText(textBlock);
                                 formatData->setHidden(true);
-
                                 if(!formatData->isHiddenFormatsEmpty()){
                                     for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
                                     {
