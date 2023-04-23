@@ -77,14 +77,14 @@ public slots:
     void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
     void stripUserData();
 
-    void updateSingleBlockMkFormat(int blockNumber);
+    void resetTextBlockFormat(int blockNumber);
     void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
     void hideSymbols(QTextBlock block,const QString &symbol);
-    void hideSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
+    void hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void showSymbols(QTextBlock block,const QString &symbol);
-    void showSymbolsAtPos(QTextBlock &block,int pos, const QString &symbol);
+    void showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);
     void showSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void autoCompleteCodeBlock(int blockNumber,bool &success);
