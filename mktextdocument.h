@@ -74,7 +74,7 @@ public slots:
     QString convertCharacterToSymbol(QChar single);
     QString convertCharacterToCheckboxSymbol(QChar single);
     QString composeSymbol(QString &text, int &index1, int &index2, int &index3);
-    void setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin = 0);
+    void setCodeBlockMargin(QTextBlock &block, int leftMargin=0,int rightMargin =0, int topMargin = 0);
     void stripUserData();
 
     void resetTextBlockFormat(int blockNumber);

@@ -301,9 +301,10 @@ QString MkTextDocument::composeSymbol(QString &text, int &index1, int &index2, i
     return(first+second+third);
 }
 
-void MkTextDocument::setCodeBlockMargin(QTextBlock &block, QTextBlockFormat &blockFormat, int leftMargin,int rightMargin, int topMargin)
+void MkTextDocument::setCodeBlockMargin(QTextBlock &block, int leftMargin,int rightMargin, int topMargin)
 {
     QTextCursor cursor(block);
+    QTextBlockFormat blockFormat = cursor.blockFormat();
     blockFormat = cursor.blockFormat();
     blockFormat.setLeftMargin(leftMargin);
     blockFormat.setRightMargin(rightMargin);
@@ -316,6 +317,9 @@ void MkTextDocument::stripUserData()
     bool openBlock = false;
     for(QTextBlock tBlock = this->begin(); tBlock != this->end(); tBlock = tBlock.next()){
         tBlock.setUserData(nullptr);
+        QTextCursor cursor(tBlock);
+        QTextBlockFormat format;
+        cursor.setBlockFormat(format);
     }
 }
 
@@ -324,9 +328,6 @@ void MkTextDocument::resetTextBlockFormat(int blockNumber)
     QTextBlock block = this->findBlockByNumber(blockNumber);
     QTextCursor cursor(block);
     QTextCharFormat format;
-    format.setFontWeight(QFont::Normal);
-    format.setFontItalic(false);
-    format.setFontStrikeOut(false);
     cursor.setPosition(block.position());
     cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
     cursor.setCharFormat(format);
@@ -732,11 +733,10 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
             BlockData* blockData = dynamic_cast<BlockData*>(data);
             if(blockData)
             {
-                QTextBlockFormat blockFormat;
                 if(blockData->getStatus()==BlockData::start)
                 {
                     checkBlock.start = block;
-                    setCodeBlockMargin(block, blockFormat, fontSize*3/4, fontSize, fontSize);
+                    setCodeBlockMargin(block, fontSize*3/4, fontSize, fontSize);
                 }
                 else if(blockData->getStatus()==BlockData::end)
                 {
@@ -745,7 +745,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                         continue;
                     }
                     checkBlock.end = block;
-                    setCodeBlockMargin(block, blockFormat, fontSize*3/4, fontSize, 0);
+                    setCodeBlockMargin(block,fontSize*3/4, fontSize, 0);
                     if(blockNumber >= checkBlock.start.blockNumber() && blockNumber <= checkBlock.end.blockNumber()){
                         showSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
                         showSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
@@ -757,7 +757,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                         }
                     }
                 }else if(blockData->getStatus()==BlockData::content){
-                    setCodeBlockMargin(block, blockFormat, fontSize*5/3, fontSize, 0);
+                    setCodeBlockMargin(block, fontSize*5/3, fontSize, 0);
                 }
             }
             else{
