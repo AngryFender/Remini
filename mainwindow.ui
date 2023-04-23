@@ -53,7 +53,7 @@
       <widget class="QFrame" name="verticalFrame_2">
        <property name="maximumSize">
         <size>
-         <width>200</width>
+         <width>1677215</width>
          <height>16777215</height>
         </size>
        </property>
@@ -71,7 +71,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>200</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
@@ -99,7 +99,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>200</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
@@ -157,6 +157,12 @@
         </item>
         <item>
          <widget class="MkEdit" name="uiTextView">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true"/>
           </property>
