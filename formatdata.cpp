@@ -50,7 +50,23 @@ FormatData::~FormatData()
 void FormatData::addFormat(int start, int end, QString &symbol)
 {
     FragmentData::FormatSymbol status = FragmentData::BOLD ;
-    if(symbol == BOLD_SYMBOL_A || symbol == BOLD_SYMBOL_U){
+    if(symbol == HEADING1_SYMBOL){
+        formats.append(new FragmentData(start,end,FragmentData::HEADING1));
+        addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING1);
+        positions.append(new PositionData(0,symbol));
+        return;
+    }else if(symbol == HEADING2_SYMBOL){
+        formats.append(new FragmentData(start,end,FragmentData::HEADING2));
+        addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING2);
+        positions.append(new PositionData(0,symbol));
+        return;
+    }else if(symbol == HEADING3_SYMBOL){
+        formats.append(new FragmentData(start,end,FragmentData::HEADING3));
+        addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING3);
+        positions.append(new PositionData(0,symbol));
+        return;
+    }
+    else if(symbol == BOLD_SYMBOL_A || symbol == BOLD_SYMBOL_U){
         status = FragmentData::BOLD;
     }else if(symbol == ITALIC_SYMBOL_A || symbol == ITALIC_SYMBOL_U){
         status = FragmentData::ITALIC;
@@ -111,8 +127,18 @@ void FormatData::addHiddenFormat(int start, int end, int length, FragmentData::F
     int last = end-accumulate-length;
 
     if(status == FragmentData::CHECKED_END ||status == FragmentData::UNCHECKED_END){
-        accumulate = accumulate+CHECKED_FULL_COUNT;
-    }else{
+        accumulate += CHECKED_FULL_COUNT;
+    }else if(status == FragmentData::HEADING1){
+        accumulate += HEADING1_SYMBOL_COUNT;
+        begin = last = 0;
+    }else if(status == FragmentData::HEADING2){
+        accumulate += HEADING2_SYMBOL_COUNT;
+        begin = last = 0;
+    }else if(status == FragmentData::HEADING3){
+        accumulate += HEADING3_SYMBOL_COUNT;
+        begin = last = 0;
+    }
+    else{
         accumulate = accumulate+2*length;
     }
 

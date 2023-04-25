@@ -12,11 +12,18 @@
 #define CHECK_SYMBOL_START "- ["
 #define CHECKED_SYMBOL_END "x] "
 #define UNCHECKED_SYMBOL_END " ] "
+#define HEADING1_SYMBOL "# "
+#define HEADING2_SYMBOL "## "
+#define HEADING3_SYMBOL "### "
+
 
 #define CHECKED_PIC "☑"
 #define UNCHECKED_PIC "☐"
 
 #define CHECKED_FULL_COUNT 5
+#define HEADING1_SYMBOL_COUNT 2
+#define HEADING2_SYMBOL_COUNT 3
+#define HEADING3_SYMBOL_COUNT 4
 
 class FragmentData{
 public:
@@ -26,7 +33,10 @@ public:
         STRIKETHROUGH,
         CHECK_START,
         CHECKED_END,
-        UNCHECKED_END
+        UNCHECKED_END,
+        HEADING1,
+        HEADING2,
+        HEADING3
     };
     FragmentData(int start, int end, FormatSymbol status){
         this->start = start;

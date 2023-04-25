@@ -14,6 +14,7 @@
 #include <formatdata.h>
 #include <QAbstractTextDocumentLayout>
 #include <QQueue>
+#include <QMutex>
 
 class MkTextDocument : public QTextDocument
 {
@@ -55,12 +56,18 @@ public slots:
             end =-1;
         }
     };
+
+    QMutex hideMutex;
+    QMutex showMutex;
     FormatLocation locBoldA;
     FormatLocation locBoldU;
     FormatLocation locItalicA;
     FormatLocation locItalicU;
     FormatLocation locStrike;
     FormatLocation locCheck;
+    FormatLocation locHeading1;
+    FormatLocation locHeading2;
+    FormatLocation locHeading3;
 
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
@@ -68,9 +75,9 @@ public slots:
     QQueue<QTextBlock> savedBlocks;
 
     void resetFormatLocation();
-    void identifyUserData(bool showAll, int blockNumber=0, bool hasSelection = false);
+    void identifyUserData(bool showAll, bool hasSelection = false);
 
-    void identifyFormatData(QTextBlock &block, bool showAll, int blockNumber=0, bool hasSelection = false);
+    void identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection = false);
     QString convertCharacterToSymbol(QChar single);
     QString convertCharacterToCheckboxSymbol(QChar single);
     QString composeSymbol(QString &text, int &index1, int &index2, int &index3);
