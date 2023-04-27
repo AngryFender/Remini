@@ -52,6 +52,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
     bool drawBlock = false;
     int xBlock =0, yBlock =0;
     int fontSize = this->currentFont().pointSize();
+//    int fontSize = this->getStandardFontSize();
     int scrollPos = this->verticalScrollBar()->value();
     penCodeBlock.setColor(codeBlockColor);
 
@@ -64,9 +65,17 @@ void MkEdit::paintEvent(QPaintEvent *e)
             QTextBlockUserData* data =block.userData();
             BlockData* blockData = dynamic_cast<BlockData*>(data);
             if(blockData){
+
+                QTextCursor cursor(block);
+                cursor.movePosition(QTextCursor::StartOfBlock);
+                cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+                fontSize = cursor.charFormat().fontPointSize();
+
                 if(blockData->getStatus()==BlockData::start){
+
                     xBlock = block.layout()->position().x()-2;
                     yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4);
+                    qDebug()<<"fontsize =  "<<fontSize<< cursor.charFormat().isCharFormat();
                 }
                 else if(blockData->getStatus()==BlockData::end){
                     int height = block.layout()->position().y() - yBlock + (fontSize*0.6)-scrollPos;
@@ -408,6 +417,16 @@ void MkEdit::setKeywordColor(const QColor &color)
 {
     syntaxColor.keyword = color;
     emit syntaxColorUpdate(syntaxColor);
+}
+
+void MkEdit::setStandardFontSize(const qreal &fontSize)
+{
+    standardFontSize = fontSize;
+}
+
+const qreal &MkEdit::getStandardFontSize() const
+{
+    return standardFontSize;
 }
 
 void MkEdit::undo()

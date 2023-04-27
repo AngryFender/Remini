@@ -51,6 +51,9 @@ public:
     void setQuoteColor(const QColor& color);
     void setKeywordColor(const QColor& color);
 
+    void setStandardFontSize(const qreal& fontSize);
+    const qreal& getStandardFontSize() const;
+
 protected:
     void insertFromMimeData(const QMimeData *source) override;
     void mousePressEvent(QMouseEvent *e) override;
@@ -65,6 +68,7 @@ protected:
     UndoData undoData;
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
+    qreal standardFontSize;
 
     void quoteLeftKey();
     void smartSelectionSetup();
