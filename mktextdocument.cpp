@@ -694,12 +694,6 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
         QTextBlockUserData* data =block.userData();
         if(data == nullptr){
             block = block.next();
-//            QTextCursor cursor(block);
-//            QTextCharFormat format;
-//            format.setFontPointSize(this->defaultFont().pointSize());
-//            cursor.setPosition(block.position());
-//            cursor.setPosition(block.length()-1, QTextCursor::KeepAnchor);
-//            cursor.setCharFormat(format);
             continue;
         }
 
@@ -792,7 +786,6 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                 }
                 FormatData* formatData = dynamic_cast<FormatData*>(data);
                 if(formatData){
-
                     if(blockNumber == currentBlockNumber){
                         if(formatData->isHidden()){
                             formatData->setHidden(false);
@@ -855,6 +848,13 @@ void MkTextDocument::numberListDetect(int blockNumber)
         editCursor.insertText(QString("").leftJustified(spaces,' '));
         editCursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
         return;
+    }
+    else{
+        QTextCharFormat format;
+        format.setFontPointSize(this->defaultFont().pointSize());
+        editCursor.movePosition(QTextCursor::EndOfBlock);
+        editCursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor);
+        editCursor.setCharFormat(format);
     }
 }
 
