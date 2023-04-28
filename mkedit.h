@@ -17,6 +17,8 @@
 
 #define FILE_SAVE_TIMEOUT 300
 #define BLOCKRADIUS 3
+#define MAXIMUM_FONT_SIZE 40
+#define MINIMUM_FONT_SIZE 8
 
 class MkEdit : public QTextEdit
 {
@@ -51,9 +53,6 @@ public:
     void setQuoteColor(const QColor& color);
     void setKeywordColor(const QColor& color);
 
-    void setStandardFontSize(const qreal& fontSize);
-    const qreal& getStandardFontSize() const;
-
 protected:
     void insertFromMimeData(const QMimeData *source) override;
     void mousePressEvent(QMouseEvent *e) override;
@@ -68,7 +67,6 @@ protected:
     UndoData undoData;
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
-    qreal standardFontSize;
 
     void quoteLeftKey();
     void smartSelectionSetup();
