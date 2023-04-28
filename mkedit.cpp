@@ -104,6 +104,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() == Qt::ControlModifier) {
         int zoomDelta = e->angleDelta().y();
+        emit removeAllMkData();
         this->blockSignals(true);
         if (zoomDelta > 0) {
             if((this->currentFont().pointSizeF())<MAXIMUM_FONT_SIZE)
@@ -113,10 +114,8 @@ void MkEdit::wheelEvent(QWheelEvent *e)
                 this->zoomOut();
         }
         this->blockSignals(false);
-        QTextCursor cursor = this->cursorForPosition(QCursor::pos());
-        this->setTextCursor(cursor);
+        emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
         this->ensureCursorVisible();
-
     }else{
         QTextEdit::wheelEvent(e);
     }

@@ -397,14 +397,12 @@ void MkTextDocument::hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
 
 void MkTextDocument::hideSymbolsAtPos(QString &text, int pos, const QString &symbol)
 {
-    //qDebug()<<"start =" <<pos<<" sybol = "<<symbol<< " text ="<<text<< " font size ="<<this->defaultFont().pointSize() ;
     text.remove(pos,symbol.length());
     if(symbol == CHECKED_SYMBOL_END){
         text.insert(pos,CHECKED_PIC);
     }else if(symbol == UNCHECKED_SYMBOL_END){
         text.insert(pos,UNCHECKED_PIC);
     }
-    //qDebug()<<"start =" <<pos<<" sybol = "<<symbol<< " text ="<<text<< " font size ="<<this->defaultFont().pointSize() ;
 }
 
 void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
@@ -445,7 +443,6 @@ void MkTextDocument::showSymbolsAtPos(QString &text, int pos, const QString &sym
         text.remove(pos,1);
     }
     text.insert(pos,symbol);
-    //qDebug()<<">>>>>>>>>>>> show start =" <<pos<<" sybol = "<<symbol<< " text ="<<text<< " font size ="<<this->defaultFont().pointSize() ;
 }
 
 void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
