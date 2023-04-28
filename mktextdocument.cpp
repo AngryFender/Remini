@@ -681,7 +681,6 @@ void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, b
 
 void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
 {
-    QMutexLocker locker(&hideMutex);
 //    QAbstractTextDocumentLayout* layout = this->documentLayout();
 
     while(!savedBlocks.empty()){
@@ -732,7 +731,6 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
 
 void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll)
 {
-//    QMutexLocker locker(&hideMutex);
     int fontSize =this->defaultFont().pointSize();
     QAbstractTextDocumentLayout* layout = this->documentLayout();
     CheckingBlock checkBlock;

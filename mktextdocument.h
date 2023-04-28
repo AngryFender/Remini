@@ -57,8 +57,6 @@ public slots:
         }
     };
 
-    QMutex hideMutex;
-    QMutex showMutex;
     FormatLocation locBoldA;
     FormatLocation locBoldU;
     FormatLocation locItalicA;
