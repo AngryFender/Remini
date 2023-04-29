@@ -56,11 +56,7 @@ void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bo
 
 void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
 {
-    QElapsedTimer timer;
-    timer.start();
     bool openBlock = false;
-    QTextBlock startBlock;
-    QTextBlockFormat blockFormat;
 
     for(QTextBlock tBlock = this->begin(); tBlock != this->end(); tBlock = tBlock.next()){
 
@@ -72,7 +68,6 @@ void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
             if(!openBlock){
                 openBlock = true;
                 blockData->setStatus(BlockData::start);
-                startBlock = tBlock;
             }
             else{
                 openBlock = false;
@@ -96,30 +91,23 @@ void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
             }
         }
     }
-    qDebug()<<"time passed" << timer.nsecsElapsed();
 }
 
 void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection)
 {
-
     resetFormatLocation();
     FormatData *formatData = new FormatData;
-    QString text = block.text();
-    int index1 = 0;
+    QString text(block.text());
+    QString test;
 
-    if(HEADING1_SYMBOL == text.left(HEADING1_SYMBOL_COUNT)){
-        formatData->addFormat(0, HEADING1_SYMBOL_COUNT-1, QString(HEADING1_SYMBOL));  index1+=HEADING1_SYMBOL_COUNT;
-    }else if(HEADING2_SYMBOL == text.left(HEADING2_SYMBOL_COUNT)){
-        formatData->addFormat(0, HEADING2_SYMBOL_COUNT-1, QString(HEADING2_SYMBOL));  index1+=HEADING2_SYMBOL_COUNT;
-    }else if(HEADING3_SYMBOL == text.left(HEADING3_SYMBOL_COUNT)){
-        formatData->addFormat(0, HEADING3_SYMBOL_COUNT-1, QString(HEADING3_SYMBOL));  index1+=HEADING3_SYMBOL_COUNT;
-    }
-
+    int index1 = 0; insertHeadingData(text, index1, formatData);
     int index2 = index1+1;
     int index3 = index2+1;
+
     int len = text.length();
-    while(index1<len){    
-        QString test = composeSymbol(text, index1, index2, index3);
+    while(index1<len){
+
+        composeSymbolCombination(len, text, index1, index2, index3, test);
 
         if(test != ""){
             if(test == "_**"){
@@ -168,6 +156,17 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
     }
 }
 
+void MkTextDocument::insertHeadingData( const QString &text, int &index1, FormatData *formatData)
+{
+    if(HEADING1_SYMBOL == text.left(HEADING1_SYMBOL_COUNT)){
+        formatData->addFormat(0, HEADING1_SYMBOL_COUNT-1, QString(HEADING1_SYMBOL));   index1+=HEADING1_SYMBOL_COUNT;
+    }else if(HEADING2_SYMBOL == text.left(HEADING2_SYMBOL_COUNT)){
+        formatData->addFormat(0, HEADING2_SYMBOL_COUNT-1, QString(HEADING2_SYMBOL));   index1+=HEADING2_SYMBOL_COUNT;
+    }else if(HEADING3_SYMBOL == text.left(HEADING3_SYMBOL_COUNT)){
+        formatData->addFormat(0, HEADING3_SYMBOL_COUNT-1, QString(HEADING3_SYMBOL));   index1+=HEADING3_SYMBOL_COUNT;
+    }
+}
+
 void MkTextDocument::insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test)
 {
     if(loc.start == -1){
@@ -179,82 +178,62 @@ void MkTextDocument::insertFormatData(FormatLocation &loc, int &index1, int &ind
             loc.reset();
         }
     }
-    const short size = test.size();
+    const int size = test.size();
     index1 += size;
     index2 += size;
     index3 += size;
 }
 
-QString MkTextDocument::convertCharacterToSymbol(QChar single)
+bool MkTextDocument::convertCharacterToSymbol(const QChar &single, QString &text)
 {
-    QString result = "";
-    if(single =='*'){
-        result = "*";
-    }else if (single == '_'){
-        result = "_";
-    }else if (single == '~'){
-        result = "~";
+    if(single =='*' || single == '_' || single == '~'){
+        text+=single;
+        return true;
     }
-    return result;
+    return false;
 }
 
-QString MkTextDocument::convertCharacterToCheckboxSymbol(QChar single)
+void MkTextDocument::convertCharacterToCheckboxSymbol(const QChar &single, QString &text)
 {
-    QString result = "";
-    if(single == '-'){
-        result = "-";
-    }else if (single == ' '){
-        result = " ";
-    }else if (single == '['){
-        result = "[";
-    }else if (single == ']'){
-        result = "]";
-    }else if (single == 'x'){
-        result = "x";
+    if(single =='-' || single == ' ' || single == '[' || single == ']' || single == 'x'){
+        text+=single;
     }
-    return result;
 }
 
-QString MkTextDocument::composeSymbol(QString &text, int &index1, int &index2, int &index3)
+void MkTextDocument::composeSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result)
 {
-    QString first, second, third;
-    int len = text.length();
+    result.clear();
+    if(index3<length){
+        convertCharacterToCheckboxSymbol(text[index1], result);
+        convertCharacterToCheckboxSymbol(text[index2], result);
+        convertCharacterToCheckboxSymbol(text[index3], result);
 
-    if(index3<text.length()){
-        first  = convertCharacterToCheckboxSymbol(text.at(index1));
-        second = convertCharacterToCheckboxSymbol(text.at(index2));
-        third  = convertCharacterToCheckboxSymbol(text.at(index3));
-        QString result = first+second+third;
         if(result == CHECK_SYMBOL_START ||
            result == CHECKED_SYMBOL_END ||
            result == UNCHECKED_SYMBOL_END){
-            return result;
+            return;
         }
     }
-    first.clear();
-    second.clear();
-    third.clear();
 
-    first = convertCharacterToSymbol(text.at(index1));
-    if(first == ""){
-        return "";
+    result.clear();
+    convertCharacterToSymbol(text[index1],result);
+    if(result.isEmpty()){
+        return;
     }
 
-    if(index2 >= len){
-        return first;
+    if(index2 >= length){
+        return;
     }
 
-    second = convertCharacterToSymbol(text.at(index2));
-    if(second ==""){
-        return first;
+    if(!convertCharacterToSymbol(text[index2],result)){
+        return;
     }
 
-    if(index3>= len){
-        return first+second;
+    if(index3>= length){
+        return;
     }
-    third = convertCharacterToSymbol(text.at(index3));
+    convertCharacterToSymbol(text[index3],result);
 
-    return(first+second+third);
 }
 
 void MkTextDocument::setCodeBlockMargin(QTextBlock &block, int leftMargin,int rightMargin, int topMargin)
@@ -314,7 +293,7 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     cursor.mergeCharFormat(format);
 }
 
-void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
+void MkTextDocument::hideSymbols(QTextBlock &block,const QString &symbol)
 {
     QString textBlock = block.text();
     QRegularExpression regex(symbol);
@@ -324,7 +303,6 @@ void MkTextDocument::hideSymbols(QTextBlock block,const QString &symbol)
     editCursor.movePosition(QTextCursor::StartOfBlock);
     editCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     editCursor.removeSelectedText();
-
     editCursor.insertText(textBlock);
 }
 

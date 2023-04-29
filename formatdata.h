@@ -38,22 +38,22 @@ public:
         HEADING2,
         HEADING3
     };
-    FragmentData(int start, int end, FormatSymbol status){
+    FragmentData(const int start,const int end,const FormatSymbol status){
         this->start = start;
         this->end = end;
         this->status = status;
     }
-    FragmentData(int start, int end, FormatSymbol status, int accumulate){
+    FragmentData(const int start,const int end,const FormatSymbol status,const int accumulate){
         this->start = start;
         this->end = end;
         this->status = status;
         this->accumulate = accumulate;
     }
 
-    int getStart();
-    int getEnd();
-    FormatSymbol getStatus();
-    int getAccumulate();
+    int getStart() const;
+    int getEnd() const;
+    FormatSymbol getStatus() const;
+    int getAccumulate() const;
 private:
     int start;
     int end;
@@ -63,13 +63,13 @@ private:
 
 class PositionData{
 public:
-    PositionData(int position, QString symbol);
+    PositionData(const int position, const QString &symbol);
 
     int getPos() const;
-    QString &getSymbol();
+    const QString &getSymbol() const;
 
-    bool& isHidden();
-    void setHidden(bool hide);
+    bool isHidden() const;
+    void setHidden(const bool hide);
 
 private:
     int position;
@@ -83,7 +83,8 @@ public:
     FormatData();
     ~FormatData();
 
-    void addFormat(int start, int end, const QString& symbol);
+    void addFormat(const int start, const int end, const QString& symbol);
+
     QVector<FragmentData*>::Iterator formats_begin() {return formats.begin();};
     QVector<FragmentData*>::Iterator formats_next(QVector<FragmentData*>::Iterator it) {return it++;};
     QVector<FragmentData*>::Iterator formats_end() {return formats.end();};
@@ -98,12 +99,10 @@ public:
     QVector<PositionData*>::Iterator pos_end() {return positions.end();};
 
     bool isHiddenFormatsEmpty() const;
-    bool isEmpty();
-    bool& isHidden();
+    bool isEmpty() const;
+    bool isHidden() const;
     void setHidden(bool hide);
-    int positionsCount(){
-        return positions.count();
-    }
+    int positionsCount() const;
     void sortAscendingPos();
 
     static bool sortAscendingStartPos(const PositionData* f1, const PositionData* f2)
@@ -117,7 +116,7 @@ private:
     QVector<PositionData*> positions;
     bool hidden;
 
-    void addHiddenFormat(int start, int end,int length, FragmentData::FormatSymbol status);
+    void addHiddenFormat(const int start,const int end, const int length,const FragmentData::FormatSymbol status);
 };
 
 #endif // FORMATDATA_H

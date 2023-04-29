@@ -1,6 +1,6 @@
 #include "formatdata.h"
 
-PositionData::PositionData(int position, QString symbol){
+PositionData::PositionData(const int position, const QString &symbol){
     this->position = position;
     this->symbol = symbol;
     this->hidden = false;
@@ -10,16 +10,16 @@ int PositionData::getPos() const{
     return position;
 }
 
-QString &PositionData::getSymbol(){
+const QString &PositionData::getSymbol() const{
     return symbol;
 }
 
-bool &PositionData::isHidden()
+bool PositionData::isHidden() const
 {
     return hidden;
 }
 
-void PositionData::setHidden(bool hide)
+void PositionData::setHidden(const bool hide)
 {
     this->hidden = hide;
 }
@@ -47,7 +47,7 @@ FormatData::~FormatData()
     positions.clear();
 }
 
-void FormatData::addFormat(int start, int end,const QString &symbol)
+void FormatData::addFormat(const int start, const int end,const QString &symbol)
 {
     FragmentData::FormatSymbol status = FragmentData::BOLD ;
     if(symbol == HEADING1_SYMBOL){
@@ -97,12 +97,12 @@ bool FormatData::isHiddenFormatsEmpty() const
     return hiddenFormats.empty();
 }
 
-bool FormatData::isEmpty()
+bool FormatData::isEmpty() const
 {
     return positions.empty();
 }
 
-bool &FormatData::isHidden()
+bool FormatData::isHidden() const
 {
     return hidden;
 }
@@ -112,12 +112,16 @@ void FormatData::setHidden(bool hide)
     this->hidden = hide;
 }
 
+int FormatData::positionsCount() const{
+    return positions.count();
+}
+
 void FormatData::sortAscendingPos()
 {
     std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
 }
 
-void FormatData::addHiddenFormat(int start, int end, int length, FragmentData::FormatSymbol status)
+void FormatData::addHiddenFormat(const int start, const int end, const int length, const FragmentData::FormatSymbol status)
 {
     int accumulate = 0;
     if(!hiddenFormats.empty()){
@@ -145,22 +149,22 @@ void FormatData::addHiddenFormat(int start, int end, int length, FragmentData::F
     hiddenFormats.append(new FragmentData(begin,last,status,accumulate));
 }
 
-int FragmentData::getStart()
+int FragmentData::getStart() const
 {
     return start;
 }
 
-int FragmentData::getEnd()
+int FragmentData::getEnd() const
 {
     return end;
 }
 
-FragmentData::FormatSymbol FragmentData::getStatus()
+FragmentData::FormatSymbol FragmentData::getStatus() const
 {
     return status;
 }
 
-int FragmentData::getAccumulate()
+int FragmentData::getAccumulate() const
 {
     return accumulate;
 }

@@ -75,16 +75,18 @@ public slots:
     void identifyUserData(bool showAll, bool hasSelection = false);
 
     void identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection = false);
+    void insertHeadingData( const QString &text, int &index1, FormatData *formatData);
     void insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
-    QString convertCharacterToSymbol(QChar single);
-    QString convertCharacterToCheckboxSymbol(QChar single);
-    QString composeSymbol(QString &text, int &index1, int &index2, int &index3);
+    bool convertCharacterToSymbol(const QChar &single, QString &text);
+    void convertCharacterToCheckboxSymbol(const QChar &single, QString &text);
+    void composeSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result);
+
     void setCodeBlockMargin(QTextBlock &block, int leftMargin=0,int rightMargin =0, int topMargin = 0);
     void stripUserData();
 
     void resetTextBlockFormat(int blockNumber);
     void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
-    void hideSymbols(QTextBlock block,const QString &symbol);
+    void hideSymbols(QTextBlock &block,const QString &symbol);
     void hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
