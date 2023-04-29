@@ -123,9 +123,6 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
-    QElapsedTimer timer;
-    timer.start();
-
     switch(event->key()){
     case Qt::Key_Shift:
     case Qt::Key_Control:
@@ -151,7 +148,6 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     switch(event->key()){
     case Qt::Key_Enter:
     case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber());
-    case Qt::Key_Backspace:
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;
@@ -162,8 +158,6 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     }
 
     applyMkEffects();
-//    qDebug()<< ">>>time to process key press = "<<timer.elapsed();
-
 }
 
 void MkEdit::quoteLeftKey()
