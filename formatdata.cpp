@@ -47,7 +47,7 @@ FormatData::~FormatData()
     positions.clear();
 }
 
-void FormatData::addFormat(int start, int end, QString &symbol)
+void FormatData::addFormat(int start, int end,const QString &symbol)
 {
     FragmentData::FormatSymbol status = FragmentData::BOLD ;
     if(symbol == HEADING1_SYMBOL){

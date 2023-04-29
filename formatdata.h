@@ -83,7 +83,7 @@ public:
     FormatData();
     ~FormatData();
 
-    void addFormat(int start, int end, QString& symbol);
+    void addFormat(int start, int end, const QString& symbol);
     QVector<FragmentData*>::Iterator formats_begin() {return formats.begin();};
     QVector<FragmentData*>::Iterator formats_next(QVector<FragmentData*>::Iterator it) {return it++;};
     QVector<FragmentData*>::Iterator formats_end() {return formats.end();};

@@ -9,12 +9,6 @@ MkTextDocument::MkTextDocument(QObject *parent)
 
     this->setUndoRedoEnabled(false);
 
-    locBoldA.symbol = BOLD_SYMBOL_A;
-    locBoldU.symbol = BOLD_SYMBOL_U;
-    locItalicA.symbol = ITALIC_SYMBOL_A;
-    locItalicU.symbol = ITALIC_SYMBOL_U;
-    locStrike.symbol = STRIKETHROUGH_SYMBOL;
-
 }
 
 void MkTextDocument::setPlainText(const QString &text)
@@ -62,6 +56,8 @@ void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bo
 
 void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
 {
+    QElapsedTimer timer;
+    timer.start();
     bool openBlock = false;
     QTextBlock startBlock;
     QTextBlockFormat blockFormat;
@@ -100,24 +96,23 @@ void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
             }
         }
     }
+    qDebug()<<"time passed" << timer.nsecsElapsed();
 }
 
 void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection)
 {
+
     resetFormatLocation();
     FormatData *formatData = new FormatData;
     QString text = block.text();
     int index1 = 0;
 
     if(HEADING1_SYMBOL == text.left(HEADING1_SYMBOL_COUNT)){
-        QString symbol(HEADING1_SYMBOL);
-        formatData->addFormat(0, HEADING1_SYMBOL_COUNT-1, symbol);  index1+=HEADING1_SYMBOL_COUNT;
+        formatData->addFormat(0, HEADING1_SYMBOL_COUNT-1, QString(HEADING1_SYMBOL));  index1+=HEADING1_SYMBOL_COUNT;
     }else if(HEADING2_SYMBOL == text.left(HEADING2_SYMBOL_COUNT)){
-        QString symbol(HEADING2_SYMBOL);
-        formatData->addFormat(0, HEADING2_SYMBOL_COUNT-1, symbol);  index1+=HEADING2_SYMBOL_COUNT;
+        formatData->addFormat(0, HEADING2_SYMBOL_COUNT-1, QString(HEADING2_SYMBOL));  index1+=HEADING2_SYMBOL_COUNT;
     }else if(HEADING3_SYMBOL == text.left(HEADING3_SYMBOL_COUNT)){
-        QString symbol(HEADING3_SYMBOL);
-        formatData->addFormat(0, HEADING3_SYMBOL_COUNT-1, symbol);  index1+=HEADING3_SYMBOL_COUNT;
+        formatData->addFormat(0, HEADING3_SYMBOL_COUNT-1, QString(HEADING3_SYMBOL));  index1+=HEADING3_SYMBOL_COUNT;
     }
 
     int index2 = index1+1;
@@ -135,97 +130,31 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
                 index1+=3; index2+=3; index3+=3;
                 continue;
             }
+
             if(test == ITALIC_SYMBOL_A){
-                if(locItalicA.start == -1){
-                    locItalicA.start = index1;
-                }else{
-                    locItalicA.end = index1;
-                    if(locItalicA.end-locItalicA.start>1){
-                        locItalicA.symbol = ITALIC_SYMBOL_A;
-                        formatData->addFormat(locItalicA.start, locItalicA.end, locItalicA.symbol);
-                        locItalicA.reset();
-                    }
-                }
+                insertFormatData(locItalicA, index1, index2, index3, formatData, test);
+                continue;
             }else if(test == ITALIC_SYMBOL_U){
-                if(locItalicU.start == -1){
-                   locItalicU.start = index1;
-                }else{
-                    locItalicU.end = index1;
-                    if(locItalicU.end-locItalicU.start>1){
-                        locItalicU.symbol = ITALIC_SYMBOL_U;
-                        formatData->addFormat(locItalicU.start, locItalicU.end, locItalicU.symbol);
-                        locItalicU.reset();
-                    }
-                }
+                insertFormatData(locItalicU, index1, index2, index3, formatData, test);
+                continue;
             }else if(test == BOLD_SYMBOL_A){
-                if(locBoldA.start == -1){
-                    locBoldA.start = index1;
-                    index1+=2; index2+=2; index3+=2;
-                    continue;
-                }else{
-                    locBoldA.end = index1;
-                    if(locBoldA.end-locBoldA.start>1){
-                        locBoldA.symbol = BOLD_SYMBOL_A;
-                        formatData->addFormat(locBoldA.start, locBoldA.end, locBoldA.symbol);
-                        locBoldA.reset();
-                        index1+=2; index2+=2; index3+=2;
-                        continue;
-                    }
-                }
-            }else if(test == BOLD_SYMBOL_U){
-                if(locBoldU.start == -1){
-                    locBoldU.start = index1;
-                    index1+=2; index2+=2; index3+=2;
-                    continue;
-                }else{
-                    locBoldU.end = index1;
-                    if(locBoldU.end-locBoldU.start>1){
-                        locBoldU.symbol = BOLD_SYMBOL_U;
-                        formatData->addFormat(locBoldU.start, locBoldU.end, locBoldU.symbol);
-                        locBoldU.reset();
-                        index1+=2; index2+=2; index3+=2;
-                        continue;
-                    }
-                }
+                insertFormatData(locBoldA, index1, index2, index3, formatData, test);
+                continue;
+            }else if(test == BOLD_SYMBOL_U  ){
+                insertFormatData(locBoldU,  index1, index2, index3, formatData, test);
+                continue;
             }else if(test == STRIKETHROUGH_SYMBOL){
-                if(locStrike.start == -1){
-                    locStrike.start = index1;
-                    index1+=2; index2+=2; index3+=2;
-                    continue;
-                }else{
-                    locStrike.end = index1;
-                    if(locStrike.end-locStrike.start>1){
-                        locStrike.symbol = STRIKETHROUGH_SYMBOL;
-                        formatData->addFormat(locStrike.start, locStrike.end, locStrike.symbol);
-                        locStrike.reset();
-                        index1+=2; index2+=2; index3+=2;
-                        continue;
-                    }
-                }
+                insertFormatData(locStrike,  index1, index2, index3, formatData, test);
+                continue;
             }else if(test == CHECK_SYMBOL_START){
-                if(locCheck.start == -1){
-                    locCheck.start = index1;
-                    index1+=3; index2+=3; index3+=3;
-                    continue;
-                }
+                insertFormatData(locCheck,  index1, index2, index3, formatData, test);
+                continue;
             }else if(test == CHECKED_SYMBOL_END && locCheck.start != -1){
-                locCheck.end = index1;
-                if((locCheck.end-locCheck.start)==3){
-                    locCheck.symbol = CHECKED_SYMBOL_END;
-                    formatData->addFormat(locCheck.start, locCheck.end, locCheck.symbol);
-                    locCheck.reset();
-                    index1+=3; index2+=3; index3+=3;
-                    continue;
-                }
+                insertFormatData(locCheck,  index1, index2, index3, formatData, QString(CHECKED_SYMBOL_END));
+                continue;
             } else if(test == UNCHECKED_SYMBOL_END && locCheck.start != -1){
-                locCheck.end = index1;
-                if((locCheck.end-locCheck.start)==3){
-                    locCheck.symbol = UNCHECKED_SYMBOL_END;
-                    formatData->addFormat(locCheck.start, locCheck.end, locCheck.symbol);
-                    locCheck.reset();
-                    index1+=3; index2+=3; index3+=3;
-                    continue;
-                }
+                insertFormatData(locCheck,  index1, index2, index3, formatData, QString(UNCHECKED_SYMBOL_END));
+                continue;
             }
         }
         index1++;
@@ -237,6 +166,23 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
         block.setUserData(formatData);
         formatData->sortAscendingPos();
     }
+}
+
+void MkTextDocument::insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test)
+{
+    if(loc.start == -1){
+        loc.start = index1;
+    }else{
+        loc.end = index1;
+        if(loc.end-loc.start>1){
+            formatData->addFormat(loc.start, loc.end, test);
+            loc.reset();
+        }
+    }
+    const short size = test.size();
+    index1 += size;
+    index2 += size;
+    index3 += size;
 }
 
 QString MkTextDocument::convertCharacterToSymbol(QChar single)

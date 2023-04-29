@@ -49,7 +49,6 @@ public slots:
     struct FormatLocation{
         int start = -1;
         int end =-1;
-        QString symbol;
 
         void reset(){
             start = -1;
@@ -76,6 +75,7 @@ public slots:
     void identifyUserData(bool showAll, bool hasSelection = false);
 
     void identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection = false);
+    void insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
     QString convertCharacterToSymbol(QChar single);
     QString convertCharacterToCheckboxSymbol(QChar single);
     QString composeSymbol(QString &text, int &index1, int &index2, int &index3);
