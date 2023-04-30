@@ -11,9 +11,6 @@ public:
     LineData();
     enum statusID{
         horizontalLine,
-        heading1,
-        heading2,
-        heading3,
     } ;
 
     statusID getStatus() const;

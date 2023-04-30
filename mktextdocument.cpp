@@ -84,7 +84,6 @@ void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
                 QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(tBlock.text());
                 if(matchHorizontalLine.hasMatch()){
                     LineData *lineData = new LineData;
-                    lineData->setStatus(LineData::horizontalLine);
                     tBlock.setUserData(lineData);
                 }
                 identifyFormatData(tBlock, showAll, hasSelection);
@@ -115,7 +114,7 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
             }else if(test == "**_"){
                 test = "**";
             }else if(test == "***" || test == "___"){
-                index1+=3; index2+=3; index3+=3;
+                incrementIndexes(index1, index2,index3, test.size());
                 continue;
             }
 
@@ -128,26 +127,25 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
             }else if(test == BOLD_SYMBOL_A){
                 insertFormatData(locBoldA, index1, index2, index3, formatData, test);
                 continue;
-            }else if(test == BOLD_SYMBOL_U  ){
+            }else if(test == BOLD_SYMBOL_U){
                 insertFormatData(locBoldU,  index1, index2, index3, formatData, test);
                 continue;
             }else if(test == STRIKETHROUGH_SYMBOL){
                 insertFormatData(locStrike,  index1, index2, index3, formatData, test);
                 continue;
-            }else if(test == CHECK_SYMBOL_START){
-                insertFormatData(locCheck,  index1, index2, index3, formatData, test);
-                continue;
             }else if(test == CHECKED_SYMBOL_END && locCheck.start != -1){
-                insertFormatData(locCheck,  index1, index2, index3, formatData, QString(CHECKED_SYMBOL_END));
+                insertFormatCheckBoxData(locCheck,  index1, index2, index3, formatData, QString(CHECKED_SYMBOL_END));
                 continue;
             } else if(test == UNCHECKED_SYMBOL_END && locCheck.start != -1){
-                insertFormatData(locCheck,  index1, index2, index3, formatData, QString(UNCHECKED_SYMBOL_END));
+                insertFormatCheckBoxData(locCheck,  index1, index2, index3, formatData, QString(UNCHECKED_SYMBOL_END));
+                continue;
+            }else if(test == CHECK_SYMBOL_START){
+                locCheck.start = index1;
+                incrementIndexes(index1, index2,index3, test.size());
                 continue;
             }
         }
-        index1++;
-        index2++;
-        index3++;
+        incrementIndexes(index1, index2,index3);
     }
 
     if(!formatData->isEmpty()){
@@ -178,7 +176,21 @@ void MkTextDocument::insertFormatData(FormatLocation &loc, int &index1, int &ind
             loc.reset();
         }
     }
-    const int size = test.size();
+    incrementIndexes(index1, index2,index3, test.size());
+}
+
+void MkTextDocument::insertFormatCheckBoxData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test)
+{
+    loc.end = index1;
+    if(loc.end-loc.start==3){
+        formatData->addFormat(loc.start, loc.end, test);
+        loc.reset();
+    }
+    incrementIndexes(index1, index2,index3, test.size());
+}
+
+void MkTextDocument::incrementIndexes(int &index1, int &index2, int &index3, const int size)
+{
     index1 += size;
     index2 += size;
     index3 += size;
@@ -268,6 +280,15 @@ void MkTextDocument::resetTextBlockFormat(int blockNumber)
     cursor.setCharFormat(format);
 }
 
+void MkTextDocument::resetTextBlockFormat(QTextBlock block)
+{
+    QTextCursor cursor(block);
+    QTextCharFormat format;
+    cursor.setPosition(block.position());
+    cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(format);
+}
+
 void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status)
 {
     QTextCharFormat format;
@@ -302,7 +323,6 @@ void MkTextDocument::hideSymbols(QTextBlock &block,const QString &symbol)
     QTextCursor editCursor(block);
     editCursor.movePosition(QTextCursor::StartOfBlock);
     editCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-    editCursor.removeSelectedText();
     editCursor.insertText(textBlock);
 }
 
@@ -329,7 +349,7 @@ void MkTextDocument::hideSymbolsAtPos(QString &text, int pos, const QString &sym
     }
 }
 
-void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
+void MkTextDocument::showSymbols(QTextBlock &block, const QString &symbol)
 {
     //avoid prepending more than 3 ```
     QRegularExpression regex(symbol);
@@ -343,7 +363,6 @@ void MkTextDocument::showSymbols(QTextBlock block, const QString &symbol)
     QString newText= block.text().prepend(symbol);
     editCursor.movePosition(QTextCursor::StartOfBlock);
     editCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-    editCursor.removeSelectedText();
     editCursor.insertText(newText);
 
 }
@@ -649,14 +668,15 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
     int fontSize =this->defaultFont().pointSize();
     QAbstractTextDocumentLayout* layout = this->documentLayout();
     CheckingBlock checkBlock;
-    QTextBlock block = this->firstBlock();
 
-    while(block.isValid()){
+    QElapsedTimer timer;
+    timer.start();
+
+    for(QTextBlock block = this->begin(); block != this->end(); block = block.next()){
         if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
 
             QTextBlockUserData* data =block.userData();
             if(data == nullptr){
-                block = block.next();
                 continue;
             }
 
@@ -671,7 +691,6 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                 else if(blockData->getStatus()==BlockData::end)
                 {
                     if(!checkBlock.start.isValid()){
-                        block = block.next();
                         continue;
                     }
                     checkBlock.end = block;
@@ -710,7 +729,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                     if(blockNumber == currentBlockNumber){
                         if(formatData->isHidden()){
                             formatData->setHidden(false);
-                            resetTextBlockFormat(currentBlockNumber);
+                            resetTextBlockFormat(block);
                             showAllFormatSymbolsInTextBlock(block, formatData);
 
                         }
@@ -723,7 +742,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                         if(!hasSelection){
                             if(!formatData->isHidden()){
                                 formatData->setHidden(true);
-                                resetTextBlockFormat(currentBlockNumber);
+                                resetTextBlockFormat(block);
                                 hideAllFormatSymbolsInTextBlock(block,formatData);
                                 if(!formatData->isHiddenFormatsEmpty()){
                                     for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
@@ -738,8 +757,8 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
             }
             savedBlocks.append(block);
         }
-        block = block.next();
     }
+        qDebug()<<"time passed" << timer.nsecsElapsed();
 }
 
 

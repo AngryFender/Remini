@@ -18,13 +18,7 @@ void LineData::setStatus(statusID newStatus)
 
 QString LineData::getSymbol()
 {
-    switch(status){
-    case horizontalLine: return "---"; break;
-    case heading1:return "#"; break;
-    case heading2:return "##"; break;
-    case heading3:return "###"; break;
-    default:return "";
-    }
+    return "---";
 }
 
 bool LineData::getDraw() const
