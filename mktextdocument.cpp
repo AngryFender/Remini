@@ -33,12 +33,13 @@ void MkTextDocument::clear()
         savedBlocks.dequeue();
     }
     savedBlocks.clear();
+    checkMarkPositions.clear();
     QTextDocument::clear();
 }
 
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect)
 {
-    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false);
+    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, false);
 }
 
 void MkTextDocument::removeAllMkDataHandle()
@@ -333,6 +334,16 @@ void MkTextDocument::hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     {
         hideSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
     }
+
+    const int blockPos = block.position();
+    int index = 0;
+    for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
+        if(*cp == u'☑' || *cp == u'☐'){
+            checkMarkPositions.append(blockPos + index);
+        }
+        index++;
+    }
+
     QTextCursor cursor(block);
     cursor.movePosition(QTextCursor::StartOfBlock);
     cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
@@ -370,6 +381,17 @@ void MkTextDocument::showSymbols(QTextBlock &block, const QString &symbol)
 void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData)
 {
     QString textBlock = block.text();
+    const int blockPos = block.position();
+    int index = 0;
+    for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
+        if(*cp == u'☑' || *cp == u'☐'){
+            int total = blockPos +index;
+            checkMarkPositions.removeAll(blockPos + index);
+        }
+        index++;
+    }
+
+
     for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
     {
         showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
@@ -622,7 +644,6 @@ void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, b
 void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
 {
 //    QAbstractTextDocumentLayout* layout = this->documentLayout();
-
     while(!savedBlocks.empty()){
         QTextBlock block = savedBlocks.takeFirst();
 
@@ -663,14 +684,14 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
     }
 }
 
-void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll)
+void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll, const bool clearPushCheckBoxData)
 {
     int fontSize =this->defaultFont().pointSize();
     QAbstractTextDocumentLayout* layout = this->documentLayout();
     CheckingBlock checkBlock;
-
-    QElapsedTimer timer;
-    timer.start();
+    if(clearPushCheckBoxData){
+        checkMarkPositions.clear();
+    }
 
     for(QTextBlock block = this->begin(); block != this->end(); block = block.next()){
         if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
@@ -758,7 +779,62 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
             savedBlocks.append(block);
         }
     }
-        qDebug()<<"time passed" << timer.nsecsElapsed();
+}
+
+void MkTextDocument::pushCheckBoxHandle(const int position)
+{
+    QTextCursor cursor(this);
+    cursor.setPosition(position);
+    cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
+
+    QTextBlock block = findBlock(position);
+    QTextBlockUserData* data =block.userData();
+    FormatData* formatData = dynamic_cast<FormatData*>(data);
+
+    if(!formatData)
+        return;
+
+    int linePosition = position - block.position();
+
+    int index1 = 0;
+    for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+    {
+        if((*it)->getStatus() == FragmentData::CHECKED_END){
+                if((*it)->getStart() == linePosition){
+                    (*it)->setStatus(FragmentData::UNCHECKED_END);
+                    cursor.insertText(UNCHECKED_PIC);
+                    break;
+                }
+                index1++;
+        }else if((*it)->getStatus() == FragmentData::UNCHECKED_END){
+
+                if((*it)->getStart() == linePosition){
+                    (*it)->setStatus(FragmentData::CHECKED_END);
+                    cursor.insertText(CHECKED_PIC);
+                    break;
+                }
+                index1++;
+        }
+    }
+
+    int index2 = 0;
+
+    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it != formatData->pos_end(); ++it)
+    {
+        if((*it)->getSymbol()== CHECKED_SYMBOL_END){
+                if(index2 == index1){
+                    (*it)->setSymbol(UNCHECKED_SYMBOL_END);
+                }
+                index2++;
+        }else if((*it)->getSymbol()== UNCHECKED_SYMBOL_END){
+                if(index2 == index1){
+                    (*it)->setSymbol(CHECKED_SYMBOL_END);
+                }
+                index2++;
+        }
+    }
+
+
 }
 
 

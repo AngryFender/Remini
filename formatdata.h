@@ -54,6 +54,8 @@ public:
     int getEnd() const;
     FormatSymbol getStatus() const;
     int getAccumulate() const;
+
+    void setStatus(FormatSymbol status);
 private:
     int start;
     int end;
@@ -70,6 +72,7 @@ public:
 
     bool isHidden() const;
     void setHidden(const bool hide);
+    void setSymbol(const QString &symbol);
 
 private:
     int position;
@@ -88,6 +91,8 @@ public:
     QVector<FragmentData*>::Iterator formats_begin() {return formats.begin();};
     QVector<FragmentData*>::Iterator formats_next(QVector<FragmentData*>::Iterator it) {return it++;};
     QVector<FragmentData*>::Iterator formats_end() {return formats.end();};
+    QVector<FragmentData*>::reverse_iterator formats_rbegin() {return formats.rbegin();};
+    QVector<FragmentData*>::reverse_iterator formats_rend() {return formats.rend();};
 
     QVector<FragmentData*>::Iterator hiddenFormats_begin() {return hiddenFormats.begin();};
     QVector<FragmentData*>::Iterator hiddenFormats_next(QVector<FragmentData*>::Iterator it) {return it++;};
@@ -101,8 +106,11 @@ public:
     bool isHiddenFormatsEmpty() const;
     bool isEmpty() const;
     bool isHidden() const;
-    void setHidden(bool hide);
     int positionsCount() const;
+    int getFormatCounts() const;
+    int hiddenFormatsCount() const;
+
+    void setHidden(bool hide);
     void sortAscendingPos();
 
     static bool sortAscendingStartPos(const PositionData* f1, const PositionData* f2)

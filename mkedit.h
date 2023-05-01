@@ -57,6 +57,7 @@ protected:
     void insertFromMimeData(const QMimeData *source) override;
     void mousePressEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
+    void mouseDoubleClickEvent(QMouseEvent *e) override;
 
  private:
     QColor codeBlockColor;
@@ -85,8 +86,11 @@ protected:
 
     QRect getVisibleRect();
     void clearMkEffects();
-    void applyMkEffects();
+    void applyMkEffects(const bool scroll = true);
     void fileSaveNow();
+    void fileSaveWithScroll(const bool scroll = true);
+
+    bool isMouseOnCheckBox(QMouseEvent *e);
 
  public slots:
     void contextMenuHandler(QPoint pos);
@@ -125,6 +129,8 @@ signals:
     void commentColorChanged(const QColor &color);
     void quoteColorChanged(const QColor &color);
     void keywordColorChanged(const QColor &color);
+
+    void pushCheckBox(int position);
 };
 
 #endif // MKEDIT_H

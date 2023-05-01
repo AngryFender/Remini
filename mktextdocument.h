@@ -25,6 +25,9 @@ public:
     void setUndoRedoText(const QString &text);
     void clear() override;
 
+    QVector<int>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
+    QVector<int>::const_iterator checkMarkPosEnd(){return checkMarkPositions.cend();};
+
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect);
     void removeAllMkDataHandle();
@@ -38,7 +41,9 @@ public slots:
     void drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect);
 
     void showMKSymbolsFromSavedBlocks(QRect *rect = nullptr);
-    void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll);
+
+
+    void pushCheckBoxHandle(const int position);
 
  private:
     struct CheckingBlock{
@@ -70,6 +75,8 @@ public slots:
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
     QQueue<QTextBlock> savedBlocks;
+
+    QVector<int> checkMarkPositions;
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, bool hasSelection = false);
@@ -104,6 +111,7 @@ public slots:
     int numberListGetSpaces(const QString &text);
     QString numberListGetNextNumber(const QString &text);
 
+    void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll, const bool clearPushCheckBoxData = true);
 signals:
     void clearUndoStack();
 

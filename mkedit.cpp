@@ -227,11 +227,13 @@ void MkEdit::clearMkEffects()
     fileSaveTimer.start();
 }
 
-void MkEdit::applyMkEffects()
+void MkEdit::applyMkEffects(const bool scroll)
 {
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
-    this->ensureCursorVisible();
+    if(scroll){
+        this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+        this->ensureCursorVisible();
+    }
 }
 
 void MkEdit::fileSaveNow()
@@ -240,6 +242,54 @@ void MkEdit::fileSaveNow()
     postUndoSetup();
     emit fileSave();
     applyMkEffects();
+}
+
+void MkEdit::fileSaveWithScroll(const bool scroll)
+{
+    fileSaveTimer.stop();
+    emit removeAllMkData();
+    postUndoSetup();
+    emit fileSave();
+    applyMkEffects(scroll);
+}
+
+bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
+{
+    int yPos = e->pos().y();
+    int xPos = e->pos().x();
+    QPoint pointer(xPos,yPos);
+
+    QTextDocument *doc = this->document();
+    MkTextDocument *mkDoc = dynamic_cast<MkTextDocument*>(doc);
+
+    if(nullptr == mkDoc){
+        return false;
+    }
+
+    int width = this->document()->defaultFont().pointSize()*1.30;
+
+    QTextCursor cursor(this->textCursor());
+
+    int last = this->document()->lastBlock().position()+this->document()->lastBlock().length();
+
+
+    for(auto it = mkDoc->checkMarkPosBegin(); it!= mkDoc->checkMarkPosEnd(); it++){
+        if((*it<last)){
+            cursor.setPosition(*it);
+        }
+        QRect rect = this->cursorRect(cursor);
+        rect.setWidth(width);
+        if(rect.contains(pointer)){
+            int pos = (*it);
+            emit removeAllMkData();
+            preUndoSetup();
+            applyMkEffects(false);
+            emit pushCheckBox(pos);
+            fileSaveWithScroll(false);
+            return true;
+        }
+    }
+    return false;
 }
 
 void MkEdit::contextMenuHandler(QPoint pos)
@@ -328,21 +378,50 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 
 void MkEdit::mousePressEvent(QMouseEvent *e)
 {
-    QTextEdit::mousePressEvent(e);
-    int yPos = this->verticalScrollBar()->value()+e->pos().y();
-    int xPos = this->horizontalScrollBar()->value()+e->pos().y();
-
-    //this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
+    if(!isMouseOnCheckBox(e)){
+        QTextEdit::mousePressEvent(e);
+    }
 }
 
 void MkEdit::mouseMoveEvent(QMouseEvent *e)
 {
     QTextEdit::mouseMoveEvent(e);
-    int yPos = this->verticalScrollBar()->value()+e->pos().y();
-    int xPos = this->horizontalScrollBar()->value()+e->pos().y();
-    qDebug()<<"x = "<<xPos<<" y = "<<yPos;
 
-    //this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
+    int yPos = e->pos().y();
+    int xPos = e->pos().x();
+    QPoint pointer(xPos,yPos);
+
+    QTextDocument *doc = this->document();
+    MkTextDocument *mkDoc = dynamic_cast<MkTextDocument*>(doc);
+
+    if(nullptr == mkDoc){
+        return;
+    }
+
+    int width = this->document()->defaultFont().pointSize()*1.30;
+    int last = this->document()->lastBlock().position()+this->document()->lastBlock().length();
+
+    QTextCursor cursor(this->textCursor());
+    for(auto it = mkDoc->checkMarkPosBegin(); it!= mkDoc->checkMarkPosEnd(); it++){
+        if((*it<last)){
+            cursor.setPosition(*it);
+        }
+        cursor.setPosition(*it);
+        QRect rect = this->cursorRect(cursor);
+        rect.setWidth(width);
+        if(rect.contains(pointer)){
+            this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
+            return;
+        }
+    }
+    this->viewport()->setCursor(Qt::CursorShape::ArrowCursor);
+}
+
+void MkEdit::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    if(!isMouseOnCheckBox(e)){
+        QTextEdit::mouseDoubleClickEvent(e);
+    }
 }
 
 QColor MkEdit::getTypeColor() const
@@ -430,11 +509,7 @@ void MkEdit::scrollValueUpdateHandle(int value)
 
 void MkEdit::fileSaveHandle()
 {
-    fileSaveTimer.stop();
-    emit removeAllMkData();
-    postUndoSetup();
-    emit fileSave();
-    applyMkEffects();
+    fileSaveWithScroll();
 }
 
 void MkEdit::cursorPositionChangedHandle()

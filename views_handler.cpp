@@ -155,6 +155,9 @@ void ViewsHandler::initConnection()
     QObject::connect(textSearchAllView,SIGNAL(showSearchedTextInFile(QString&,int,int,int)),
                      this,SLOT(displayTextSearchedFilePosition(QString&,int,int,int)));
 
+    QObject::connect(viewText,&MkEdit::pushCheckBox,
+                     &mkGuiDocument,&MkTextDocument::pushCheckBoxHandle);
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)

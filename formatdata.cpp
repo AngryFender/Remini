@@ -24,6 +24,11 @@ void PositionData::setHidden(const bool hide)
     this->hidden = hide;
 }
 
+void PositionData::setSymbol(const QString &symbol)
+{
+    this->symbol = symbol;
+}
+
 FormatData::FormatData()
 {
     hidden = false;
@@ -65,15 +70,6 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol)
         addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING3);
         positions.append(new PositionData(0,symbol));
         return;
-    }
-    else if(symbol == BOLD_SYMBOL_A || symbol == BOLD_SYMBOL_U){
-        status = FragmentData::BOLD;
-    }else if(symbol == ITALIC_SYMBOL_A || symbol == ITALIC_SYMBOL_U){
-        status = FragmentData::ITALIC;
-    }else if (symbol == STRIKETHROUGH_SYMBOL){
-        status = FragmentData::STRIKETHROUGH;
-    }else if (symbol == CHECK_SYMBOL_START){
-        return;
     }else if (symbol == CHECKED_SYMBOL_END){
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,CHECKED_SYMBOL_END));
@@ -83,6 +79,15 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol)
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,UNCHECKED_SYMBOL_END));
         addHiddenFormat(start, end, 3, FragmentData::UNCHECKED_END);
+        return;
+    }
+    else if(symbol == BOLD_SYMBOL_A || symbol == BOLD_SYMBOL_U){
+        status = FragmentData::BOLD;
+    }else if(symbol == ITALIC_SYMBOL_A || symbol == ITALIC_SYMBOL_U){
+        status = FragmentData::ITALIC;
+    }else if (symbol == STRIKETHROUGH_SYMBOL){
+        status = FragmentData::STRIKETHROUGH;
+    }else if (symbol == CHECK_SYMBOL_START){
         return;
     }
     formats.append(new FragmentData(start,end,status));
@@ -114,6 +119,16 @@ void FormatData::setHidden(bool hide)
 
 int FormatData::positionsCount() const{
     return positions.count();
+}
+
+int FormatData::getFormatCounts() const
+{
+    return formats.count();
+}
+
+int FormatData::hiddenFormatsCount() const
+{
+    return hiddenFormats.count();
 }
 
 void FormatData::sortAscendingPos()
@@ -167,5 +182,10 @@ FragmentData::FormatSymbol FragmentData::getStatus() const
 int FragmentData::getAccumulate() const
 {
     return accumulate;
+}
+
+void FragmentData::setStatus(FormatSymbol status)
+{
+    this->status = status;
 }
 
