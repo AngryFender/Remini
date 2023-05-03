@@ -15,6 +15,9 @@
 #define HEADING1_SYMBOL "# "
 #define HEADING2_SYMBOL "## "
 #define HEADING3_SYMBOL "### "
+#define LINK_SYMBOL_START "["
+#define LINK_SYMBOL_MID "]("
+#define LINK_SYMBOL_END ")"
 
 
 #define CHECKED_PIC "☑"

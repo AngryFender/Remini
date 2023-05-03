@@ -849,6 +849,7 @@ void MkTextDocument::resetFormatLocation()
     locHeading1.reset();
     locHeading2.reset();
     locHeading3.reset();
+    locLink.reset();
 }
 
 void MkTextDocument::numberListDetect(int blockNumber)
