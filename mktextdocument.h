@@ -44,6 +44,7 @@ public slots:
 
 
     void pushCheckBoxHandle(const int position);
+    void autoInsertSymobolHandle(const int position);
 
  private:
     struct CheckingBlock{
@@ -89,6 +90,7 @@ public slots:
     void incrementIndexes(int &index1, int &index2, int &index3,const int size =1);
     bool convertCharacterToSymbol(const QChar &single, QString &text);
     void convertCharacterToCheckboxSymbol(const QChar &single, QString &text);
+    void convertCharacterToLinkSymbol(const QChar &single, QString &text);
     void composeSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result);
 
     void setCodeBlockMargin(QTextBlock &block, int leftMargin=0,int rightMargin =0, int topMargin = 0);

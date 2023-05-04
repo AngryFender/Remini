@@ -213,6 +213,13 @@ void MkTextDocument::convertCharacterToCheckboxSymbol(const QChar &single, QStri
     }
 }
 
+void MkTextDocument::convertCharacterToLinkSymbol(const QChar &single, QString &text)
+{
+    if(single == '[' || single == ']' ||single == '(' || single == ')'){
+        text+=single;
+    }
+}
+
 void MkTextDocument::composeSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result)
 {
     result.clear();
@@ -227,6 +234,8 @@ void MkTextDocument::composeSymbolCombination(int length, const QString &text, i
             return;
         }
     }
+
+    result.clear();
 
     result.clear();
     convertCharacterToSymbol(text[index1],result);
@@ -835,6 +844,25 @@ void MkTextDocument::pushCheckBoxHandle(const int position)
     }
 
 
+}
+
+void MkTextDocument::autoInsertSymobolHandle(const int position)
+{
+    QTextCursor cursor(this);
+    cursor.setPosition(position);
+    cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
+
+    QString text = cursor.selectedText().toLower();
+    QString checkedSymbol = QString(CHECK_SYMBOL_START) + QString(CHECKED_SYMBOL_END);
+    QString unCheckSymbol = QString(CHECK_SYMBOL_START) + QString(UNCHECKED_SYMBOL_END);
+    if(text == "check" || text == "ch"){
+        cursor.insertText(checkedSymbol);
+    }else if(text == "uncheck" || text == "uch"){
+        cursor.insertText(unCheckSymbol);
+    }else{
+        cursor.setPosition(position);
+        cursor.insertText("    ");
+    }
 }
 
 

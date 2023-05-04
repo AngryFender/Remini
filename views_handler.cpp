@@ -158,6 +158,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::pushCheckBox,
                      &mkGuiDocument,&MkTextDocument::pushCheckBoxHandle);
 
+    QObject::connect(viewText,&MkEdit::autoInsertSymbol,
+                     &mkGuiDocument,&MkTextDocument::autoInsertSymobolHandle);
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)

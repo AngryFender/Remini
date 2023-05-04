@@ -181,9 +181,7 @@ void MkEdit::smartSelectionSetup()
 
 void MkEdit::tabKeyPressed()
 {
-    QTextCursor cursor = this->textCursor();
-    cursor.insertText("    ");
-    this->setTextCursor(cursor);
+    emit autoInsertSymbol(this->textCursor().position());
 }
 
 void MkEdit::preUndoSetup()
