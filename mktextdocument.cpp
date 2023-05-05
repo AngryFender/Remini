@@ -144,6 +144,14 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
                 locCheck.start = index1;
                 incrementIndexes(index1, index2,index3, test.size());
                 continue;
+            }else if(test == LINK_SYMBOL_START){
+                locLinkTitle.start = index1;
+            }else if(test == LINK_SYMBOL_MID){
+                locLinkTitle.end = index1;
+                locLink.start = index2;
+            }else if(test == LINK_SYMBOL_END){
+                locLink.end = index1;
+                //do insertFormatLinkData();
             }
         }
         incrementIndexes(index1, index2,index3);
@@ -236,6 +244,7 @@ void MkTextDocument::composeSymbolCombination(int length, const QString &text, i
     }
 
     result.clear();
+    //do covertCharacterToLinkSymbols();
 
     result.clear();
     convertCharacterToSymbol(text[index1],result);
@@ -878,6 +887,7 @@ void MkTextDocument::resetFormatLocation()
     locHeading2.reset();
     locHeading3.reset();
     locLink.reset();
+    locLinkTitle.reset();
 }
 
 void MkTextDocument::numberListDetect(int blockNumber)

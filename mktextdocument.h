@@ -72,6 +72,7 @@ public slots:
     FormatLocation locHeading2;
     FormatLocation locHeading3;
     FormatLocation locLink;
+    FormatLocation locLinkTitle;
 
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
