@@ -8,7 +8,7 @@ MkTextDocument::MkTextDocument(QObject *parent)
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
 
     this->setUndoRedoEnabled(false);
-
+    linkColor.setRgb(51,102,204);
 }
 
 void MkTextDocument::setPlainText(const QString &text)
@@ -144,14 +144,15 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
                 locCheck.start = index1;
                 incrementIndexes(index1, index2,index3, test.size());
                 continue;
-            }else if(test == LINK_SYMBOL_START){
+            }else if(test == LINK_SYMBOL_TITLE_START){
                 locLinkTitle.start = index1;
             }else if(test == LINK_SYMBOL_MID){
                 locLinkTitle.end = index1;
                 locLink.start = index2;
-            }else if(test == LINK_SYMBOL_END){
+            }else if(test == LINK_SYMBOL_URL_END){
                 locLink.end = index1;
-                //do insertFormatLinkData();
+                QString linkText = text.mid(locLink.start+1, (locLink.end-locLink.start-1));
+                insertFormatLinkData(locLinkTitle,locLink, index1, index2, index3 , formatData, test, &linkText);
             }
         }
         incrementIndexes(index1, index2,index3);
@@ -198,6 +199,18 @@ void MkTextDocument::insertFormatCheckBoxData(FormatLocation &loc, int &index1, 
     incrementIndexes(index1, index2,index3, test.size());
 }
 
+void MkTextDocument::insertFormatLinkData(FormatLocation &locTitle, FormatLocation &locLink, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test, QString * linkText)
+{
+    locLink.end = index1;
+    if(locLink.end-locLink.start>1){
+        formatData->addFormat(locTitle.start, locTitle.end, QString(LINK_SYMBOL_TITLE_END));
+        formatData->addFormat(locLink.start, locLink.end, QString(LINK_SYMBOL_URL_END), linkText);
+        locLink.reset();
+        locTitle.reset();
+    }
+    incrementIndexes(index1, index2,index3, test.size());
+}
+
 void MkTextDocument::incrementIndexes(int &index1, int &index2, int &index3, const int size)
 {
     index1 += size;
@@ -221,11 +234,13 @@ void MkTextDocument::convertCharacterToCheckboxSymbol(const QChar &single, QStri
     }
 }
 
-void MkTextDocument::convertCharacterToLinkSymbol(const QChar &single, QString &text)
+bool MkTextDocument::convertCharacterToLinkSymbol(const QChar &single, QString &text)
 {
     if(single == '[' || single == ']' ||single == '(' || single == ')'){
         text+=single;
+        return true;
     }
+    return false;
 }
 
 void MkTextDocument::composeSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result)
@@ -244,7 +259,18 @@ void MkTextDocument::composeSymbolCombination(int length, const QString &text, i
     }
 
     result.clear();
-    //do covertCharacterToLinkSymbols();
+    if(index2<length){
+        convertCharacterToLinkSymbol(text[index1], result);
+        convertCharacterToLinkSymbol(text[index2], result);
+        if(result == LINK_SYMBOL_MID){
+            return;
+        }
+    }
+
+    result.clear();
+    if(convertCharacterToLinkSymbol(text[index1], result)){
+        return;
+    }
 
     result.clear();
     convertCharacterToSymbol(text[index1],result);
@@ -313,12 +339,13 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     QTextCharFormat format;
 
     switch(status){
-    case FragmentData::BOLD:format.setFontWeight(QFont::ExtraBold);break;
-    case FragmentData::ITALIC:format.setFontItalic(true);break;;
-    case FragmentData::STRIKETHROUGH:format.setFontStrikeOut(true);break;
-    case FragmentData::HEADING1:format.setFontPointSize(this->defaultFont().pointSize() *2);    end = block.length()-1; break;
-    case FragmentData::HEADING2:format.setFontPointSize(this->defaultFont().pointSize() *1.5);  end = block.length()-1; break;
-    case FragmentData::HEADING3:format.setFontPointSize(this->defaultFont().pointSize() *1.25); end = block.length()-1; break;
+    case FragmentData::BOLD:{format.setFontWeight(QFont::ExtraBold);break;}
+    case FragmentData::ITALIC:{format.setFontItalic(true);break;}
+    case FragmentData::STRIKETHROUGH:{format.setFontStrikeOut(true);break;}
+    case FragmentData::HEADING1:{format.setFontPointSize(this->defaultFont().pointSize() *2);    end = block.length()-1; break;}
+    case FragmentData::HEADING2:{format.setFontPointSize(this->defaultFont().pointSize() *1.5);  end = block.length()-1; break;}
+    case FragmentData::HEADING3:{format.setFontPointSize(this->defaultFont().pointSize() *1.25); end = block.length()-1; break;}
+    case FragmentData::LINK_TITLE:{format.setFontUnderline(true);format.setUnderlineColor(linkColor); format.setForeground(linkColor); break;}
     default:break;
     }
 

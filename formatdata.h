@@ -15,9 +15,11 @@
 #define HEADING1_SYMBOL "# "
 #define HEADING2_SYMBOL "## "
 #define HEADING3_SYMBOL "### "
-#define LINK_SYMBOL_START "["
+#define LINK_SYMBOL_TITLE_START "["
+#define LINK_SYMBOL_TITLE_END "]"
 #define LINK_SYMBOL_MID "]("
-#define LINK_SYMBOL_END ")"
+#define LINK_SYMBOL_URL_START "("
+#define LINK_SYMBOL_URL_END ")"
 
 
 #define CHECKED_PIC "☑"
@@ -39,7 +41,9 @@ public:
         UNCHECKED_END,
         HEADING1,
         HEADING2,
-        HEADING3
+        HEADING3,
+        LINK_TITLE,
+        LINK_URL,
     };
     FragmentData(const int start,const int end,const FormatSymbol status){
         this->start = start;
@@ -89,7 +93,7 @@ public:
     FormatData();
     ~FormatData();
 
-    void addFormat(const int start, const int end, const QString& symbol);
+    void addFormat(const int start, const int end, const QString& symbol, QString* linkText = nullptr);
 
     QVector<FragmentData*>::Iterator formats_begin() {return formats.begin();};
     QVector<FragmentData*>::Iterator formats_next(QVector<FragmentData*>::Iterator it) {return it++;};
@@ -125,9 +129,10 @@ private:
     QVector<FragmentData*> formats;
     QVector<FragmentData*> hiddenFormats;
     QVector<PositionData*> positions;
+    QVector<QString*> linkTexts;
     bool hidden;
 
-    void addHiddenFormat(const int start,const int end, const int length,const FragmentData::FormatSymbol status);
+    void addHiddenFormat(const int start,const int end, const int length,const FragmentData::FormatSymbol status, QString*linkText = nullptr);
 };
 
 #endif // FORMATDATA_H

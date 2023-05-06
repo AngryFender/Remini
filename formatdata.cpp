@@ -46,13 +46,18 @@ FormatData::~FormatData()
     }
     hiddenFormats.clear();
 
+    for(auto link:linkTexts){
+        delete link;
+    }
+    linkTexts.clear();
+
     for(auto pos:positions){
         delete pos;
     }
     positions.clear();
 }
 
-void FormatData::addFormat(const int start, const int end,const QString &symbol)
+void FormatData::addFormat(const int start, const int end,const QString &symbol, QString* linkText)
 {
     FragmentData::FormatSymbol status = FragmentData::BOLD ;
     if(symbol == HEADING1_SYMBOL){
@@ -79,6 +84,16 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol)
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,UNCHECKED_SYMBOL_END));
         addHiddenFormat(start, end, 3, FragmentData::UNCHECKED_END);
+        return;
+    }else if (symbol == LINK_SYMBOL_TITLE_END){
+        positions.append(new PositionData(start,LINK_SYMBOL_TITLE_START));
+        positions.append(new PositionData(end, LINK_SYMBOL_TITLE_END));
+        addHiddenFormat(start, end, symbol.length(), FragmentData::LINK_TITLE);
+        return;
+    }else if (symbol == LINK_SYMBOL_URL_END){
+        positions.append(new PositionData(start,LINK_SYMBOL_URL_START));
+        positions.append(new PositionData(end,LINK_SYMBOL_URL_END));
+        addHiddenFormat(start, end, symbol.length(), FragmentData::LINK_URL, linkText);
         return;
     }
     else if(symbol == BOLD_SYMBOL_A || symbol == BOLD_SYMBOL_U){
@@ -136,7 +151,7 @@ void FormatData::sortAscendingPos()
     std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
 }
 
-void FormatData::addHiddenFormat(const int start, const int end, const int length, const FragmentData::FormatSymbol status)
+void FormatData::addHiddenFormat(const int start, const int end, const int length, const FragmentData::FormatSymbol status, QString*linkText )
 {
     int accumulate = 0;
     if(!hiddenFormats.empty()){
@@ -144,6 +159,11 @@ void FormatData::addHiddenFormat(const int start, const int end, const int lengt
     }
     int begin = start-accumulate;
     int last = end-accumulate-length;
+
+    if(linkText){
+        linkTexts.append(new QString(*linkText));
+//        accumulate = linkText->length();
+    }
 
     if(status == FragmentData::CHECKED_END ||status == FragmentData::UNCHECKED_END){
         accumulate += CHECKED_FULL_COUNT;
