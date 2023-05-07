@@ -911,6 +911,8 @@ void MkTextDocument::autoInsertSymobolHandle(const int position)
         cursor.insertText(checkedSymbol);
     }else if(text == "uncheck" || text == "uch"){
         cursor.insertText(unCheckSymbol);
+    }else if(text == "link" || text == "lk"){
+        cursor.insertText("[]()");
     }else{
         cursor.setPosition(position);
         cursor.insertText("    ");
