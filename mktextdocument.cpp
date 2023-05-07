@@ -146,10 +146,10 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
                 continue;
             }else if(test == LINK_SYMBOL_TITLE_START){
                 locLinkTitle.start = index1;
-            }else if(test == LINK_SYMBOL_MID){
+            }else if(test == LINK_SYMBOL_MID && locLinkTitle.start != -1){
                 locLinkTitle.end = index1;
                 locLink.start = index2;
-            }else if(test == LINK_SYMBOL_URL_END){
+            }else if(test == LINK_SYMBOL_URL_END && locLink.start != -1){
                 locLink.end = index1;
                 QString linkText = text.mid(locLink.start+1, (locLink.end-locLink.start-1));
                 insertFormatLinkData(locLinkTitle,locLink, index1, index2, index3 , formatData, test, &linkText);
@@ -375,9 +375,21 @@ void MkTextDocument::hideSymbols(QTextBlock &block,const QString &symbol)
 void MkTextDocument::hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData)
 {
     QString textBlock = block.text();
+    bool isLink = false;
+    int linkEnd = 0, linkStart = 0;
     for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
     {
         hideSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
+        if((*it)->getSymbol() == LINK_SYMBOL_URL_END){
+            isLink = true;
+            linkEnd = (*it)->getPos()-1;
+        }
+
+        if((*it)->getSymbol() == LINK_SYMBOL_URL_START || isLink){
+            linkStart = (*it)->getPos();
+            textBlock.remove(linkStart, linkEnd-linkStart);
+            isLink = false;
+        }
     }
 
     const int blockPos = block.position();
@@ -430,7 +442,6 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     int index = 0;
     for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
         if(*cp == u'☑' || *cp == u'☐'){
-            int total = blockPos +index;
             checkMarkPositions.removeAll(blockPos + index);
         }
         index++;
@@ -440,6 +451,11 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
     {
         showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
+
+        if((*it)->getSymbol() == LINK_SYMBOL_URL_START){
+            int pos = (*it)->getPos();
+            textBlock.insert(pos+1,formatData->getLinkUrl(pos));
+        }
     }
     QTextCursor cursor(block);
     cursor.movePosition(QTextCursor::StartOfBlock);

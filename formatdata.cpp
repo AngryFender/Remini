@@ -46,10 +46,8 @@ FormatData::~FormatData()
     }
     hiddenFormats.clear();
 
-    for(auto link:linkTexts){
-        delete link;
-    }
-    linkTexts.clear();
+    qDeleteAll(linkMap);
+    linkMap.clear();
 
     for(auto pos:positions){
         delete pos;
@@ -146,6 +144,11 @@ int FormatData::hiddenFormatsCount() const
     return hiddenFormats.count();
 }
 
+const QString &FormatData::getLinkUrl(int key) const
+{
+    return *linkMap.value(key);
+}
+
 void FormatData::sortAscendingPos()
 {
     std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
@@ -161,8 +164,8 @@ void FormatData::addHiddenFormat(const int start, const int end, const int lengt
     int last = end-accumulate-length;
 
     if(linkText){
-        linkTexts.append(new QString(*linkText));
-//        accumulate = linkText->length();
+        linkMap.insert(start,new QString(*linkText));
+        accumulate+=(linkText->length());
     }
 
     if(status == FragmentData::CHECKED_END ||status == FragmentData::UNCHECKED_END){
