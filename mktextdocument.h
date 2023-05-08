@@ -9,6 +9,7 @@
 #include <QString>
 #include <QStringList>
 #include <QRegularExpression>
+#include <QDesktopServices>
 #include <blockdata.h>
 #include <linedata.h>
 #include <formatdata.h>
@@ -28,6 +29,9 @@ public:
     QVector<int>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
     QVector<int>::const_iterator checkMarkPosEnd(){return checkMarkPositions.cend();};
 
+    QVector<QPair<int, int>>::const_iterator linkPosBegin(){return linkPositions.cbegin();};
+    QVector<QPair<int, int>>::const_iterator linkPosEnd(){return linkPositions.cend();};
+
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect);
     void removeAllMkDataHandle();
@@ -44,6 +48,7 @@ public slots:
 
 
     void pushCheckBoxHandle(const int position);
+    void pushLinkHandle(const int position);
     void autoInsertSymobolHandle(const int position);
 
  private:
@@ -80,9 +85,10 @@ public slots:
     QQueue<QTextBlock> savedBlocks;
 
     QVector<int> checkMarkPositions;
+    QVector<QPair<int, int>> linkPositions;
 
     QColor linkColor;
-    QVector<QString*> linkTexts;
+
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, bool hasSelection = false);

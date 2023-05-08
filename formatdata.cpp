@@ -49,6 +49,9 @@ FormatData::~FormatData()
     qDeleteAll(linkMap);
     linkMap.clear();
 
+    qDeleteAll(linkMapHidden);
+    linkMapHidden.clear();
+
     for(auto pos:positions){
         delete pos;
     }
@@ -86,7 +89,7 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol,
     }else if (symbol == LINK_SYMBOL_TITLE_END){
         positions.append(new PositionData(start,LINK_SYMBOL_TITLE_START));
         positions.append(new PositionData(end, LINK_SYMBOL_TITLE_END));
-        addHiddenFormat(start, end, symbol.length(), FragmentData::LINK_TITLE);
+        addHiddenFormat(start, end, symbol.length(), FragmentData::LINK_TITLE, linkText);
         return;
     }else if (symbol == LINK_SYMBOL_URL_END){
         positions.append(new PositionData(start,LINK_SYMBOL_URL_START));
@@ -149,6 +152,28 @@ const QString &FormatData::getLinkUrl(int key) const
     return *linkMap.value(key);
 }
 
+const QString *FormatData::getHiddenLinkUrl(int key) const
+{
+    return linkMapHidden.value(key);
+}
+
+void FormatData::clearAllLinkMapt()
+{
+    qDeleteAll(linkMap);
+    linkMap.clear();
+}
+
+void FormatData::clearAllLinkMapHidden()
+{
+    qDeleteAll(linkMapHidden);
+    linkMapHidden.clear();
+}
+
+void FormatData::clearElementLinkMapHidden(int key)
+{
+    linkMapHidden.remove(key);
+}
+
 void FormatData::sortAscendingPos()
 {
     std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
@@ -163,7 +188,7 @@ void FormatData::addHiddenFormat(const int start, const int end, const int lengt
     int begin = start-accumulate;
     int last = end-accumulate-length;
 
-    if(linkText){
+    if(linkText && status == FragmentData::LINK_URL){
         linkMap.insert(start,new QString(*linkText));
         accumulate+=(linkText->length());
     }
@@ -182,6 +207,10 @@ void FormatData::addHiddenFormat(const int start, const int end, const int lengt
     }
     else{
         accumulate = accumulate+2*length;
+    }
+
+    if(linkText && status == FragmentData::LINK_TITLE){
+        linkMapHidden.insert(begin, new QString(*linkText));
     }
 
     hiddenFormats.append(new FragmentData(begin,last,status,accumulate));

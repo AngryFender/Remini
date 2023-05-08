@@ -34,6 +34,7 @@ void MkTextDocument::clear()
     }
     savedBlocks.clear();
     checkMarkPositions.clear();
+    linkPositions.clear();
     QTextDocument::clear();
 }
 
@@ -203,7 +204,7 @@ void MkTextDocument::insertFormatLinkData(FormatLocation &locTitle, FormatLocati
 {
     locLink.end = index1;
     if(locLink.end-locLink.start>1){
-        formatData->addFormat(locTitle.start, locTitle.end, QString(LINK_SYMBOL_TITLE_END));
+        formatData->addFormat(locTitle.start, locTitle.end, QString(LINK_SYMBOL_TITLE_END),linkText);
         formatData->addFormat(locLink.start, locLink.end, QString(LINK_SYMBOL_URL_END), linkText);
         locLink.reset();
         locTitle.reset();
@@ -345,7 +346,20 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     case FragmentData::HEADING1:{format.setFontPointSize(this->defaultFont().pointSize() *2);    end = block.length()-1; break;}
     case FragmentData::HEADING2:{format.setFontPointSize(this->defaultFont().pointSize() *1.5);  end = block.length()-1; break;}
     case FragmentData::HEADING3:{format.setFontPointSize(this->defaultFont().pointSize() *1.25); end = block.length()-1; break;}
-    case FragmentData::LINK_TITLE:{format.setFontUnderline(true);format.setUnderlineColor(linkColor); format.setForeground(linkColor); break;}
+    case FragmentData::CHECKED_END:
+    case FragmentData::UNCHECKED_END:{
+        const int blockPos = block.position();
+        checkMarkPositions.append(blockPos + start);
+        break;
+    }
+    case FragmentData::LINK_TITLE:{
+        const int blockPos = block.position();
+        format.setFontUnderline(true);
+        format.setUnderlineColor(linkColor);
+        format.setForeground(linkColor);
+        linkPositions.append(QPair<int,int>(blockPos + start, blockPos + end));
+        break;}
+
     default:break;
     }
 
@@ -377,28 +391,26 @@ void MkTextDocument::hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     QString textBlock = block.text();
     bool isLink = false;
     int linkEnd = 0, linkStart = 0;
+    int linkTitleEnd = -1, linkTitleStart = -1;
+
+    const QString *symbol;
+    int symbolPos = -1;
     for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
     {
-        hideSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
-        if((*it)->getSymbol() == LINK_SYMBOL_URL_END){
+        symbol = &(*it)->getSymbol();
+        symbolPos = (*it)->getPos();
+        hideSymbolsAtPos(textBlock, symbolPos, *symbol);
+
+        if(*symbol == LINK_SYMBOL_URL_END){
             isLink = true;
-            linkEnd = (*it)->getPos()-1;
+            linkEnd = symbolPos-1;
         }
 
-        if((*it)->getSymbol() == LINK_SYMBOL_URL_START || isLink){
-            linkStart = (*it)->getPos();
+        if(*symbol == LINK_SYMBOL_URL_START || isLink){
+            linkStart = symbolPos;
             textBlock.remove(linkStart, linkEnd-linkStart);
             isLink = false;
         }
-    }
-
-    const int blockPos = block.position();
-    int index = 0;
-    for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
-        if(*cp == u'☑' || *cp == u'☐'){
-            checkMarkPositions.append(blockPos + index);
-        }
-        index++;
     }
 
     QTextCursor cursor(block);
@@ -444,9 +456,17 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
         if(*cp == u'☑' || *cp == u'☐'){
             checkMarkPositions.removeAll(blockPos + index);
         }
+
+        QVector<QPair<int, int>>::iterator it = linkPositions.begin();
+        while (it != linkPositions.end()) {
+            if (it->first == (blockPos + index)) {
+                it = linkPositions.erase(it);
+            } else {
+                ++it;
+            }
+        }
         index++;
     }
-
 
     for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
     {
@@ -752,6 +772,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
     CheckingBlock checkBlock;
     if(clearPushCheckBoxData){
         checkMarkPositions.clear();
+        linkPositions.clear();
     }
 
     for(QTextBlock block = this->begin(); block != this->end(); block = block.next()){
@@ -894,8 +915,31 @@ void MkTextDocument::pushCheckBoxHandle(const int position)
                 index2++;
         }
     }
+}
 
+void MkTextDocument::pushLinkHandle(const int position)
+{
+    QTextCursor cursor(this);
+    cursor.setPosition(position);
+    cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
 
+    QTextBlock block = findBlock(position);
+    QTextBlockUserData* data =block.userData();
+    FormatData* formatData = dynamic_cast<FormatData*>(data);
+
+    if(!formatData)
+        return;
+
+    int index1 = 0;
+    for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+    {
+        if((*it)->getStatus() == FragmentData::LINK_TITLE){
+            const QString *link =formatData->getHiddenLinkUrl((*it)->getStart());
+            if(link){
+                QDesktopServices::openUrl(QUrl(*link));
+            }
+        }
+    }
 }
 
 void MkTextDocument::autoInsertSymobolHandle(const int position)

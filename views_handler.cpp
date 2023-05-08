@@ -158,6 +158,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::pushCheckBox,
                      &mkGuiDocument,&MkTextDocument::pushCheckBoxHandle);
 
+    QObject::connect(viewText,&MkEdit::pushLink,
+                     &mkGuiDocument,&MkTextDocument::pushLinkHandle);
+
     QObject::connect(viewText,&MkEdit::autoInsertSymbol,
                      &mkGuiDocument,&MkTextDocument::autoInsertSymobolHandle);
 

@@ -117,6 +117,11 @@ public:
     int getFormatCounts() const;
     int hiddenFormatsCount() const;
     const QString &getLinkUrl(int key) const;
+    const QString *getHiddenLinkUrl(int key) const;
+
+    void clearAllLinkMapt();
+    void clearAllLinkMapHidden();
+    void clearElementLinkMapHidden(int key);
 
     void setHidden(bool hide);
     void sortAscendingPos();
@@ -131,6 +136,7 @@ private:
     QVector<FragmentData*> hiddenFormats;
     QVector<PositionData*> positions;
     QMap<int, QString*> linkMap;
+    QMap<int, QString*> linkMapHidden;
     bool hidden;
 
     void addHiddenFormat(const int start,const int end, const int length,const FragmentData::FormatSymbol status, QString*linkText = nullptr);

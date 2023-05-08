@@ -266,17 +266,16 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
     }
 
     int width = this->document()->defaultFont().pointSize()*1.30;
-
-    QTextCursor cursor(this->textCursor());
-
     int last = this->document()->lastBlock().position()+this->document()->lastBlock().length();
 
-
+    QTextCursor cursor(this->textCursor());
+    QRect rect;
     for(auto it = mkDoc->checkMarkPosBegin(); it!= mkDoc->checkMarkPosEnd(); it++){
-        if((*it<last)){
-            cursor.setPosition(*it);
+        if((*it>last)){
+            continue;
         }
-        QRect rect = this->cursorRect(cursor);
+        cursor.setPosition(*it);
+        rect = this->cursorRect(cursor);
         rect.setWidth(width);
         if(rect.contains(pointer)){
             int pos = (*it);
@@ -288,6 +287,29 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
             return true;
         }
     }
+
+    int linkTextWidth = 0;
+    for(auto it = mkDoc->linkPosBegin(); it!= mkDoc->linkPosEnd(); ++it){
+        if((*it).first >last ||(*it).second >last ){
+            continue;
+        }
+        cursor.setPosition((*it).first);
+
+        rect = this->cursorRect(cursor);
+        linkTextWidth = ((*it).second - (*it).first) *this->document()->defaultFont().pointSize()*0.55;
+        rect.setWidth(linkTextWidth);
+        if(rect.contains(pointer)){
+            int pos = (*it).first;
+            emit removeAllMkData();
+            preUndoSetup();
+            applyMkEffects(false);
+            emit pushLink(pos);
+            fileSaveWithScroll(false);
+            return true;
+
+        }
+    }
+
     return false;
 }
 
@@ -370,7 +392,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 
     QString link = source->text();
     match = regexUrl.match(link);
-    if (match.hasMatch()) {
+    if (match.hasMatch() && !link.contains("](")) {
         QTextCursor cursor = this->textCursor();
         int pos = cursor.position()+1;
         QString symbolsWithLink = "[]("+link+")";
@@ -412,18 +434,36 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
     int last = this->document()->lastBlock().position()+this->document()->lastBlock().length();
 
     QTextCursor cursor(this->textCursor());
+    QRect rect;
     for(auto it = mkDoc->checkMarkPosBegin(); it!= mkDoc->checkMarkPosEnd(); it++){
-        if((*it<last)){
-            cursor.setPosition(*it);
+        if((*it>last)){
+            continue;
         }
         cursor.setPosition(*it);
-        QRect rect = this->cursorRect(cursor);
+        rect = this->cursorRect(cursor);
         rect.setWidth(width);
         if(rect.contains(pointer)){
             this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
             return;
         }
     }
+
+    int linkTextWidth = 0;
+    for(auto it = mkDoc->linkPosBegin(); it!= mkDoc->linkPosEnd(); ++it){
+        if((*it).first >last ||(*it).second >last ){
+            continue;
+        }
+        cursor.setPosition((*it).first);
+
+        rect = this->cursorRect(cursor);
+        linkTextWidth = ((*it).second - (*it).first) *this->document()->defaultFont().pointSize()*0.55;
+        rect.setWidth(linkTextWidth);
+        if(rect.contains(pointer)){
+            this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
+            return;
+        }
+    }
+
     this->viewport()->setCursor(Qt::CursorShape::ArrowCursor);
 }
 

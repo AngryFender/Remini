@@ -135,6 +135,7 @@ signals:
     void keywordColorChanged(const QColor &color);
 
     void pushCheckBox(int position);
+    void pushLink(int position);
     void autoInsertSymbol(const int position);
 };
 
