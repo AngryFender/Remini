@@ -8,6 +8,7 @@
 #include <QRegularExpressionMatch>
 #include <QTextDocument>
 #include <QMenu>
+#include <QMimeData>
 #include <QTimer>
 #include <mktextdocument.h>
 #include <QScrollBar>
@@ -83,6 +84,9 @@ protected:
     QAction selectAllAction;
     QAction selectBlockAction;
     QPoint contextMenuPos;
+
+    QRegularExpression regexUrl;
+    QRegularExpressionMatch match;
 
     QRect getVisibleRect();
     void clearMkEffects();

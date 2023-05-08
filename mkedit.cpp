@@ -6,6 +6,7 @@
 MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
     fileSaveTimer.setInterval(FILE_SAVE_TIMEOUT);
+    regexUrl.setPattern("(https?|ftp|file)://[\\w\\d._-]+(?:\\.[\\w\\d._-]+)+[\\w\\d._-]*(?:(?:/[\\w\\d._-]+)*/?)?(?:\\?[\\w\\d_=-]+(?:&[\\w\\d_=-]+)*)?(?:#[\\w\\d_-]+)?");
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     undoAction.setText("Undo         Ctrl+Z");
@@ -367,7 +368,18 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     emit removeAllMkData();
     preUndoSetup();
 
-    QTextEdit::insertFromMimeData(source);
+    QString link = source->text();
+    match = regexUrl.match(link);
+    if (match.hasMatch()) {
+        QTextCursor cursor = this->textCursor();
+        int pos = cursor.position()+1;
+        QString symbolsWithLink = "[]("+link+")";
+        cursor.insertText(symbolsWithLink);
+        cursor.setPosition(pos);
+        this->setTextCursor(cursor);
+    }else{
+        QTextEdit::insertFromMimeData(source);
+    }
 
     postUndoSetup();
     emit fileSave();
