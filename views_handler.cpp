@@ -196,6 +196,9 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     viewText->update();
+
+    viewText->initialialCursorPosition();
+    viewText->verticalScrollBar()->setSliderPosition(0);
 }
 
 void ViewsHandler::fileSaveHandle()

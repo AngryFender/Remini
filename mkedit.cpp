@@ -39,8 +39,16 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     QObject::connect(this->verticalScrollBar(),SIGNAL(valueChanged(int)),
                      this, SLOT(scrollValueUpdateHandle(int)));
 
-
     this->setUndoRedoEnabled(false);
+}
+
+void MkEdit::initialialCursorPosition()
+{
+    QTextCursor cursor = this->textCursor();
+    cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+
+    int savedBlockNumber = cursor.blockNumber();
+    emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , getVisibleRect());
 }
 
 void MkEdit::paintEvent(QPaintEvent *e)
