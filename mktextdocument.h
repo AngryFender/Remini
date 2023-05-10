@@ -17,6 +17,44 @@
 #include <QQueue>
 #include <QMutex>
 
+
+class FormatCollection{
+public:
+    FormatCollection(int fontSize){
+
+        linkColor.setRgb(51,102,204);
+
+        bold.setFontWeight(QFont::ExtraBold);
+        italic.setFontItalic(true);
+        strikethrough.setFontStrikeOut(true);
+        heading1.setFontPointSize(fontSize *2);
+        heading2.setFontPointSize(fontSize *1.5);
+        heading3.setFontPointSize(fontSize *1.25);
+        link.setFontUnderline(true);
+        link.setUnderlineColor(linkColor);
+        link.setForeground(linkColor);
+    }
+
+    QTextCharFormat * getBold(){return &bold;};
+    QTextCharFormat * getItalic (){return &italic;};
+    QTextCharFormat * getStrikethrough(){return &strikethrough;};
+    QTextCharFormat * getHeading1(){return &heading1;};
+    QTextCharFormat * getHeading2(){return &heading2;};
+    QTextCharFormat * getHeading3(){return &heading3;};
+    QTextCharFormat * getLink(){return &link;};
+    QColor linkColor;
+
+private:
+    QTextCharFormat bold;
+    QTextCharFormat italic;
+    QTextCharFormat strikethrough;
+    QTextCharFormat heading1;
+    QTextCharFormat heading2;
+    QTextCharFormat heading3;
+    QTextCharFormat link;
+};
+
+
 class MkTextDocument : public QTextDocument
 {
     Q_OBJECT
@@ -109,7 +147,7 @@ public slots:
 
     void resetTextBlockFormat(int blockNumber);
     void resetTextBlockFormat(QTextBlock block);
-    void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
+    void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status, QTextCursor &cursor,FormatCollection &formatCollection);
     void hideSymbols(QTextBlock &block,const QString &symbol);
     void hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);

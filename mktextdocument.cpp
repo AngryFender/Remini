@@ -335,17 +335,17 @@ void MkTextDocument::resetTextBlockFormat(QTextBlock block)
     cursor.setCharFormat(format);
 }
 
-void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status)
+void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status, QTextCursor &cursor, FormatCollection &formatCollection)
 {
-    QTextCharFormat format;
+    QTextCharFormat *format = nullptr;
 
     switch(status){
-    case FragmentData::BOLD:{format.setFontWeight(QFont::ExtraBold);break;}
-    case FragmentData::ITALIC:{format.setFontItalic(true);break;}
-    case FragmentData::STRIKETHROUGH:{format.setFontStrikeOut(true);break;}
-    case FragmentData::HEADING1:{format.setFontPointSize(this->defaultFont().pointSize() *2);    end = block.length()-1; break;}
-    case FragmentData::HEADING2:{format.setFontPointSize(this->defaultFont().pointSize() *1.5);  end = block.length()-1; break;}
-    case FragmentData::HEADING3:{format.setFontPointSize(this->defaultFont().pointSize() *1.25); end = block.length()-1; break;}
+    case FragmentData::BOLD:{format = formatCollection.getBold();break;}
+    case FragmentData::ITALIC:{format = formatCollection.getItalic();break;}
+    case FragmentData::STRIKETHROUGH:{format = formatCollection.getStrikethrough();break;}
+    case FragmentData::HEADING1:{format = formatCollection.getHeading1(); end = block.length()-1; break;}
+    case FragmentData::HEADING2:{format = formatCollection.getHeading2(); end = block.length()-1; break;}
+    case FragmentData::HEADING3:{format = formatCollection.getHeading3(); end = block.length()-1; break;}
     case FragmentData::CHECKED_END:
     case FragmentData::UNCHECKED_END:{
         const int blockPos = block.position();
@@ -353,17 +353,17 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
         break;
     }
     case FragmentData::LINK_TITLE:{
+        format = formatCollection.getLink();
         const int blockPos = block.position();
-        format.setFontUnderline(true);
-        format.setUnderlineColor(linkColor);
-        format.setForeground(linkColor);
         linkPositions.append(QPair<int,int>(blockPos + start, blockPos + end));
         break;}
 
     default:break;
     }
 
-    QTextCursor cursor(block);
+    if(!format)
+        return;
+
     int startPoint = block.position()+start;
     int endPoint = block.position()+end;
     if(end>=block.length()){
@@ -371,7 +371,7 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     }
     cursor.setPosition(startPoint);
     cursor.setPosition(endPoint, QTextCursor::KeepAnchor);
-    cursor.mergeCharFormat(format);
+    cursor.mergeCharFormat(*format);
 }
 
 void MkTextDocument::hideSymbols(QTextBlock &block,const QString &symbol)
@@ -768,6 +768,7 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
 void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll, const bool clearPushCheckBoxData)
 {
     int fontSize =this->defaultFont().pointSize();
+    FormatCollection formatCollection(fontSize);
     QAbstractTextDocumentLayout* layout = this->documentLayout();
     CheckingBlock checkBlock;
     if(clearPushCheckBoxData){
@@ -836,9 +837,10 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                             showAllFormatSymbolsInTextBlock(block, formatData);
 
                         }
+                        QTextCursor cursor(block);
                         for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
                         {
-                            applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
+                            applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), cursor, formatCollection);
                         }
                     }
                     else{
@@ -847,10 +849,13 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                                 formatData->setHidden(true);
                                 resetTextBlockFormat(block);
                                 hideAllFormatSymbolsInTextBlock(block,formatData);
+
                                 if(!formatData->isHiddenFormatsEmpty()){
+                                    QTextCursor cursor(block);
                                     for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
                                     {
-                                        applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
+                                        applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), cursor, formatCollection);
+
                                     }
                                 }
                             }
