@@ -113,6 +113,7 @@ public:
     bool isHiddenFormatsEmpty() const;
     bool isEmpty() const;
     bool isHidden() const;
+    bool isFormatted() const;
     int positionsCount() const;
     int getFormatCounts() const;
     int hiddenFormatsCount() const;
@@ -124,6 +125,7 @@ public:
     void clearElementLinkMapHidden(int key);
 
     void setHidden(bool hide);
+    void setFormatted(bool state);
     void sortAscendingPos();
 
     static bool sortAscendingStartPos(const PositionData* f1, const PositionData* f2)
@@ -138,7 +140,7 @@ private:
     QMap<int, QString*> linkMap;
     QMap<int, QString*> linkMapHidden;
     bool hidden;
-
+    bool formatted;
     void addHiddenFormat(const int start,const int end, const int length,const FragmentData::FormatSymbol status, QString*linkText = nullptr);
 };
 

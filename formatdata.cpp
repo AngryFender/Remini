@@ -32,6 +32,7 @@ void PositionData::setSymbol(const QString &symbol)
 FormatData::FormatData()
 {
     hidden = false;
+    formatted = false;
 }
 
 FormatData::~FormatData()
@@ -128,9 +129,19 @@ bool FormatData::isHidden() const
     return hidden;
 }
 
+bool FormatData::isFormatted() const
+{
+    return formatted;
+}
+
 void FormatData::setHidden(bool hide)
 {
     this->hidden = hide;
+}
+
+void FormatData::setFormatted(bool state)
+{
+    this->formatted = state;
 }
 
 int FormatData::positionsCount() const{
