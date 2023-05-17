@@ -123,7 +123,7 @@ signals:
     void smartSelection(int blockNumber, QTextCursor &cursor);
     void drawTextBlocks(bool hasSelection, int blockNumber, bool showAll, QRect rect);
 
-    void removeAllMkData();
+    void removeAllMkData(int currentBlockNo);
     void applyAllMkData(bool hasSelection, int blockNumber, bool showAll, QRect rect);
     void blockColorChanged(const QColor& color);
     void syntaxColorUpdate(HighlightColor& colors);

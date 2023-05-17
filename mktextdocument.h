@@ -72,7 +72,7 @@ public:
 
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect);
-    void removeAllMkDataHandle();
+    void removeAllMkDataHandle(int blockNo);
     void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll, QRect rect);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);

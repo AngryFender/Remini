@@ -119,8 +119,8 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,SIGNAL(quoteLeftKeyPressed(int,bool&)),
                      &mkGuiDocument,SLOT(quoteLeftKeyPressedHandle(int,bool&)));
 
-    QObject::connect(viewText,SIGNAL(removeAllMkData()),
-                     &mkGuiDocument,SLOT(removeAllMkDataHandle()));
+    QObject::connect(viewText,&MkEdit::removeAllMkData,
+                     &mkGuiDocument,&MkTextDocument::removeAllMkDataHandle);
 
     QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int,bool,QRect)),
                      &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int,bool,QRect)));

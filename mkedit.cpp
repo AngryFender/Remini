@@ -113,7 +113,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() == Qt::ControlModifier) {
         int zoomDelta = e->angleDelta().y();
-        emit removeAllMkData();
+        emit removeAllMkData(this->textCursor().blockNumber());
         this->blockSignals(true);
         if (zoomDelta > 0) {
             if((this->currentFont().pointSizeF())<MAXIMUM_FONT_SIZE)
@@ -227,7 +227,7 @@ void MkEdit::clearMkEffects()
 {
 
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
-    emit removeAllMkData();
+    emit removeAllMkData(this->textCursor().blockNumber());
     if(!fileSaveTimer.isActive()){
         preUndoSetup();
     }
@@ -254,7 +254,7 @@ void MkEdit::fileSaveNow()
 void MkEdit::fileSaveWithScroll(const bool scroll)
 {
     fileSaveTimer.stop();
-    emit removeAllMkData();
+    emit removeAllMkData(this->textCursor().blockNumber());
     postUndoSetup();
     emit fileSave();
     applyMkEffects(scroll);
@@ -287,7 +287,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         rect.setWidth(width);
         if(rect.contains(pointer)){
             int pos = (*it);
-            emit removeAllMkData();
+            emit removeAllMkData(this->textCursor().blockNumber());
             preUndoSetup();
             applyMkEffects(false);
             emit pushCheckBox(pos);
@@ -308,7 +308,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
             int pos = (*it).first;
-            emit removeAllMkData();
+            emit removeAllMkData(this->textCursor().blockNumber());
             preUndoSetup();
             applyMkEffects(false);
             emit pushLink(pos);
@@ -395,7 +395,7 @@ void MkEdit::blockColor(const QColor &color)
 
 void MkEdit::insertFromMimeData(const QMimeData *source)
 {
-    emit removeAllMkData();
+    emit removeAllMkData(this->textCursor().blockNumber());
     preUndoSetup();
 
     QString link = source->text();
