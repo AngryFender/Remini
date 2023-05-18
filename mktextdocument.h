@@ -82,7 +82,7 @@ public slots:
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
     void drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect);
 
-    void showMKSymbolsFromSavedBlocks(QRect *rect = nullptr);
+    void showMKSymbolsFromSavedBlocks(QRect *rect = nullptr, int cursorBlockNo = 0);
 
 
     void pushCheckBoxHandle(const int position);

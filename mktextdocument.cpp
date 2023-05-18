@@ -43,9 +43,9 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
     hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, false);
 }
 
-void MkTextDocument::removeAllMkDataHandle()
+void MkTextDocument::removeAllMkDataHandle(int blockNo)
 {
-    showMKSymbolsFromSavedBlocks();
+    showMKSymbolsFromSavedBlocks(nullptr, blockNo);
     stripUserData();
 }
 
@@ -718,11 +718,11 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 
 void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect)
 {
-    showMKSymbolsFromSavedBlocks(&rect);
+    showMKSymbolsFromSavedBlocks(&rect, blockNumber);
     hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll);
 }
 
-void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect)
+void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo)
 {
 //    QAbstractTextDocumentLayout* layout = this->documentLayout();
     while(!savedBlocks.empty()){
