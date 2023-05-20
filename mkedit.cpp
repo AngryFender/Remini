@@ -556,7 +556,6 @@ void MkEdit::redo()
 void MkEdit::clearUndoStackHandle()
 {
     undoStack.clear();
-    emit cursorPosChanged(false, 0, getVisibleRect());
 }
 
 void MkEdit::scrollValueUpdateHandle(int value)
