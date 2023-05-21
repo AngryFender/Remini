@@ -133,12 +133,16 @@ public:
         return(f1->getPos() < f2->getPos());
     }
 
+    QString getOriginalText() const;
+    void setOriginalText(const QString &newOriginalText);
+
 private:
     QVector<FragmentData*> formats;
     QVector<FragmentData*> hiddenFormats;
     QVector<PositionData*> positions;
     QMap<int, QString*> linkMap;
     QMap<int, QString*> linkMapHidden;
+    QString originalText;
     bool hidden;
     bool formatted;
     void addHiddenFormat(const int start,const int end, const int length,const FragmentData::FormatSymbol status, QString*linkText = nullptr);

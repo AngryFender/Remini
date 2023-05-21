@@ -190,6 +190,16 @@ void FormatData::sortAscendingPos()
     std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
 }
 
+QString FormatData::getOriginalText() const
+{
+    return originalText;
+}
+
+void FormatData::setOriginalText(const QString &originalText)
+{
+    this->originalText = originalText;
+}
+
 void FormatData::addHiddenFormat(const int start, const int end, const int length, const FragmentData::FormatSymbol status, QString*linkText )
 {
     int accumulate = 0;
