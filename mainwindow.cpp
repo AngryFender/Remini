@@ -8,6 +8,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setup_views(this, *ui);
 
+    fileSearchBox = new TransparentDialog(this);
+    folderTreeBox = new TransparentDialog(this);
+    mkEditorBox = new TransparentDialog(this);
     themeContents = darkTheme;
     themeState = darkThemeState;
     QApplication::setStyle(QStyleFactory::create("fusion"));
@@ -41,6 +44,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
         this->setStyleSheet(themeContents);
     }else if(event->key() == Qt::Key_Shift){
+    } else if (event->key() == Qt::Key_Alt) {
+        fileSearchBox->setDimension(ui->uiSearch->x(), ui->uiSearch->y(),ui->uiSearch->width(),ui->uiSearch->height());
+        fileSearchBox->show();
+
+    } else if (event->key() == Qt::Key_Shift) {
         if(shiftTimer->isActive()){
             emit startSearchAll();
         }

@@ -10,7 +10,7 @@
 #include <navigationview.h>
 #include <navigationmodel.h>
 #include "textsearchworker.h"
-#include "./ui_mainwindow.h"
+#include "ui_mainwindow.h"
 #include "searchalldialog.h"
 
 #define NAVIGATION_RATIO 100

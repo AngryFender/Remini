@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "./ui_mainwindow.h"
+#include "transparentdialog.h"
 #include "views_handler.h"
 #include <QTimer>
 #include <QStyleFactory>
