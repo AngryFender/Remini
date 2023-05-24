@@ -11,14 +11,18 @@ MainWindow::MainWindow(QWidget *parent)
     fileSearchBox = new TransparentDialog(this);
     folderTreeBox = new TransparentDialog(this);
     mkEditorBox = new TransparentDialog(this);
+
+    lightThemeStyle = QStyleFactory::create("windowsvista");
+    darkThemeStyle = QStyleFactory::create("fusion");
+
     themeContents = darkTheme;
     themeState = darkThemeState;
     QApplication::setStyle(QStyleFactory::create("fusion"));
     this->setStyleSheet(themeContents);
 
     shiftTimer = new QTimer(this);
-    QObject::connect(shiftTimer,SIGNAL(timeout()),
-                     this, SLOT(shiftTimerHandle()));
+    QObject::connect(shiftTimer,&QTimer::timeout,
+                     this, &MainWindow::shiftTimerHandle);
 
     QObject::connect(this,SIGNAL(startSearchAll()),
                      view_handler.get(),SLOT(startTextSearchInAllFilesHandle()));
@@ -27,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete shiftTimer;
+    delete lightThemeStyle;
+    delete darkThemeStyle;
     delete ui;
 }
 
@@ -34,16 +40,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_F12){
         if (themeState == darkThemeState){
-            themeContents = lightTheme;
             themeState = lightThemeState;
-            QApplication::setStyle(QStyleFactory::create("windowsvista"));
+            this->setStyleSheet(lightTheme);
+            QApplication::setStyle(lightThemeStyle);
         }else{
-            themeContents = darkTheme;
             themeState = darkThemeState;
-            QApplication::setStyle(QStyleFactory::create("fusion"));
+            this->setStyleSheet(darkTheme);
+            QApplication::setStyle(darkThemeStyle);
         }
-        this->setStyleSheet(themeContents);
-    }else if(event->key() == Qt::Key_Shift){
     } else if (event->key() == Qt::Key_Alt) {
         fileSearchBox->setDimension(ui->uiSearch->x(), ui->uiSearch->y(),ui->uiSearch->width(),ui->uiSearch->height());
         fileSearchBox->show();

@@ -36,7 +36,12 @@ private:
     QString themeContents;
     ThemeState themeState;
     QSharedPointer<ViewsHandler> view_handler;
+    QStyle *lightThemeStyle;
+    QStyle *darkThemeStyle;
 
+    TransparentDialog * fileSearchBox;
+    TransparentDialog * folderTreeBox;
+    TransparentDialog * mkEditorBox;
     void setup_views(QWidget *parent, Ui::MainWindow &ui);
 
 signals:
