@@ -50,7 +50,7 @@
       <property name="childrenCollapsible">
        <bool>true</bool>
       </property>
-      <widget class="QFrame" name="verticalFrame_2">
+      <widget class="QFrame" name="uiLeftPane">
        <property name="maximumSize">
         <size>
          <width>1677215</width>
