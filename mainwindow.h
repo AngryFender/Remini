@@ -22,6 +22,11 @@ public:
     ~MainWindow();
 
     void keyPressEvent(QKeyEvent *event)override;
+    void keyReleaseEvent(QKeyEvent *event)override;
+
+public slots:
+    void KeyPressAltHandler(bool press);       //true for press, false for release
+    void viewChosenHandler(Qt::Key key);
 private slots:
     void shiftTimerHandle();
 

@@ -38,44 +38,66 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_F12){
-        if (themeState == darkThemeState){
-            themeState = lightThemeState;
-            this->setStyleSheet(lightTheme);
-            QApplication::setStyle(lightThemeStyle);
-        }else{
-            themeState = darkThemeState;
-            this->setStyleSheet(darkTheme);
-            QApplication::setStyle(darkThemeStyle);
-        }
-    }
-    else if(event->key()== Qt::Key_1 && event->modifiers() == Qt::AltModifier){
-        QPoint globalPos = mapToGlobal(ui->uiSearch->pos());
-        fileSearchBox->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-        fileSearchBox->setGeometry(ui->uiSearch->geometry());
-        fileSearchBox->move(globalPos);
-        fileSearchBox->show();
-    }else if(event->key()== Qt::Key_2&& event->modifiers() == Qt::AltModifier){
-        QPoint globalPos = mapToGlobal(ui->uiTreeView->pos());
-        fileSearchBox->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-        fileSearchBox->setGeometry(ui->uiTreeView->geometry());
-        fileSearchBox->move(globalPos);
-        fileSearchBox->show();
-    }else if(event->key()== Qt::Key_3&& event->modifiers() == Qt::AltModifier){
-        QPoint globalPos = mapToGlobal(ui->uiTextView->pos());
-        fileSearchBox->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-        fileSearchBox->setGeometry(ui->uiTextView->geometry());
-        fileSearchBox->move(globalPos);
-        fileSearchBox->show();
-    } else if (event->key() == Qt::Key_Shift) {
+    switch(event->key()){
+        case Qt::Key_F12:{
+                if (themeState == darkThemeState){
+                    themeState = lightThemeState;
+                    this->setStyleSheet(lightTheme);
+                    QApplication::setStyle(lightThemeStyle);
+                }else{
+                    themeState = darkThemeState;
+                    this->setStyleSheet(darkTheme);
+                    QApplication::setStyle(darkThemeStyle);
+                }
+            }; break;
 
-        if(shiftTimer->isActive()){
-            emit startSearchAll();
-        }
-        shiftTimer->start(200);
+        case Qt::Key_Shift:{
+                if(shiftTimer->isActive()){
+                    emit startSearchAll();
+                }
+                shiftTimer->start(200);
+            }break;
     }
-
     QMainWindow::keyPressEvent(event);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Alt){
+        fileSearchBox->hide();
+        folderTreeBox->hide();
+        mkEditorBox->hide();
+    }
+    QMainWindow::keyReleaseEvent(event);
+}
+
+void MainWindow::KeyPressAltHandler(bool press)
+{
+    fileSearchBox->hide();
+    folderTreeBox->hide();
+    mkEditorBox->hide();
+
+    if(press){
+        QPoint fileSearchPos = mapToGlobal(ui->uiSearch->pos());
+        fileSearchBox->setGeometry(ui->uiSearch->geometry());
+        fileSearchBox->move(fileSearchPos);
+        fileSearchBox->show();
+
+        QPoint folderTreePos = mapToGlobal(ui->uiTreeView->pos());
+        folderTreeBox->setGeometry(ui->uiTreeView->geometry());
+        folderTreeBox->move(folderTreePos);
+        folderTreeBox->show();
+
+        QPoint mkEditorPos = QWidget::mapToGlobal(ui->uiRightPane->pos());
+        mkEditorBox->setGeometry(ui->uiRightPane->geometry());
+        mkEditorBox->move(mkEditorPos);
+        mkEditorBox->show();
+    }
+}
+
+void MainWindow::viewChosenHandler(Qt::Key key)
+{
+
 }
 
 void MainWindow::shiftTimerHandle()
