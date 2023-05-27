@@ -3,7 +3,7 @@
 AppEventFilter::AppEventFilter(QObject *parent)
     : QObject{parent}
 {
-
+    altPressed = false;
 }
 
 bool AppEventFilter::eventFilter(QObject *obj, QEvent *event)
@@ -12,7 +12,10 @@ bool AppEventFilter::eventFilter(QObject *obj, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
         if(Qt::AltModifier == keyEvent->modifiers()){
-            emit KeyPressAlt(true);
+            if(!altPressed){
+                altPressed = true;
+                emit KeyPressAlt(true);
+            }
 
             switch(keyEvent->key()){
             case Qt::Key_1:
@@ -20,6 +23,7 @@ bool AppEventFilter::eventFilter(QObject *obj, QEvent *event)
             case Qt::Key_3:
             case Qt::Key_4: emit viewChosen((Qt::Key)keyEvent->key());break;
             }
+            return true;
         }
     }
 
@@ -27,7 +31,9 @@ bool AppEventFilter::eventFilter(QObject *obj, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
         if(Qt::Key_Alt == keyEvent->key()){
+            altPressed = false;
             emit KeyPressAlt(false);
+            return false;
         }
     }
 

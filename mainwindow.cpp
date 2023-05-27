@@ -8,9 +8,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setup_views(this, *ui);
 
-    fileSearchBox = new TransparentDialog(this);
-    folderTreeBox = new TransparentDialog(this);
-    mkEditorBox = new TransparentDialog(this);
+    fileSearchBox = new TransparentDialog(nullptr,"1");
+    folderTreeBox = new TransparentDialog(this,"2");
+    mkEditorBox = new TransparentDialog(this,"3");
 
     lightThemeStyle = QStyleFactory::create("windowsvista");
     darkThemeStyle = QStyleFactory::create("fusion");
@@ -73,31 +73,40 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 
 void MainWindow::KeyPressAltHandler(bool press)
 {
-    fileSearchBox->hide();
-    folderTreeBox->hide();
-    mkEditorBox->hide();
-
     if(press){
         QPoint fileSearchPos = mapToGlobal(ui->uiSearch->pos());
+        fileSearchPos.setY(fileSearchPos.y()-15);
         fileSearchBox->setGeometry(ui->uiSearch->geometry());
         fileSearchBox->move(fileSearchPos);
-        fileSearchBox->show();
+        if(fileSearchBox->isHidden())fileSearchBox->show();
 
         QPoint folderTreePos = mapToGlobal(ui->uiTreeView->pos());
         folderTreeBox->setGeometry(ui->uiTreeView->geometry());
         folderTreeBox->move(folderTreePos);
-        folderTreeBox->show();
+        if(folderTreeBox->isHidden())folderTreeBox->show();
 
         QPoint mkEditorPos = QWidget::mapToGlobal(ui->uiRightPane->pos());
         mkEditorBox->setGeometry(ui->uiRightPane->geometry());
         mkEditorBox->move(mkEditorPos);
-        mkEditorBox->show();
+        if(mkEditorBox->isHidden())mkEditorBox->show();
+    }else{
+        fileSearchBox->hide();
+        folderTreeBox->hide();
+        mkEditorBox->hide();
     }
 }
 
 void MainWindow::viewChosenHandler(Qt::Key key)
 {
-
+    fileSearchBox->hide();
+    folderTreeBox->hide();
+    mkEditorBox->hide();
+    switch(key){
+        case Qt::Key_1: ui->uiSearch->setFocus();break;
+        case Qt::Key_2: ui->uiTreeView->setFocus();break;
+        case Qt::Key_3: ui->uiTextView->setFocus();break;
+        default:break;
+        }
 }
 
 void MainWindow::shiftTimerHandle()

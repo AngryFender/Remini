@@ -46,6 +46,8 @@ set(PROJECT_SOURCES
         textsearchworker.cpp
         transparentdialog.h
         transparentdialog.cpp
+        appeventfilter.h
+        appeventfilter.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
