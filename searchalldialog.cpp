@@ -1,15 +1,14 @@
 #include "searchalldialog.h"
+#include "qapplication.h"
 
 SearchAllDialog::SearchAllDialog(QWidget *parent):QDialog(parent)
 {
     layout = new QVBoxLayout(this);
-    layout->setSpacing(0);
     textView = new QLineEdit(this);
     textView->setPlaceholderText("Search Texts");
     matchCountView = new QLabel(this);
     matchCountView->setAlignment(Qt::AlignRight);
     searchView = new NavigationView(this);
-
 
     layout->addWidget(textView);
     layout->addWidget(matchCountView,Qt::AlignRight);
@@ -36,8 +35,19 @@ SearchAllDialog::~SearchAllDialog(){
 
 void SearchAllDialog::show()
 {
+    searchView->setFixedHeight(this->height()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-textView->height()-matchCountView->height());
     textView->setFocus();
     QWidget::show();
+}
+
+void SearchAllDialog::setFocusAtSearch()
+{
+    textView->setFocus();
+}
+
+void SearchAllDialog::setFocusAtResults()
+{
+    searchView->setFocus();
 }
 
 void SearchAllDialog::updateTextSearchViewHandle(QStandardItemModel *model,int matchCount)

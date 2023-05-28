@@ -49,6 +49,7 @@ private:
     QWidget *parent;
     QThread searchThread;
     SearchAllDialog *textSearchAllView;
+    QFrame *viewLeftFrame;
     TextSearchWorker textSearchWorker;
     QFileSystemModel modelTree;
     NavigationProxyModel proxyModel;

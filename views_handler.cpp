@@ -17,7 +17,7 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     viewTree = ui.uiTreeView;
     viewText = ui.uiTextView;
     viewTitle = ui.uiTitle;
-
+    viewLeftFrame = ui.uiLeftPane;
 
     viewSearch->setPlaceholderText("Search Files...");
     initTreeView();
@@ -317,6 +317,13 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 void ViewsHandler::startTextSearchInAllFilesHandle()
 {
-    textSearchAllView->show();
     proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
+
+    QPoint pos =  this->parent->mapToGlobal( viewLeftFrame->pos());
+    pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-6);
+    textSearchAllView->setGeometry(viewLeftFrame->geometry());
+    textSearchAllView->move(pos);
+
+    textSearchAllView->show();
+
 }

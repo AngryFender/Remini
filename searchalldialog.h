@@ -23,6 +23,8 @@ public:
     SearchAllDialog(QWidget*parent);
     ~SearchAllDialog();
     void show();
+    void setFocusAtSearch();
+    void setFocusAtResults();
 public slots:
     void updateTextSearchViewHandle(QStandardItemModel *model, int matchCount);
     void textSearchPositionSelected(const QModelIndex &index);
