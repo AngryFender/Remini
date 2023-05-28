@@ -102,9 +102,9 @@ void MainWindow::viewChosenHandler(Qt::Key key)
     folderTreeBox->hide();
     mkEditorBox->hide();
     switch(key){
-        case Qt::Key_1: ui->uiSearch->setFocus();break;
-        case Qt::Key_2: ui->uiTreeView->setFocus();break;
-        case Qt::Key_3: ui->uiTextView->setFocus();break;
+        case Qt::Key_1: ui->uiSearch->activateWindow();  ui->uiSearch->setFocus();break;
+        case Qt::Key_2: ui->uiTreeView->activateWindow();ui->uiTreeView->setFocus();break;
+        case Qt::Key_3: ui->uiTextView->isActiveWindow();ui->uiTextView->setFocus();break;
         default:break;
         }
 }
