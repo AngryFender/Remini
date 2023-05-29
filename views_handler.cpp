@@ -317,13 +317,19 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 void ViewsHandler::startTextSearchInAllFilesHandle()
 {
-    proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
+    if(textSearchAllView->isHidden()){
+        proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
 
-    QPoint pos =  this->parent->mapToGlobal( viewLeftFrame->pos());
-    pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-6);
-    textSearchAllView->setGeometry(viewLeftFrame->geometry());
-    textSearchAllView->move(pos);
+        QPoint pos =  this->parent->mapToGlobal( viewLeftFrame->pos());
+        pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-6);
+        textSearchAllView->setGeometry(viewLeftFrame->geometry());
+        textSearchAllView->move(pos);
 
-    textSearchAllView->show();
+        textSearchAllView->show();
+    }else{
+        textSearchAllView->activateWindow();
+        textSearchAllView->setFocusAtSearch();
+    }
+
 
 }
