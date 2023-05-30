@@ -324,12 +324,9 @@ void ViewsHandler::startTextSearchInAllFilesHandle()
         pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-6);
         textSearchAllView->setGeometry(viewLeftFrame->geometry());
         textSearchAllView->move(pos);
-
         textSearchAllView->show();
     }else{
         textSearchAllView->activateWindow();
         textSearchAllView->setFocusAtSearch();
     }
-
-
 }

@@ -33,9 +33,14 @@ SearchAllDialog::~SearchAllDialog(){
     delete textView;
 }
 
+void SearchAllDialog::setGeometry(const QRect &rect)
+{
+    searchView->setFixedHeight(rect.height()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-textView->height()-matchCountView->height()-PADDING);
+    QDialog::setGeometry(rect);
+}
+
 void SearchAllDialog::show()
 {
-    searchView->setFixedHeight(this->height()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-textView->height()-matchCountView->height());
     textView->setFocus();
     QWidget::show();
 }

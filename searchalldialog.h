@@ -15,6 +15,7 @@
 #include <QLabel>
 
 #define KEY_PRESS_TIMEOUT 400
+#define PADDING 10
 
 class SearchAllDialog : public QDialog
 {
@@ -22,6 +23,7 @@ class SearchAllDialog : public QDialog
 public:
     SearchAllDialog(QWidget*parent);
     ~SearchAllDialog();
+    void setGeometry(const QRect &rect);
     void show();
     void setFocusAtSearch();
     void setFocusAtResults();
