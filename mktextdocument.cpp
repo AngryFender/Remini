@@ -94,6 +94,51 @@ void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
     }
 }
 
+void MkTextDocument::formatAllLines(const QTextDocument &original, MkTextDocument &formatted)
+{
+    bool openBlock = false;
+
+    QTextCursor cursor(&formatted);
+    cursor.movePosition(QTextCursor::Start);
+    for(QTextBlock block = original.begin(); block != original.end(); block = block.next()){
+        cursor.insertBlock();
+        QString blockText = block.text();
+
+        QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(blockText);
+        if(matchCodeBlock.hasMatch()){
+            BlockData *blockData = new BlockData;
+            cursor.block().setUserData(blockData);
+
+            if(!openBlock){
+                openBlock = true;
+                blockData->setStatus(BlockData::start);
+            }
+            else{
+                openBlock = false;
+                blockData->setStatus(BlockData::end);
+            }
+
+            hideSymbols(blockText,CODEBLOCK_SYMBOL);
+
+        }
+        else{
+            if(openBlock){
+                BlockData *blockData = new BlockData;
+                blockData->setStatus(BlockData::content);
+                cursor.block().setUserData(blockData);
+            }
+            else{
+                QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(block.text());
+                if(matchHorizontalLine.hasMatch()){
+                    LineData *lineData = new LineData;
+                    cursor.block().setUserData(lineData);
+                }
+                //identifyFormatData(block, showAll, hasSelection);
+            }
+        }
+        cursor.insertText(blockText);
+    }
+}
 void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection)
 {
     resetFormatLocation();

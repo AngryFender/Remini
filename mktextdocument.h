@@ -105,6 +105,9 @@ public slots:
         }
     };
 
+    QTextDocument originalTexts;
+    QTextDocument formattedTexts;
+
     FormatLocation locBoldA;
     FormatLocation locBoldU;
     FormatLocation locItalicA;
@@ -130,6 +133,7 @@ public slots:
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, bool hasSelection = false);
+    void formatAllLines(const QTextDocument &original, MkTextDocument &formatted);
 
     void identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection = false);
     void insertHeadingData( const QString &text, int &index1, FormatData *formatData);
