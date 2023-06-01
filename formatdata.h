@@ -120,6 +120,8 @@ public:
     const QString &getLinkUrl(int key) const;
     const QString *getHiddenLinkUrl(int key) const;
 
+    void insertLinkText(int key, QString * linkText);
+
     void clearAllLinkMapt();
     void clearAllLinkMapHidden();
     void clearElementLinkMapHidden(int key);

@@ -168,6 +168,11 @@ const QString *FormatData::getHiddenLinkUrl(int key) const
     return linkMapHidden.value(key);
 }
 
+void FormatData::insertLinkText(int key, QString *linkText)
+{
+    linkMap.insert(key, linkText);
+}
+
 void FormatData::clearAllLinkMapt()
 {
     qDeleteAll(linkMap);
