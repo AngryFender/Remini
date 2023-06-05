@@ -1,5 +1,4 @@
 #include "highlighter.h"
-#include <_mingw_mac.h>
 
 Highlighter::Highlighter(QObject *parent)
     : QSyntaxHighlighter(parent),initialised(false)
