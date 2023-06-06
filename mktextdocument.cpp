@@ -118,8 +118,6 @@ void MkTextDocument::formatAllLines(const QTextDocument &original, MkTextDocumen
                 blockData->setStatus(BlockData::end);
             }
 
-            hideSymbols(blockText,CODEBLOCK_SYMBOL);
-
         }
         else{
             if(openBlock){
@@ -144,6 +142,7 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
     resetFormatLocation();
     FormatData *formatData = new FormatData;
     QString text(block.text());
+    QString textLink = text;
     QString test;
 
     int index1 = 0; insertHeadingData(text, index1, formatData);
@@ -165,40 +164,45 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
                 continue;
             }
 
-            if(test == ITALIC_SYMBOL_A){
-                insertFormatData(locItalicA, index1, index2, index3, formatData, test);
-                continue;
-            }else if(test == ITALIC_SYMBOL_U){
-                insertFormatData(locItalicU, index1, index2, index3, formatData, test);
-                continue;
-            }else if(test == BOLD_SYMBOL_A){
-                insertFormatData(locBoldA, index1, index2, index3, formatData, test);
-                continue;
-            }else if(test == BOLD_SYMBOL_U){
-                insertFormatData(locBoldU,  index1, index2, index3, formatData, test);
-                continue;
-            }else if(test == STRIKETHROUGH_SYMBOL){
-                insertFormatData(locStrike,  index1, index2, index3, formatData, test);
-                continue;
-            }else if(test == CHECKED_SYMBOL_END && locCheck.start != -1){
-                insertFormatCheckBoxData(locCheck,  index1, index2, index3, formatData, QString(CHECKED_SYMBOL_END));
-                continue;
-            } else if(test == UNCHECKED_SYMBOL_END && locCheck.start != -1){
-                insertFormatCheckBoxData(locCheck,  index1, index2, index3, formatData, QString(UNCHECKED_SYMBOL_END));
-                continue;
-            }else if(test == CHECK_SYMBOL_START){
-                locCheck.start = index1;
-                incrementIndexes(index1, index2,index3, test.size());
-                continue;
-            }else if(test == LINK_SYMBOL_TITLE_START){
-                locLinkTitle.start = index1;
-            }else if(test == LINK_SYMBOL_MID && locLinkTitle.start != -1){
-                locLinkTitle.end = index1;
-                locLink.start = index2;
-            }else if(test == LINK_SYMBOL_URL_END && locLink.start != -1){
-                locLink.end = index1;
-                QString linkText = text.mid(locLink.start+1, (locLink.end-locLink.start-1));
-                insertFormatLinkData(locLinkTitle,locLink, index1, index2, index3 , formatData, test, &linkText);
+            if(locLink.start != -1){
+                if(test == LINK_SYMBOL_URL_END){
+                    locLink.end = index1;
+                    QString linkText = textLink.mid(locLink.start+1, (locLink.end-locLink.start-1));
+                    insertFormatLinkData(locLinkTitle,locLink, index1, index2, index3 , formatData, test, &linkText);
+                }
+            }else{
+
+                if(test == ITALIC_SYMBOL_A){
+                    insertFormatData(locItalicA, index1, index2, index3, formatData, test);
+                    continue;
+                }else if(test == ITALIC_SYMBOL_U){
+                    insertFormatData(locItalicU, index1, index2, index3, formatData, test);
+                    continue;
+                }else if(test == BOLD_SYMBOL_A){
+                    insertFormatData(locBoldA, index1, index2, index3, formatData, test);
+                    continue;
+                }else if(test == BOLD_SYMBOL_U){
+                    insertFormatData(locBoldU,  index1, index2, index3, formatData, test);
+                    continue;
+                }else if(test == STRIKETHROUGH_SYMBOL){
+                    insertFormatData(locStrike,  index1, index2, index3, formatData, test);
+                    continue;
+                }else if(test == CHECKED_SYMBOL_END && locCheck.start != -1){
+                    insertFormatCheckBoxData(locCheck,  index1, index2, index3, formatData, QString(CHECKED_SYMBOL_END));
+                    continue;
+                } else if(test == UNCHECKED_SYMBOL_END && locCheck.start != -1){
+                    insertFormatCheckBoxData(locCheck,  index1, index2, index3, formatData, QString(UNCHECKED_SYMBOL_END));
+                    continue;
+                }else if(test == CHECK_SYMBOL_START){
+                    locCheck.start = index1;
+                    incrementIndexes(index1, index2,index3, test.size());
+                    continue;
+                }else if(test == LINK_SYMBOL_TITLE_START){
+                    locLinkTitle.start = index1;
+                }else if(test == LINK_SYMBOL_MID && locLinkTitle.start != -1){
+                    locLinkTitle.end = index1;
+                    locLink.start = index2;
+                }
             }
         }
         incrementIndexes(index1, index2,index3);
