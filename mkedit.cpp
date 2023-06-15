@@ -58,7 +58,6 @@ void MkEdit::paintEvent(QPaintEvent *e)
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-    bool drawBlock = false;
     int xBlock =0, yBlock =0;
     int fontSize = this->document()->defaultFont().pointSizeF();
     int scrollPos = this->verticalScrollBar()->value();
@@ -140,7 +139,6 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Left:
     case Qt::Key_Down:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
-    case Qt::Key_A:         if( event->modifiers() == Qt::CTRL) {undoData.selectAll = true; undoData.undoRedoSkip = true; QTextEdit::keyPressEvent(event);return;}break;
     case Qt::Key_V:
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}break;
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}break;
