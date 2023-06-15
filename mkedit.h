@@ -33,7 +33,7 @@ class MkEdit : public QTextEdit
     Q_PROPERTY(QColor keywordColor READ getKeywordColor WRITE setKeywordColor NOTIFY keywordColorChanged)
 
 public:
-    MkEdit(QWidget *parent = nullptr);
+    explicit MkEdit(QWidget *parent = nullptr);
     void initialialCursorPosition();
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event)override;

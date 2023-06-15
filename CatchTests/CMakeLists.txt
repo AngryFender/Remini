@@ -9,10 +9,21 @@ SET(CMAKE_CXX_STANDARD 17)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui)
 
-include_directories("${PROJECT_SOURCE_DIR}/..")
+include_directories("${CMAKE_SOURCE_DIR}")
 
-add_executable(${PROJECT_NAME}  navigationview_tests.cpp
-                                main.cpp)
+add_executable(${PROJECT_NAME}
+
+    ${CMAKE_SOURCE_DIR}/blockdata.cpp
+    ${CMAKE_SOURCE_DIR}/mkedit.cpp
+    ${CMAKE_SOURCE_DIR}/linedata.cpp
+    ${CMAKE_SOURCE_DIR}/blockdata.cpp
+    ${CMAKE_SOURCE_DIR}/formatdata.cpp
+    ${CMAKE_SOURCE_DIR}/editcommand.cpp
+    ${CMAKE_SOURCE_DIR}/mktextdocument.cpp
+    main.cpp
+    navigationview_tests.cpp
+    MkEdit_Tests.cpp
+)
 
 target_link_libraries(ReminiTests PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
 target_link_libraries(ReminiTests PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
@@ -30,3 +41,4 @@ endif ()
 
 
 message(PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
+message(PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")

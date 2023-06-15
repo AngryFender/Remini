@@ -73,7 +73,13 @@ else()
     endif()
 endif()
 
+# Add the test directory to the build process
+add_subdirectory(CatchTests)
+
 target_link_libraries(Remini PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+# Run the tests as part of the build process
+add_test(NAME CatchTests COMMAND CatchTests)
 
 set_target_properties(Remini PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
@@ -82,7 +88,6 @@ set_target_properties(Remini PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
-
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Remini)
