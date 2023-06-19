@@ -48,6 +48,7 @@ set(PROJECT_SOURCES
         transparentdialog.cpp
         appeventfilter.h
         appeventfilter.cpp
+        resources/icons.qrc
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
