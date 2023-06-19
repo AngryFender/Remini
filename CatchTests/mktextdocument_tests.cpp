@@ -56,7 +56,7 @@ TEST_CASE("MkTextDocument single word bold, hide symbols, multiple words", "[MkT
     REQUIRE("abc qwerty" == text);
 }
 
-TEST_CASE("MkTextDocument single word bold, hide symbols, multiple words, multiple lines", "[MkTextDocument]")
+TEST_CASE("MkTextDocument single word bold, hide symbols on multiple lines", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -70,7 +70,7 @@ TEST_CASE("MkTextDocument single word bold, hide symbols, multiple words, multip
     REQUIRE("abc qwerty\n new line" == text);
 }
 
-TEST_CASE("MkTextDocument single word bold, hide symbols, multiple words, multiple lines, cursor on the last line", "[MkTextDocument]")
+TEST_CASE("MkTextDocument single word bold, hide symbols only on 1st line", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -98,6 +98,35 @@ TEST_CASE("MkTextDocument single word bold, hide symbols, underscore", "[MkTextD
     REQUIRE("abc" == text);
 }
 
+TEST_CASE("MkTextDocument single word bold, hide underscore symbols only on 1st line", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("__abc__\n __123__");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("abc\n __123__" == text);
+}
+
+
+TEST_CASE("MkTextDocument single word bold, hide underscore symbols only on both lines", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("__abc__\n __123__");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 2,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("abc\n 123" == text);
+}
+
 TEST_CASE("MkTextDocument single word italic, hide symbols", "[MkTextDocument]")
 {
     MkTextDocument doc;
@@ -112,6 +141,34 @@ TEST_CASE("MkTextDocument single word italic, hide symbols", "[MkTextDocument]")
     REQUIRE("abc" == text);
 }
 
+TEST_CASE("MkTextDocument single word italic, hide symbol on 1st line", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("*abc*\n*hello*");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("abc\n*hello*" == text);
+}
+
+TEST_CASE("MkTextDocument single word italic, hide symbols on both lines", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("*abc*\n*hello*");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 2,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("abc\nhello" == text);
+}
+
 TEST_CASE("MkTextDocument single word italic, hide symbols, underscore", "[MkTextDocument]")
 {
     MkTextDocument doc;
@@ -124,6 +181,34 @@ TEST_CASE("MkTextDocument single word italic, hide symbols, underscore", "[MkTex
 
     QString text = edit.toPlainText();
     REQUIRE("abc" == text);
+}
+
+TEST_CASE("MkTextDocument single word italic, hide underscore symbols on 1st line", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("_abc_\n_hello_");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("abc\n_hello_" == text);
+}
+
+TEST_CASE("MkTextDocument single word italic, hide underscore symbols on both lines", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("_abc_\n_hello_");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 2,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("abc\nhello" == text);
 }
 
 TEST_CASE("MkTextDocument single word bold plus false bold sign, hide only bold symbols", "[MkTextDocument]")
@@ -196,6 +281,34 @@ TEST_CASE("MkTextDocument link texts", "[MkTextDocument]")
     REQUIRE("youtube" == text);
 }
 
+TEST_CASE("MkTextDocument link texts, hide symbols only in 1st line", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("[youtube](www.youtube.com)\n[google](www.google.com)");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("youtube\n[google](www.google.com)" == text);
+}
+
+TEST_CASE("MkTextDocument link texts, hide symbols only in both lines", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("[youtube](www.youtube.com)\n[google](www.google.com)");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 2,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("youtube\ngoogle" == text);
+}
+
 TEST_CASE("MkTextDocument link texts with underscore", "[MkTextDocument]")
 {
     MkTextDocument doc;
@@ -238,7 +351,6 @@ TEST_CASE("MkTextDocument link texts false positive", "[MkTextDocument]")
     REQUIRE("abc](123" == text);
 }
 
-
 TEST_CASE("MkTextDocument strikethrough", "[MkTextDocument]")
 {
     MkTextDocument doc;
@@ -251,6 +363,34 @@ TEST_CASE("MkTextDocument strikethrough", "[MkTextDocument]")
 
     QString text = edit.toPlainText();
     REQUIRE("strike" == text);
+}
+
+TEST_CASE("MkTextDocument strikethrough, hide symbols only in 1st line", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("~~strike~~\n~~new line~~");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("strike\n~~new line~~" == text);
+}
+
+TEST_CASE("MkTextDocument strikethrough, hide symbols in both lines", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("~~strike~~\n~~new line~~");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,2,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("strike\nnew line" == text);
 }
 
 TEST_CASE("MkTextDocument strikethrough, false positive at the back", "[MkTextDocument]")
@@ -307,4 +447,88 @@ TEST_CASE("MkTextDocument strikethrough with false positive at the front", "[MkT
 
     QString text = edit.toPlainText();
     REQUIRE(" strike~~" == text);
+}
+
+TEST_CASE("MkTestDocument single checkbox unchecked","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [ ] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("☐"==text);
+}
+
+TEST_CASE("MkTestDocument double checkbox unchecked","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [ ] - [ ] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("☐☐"==text);
+}
+
+TEST_CASE("MkTestDocument checkbox unchecked, hidden only in 1st line","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [ ] \n- [ ] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,2,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("☐\n☐"==text);
+}
+
+TEST_CASE("MkTestDocument single checkbox checked","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [x] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("☑"==text);
+}
+
+TEST_CASE("MkTestDocument double checkbox checked","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [x] - [x] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("☑☑"==text);
+}
+
+TEST_CASE("MkTestDocument checkbox checked, hidden only in 1st line","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [x] \n- [x] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,2,rec);
+
+    QString text = edit.toPlainText();
+    REQUIRE("☑\n☑"==text);
 }
