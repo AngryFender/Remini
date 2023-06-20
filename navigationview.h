@@ -16,8 +16,9 @@ class NavigationView : public QTreeView
 {
     Q_OBJECT
 public:
-    NavigationView(QWidget * parent);
+    NavigationView(QWidget * parent = nullptr);
     void expandEveryItems(QModelIndex index);
+    void keyPressEvent(QKeyEvent *event)override;
 private:
     QMenu menu;
     QAction addFileAction ;

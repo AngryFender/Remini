@@ -31,6 +31,24 @@ void NavigationView::expandEveryItems(QModelIndex index)
         expandTimer.start(TIME_PERIOD_FOR_EXPANSION);
 }
 
+void NavigationView::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key()== Qt::Key_Enter || event->key() == Qt::Key_Return ){
+        QModelIndex index = this->currentIndex();
+        emit pressed(index);
+
+        if(this->isExpanded(index))
+        {
+            this->collapse(index);
+        }
+        else
+        {
+            this->expand(index);
+        }
+    }
+    QTreeView::keyPressEvent(event);
+}
+
 void NavigationView::mousePressEvent(QMouseEvent *event)
 {
     if(event->buttons() & Qt::LeftButton)
