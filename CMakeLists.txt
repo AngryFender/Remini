@@ -49,6 +49,7 @@ set(PROJECT_SOURCES
         appeventfilter.h
         appeventfilter.cpp
         resources/icons.qrc
+        startuptext.h
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
