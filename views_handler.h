@@ -9,6 +9,7 @@
 #include <mkedit.h>
 #include <navigationview.h>
 #include <navigationmodel.h>
+#include <startupText.h>
 #include "textsearchworker.h"
 #include "ui_mainwindow.h"
 #include "searchalldialog.h"
@@ -43,6 +44,8 @@ private:
         initViews(ui);
         initConnection();
         textSearchWorker.moveToThread(&searchThread);
+        viewTitle->setText("Startup Tips");
+        mkGuiDocument.setPlainText(startupText);
     }
 
 
