@@ -88,6 +88,7 @@ public slots:
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int position);
     void autoInsertSymobolHandle(const int position);
+    void setMarkdownHandle(bool state);
 
  private:
     struct CheckingBlock{
@@ -129,6 +130,7 @@ public slots:
     QVector<QPair<int, int>> linkPositions;
 
     QColor linkColor;
+    bool disableMarkdownState;
 
 
     void resetFormatLocation();

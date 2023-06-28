@@ -84,6 +84,7 @@ protected:
     QAction deleteTextAction;
     QAction selectAllAction;
     QAction selectBlockAction;
+    QAction disableMarkdown;
     QPoint contextMenuPos;
 
     QRegularExpression regexUrl;
@@ -111,6 +112,7 @@ protected:
 
 private slots:
     void fileSaveHandle();
+    void diableMarkdown_internal();
 
 signals:
     void cursorPosChanged(bool hasSelection, int blockNumber, QRect rect);
@@ -138,6 +140,7 @@ signals:
     void pushCheckBox(int position);
     void pushLink(int position);
     void autoInsertSymbol(const int position);
+    void setMarkdown(bool state);
 };
 
 #endif // MKEDIT_H

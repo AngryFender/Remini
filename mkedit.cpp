@@ -16,6 +16,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     deleteTextAction.setText("Delete        Del");
     selectAllAction.setText("Select All    Ctrl+A");
     selectBlockAction.setText("Copy Block");
+    disableMarkdown.setText("Disable Markdown");
 
     connect(&undoAction, SIGNAL(triggered()), this, SLOT(undoContextMenu()));
     connect(&redoAction, SIGNAL(triggered()), this, SLOT(redoContextMenu()));
@@ -24,6 +25,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     connect(&deleteTextAction, SIGNAL(triggered()), this, SLOT(deleteContextMenu()));
     connect(&selectAllAction, SIGNAL(triggered()), this, SLOT(selectAll()));
     connect(&selectBlockAction, SIGNAL(triggered()), this, SLOT(selectBlock()));
+    connect(&disableMarkdown, &QAction::triggered,this, &MkEdit::diableMarkdown_internal);
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(contextMenuHandler(QPoint)));
 
@@ -336,6 +338,8 @@ void MkEdit::contextMenuHandler(QPoint pos)
     menu.addAction(&deleteTextAction);
     menu.addSeparator();
     menu.addAction(&selectAllAction);
+    menu.addSeparator();
+    menu.addAction(&disableMarkdown);
     menu.exec(viewport()->mapToGlobal(pos));
 }
 
@@ -565,6 +569,17 @@ void MkEdit::scrollValueUpdateHandle(int value)
 void MkEdit::fileSaveHandle()
 {
     fileSaveWithScroll();
+}
+
+void MkEdit::diableMarkdown_internal()
+{
+    if("Disable Markdown" ==disableMarkdown.text()){
+        disableMarkdown.setText("Enable Markdown");
+        emit setMarkdown(false);
+    }else{
+        disableMarkdown.setText("Disable Markdown");
+        emit setMarkdown(true);
+    }
 }
 
 void MkEdit::cursorPositionChangedHandle()

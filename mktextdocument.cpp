@@ -9,6 +9,7 @@ MkTextDocument::MkTextDocument(QObject *parent)
 
     this->setUndoRedoEnabled(false);
     linkColor.setRgb(51,102,204);
+    disableMarkdownState = false;
 }
 
 void MkTextDocument::setPlainText(const QString &text)
@@ -1015,6 +1016,11 @@ void MkTextDocument::autoInsertSymobolHandle(const int position)
         cursor.setPosition(position);
         cursor.insertText("    ");
     }
+}
+
+void MkTextDocument::setMarkdownHandle(bool state)
+{
+    disableMarkdownState = state;
 }
 
 
