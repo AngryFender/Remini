@@ -88,7 +88,7 @@ public slots:
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int position);
     void autoInsertSymobolHandle(const int position);
-    void setMarkdownHandle(bool state);
+    void setMarkdownHandle(bool state, QRect rect);
 
  private:
     struct CheckingBlock{

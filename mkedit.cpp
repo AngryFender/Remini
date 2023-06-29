@@ -575,10 +575,10 @@ void MkEdit::diableMarkdown_internal()
 {
     if("Disable Markdown" ==disableMarkdown.text()){
         disableMarkdown.setText("Enable Markdown");
-        emit setMarkdown(false);
+        emit setMarkdown(false, getVisibleRect());
     }else{
         disableMarkdown.setText("Disable Markdown");
-        emit setMarkdown(true);
+        emit setMarkdown(true, getVisibleRect());
     }
 }
 

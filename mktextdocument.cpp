@@ -132,7 +132,7 @@ void MkTextDocument::formatAllLines(const QTextDocument &original, MkTextDocumen
                     LineData *lineData = new LineData;
                     cursor.block().setUserData(lineData);
                 }
-                //identifyFormatData(block, showAll, hasSelection);
+                identifyFormatData(block, false, false);
             }
         }
         cursor.insertText(blockText);
@@ -817,6 +817,10 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo
 
 void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll, const bool clearPushCheckBoxData)
 {
+    if(disableMarkdownState){
+        return;
+    }
+
     int fontSize =this->defaultFont().pointSize();
     FormatCollection formatCollection(fontSize);
     QAbstractTextDocumentLayout* layout = this->documentLayout();
@@ -894,7 +898,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                         }
                     }
                     else{
-                        if(!hasSelection){
+                        if(!hasSelection && !showAll){
                             if(!formatData->isHidden()){
                                 formatData->setHidden(true);
                                 resetTextBlockFormat(block);
@@ -1018,9 +1022,14 @@ void MkTextDocument::autoInsertSymobolHandle(const int position)
     }
 }
 
-void MkTextDocument::setMarkdownHandle(bool state)
+void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
 {
-    disableMarkdownState = state;
+    disableMarkdownState = !state;
+    if(disableMarkdownState){
+        showMKSymbolsFromSavedBlocks(&rect,0);
+    }else{
+        hideMKSymbolsFromDrawingRect(rect, false, 0,false, false);
+    }
 }
 
 
