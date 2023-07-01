@@ -532,3 +532,183 @@ TEST_CASE("MkTestDocument checkbox checked, hidden only in 1st line","[MkTextDoc
     QString text = edit.toPlainText();
     REQUIRE("☑\n☑"==text);
 }
+
+TEST_CASE("MkTextDocument single word bold, setMarkdown = false", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("**abc**");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(false,rec);
+    QString text = doc.toPlainText();
+    REQUIRE("**abc**" == text);
+}
+
+TEST_CASE("MkTextDocument single word bold, setMarkdown = true", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("**abc**");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(true,rec);
+    QString text = doc.toPlainText();
+    REQUIRE("abc" == text);
+}
+
+TEST_CASE("MkTextDocument single word italic, underscore, setMarkdown = false", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("_abc_");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(false,rec);
+    QString text = edit.toPlainText();
+    REQUIRE("_abc_" == text);
+}
+
+TEST_CASE("MkTextDocument single word italic, underscore, setMarkdown = true", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("_abc_");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(true,rec);
+    QString text = edit.toPlainText();
+    REQUIRE("abc" == text);
+}
+
+TEST_CASE("MkTextDocument strikethrough, setMarkdown = false", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("~~strike~~");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    doc.setMarkdownHandle(false,rec);
+    QString text = edit.toPlainText();
+    REQUIRE("~~strike~~" == text);
+}
+
+TEST_CASE("MkTextDocument strikethrough, setMarkdown = true", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("~~strike~~");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    doc.setMarkdownHandle(true,rec);
+    QString text = edit.toPlainText();
+    REQUIRE("strike" == text);
+}
+
+TEST_CASE("MkTextDocument link texts with underscore, setMarkdown = false", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("[lang_explain](https://sqlite.org/lang_explain.html)");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(false,rec);
+    QString text = edit.toPlainText();
+    REQUIRE("[lang_explain](https://sqlite.org/lang_explain.html)" == text);
+}
+
+TEST_CASE("MkTextDocument link texts with underscore, setMarkdown = true", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("[lang_explain](https://sqlite.org/lang_explain.html)");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(true,rec);
+    QString text = edit.toPlainText();
+    REQUIRE("lang_explain" == text);
+}
+
+TEST_CASE("MkTestDocument single checkbox unchecked, setMarkdown = false","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [ ] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    doc.setMarkdownHandle(false, rec);
+    QString text = edit.toPlainText();
+    REQUIRE("- [ ] "==text);
+}
+
+TEST_CASE("MkTestDocument single checkbox unchecked, setMarkdown = true","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [ ] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    doc.setMarkdownHandle(true, rec);
+    QString text = edit.toPlainText();
+    REQUIRE("☐"==text);
+}
+
+TEST_CASE("MkTestDocument single checkbox checked, setMarkdown = false","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [x] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    doc.setMarkdownHandle(false, rec);
+    QString text = edit.toPlainText();
+    REQUIRE("- [x] "==text);
+}
+
+TEST_CASE("MkTestDocument single checkbox checked, setMarkdown = true","[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("- [x] ");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false,1,rec);
+
+    doc.setMarkdownHandle(true, rec);
+    QString text = edit.toPlainText();
+    REQUIRE("☑"==text);
+}

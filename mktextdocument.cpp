@@ -1025,10 +1025,11 @@ void MkTextDocument::autoInsertSymobolHandle(const int position)
 void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
 {
     disableMarkdownState = !state;
+
     if(disableMarkdownState){
         showMKSymbolsFromSavedBlocks(&rect,0);
     }else{
-        hideMKSymbolsFromDrawingRect(rect, false, 0,false, false);
+        hideMKSymbolsFromDrawingRect(rect, false, -1,false, false);
     }
 }
 
