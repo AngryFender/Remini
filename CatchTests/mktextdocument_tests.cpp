@@ -42,7 +42,7 @@ TEST_CASE("MkTextDocument single word bold, hide symbols", "[MkTextDocument]")
     REQUIRE("abc" == text);
 }
 
-TEST_CASE("MkTextDocument single word bold, hide symbols, multiple words", "[MkTextDocument]")
+TEST_CASE("MkTextDocument bold, hide symbols, multiple words", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -56,7 +56,7 @@ TEST_CASE("MkTextDocument single word bold, hide symbols, multiple words", "[MkT
     REQUIRE("abc qwerty" == text);
 }
 
-TEST_CASE("MkTextDocument single word bold, hide symbols on multiple lines", "[MkTextDocument]")
+TEST_CASE("MkTextDocument bold, hide symbols on multiple lines", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -70,7 +70,7 @@ TEST_CASE("MkTextDocument single word bold, hide symbols on multiple lines", "[M
     REQUIRE("abc qwerty\n new line" == text);
 }
 
-TEST_CASE("MkTextDocument single word bold, hide symbols only on 1st line", "[MkTextDocument]")
+TEST_CASE("MkTextDocument bold, hide symbols only on 1st line", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -84,7 +84,7 @@ TEST_CASE("MkTextDocument single word bold, hide symbols only on 1st line", "[Mk
     REQUIRE("abc qwerty\n **new** **line**" == text);
 }
 
-TEST_CASE("MkTextDocument single word bold, hide symbols, underscore", "[MkTextDocument]")
+TEST_CASE("MkTextDocument bold, hide symbols, underscore", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -98,7 +98,7 @@ TEST_CASE("MkTextDocument single word bold, hide symbols, underscore", "[MkTextD
     REQUIRE("abc" == text);
 }
 
-TEST_CASE("MkTextDocument single word bold, hide underscore symbols only on 1st line", "[MkTextDocument]")
+TEST_CASE("MkTextDocument bold, hide underscore symbols only on 1st line", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -113,7 +113,7 @@ TEST_CASE("MkTextDocument single word bold, hide underscore symbols only on 1st 
 }
 
 
-TEST_CASE("MkTextDocument single word bold, hide underscore symbols only on both lines", "[MkTextDocument]")
+TEST_CASE("MkTextDocument bold, hide underscore symbols only on both lines", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -141,7 +141,7 @@ TEST_CASE("MkTextDocument single word italic, hide symbols", "[MkTextDocument]")
     REQUIRE("abc" == text);
 }
 
-TEST_CASE("MkTextDocument single word italic, hide symbol on 1st line", "[MkTextDocument]")
+TEST_CASE("MkTextDocument italic, hide symbol on 1st line", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -155,7 +155,7 @@ TEST_CASE("MkTextDocument single word italic, hide symbol on 1st line", "[MkText
     REQUIRE("abc\n*hello*" == text);
 }
 
-TEST_CASE("MkTextDocument single word italic, hide symbols on both lines", "[MkTextDocument]")
+TEST_CASE("MkTextDocument italic, hide symbols on both lines", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -183,7 +183,7 @@ TEST_CASE("MkTextDocument single word italic, hide symbols, underscore", "[MkTex
     REQUIRE("abc" == text);
 }
 
-TEST_CASE("MkTextDocument single word italic, hide underscore symbols on 1st line", "[MkTextDocument]")
+TEST_CASE("MkTextDocument italic, hide underscore symbols on 1st line", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -197,7 +197,7 @@ TEST_CASE("MkTextDocument single word italic, hide underscore symbols on 1st lin
     REQUIRE("abc\n_hello_" == text);
 }
 
-TEST_CASE("MkTextDocument single word italic, hide underscore symbols on both lines", "[MkTextDocument]")
+TEST_CASE("MkTextDocument italic, hide underscore symbols on both lines", "[MkTextDocument]")
 {
     MkTextDocument doc;
     MkEdit edit;
@@ -711,4 +711,80 @@ TEST_CASE("MkTestDocument single checkbox checked, setMarkdown = true","[MkTextD
     doc.setMarkdownHandle(true, rec);
     QString text = edit.toPlainText();
     REQUIRE("☑"==text);
+}
+
+TEST_CASE("MkTextDocument bold and italic, setMarkdown = false", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("**bold** _italic_");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(false,rec);
+    QString text = doc.toPlainText();
+    REQUIRE("**bold** _italic_" == text);
+}
+
+TEST_CASE("MkTextDocument bold and italic, setMarkdown = true", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("**bold** _italic_");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(true,rec);
+    QString text = doc.toPlainText();
+    REQUIRE("bold italic" == text);
+}
+
+TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = false", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("**bold** _italic_ \n **new line**");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(false,rec);
+    QString text = doc.toPlainText();
+    REQUIRE("**bold** _italic_ \n **new line**" == text);
+}
+
+TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("**bold** _italic_ \n **new line**");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec);
+
+    doc.setMarkdownHandle(true,rec);
+    QString text = doc.toPlainText();
+    REQUIRE("bold italic \n new line" == text);
+}
+
+TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true, focus on 1st line", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("**bold** _italic_ \n **new line**");
+    edit.setDocument(&doc);
+
+    doc.setMarkdownHandle(true,rec);
+
+    doc.cursorPosChangedHandle(false, 1,rec);
+    QString text = doc.toPlainText();
+    REQUIRE("bold italic \n **new line**" == text);
 }
