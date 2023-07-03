@@ -1028,6 +1028,8 @@ void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
 
     if(disableMarkdownState){
         showMKSymbolsFromSavedBlocks(&rect,0);
+        QString allTexts = this->toPlainText();
+        this->setPlainText(allTexts);
     }else{
         hideMKSymbolsFromDrawingRect(rect, false, -1,false, false);
     }
