@@ -573,9 +573,14 @@ void MkEdit::fileSaveHandle()
 
 void MkEdit::diableMarkdown_internal()
 {
+    QTextCursor cursor = this->textCursor();
+    QTextBlock block = this->document()->findBlockByNumber(cursor.blockNumber());
+
     if("Disable Markdown" ==disableMarkdown.text()){
         disableMarkdown.setText("Enable Markdown");
         emit setMarkdown(false, getVisibleRect());
+        cursor.setPosition(block.position());
+        this->setTextCursor(cursor);
     }else{
         disableMarkdown.setText("Disable Markdown");
         emit setMarkdown(true, getVisibleRect());
