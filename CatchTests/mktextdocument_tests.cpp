@@ -784,6 +784,22 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true, focu
 
     doc.setMarkdownHandle(true,rec);
 
+    doc.cursorPosChangedHandle(false, 0,rec);
+    QString text = doc.toPlainText();
+    REQUIRE("**bold** _italic_ \n new line" == text);
+}
+
+TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true, focus on 2nd line", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+
+    doc.setPlainText("**bold** _italic_ \n **new line**");
+    edit.setDocument(&doc);
+
+    doc.setMarkdownHandle(true,rec);
+
     doc.cursorPosChangedHandle(false, 1,rec);
     QString text = doc.toPlainText();
     REQUIRE("bold italic \n **new line**" == text);
