@@ -68,47 +68,47 @@ void ViewsHandler::initFontDefault()
 
 void ViewsHandler::initConnection()
 {
-    QObject::connect(viewText,SIGNAL(syntaxColorUpdate(HighlightColor&)),
-                     &highlighter,SLOT(syntaxColorUpdateHandler(HighlightColor&)));
+    QObject::connect(viewText,&MkEdit::syntaxColorUpdate,
+                     &highlighter,&Highlighter::syntaxColorUpdateHandler);
 
-    QObject::connect(viewTree, SIGNAL(pressed(QModelIndex)),
-                      this, SLOT(fileDisplay(QModelIndex)));
+    QObject::connect(viewTree, &NavigationView::pressed,
+                     this, &ViewsHandler::fileDisplay);
 
-    QObject::connect(viewTree, SIGNAL(createFile(QModelIndex&,QString&)),
-                     &proxyModel, SLOT(createFileHandler(QModelIndex&,QString&)));
+    QObject::connect(viewTree, &NavigationView::createFile,
+                     &proxyModel, &NavigationProxyModel::createFileHandler);
 
-    QObject::connect(viewTree, SIGNAL(createFolder(QModelIndex&,QString&)),
-                     &proxyModel, SLOT(createFolderHandler(QModelIndex&,QString&)));
+    QObject::connect(viewTree, &NavigationView::createFolder,
+                     &proxyModel, &NavigationProxyModel::createFolderHandler);
 
-    QObject::connect(this, SIGNAL(fileDelete(QModelIndex&)),
-                     &proxyModel, SLOT(deleteFileFolderHandler(QModelIndex&)));
+    QObject::connect(this,  &ViewsHandler::fileDelete,
+                     &proxyModel, &NavigationProxyModel::deleteFileFolderHandler);
 
-    QObject::connect(viewTree, SIGNAL(openLocation(QModelIndex&)),
-                     &proxyModel, SLOT(openLocationHandler(QModelIndex&)));
+    QObject::connect(viewTree, &NavigationView::openLocation,
+                     &proxyModel,&NavigationProxyModel::openLocationHandler);
 
-    QObject::connect(viewText, SIGNAL(checkRightClockOnCodeBlock(int,bool&)),
-                     &mkGuiDocument, SLOT(checkRightClockOnCodeBlockHandle(int,bool&)));
+    QObject::connect(viewText, &MkEdit::checkRightClockOnCodeBlock,
+                     &mkGuiDocument, &MkTextDocument::checkRightClockOnCodeBlockHandle);
 
-    QObject::connect(viewText, SIGNAL(selectBlockCopy(int,int&,int&)),
-                     &mkGuiDocument, SLOT(selectBlockCopyHandle(int,int&,int&)));
+    QObject::connect(viewText, &MkEdit::selectBlockCopy,
+                     &mkGuiDocument,&MkTextDocument::selectBlockCopyHandle);
 
-    QObject::connect(viewText, SIGNAL(duplicateLine(int)),
-                     &mkGuiDocument, SLOT(duplicateLineHandle(int)));
+    QObject::connect(viewText, &MkEdit::duplicateLine,
+                     &mkGuiDocument,&MkTextDocument::duplicateLineHandle);
 
-    QObject::connect(viewText, SIGNAL(smartSelection(int,QTextCursor&)),
-                     &mkGuiDocument, SLOT(smartSelectionHandle(int,QTextCursor&)));
+    QObject::connect(viewText, &MkEdit::smartSelection,
+                     &mkGuiDocument,&MkTextDocument::smartSelectionHandle);
 
-    QObject::connect(viewTree, SIGNAL(deleteFileFolder(QModelIndex&)),
-                     this, SLOT(fileDeleteDialogue(QModelIndex&)));
+    QObject::connect(viewTree,&NavigationView::deleteFileFolder,
+                     this, &ViewsHandler::fileDeleteDialogue);
 
-    QObject::connect(viewTree, SIGNAL(openLocation(QModelIndex&)),
-                     &proxyModel, SLOT(openLocationHandler(QModelIndex&)));
+    QObject::connect(viewTree, &NavigationView::openLocation,
+                     &proxyModel,&NavigationProxyModel::openLocationHandler);
 
-    QObject::connect(viewTree, SIGNAL(newFileCreated(QModelIndex)),
-                     this, SLOT(fileDisplay(QModelIndex)));
+    QObject::connect(viewTree, &NavigationView::newFileCreated,
+                     this, &ViewsHandler::fileDisplay);
 
-    QObject::connect(viewText,SIGNAL(fileSave()),
-                     this, SLOT(fileSaveHandle()));
+    QObject::connect(viewText,&MkEdit::fileSave,
+                     this,  &ViewsHandler::fileSaveHandle);
 
     QObject::connect(viewText,SIGNAL(cursorPosChanged(bool,int,QRect)),
                      &mkGuiDocument,SLOT(cursorPosChangedHandle(bool,int,QRect)));
