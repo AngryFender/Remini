@@ -110,53 +110,53 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::fileSave,
                      this,  &ViewsHandler::fileSaveHandle);
 
-    QObject::connect(viewText,SIGNAL(cursorPosChanged(bool,int,QRect)),
-                     &mkGuiDocument,SLOT(cursorPosChangedHandle(bool,int,QRect)));
+    QObject::connect(viewText,&MkEdit::cursorPosChanged,
+                     &mkGuiDocument,&MkTextDocument::cursorPosChangedHandle);
 
-    QObject::connect(viewText,SIGNAL(enterKeyPressed(int)),
-                     &mkGuiDocument,SLOT(enterKeyPressedHandle(int)));
+    QObject::connect(viewText,&MkEdit::enterKeyPressed,
+                     &mkGuiDocument,&MkTextDocument::enterKeyPressedHandle);
 
-    QObject::connect(viewText,SIGNAL(quoteLeftKeyPressed(int,bool&)),
-                     &mkGuiDocument,SLOT(quoteLeftKeyPressedHandle(int,bool&)));
+    QObject::connect(viewText,&MkEdit::quoteLeftKeyPressed,
+                     &mkGuiDocument,&MkTextDocument::quoteLeftKeyPressedHandle);
 
     QObject::connect(viewText,&MkEdit::removeAllMkData,
                      &mkGuiDocument,&MkTextDocument::removeAllMkDataHandle);
 
-    QObject::connect(viewText,SIGNAL(applyAllMkData(bool,int,bool,QRect)),
-                     &mkGuiDocument,SLOT(applyAllMkDataHandle(bool,int,bool,QRect)));
+    QObject::connect(viewText,&MkEdit::applyAllMkData,
+                     &mkGuiDocument,&MkTextDocument::applyAllMkDataHandle);
 
     QObject::connect(viewText,&MkEdit::setMarkdown,
                      &mkGuiDocument,&MkTextDocument::setMarkdownHandle);
 
-    QObject::connect(&mkGuiDocument,SIGNAL(clearUndoStack()),
-                     viewText,SLOT(clearUndoStackHandle()));
+    QObject::connect(&mkGuiDocument,&MkTextDocument::clearUndoStack,
+                     viewText,&MkEdit::clearUndoStackHandle);
 
-    QObject::connect(viewText,SIGNAL(drawTextBlocks(bool,int,bool,QRect)),
-                     &mkGuiDocument,SLOT(drawTextBlocksHandler(bool,int,bool,QRect)));
+    QObject::connect(viewText,&MkEdit::drawTextBlocks,
+                     &mkGuiDocument,&MkTextDocument::drawTextBlocksHandler);
 
-    QObject::connect(viewSearch,SIGNAL(textChanged(QString)),
-                     this,SLOT(searchFileHandle(QString)));
+    QObject::connect(viewSearch,&QLineEdit::textChanged,
+                     this,&ViewsHandler::searchFileHandle);
 
-    QObject::connect(&modelTree,SIGNAL(directoryLoaded(QString)),
-                     this,SLOT(navigationAllPathLoaded(QString)));
+    QObject::connect(&modelTree,&QFileSystemModel::directoryLoaded,
+                     this,&ViewsHandler::navigationAllPathLoaded);
 
-    QObject::connect(viewTree,SIGNAL(expansionComplete()),
-                     this,SLOT(navigationViewExpandedFilenameFilter()));
+    QObject::connect(viewTree,&NavigationView::expansionComplete,
+                     this,&ViewsHandler::navigationViewExpandedFilenameFilter);
 
-    QObject::connect(textSearchAllView, SIGNAL(startSearch(QString&)),
-                     this,SLOT(doSearchWork(QString&)));
+    QObject::connect(textSearchAllView, &SearchAllDialog::startSearch,
+                     this,&ViewsHandler::doSearchWork);
 
-    QObject::connect(&searchThread, SIGNAL(started()),
-                     &textSearchWorker,SLOT(doWork()));
+    QObject::connect(&searchThread,&QThread::started,
+                     &textSearchWorker,&TextSearchWorker::doWork);
 
-    QObject::connect(&textSearchWorker,SIGNAL(finished()),
-                     &searchThread, SLOT(quit()));
+    QObject::connect(&textSearchWorker,&TextSearchWorker::finished,
+                     &searchThread, &QThread::quit);
 
-    QObject::connect(&textSearchWorker,SIGNAL(updateTextSearchView(QStandardItemModel*,int)),
-                     textSearchAllView, SLOT(updateTextSearchViewHandle(QStandardItemModel*,int)));
+    QObject::connect(&textSearchWorker,&TextSearchWorker::updateTextSearchView,
+                     textSearchAllView, &SearchAllDialog::updateTextSearchViewHandle);
 
-    QObject::connect(textSearchAllView,SIGNAL(showSearchedTextInFile(QString&,int,int,int)),
-                     this,SLOT(displayTextSearchedFilePosition(QString&,int,int,int)));
+    QObject::connect(textSearchAllView,&SearchAllDialog::showSearchedTextInFile,
+                     this,&ViewsHandler::displayTextSearchedFilePosition);
 
     QObject::connect(viewText,&MkEdit::pushCheckBox,
                      &mkGuiDocument,&MkTextDocument::pushCheckBoxHandle);

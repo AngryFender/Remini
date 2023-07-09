@@ -14,14 +14,13 @@ NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
     deleteFileAction.setText("Delete");
     openLocationAction.setText("Open Location");
 
-    connect(&addFileAction, SIGNAL(triggered()), this, SLOT(addFile()));
-    connect(&addFolderAction, SIGNAL(triggered()), this, SLOT(addFolder()));
-    connect(&renameFileAction, SIGNAL(triggered()), this, SLOT(renameFile()));
-    connect(&deleteFileAction, SIGNAL(triggered()), this, SLOT(deleteFile()));
-    connect(&openLocationAction, SIGNAL(triggered()), this, SLOT(openFileFolder()));
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)),
-            this, SLOT(ContextMenuHandler(QPoint)));
-    connect(&expandTimer,SIGNAL(timeout()), this, SLOT(expandTimerHandler()));
+    connect(&addFileAction, &QAction::triggered, this, &NavigationView::addFile);
+    connect(&addFolderAction, &QAction::triggered, this, &NavigationView::addFolder);
+    connect(&renameFileAction, &QAction::triggered, this, &NavigationView::renameFile);
+    connect(&deleteFileAction, &QAction::triggered, this, &NavigationView::deleteFile);
+    connect(&openLocationAction, &QAction::triggered, this, &NavigationView::openFileFolder);
+    connect(this, &NavigationView::customContextMenuRequested, this, &NavigationView::ContextMenuHandler);
+    connect(&expandTimer,&QTimer::timeout, this, &NavigationView::expandTimerHandler);
 
 }
 
