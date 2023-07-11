@@ -16,14 +16,14 @@ SearchAllDialog::SearchAllDialog(QWidget *parent):QDialog(parent)
 
     keyPressTimer.setInterval(KEY_PRESS_TIMEOUT);
 
-    connect(searchView,SIGNAL(pressed(QModelIndex)),
-            this,SLOT(textSearchPositionSelected(QModelIndex)));
+    connect(searchView,&NavigationView::pressed,
+            this,&SearchAllDialog::textSearchPositionSelected);
 
-    connect(&keyPressTimer,SIGNAL(timeout()),
-            this,SLOT(keyPressTimeoutHandle()));
+    connect(&keyPressTimer,&QTimer::timeout,
+            this,&SearchAllDialog::keyPressTimeoutHandle);
 
-    connect(textView,SIGNAL(textChanged(QString)),
-            this,SLOT(textSearchChanged(QString)));
+    connect(textView,&QLineEdit::textChanged,
+            this,&SearchAllDialog::textSearchChanged);
 
 
 }

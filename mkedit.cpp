@@ -18,16 +18,16 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     selectBlockAction.setText("Copy Block");
     disableMarkdown.setText("Disable Markdown");
 
-    connect(&undoAction, SIGNAL(triggered()), this, SLOT(undoContextMenu()));
-    connect(&redoAction, SIGNAL(triggered()), this, SLOT(redoContextMenu()));
-    connect(&copyTextAction, SIGNAL(triggered()), this, SLOT(copy()));
-    connect(&pasteTextAction, SIGNAL(triggered()), this, SLOT(paste()));
-    connect(&deleteTextAction, SIGNAL(triggered()), this, SLOT(deleteContextMenu()));
-    connect(&selectAllAction, SIGNAL(triggered()), this, SLOT(selectAll()));
-    connect(&selectBlockAction, SIGNAL(triggered()), this, SLOT(selectBlock()));
+    connect(&undoAction, &QAction::triggered, this, &MkEdit::undoContextMenu);
+    connect(&redoAction, &QAction::triggered, this, &MkEdit::redoContextMenu);
+    connect(&copyTextAction, &QAction::triggered, this, &MkEdit::copy);
+    connect(&pasteTextAction, &QAction::triggered, this, &MkEdit::paste);
+    connect(&deleteTextAction, &QAction::triggered, this, &MkEdit::deleteContextMenu);
+    connect(&selectAllAction, &QAction::triggered, this, &MkEdit::selectAll);
+    connect(&selectBlockAction, &QAction::triggered, this, &MkEdit::selectBlock);
     connect(&disableMarkdown, &QAction::triggered,this, &MkEdit::diableMarkdown_internal);
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)),
-            this, SLOT(contextMenuHandler(QPoint)));
+    connect(this, &MkEdit::customContextMenuRequested,
+            this, &MkEdit::contextMenuHandler);
 
     connect(&fileSaveTimer, &QTimer::timeout,
             this, &MkEdit::fileSaveHandle);
@@ -35,11 +35,11 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     penCodeBlock.setWidthF(1);
     penCodeBlock.setStyle(Qt::SolidLine);
 
-    QObject::connect(this,SIGNAL(cursorPositionChanged()),
-                     this, SLOT(cursorPositionChangedHandle()));
+    QObject::connect(this,&MkEdit::cursorPositionChanged,
+                     this, &MkEdit::cursorPositionChangedHandle);
 
-    QObject::connect(this->verticalScrollBar(),SIGNAL(valueChanged(int)),
-                     this, SLOT(scrollValueUpdateHandle(int)));
+    QObject::connect(this->verticalScrollBar(),&QScrollBar::valueChanged,
+                     this, &MkEdit::scrollValueUpdateHandle);
 
     this->setUndoRedoEnabled(false);
 }
