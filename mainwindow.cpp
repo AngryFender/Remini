@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(shiftTimer,&QTimer::timeout,
                      this, &MainWindow::shiftTimerHandle);
 
-    QObject::connect(this,SIGNAL(startSearchAll()),
-                     view_handler.get(),SLOT(startTextSearchInAllFilesHandle()));
+    QObject::connect(this,&MainWindow::startSearchAll,
+                     view_handler.get(),&ViewsHandler::startTextSearchInAllFilesHandle);
 }
 
 MainWindow::~MainWindow()
