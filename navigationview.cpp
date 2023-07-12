@@ -32,20 +32,24 @@ void NavigationView::expandEveryItems(QModelIndex index)
 
 void NavigationView::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key()== Qt::Key_Enter || event->key() == Qt::Key_Return ){
-        QModelIndex index = this->currentIndex();
-        emit pressed(index);
+    QTreeView::keyPressEvent(event);
 
-        if(this->isExpanded(index))
-        {
-            this->collapse(index);
-        }
-        else
-        {
-            this->expand(index);
+    QModelIndex index = this->currentIndex();
+    if(!isPersistentEditorOpen(index))
+    {
+        if(event->key()== Qt::Key_Enter || event->key() == Qt::Key_Return ){
+            emit pressed(index);
+
+            if(this->isExpanded(index))
+            {
+                this->collapse(index);
+            }
+            else
+            {
+                this->expand(index);
+            }
         }
     }
-    QTreeView::keyPressEvent(event);
 }
 
 void NavigationView::mousePressEvent(QMouseEvent *event)
