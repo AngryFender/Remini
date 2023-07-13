@@ -4,7 +4,8 @@
 #include <QString>
 
 const QString startupText = QStringLiteral("Keyboard Shortcuts:\n"
-                                           " - Alt + 1 to search filenames\n"
+                                           " - Alt + 1 to search file/folders\n"
+                                           "        - \"/\" + name to search folders\n"
                                            " - Alt + 2 to navigate files/folders\n"
                                            " - Alt + 3 to start editing files\n"
                                            " - Quick double shift for searching words in all files\n"

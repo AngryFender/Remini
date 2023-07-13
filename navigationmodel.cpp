@@ -227,7 +227,7 @@ bool NavigationProxyModel::filterChildIndex( QFileSystemModel* model, int source
     QString fileName = info.fileName().toLower();
 
     if(filterRegularExpression().pattern().first(1).contains('/')){                 //check if the search is for folders
-        QString folderName = filterRegularExpression().pattern().removeFirst();
+        QString folderName = filterRegularExpression().pattern().removeFirst().toLower();
         if(info.isDir()){
             if(fileName.contains(folderName)){
                 return true;
@@ -245,7 +245,7 @@ bool NavigationProxyModel::filterChildIndex( QFileSystemModel* model, int source
             }
         }
 
-        if(info.path().contains(folderName)){
+        if(info.path().toLower().contains(folderName)){
             return true;
         }
 
