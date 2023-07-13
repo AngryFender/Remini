@@ -226,28 +226,53 @@ bool NavigationProxyModel::filterChildIndex( QFileSystemModel* model, int source
     QFileInfo info = model->fileInfo(source_parent);
     QString fileName = info.fileName().toLower();
 
-    if(info.isFile()){
-        if(fileName.contains(filterRegularExpression().pattern())){
-            return true;
-        }else{
-            return false;
-        }
-    }
+    if(filterRegularExpression().pattern().first(1).contains('/')){                 //check if the search is for folders
+        QString folderName = filterRegularExpression().pattern().removeFirst();
+        if(info.isDir()){
+            if(fileName.contains(folderName)){
+                return true;
+            }
 
-    if(info.isDir())
-    {
-        QDir dir(info.absoluteFilePath());
-        if(dir.isEmpty()){
-            return false;
-        }else{
+            QDir dir(info.absoluteFilePath());
             dir.setFilter( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot );
             int rowCount = dir.count();
-            bool childResult = false;
 
             for(int row = 0; row<rowCount; row++){
                 QModelIndex childIndex = model->index(row,0,source_parent);
                 if(filterChildIndex( model, row, childIndex)){
                     return true;
+                }
+            }
+        }
+
+        if(info.path().contains(folderName)){
+            return true;
+        }
+
+
+    }else{
+        if(info.isFile()){
+            if(fileName.contains(filterRegularExpression().pattern())){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        if(info.isDir())
+        {
+            QDir dir(info.absoluteFilePath());
+            if(dir.isEmpty()){
+                return false;
+            }else{
+                dir.setFilter( QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot );
+                int rowCount = dir.count();
+
+                for(int row = 0; row<rowCount; row++){
+                    QModelIndex childIndex = model->index(row,0,source_parent);
+                    if(filterChildIndex( model, row, childIndex)){
+                        return true;
+                    }
                 }
             }
         }
