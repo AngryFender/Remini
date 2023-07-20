@@ -22,8 +22,9 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     viewSearch->setPlaceholderText("Search Files...");
     initTreeView();
 
-    viewText->setDocument(&mkGuiDocument);
+    mkGuiDocument.setPlainText(startupText);
     highlighter.setDocument(&mkGuiDocument);
+    viewText->setDocument(&mkGuiDocument);
 
     initFontDefault();
 }

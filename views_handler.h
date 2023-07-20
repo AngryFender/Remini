@@ -45,7 +45,6 @@ private:
         initConnection();
         textSearchWorker.moveToThread(&searchThread);
         viewTitle->setText("Startup Tips");
-        mkGuiDocument.setPlainText(startupText);
     }
 
 
