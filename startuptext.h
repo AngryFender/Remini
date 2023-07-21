@@ -4,11 +4,12 @@
 #include <QString>
 
 const QString startupText = QStringLiteral("Keyboard Shortcuts:\n"
-                                           " - Alt + 1 to search file/folders\n"
-                                           "        - \"/\" + name to search folders\n"
-                                           " - Alt + 2 to navigate files/folders\n"
-                                           " - Alt + 3 to start editing files\n"
-                                           " - Quick double shift for searching words in all files\n"
+                                           " - \"Alt + 1\" to search file/folders\n"
+                                           "        - Then type \"/\" + name to search folders or\n"
+                                           " - \"Alt +/\" to search folders\n"
+                                           " - \"Alt + 2\" to navigate files/folders\n"
+                                           " - \"Alt + 3\" to start editing files\n"
+                                           " - Quick double \"shift\" for searching words in all files\n"
                                            " - \"ch\" or \"check\" followed by tab for checkmark\n"
                                            " - \"uch\" or \"uncheck\" followed by tab for empty box\n"
                                            " - \"link\" or \"lk\"followed by tab for link markdown symbols\n"

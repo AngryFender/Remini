@@ -21,7 +21,8 @@ bool AppEventFilter::eventFilter(QObject *obj, QEvent *event)
             case Qt::Key_1:
             case Qt::Key_2:
             case Qt::Key_3:
-            case Qt::Key_4: emit viewChosen((Qt::Key)keyEvent->key());break;
+            case Qt::Key_4:
+            case Qt::Key_Slash: emit viewChosen((Qt::Key)keyEvent->key());break;
             }
             return true;
         }
