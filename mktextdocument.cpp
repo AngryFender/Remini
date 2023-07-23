@@ -898,7 +898,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                         }
                     }
                     else{
-                        if(!hasSelection && !showAll){
+                        if(!showAll){
                             if(!formatData->isHidden()){
                                 formatData->setHidden(true);
                                 resetTextBlockFormat(block);
