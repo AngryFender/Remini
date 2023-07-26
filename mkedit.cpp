@@ -578,12 +578,12 @@ void MkEdit::diableMarkdown_internal()
 
     if("Disable Markdown" ==disableMarkdown.text()){
         disableMarkdown.setText("Enable Markdown");
-        emit setMarkdown(false, getVisibleRect());
+        emit setMarkdownStatus(false, getVisibleRect());
         cursor.setPosition(block.position());
         this->setTextCursor(cursor);
     }else{
         disableMarkdown.setText("Disable Markdown");
-        emit setMarkdown(true, getVisibleRect());
+        emit setMarkdownStatus(true, getVisibleRect());
     }
 }
 
@@ -595,5 +595,6 @@ void MkEdit::cursorPositionChangedHandle()
         savedBlockNumber = currentBlockNumber;
         emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect());
         this->update();
+        qDebug()<<"current block number = "<< currentBlockNumber;
     }
 }

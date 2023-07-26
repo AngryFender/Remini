@@ -126,7 +126,7 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::applyAllMkData,
                      &mkGuiDocument,&MkTextDocument::applyAllMkDataHandle);
 
-    QObject::connect(viewText,&MkEdit::setMarkdown,
+    QObject::connect(viewText,&MkEdit::setMarkdownStatus,
                      &mkGuiDocument,&MkTextDocument::setMarkdownHandle);
 
     QObject::connect(&mkGuiDocument,&MkTextDocument::clearUndoStack,

@@ -140,7 +140,7 @@ signals:
     void pushCheckBox(int position);
     void pushLink(int position);
     void autoInsertSymbol(const int position);
-    void setMarkdown(bool state, QRect rect);
+    void setMarkdownStatus(bool state, QRect rect);
 };
 
 #endif // MKEDIT_H
