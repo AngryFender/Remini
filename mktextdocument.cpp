@@ -839,6 +839,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
     for(QTextBlock block = this->begin(); block != this->end(); block = block.next()){
         if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
 
+            int currentBlockNumber = block.blockNumber();
             QTextBlockUserData* data =block.userData();
             if(data == nullptr){
                 continue;
@@ -859,38 +860,40 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                     }
                     checkBlock.end = block;
                     setCodeBlockMargin(block,fontSize*3/4, fontSize, 0);
-                    if(blockNumber >= checkBlock.start.blockNumber() && blockNumber <= checkBlock.end.blockNumber()){
+
+                    hideSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
+                    hideSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
+
+                    if(showAll ||
+                      (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end)||
+                      ((blockNumber >= checkBlock.start.blockNumber() && blockNumber <= checkBlock.end.blockNumber()))){
                         showSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
                         showSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
                     }
-                    else{
-                        if(!hasSelection){
-                            hideSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
-                            hideSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
-                        }
-                    }
+
                 }else if(blockData->getStatus()==BlockData::content){
                     setCodeBlockMargin(block, fontSize*5/3, fontSize, 0);
                 }
             }
             else{
-                int currentBlockNumber = block.blockNumber();
-
                 LineData* lineData = dynamic_cast<LineData*>(data);
                 if(lineData){
-                    if(blockNumber == currentBlockNumber){
+                    if((blockNumber == currentBlockNumber)&&(selectRange.start == -1)&&(selectRange.end == -1)){
                         lineData->setDraw(false);
                         showSymbols(block, lineData->getSymbol());
                     }else{
-                        if(!hasSelection){
-                            lineData->setDraw(true);
-                            hideSymbols(block, lineData->getSymbol());
+                        lineData->setDraw(true);
+                        hideSymbols(block, lineData->getSymbol());
+                        if(showAll || (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end)){
+                            lineData->setDraw(false);
+                            showSymbols(block, lineData->getSymbol());
                         }
+
                     }
                 }
                 FormatData* formatData = dynamic_cast<FormatData*>(data);
                 if(formatData){
-                    if((blockNumber == currentBlockNumber)&&(selectStart == -1)&&(selectEnd == -1)){
+                    if((blockNumber == currentBlockNumber)&&(selectRange.start == -1)&&(selectRange.end == -1)){
                         if(formatData->isHidden()){
                             formatData->setHidden(false);
                             resetTextBlockFormat(block);
