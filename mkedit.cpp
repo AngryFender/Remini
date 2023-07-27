@@ -50,7 +50,7 @@ void MkEdit::initialialCursorPosition()
     cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
 
     int savedBlockNumber = cursor.blockNumber();
-    emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , getVisibleRect());
+    emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , getVisibleRect(),this->textCursor().selectionStart(), this->textCursor().selectionEnd());
 }
 
 void MkEdit::paintEvent(QPaintEvent *e)
@@ -593,8 +593,7 @@ void MkEdit::cursorPositionChangedHandle()
 
     if(savedBlockNumber != currentBlockNumber){
         savedBlockNumber = currentBlockNumber;
-        emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect());
+        emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect(), this->textCursor().selectionStart(), this->textCursor().selectionEnd());
         this->update();
-        qDebug()<<"current block number = "<< currentBlockNumber;
     }
 }

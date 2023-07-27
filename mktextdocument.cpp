@@ -39,8 +39,14 @@ void MkTextDocument::clear()
     QTextDocument::clear();
 }
 
-void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect)
+void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, int selectionStart, int selectionEnd)
 {
+    selectRange.start = this->findBlock(selectionStart).blockNumber();
+    selectRange.end = this->findBlock(selectionEnd).blockNumber();
+
+    if(selectRange.start == selectRange.end){
+        selectRange.start = selectRange.end = -1;
+    }
     hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, false);
 }
 
@@ -884,12 +890,11 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                 }
                 FormatData* formatData = dynamic_cast<FormatData*>(data);
                 if(formatData){
-                    if(blockNumber == currentBlockNumber){
+                    if((blockNumber == currentBlockNumber)&&(selectStart == -1)&&(selectEnd == -1)){
                         if(formatData->isHidden()){
                             formatData->setHidden(false);
                             resetTextBlockFormat(block);
                             showAllFormatSymbolsInTextBlock(block, formatData);
-
                         }
                         QTextCursor cursor(block);
                         for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
@@ -898,20 +903,23 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                         }
                     }
                     else{
-                        if(!showAll){
-                            if(!formatData->isHidden()){
-                                formatData->setHidden(true);
-                                resetTextBlockFormat(block);
-                                hideAllFormatSymbolsInTextBlock(block,formatData);
+                         if(!formatData->isHidden()){
+                            formatData->setHidden(true);
+                            resetTextBlockFormat(block);
+                            hideAllFormatSymbolsInTextBlock(block,formatData);
 
-                                if(!formatData->isHiddenFormatsEmpty()){
-                                    QTextCursor cursor(block);
-                                    for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
-                                    {
-                                        applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), cursor, formatCollection);
-
-                                    }
+                            if(!formatData->isHiddenFormatsEmpty()){
+                                QTextCursor cursor(block);
+                                for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                                {
+                                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), cursor, formatCollection);
                                 }
+                            }
+                        }
+                        if(showAll || (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end)){
+                            if(formatData->isHidden()){
+                                showAllFormatSymbolsInTextBlock(block, formatData);
+                                formatData->setHidden(false);
                             }
                         }
                     }

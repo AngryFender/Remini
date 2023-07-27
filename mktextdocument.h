@@ -71,7 +71,7 @@ public:
     QVector<QPair<int, int>>::const_iterator linkPosEnd(){return linkPositions.cend();};
 
 public slots:
-    void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect);
+    void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, int selectionStart, int selectionEnd);
     void removeAllMkDataHandle(int blockNo);
     void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll, QRect rect);
     void enterKeyPressedHandle(int blockNumber);
@@ -106,9 +106,17 @@ public slots:
         }
     };
 
+    struct SelectRange{
+        int start = -1;
+        int end = -1;
+    };
+
     QTextDocument originalTexts;
     QTextDocument formattedTexts;
 
+    SelectRange selectRange;
+    int selectStart;
+    int selectEnd;
     FormatLocation locBoldA;
     FormatLocation locBoldU;
     FormatLocation locItalicA;
