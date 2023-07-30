@@ -771,7 +771,7 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 
 void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect)
 {
-//    showMKSymbolsFromSavedBlocks(&rect, blockNumber);
+    showMKSymbolsFromSavedBlocks(&rect, blockNumber);
     hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll);
 }
 
