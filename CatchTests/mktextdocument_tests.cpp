@@ -19,7 +19,6 @@ TEST_CASE("MkTextDocument bold text", "[MkTextDocument]")
     REQUIRE("**abc**" == text);
 }
 
-
 TEST_CASE("MkTextDocument italic text", "[MkTextDocument]")
 {
     MkTextDocument doc;
@@ -36,7 +35,7 @@ TEST_CASE("MkTextDocument single word bold, hide symbols", "[MkTextDocument]")
 
     doc.setPlainText("**abc**");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc" == text);
@@ -50,7 +49,7 @@ TEST_CASE("MkTextDocument bold, hide symbols, multiple words", "[MkTextDocument]
 
     doc.setPlainText("**abc** **qwerty**");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc qwerty" == text);
@@ -64,7 +63,7 @@ TEST_CASE("MkTextDocument bold, hide symbols on multiple lines", "[MkTextDocumen
 
     doc.setPlainText("**abc** **qwerty**\n **new** **line**");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 2,rec);
+    doc.cursorPosChangedHandle(false, 2,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc qwerty\n new line" == text);
@@ -78,7 +77,7 @@ TEST_CASE("MkTextDocument bold, hide symbols only on 1st line", "[MkTextDocument
 
     doc.setPlainText("**abc** **qwerty**\n **new** **line**");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc qwerty\n **new** **line**" == text);
@@ -92,7 +91,7 @@ TEST_CASE("MkTextDocument bold, hide symbols, underscore", "[MkTextDocument]")
 
     doc.setPlainText("__abc__");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc" == text);
@@ -106,7 +105,7 @@ TEST_CASE("MkTextDocument bold, hide underscore symbols only on 1st line", "[MkT
 
     doc.setPlainText("__abc__\n __123__");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc\n __123__" == text);
@@ -121,7 +120,7 @@ TEST_CASE("MkTextDocument bold, hide underscore symbols only on both lines", "[M
 
     doc.setPlainText("__abc__\n __123__");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 2,rec);
+    doc.cursorPosChangedHandle(false, 2,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc\n 123" == text);
@@ -135,7 +134,7 @@ TEST_CASE("MkTextDocument single word italic, hide symbols", "[MkTextDocument]")
 
     doc.setPlainText("*abc*");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc" == text);
@@ -149,7 +148,7 @@ TEST_CASE("MkTextDocument italic, hide symbol on 1st line", "[MkTextDocument]")
 
     doc.setPlainText("*abc*\n*hello*");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc\n*hello*" == text);
@@ -163,7 +162,7 @@ TEST_CASE("MkTextDocument italic, hide symbols on both lines", "[MkTextDocument]
 
     doc.setPlainText("*abc*\n*hello*");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 2,rec);
+    doc.cursorPosChangedHandle(false, 2,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc\nhello" == text);
@@ -177,7 +176,7 @@ TEST_CASE("MkTextDocument single word italic, hide symbols, underscore", "[MkTex
 
     doc.setPlainText("_abc_");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc" == text);
@@ -191,7 +190,7 @@ TEST_CASE("MkTextDocument italic, hide underscore symbols on 1st line", "[MkText
 
     doc.setPlainText("_abc_\n_hello_");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc\n_hello_" == text);
@@ -205,7 +204,7 @@ TEST_CASE("MkTextDocument italic, hide underscore symbols on both lines", "[MkTe
 
     doc.setPlainText("_abc_\n_hello_");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 2,rec);
+    doc.cursorPosChangedHandle(false, 2,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc\nhello" == text);
@@ -219,7 +218,7 @@ TEST_CASE("MkTextDocument single word bold plus false bold sign, hide only bold 
 
     doc.setPlainText("**abc** **");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc **" == text);
@@ -233,7 +232,7 @@ TEST_CASE("MkTextDocument single word bold plus false bold sign, hide only bold 
 
     doc.setPlainText("__abc__ __");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc __" == text);
@@ -247,7 +246,7 @@ TEST_CASE("MkTextDocument single word italic plus false italic sign, hide only i
 
     doc.setPlainText("*abc* *");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc *" == text);
@@ -261,7 +260,7 @@ TEST_CASE("MkTextDocument single word italic plus false italic sign, hide only i
 
     doc.setPlainText("_abc_ _");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc _" == text);
@@ -275,7 +274,7 @@ TEST_CASE("MkTextDocument link texts", "[MkTextDocument]")
 
     doc.setPlainText("[youtube](www.youtube.com)");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("youtube" == text);
@@ -289,7 +288,7 @@ TEST_CASE("MkTextDocument link texts, hide symbols only in 1st line", "[MkTextDo
 
     doc.setPlainText("[youtube](www.youtube.com)\n[google](www.google.com)");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("youtube\n[google](www.google.com)" == text);
@@ -303,7 +302,7 @@ TEST_CASE("MkTextDocument link texts, hide symbols only in both lines", "[MkText
 
     doc.setPlainText("[youtube](www.youtube.com)\n[google](www.google.com)");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 2,rec);
+    doc.cursorPosChangedHandle(false, 2,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("youtube\ngoogle" == text);
@@ -317,7 +316,7 @@ TEST_CASE("MkTextDocument link texts with underscore", "[MkTextDocument]")
 
     doc.setPlainText("[lang_explain](https://sqlite.org/lang_explain.html)");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("lang_explain" == text);
@@ -331,7 +330,7 @@ TEST_CASE("MkTextDocument link texts with empty title", "[MkTextDocument]")
 
     doc.setPlainText("[](www.google.com)");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("" == text);
@@ -345,7 +344,7 @@ TEST_CASE("MkTextDocument link texts false positive", "[MkTextDocument]")
 
     doc.setPlainText("abc](123");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("abc](123" == text);
@@ -359,7 +358,7 @@ TEST_CASE("MkTextDocument strikethrough", "[MkTextDocument]")
 
     doc.setPlainText("~~strike~~");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("strike" == text);
@@ -373,7 +372,7 @@ TEST_CASE("MkTextDocument strikethrough, hide symbols only in 1st line", "[MkTex
 
     doc.setPlainText("~~strike~~\n~~new line~~");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("strike\n~~new line~~" == text);
@@ -387,7 +386,7 @@ TEST_CASE("MkTextDocument strikethrough, hide symbols in both lines", "[MkTextDo
 
     doc.setPlainText("~~strike~~\n~~new line~~");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,2,rec);
+    doc.cursorPosChangedHandle(false,2,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("strike\nnew line" == text);
@@ -401,7 +400,7 @@ TEST_CASE("MkTextDocument strikethrough, false positive at the back", "[MkTextDo
 
     doc.setPlainText("strike~~");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("strike~~" == text);
@@ -415,7 +414,7 @@ TEST_CASE("MkTextDocument strikethrough, false positive at the front", "[MkTextD
 
     doc.setPlainText("~~strike");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("~~strike" == text);
@@ -429,7 +428,7 @@ TEST_CASE("MkTextDocument strikethrough with false positive at the back", "[MkTe
 
     doc.setPlainText("~~strike~~ ~~");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("strike ~~" == text);
@@ -443,7 +442,7 @@ TEST_CASE("MkTextDocument strikethrough with false positive at the front", "[MkT
 
     doc.setPlainText("~~ ~~strike~~");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE(" strike~~" == text);
@@ -457,7 +456,7 @@ TEST_CASE("MkTestDocument single checkbox unchecked","[MkTextDocument]")
 
     doc.setPlainText("- [ ] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("☐"==text);
@@ -471,7 +470,7 @@ TEST_CASE("MkTestDocument double checkbox unchecked","[MkTextDocument]")
 
     doc.setPlainText("- [ ] - [ ] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("☐☐"==text);
@@ -485,7 +484,7 @@ TEST_CASE("MkTestDocument checkbox unchecked, hidden only in 1st line","[MkTextD
 
     doc.setPlainText("- [ ] \n- [ ] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,2,rec);
+    doc.cursorPosChangedHandle(false,2,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("☐\n☐"==text);
@@ -499,7 +498,7 @@ TEST_CASE("MkTestDocument single checkbox checked","[MkTextDocument]")
 
     doc.setPlainText("- [x] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("☑"==text);
@@ -513,7 +512,7 @@ TEST_CASE("MkTestDocument double checkbox checked","[MkTextDocument]")
 
     doc.setPlainText("- [x] - [x] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("☑☑"==text);
@@ -527,7 +526,7 @@ TEST_CASE("MkTestDocument checkbox checked, hidden only in 1st line","[MkTextDoc
 
     doc.setPlainText("- [x] \n- [x] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,2,rec);
+    doc.cursorPosChangedHandle(false,2,rec,-1,-1);
 
     QString text = edit.toPlainText();
     REQUIRE("☑\n☑"==text);
@@ -541,7 +540,7 @@ TEST_CASE("MkTextDocument single word bold, setMarkdown = false", "[MkTextDocume
 
     doc.setPlainText("**abc**");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(false,rec);
     QString text = doc.toPlainText();
@@ -556,7 +555,7 @@ TEST_CASE("MkTextDocument single word bold, setMarkdown = true", "[MkTextDocumen
 
     doc.setPlainText("**abc**");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(true,rec);
     QString text = doc.toPlainText();
@@ -571,7 +570,7 @@ TEST_CASE("MkTextDocument single word italic, underscore, setMarkdown = false", 
 
     doc.setPlainText("_abc_");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(false,rec);
     QString text = edit.toPlainText();
@@ -586,7 +585,7 @@ TEST_CASE("MkTextDocument single word italic, underscore, setMarkdown = true", "
 
     doc.setPlainText("_abc_");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(true,rec);
     QString text = edit.toPlainText();
@@ -601,7 +600,7 @@ TEST_CASE("MkTextDocument strikethrough, setMarkdown = false", "[MkTextDocument]
 
     doc.setPlainText("~~strike~~");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(false,rec);
     QString text = edit.toPlainText();
@@ -616,7 +615,7 @@ TEST_CASE("MkTextDocument strikethrough, setMarkdown = true", "[MkTextDocument]"
 
     doc.setPlainText("~~strike~~");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(true,rec);
     QString text = edit.toPlainText();
@@ -631,7 +630,7 @@ TEST_CASE("MkTextDocument link texts with underscore, setMarkdown = false", "[Mk
 
     doc.setPlainText("[lang_explain](https://sqlite.org/lang_explain.html)");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(false,rec);
     QString text = edit.toPlainText();
@@ -646,7 +645,7 @@ TEST_CASE("MkTextDocument link texts with underscore, setMarkdown = true", "[MkT
 
     doc.setPlainText("[lang_explain](https://sqlite.org/lang_explain.html)");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(true,rec);
     QString text = edit.toPlainText();
@@ -661,7 +660,7 @@ TEST_CASE("MkTestDocument single checkbox unchecked, setMarkdown = false","[MkTe
 
     doc.setPlainText("- [ ] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(false, rec);
     QString text = edit.toPlainText();
@@ -676,7 +675,7 @@ TEST_CASE("MkTestDocument single checkbox unchecked, setMarkdown = true","[MkTex
 
     doc.setPlainText("- [ ] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(true, rec);
     QString text = edit.toPlainText();
@@ -691,7 +690,7 @@ TEST_CASE("MkTestDocument single checkbox checked, setMarkdown = false","[MkText
 
     doc.setPlainText("- [x] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(false, rec);
     QString text = edit.toPlainText();
@@ -706,7 +705,7 @@ TEST_CASE("MkTestDocument single checkbox checked, setMarkdown = true","[MkTextD
 
     doc.setPlainText("- [x] ");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false,1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(true, rec);
     QString text = edit.toPlainText();
@@ -721,7 +720,7 @@ TEST_CASE("MkTextDocument bold and italic, setMarkdown = false", "[MkTextDocumen
 
     doc.setPlainText("**bold** _italic_");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(false,rec);
     QString text = doc.toPlainText();
@@ -736,7 +735,7 @@ TEST_CASE("MkTextDocument bold and italic, setMarkdown = true", "[MkTextDocument
 
     doc.setPlainText("**bold** _italic_");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(true,rec);
     QString text = doc.toPlainText();
@@ -751,7 +750,7 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = false", "[
 
     doc.setPlainText("**bold** _italic_ \n **new line**");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(false,rec);
     QString text = doc.toPlainText();
@@ -766,7 +765,7 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true", "[M
 
     doc.setPlainText("**bold** _italic_ \n **new line**");
     edit.setDocument(&doc);
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
 
     doc.setMarkdownHandle(true,rec);
     QString text = doc.toPlainText();
@@ -784,7 +783,7 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true, focu
 
     doc.setMarkdownHandle(true,rec);
 
-    doc.cursorPosChangedHandle(false, 0,rec);
+    doc.cursorPosChangedHandle(false, 0,rec,-1,-1);
     QString text = doc.toPlainText();
     REQUIRE("**bold** _italic_ \n new line" == text);
 }
@@ -800,7 +799,7 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true, focu
 
     doc.setMarkdownHandle(true,rec);
 
-    doc.cursorPosChangedHandle(false, 1,rec);
+    doc.cursorPosChangedHandle(false, 1,rec,-1,-1);
     QString text = doc.toPlainText();
     REQUIRE("bold italic \n **new line**" == text);
 }

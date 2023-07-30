@@ -44,9 +44,6 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
     selectRange.start = this->findBlock(selectionStart).blockNumber();
     selectRange.end = this->findBlock(selectionEnd).blockNumber();
 
-    if(selectRange.start == selectRange.end){
-        selectRange.start = selectRange.end = -1;
-    }
     hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, false);
 }
 
@@ -774,7 +771,7 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 
 void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect)
 {
-    showMKSymbolsFromSavedBlocks(&rect, blockNumber);
+//    showMKSymbolsFromSavedBlocks(&rect, blockNumber);
     hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll);
 }
 
@@ -878,7 +875,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
             else{
                 LineData* lineData = dynamic_cast<LineData*>(data);
                 if(lineData){
-                    if((blockNumber == currentBlockNumber)&&(selectRange.start == -1)&&(selectRange.end == -1)){
+                    if((blockNumber == currentBlockNumber)&&(selectRange.start == NO_SELECTION_POS)&&(selectRange.end == NO_SELECTION_POS)){
                         lineData->setDraw(false);
                         showSymbols(block, lineData->getSymbol());
                     }else{
@@ -893,7 +890,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                 }
                 FormatData* formatData = dynamic_cast<FormatData*>(data);
                 if(formatData){
-                    if((blockNumber == currentBlockNumber)&&(selectRange.start == -1)&&(selectRange.end == -1)){
+                    if((blockNumber == currentBlockNumber)&&(selectRange.start == NO_SELECTION_POS)&&(selectRange.end == NO_SELECTION_POS)){
                         if(formatData->isHidden()){
                             formatData->setHidden(false);
                             resetTextBlockFormat(block);
@@ -1000,7 +997,6 @@ void MkTextDocument::pushLinkHandle(const int position)
     if(!formatData)
         return;
 
-    int index1 = 0;
     for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
     {
         if((*it)->getStatus() == FragmentData::LINK_TITLE){

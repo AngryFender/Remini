@@ -54,6 +54,11 @@ private:
     QTextCharFormat link;
 };
 
+#define NO_SELECTION_POS -1
+struct SelectRange{
+    int start = NO_SELECTION_POS;
+    int end = NO_SELECTION_POS;
+};
 
 class MkTextDocument : public QTextDocument
 {
@@ -104,11 +109,6 @@ public slots:
             start = -1;
             end =-1;
         }
-    };
-
-    struct SelectRange{
-        int start = -1;
-        int end = -1;
     };
 
     QTextDocument originalTexts;

@@ -70,6 +70,7 @@ protected:
     UndoData undoData;
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
+    SelectRange selectRange;
 
     void quoteLeftKey();
     void smartSelectionSetup();
