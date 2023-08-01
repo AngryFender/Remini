@@ -56,8 +56,12 @@ private:
 
 #define NO_SELECTION_POS -1
 struct SelectRange{
-    int start = NO_SELECTION_POS;
-    int end = NO_SELECTION_POS;
+    int start           = NO_SELECTION_POS;
+    int end             = NO_SELECTION_POS;
+    int blockStart      = NO_SELECTION_POS;
+    int posInBlockStart = NO_SELECTION_POS;
+    int blockEnd        = NO_SELECTION_POS;
+    int posInBlockEnd   = NO_SELECTION_POS;
 };
 
 class MkTextDocument : public QTextDocument
@@ -76,7 +80,7 @@ public:
     QVector<QPair<int, int>>::const_iterator linkPosEnd(){return linkPositions.cend();};
 
 public slots:
-    void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, int selectionStart, int selectionEnd);
+    void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, SelectRange * editSelectRange);
     void removeAllMkDataHandle(int blockNo);
     void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll, QRect rect);
     void enterKeyPressedHandle(int blockNumber);
@@ -177,7 +181,7 @@ public slots:
     int numberListGetSpaces(const QString &text);
     QString numberListGetNextNumber(const QString &text);
 
-    void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll, const bool clearPushCheckBoxData = true);
+    void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
 signals:
     void clearUndoStack();
 

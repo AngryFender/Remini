@@ -116,7 +116,7 @@ private slots:
     void diableMarkdown_internal();
 
 signals:
-    void cursorPosChanged(bool hasSelection, int blockNumber, QRect rect, int selectionStart, int selectionEnd);
+    void cursorPosChanged(bool hasSelection, int blockNumber, QRect rect, SelectRange *selectRange);
     void fileSave();
     void enterKeyPressed(int blockNumber);
     void quoteLeftKeyPressed(int blockNumber,bool &success);

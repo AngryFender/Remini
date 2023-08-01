@@ -50,7 +50,10 @@ void MkEdit::initialialCursorPosition()
     cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
 
     int savedBlockNumber = cursor.blockNumber();
-    emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , getVisibleRect(),this->textCursor().selectionStart(), this->textCursor().selectionEnd());
+    selectRange.start = this->textCursor().selectionStart();
+    selectRange.end =  this->textCursor().selectionEnd();
+
+    emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , getVisibleRect(), &selectRange);
 }
 
 void MkEdit::paintEvent(QPaintEvent *e)
@@ -421,6 +424,8 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 void MkEdit::mousePressEvent(QMouseEvent *e)
 {
     if(!isMouseOnCheckBox(e)){
+//        selectRange.blockStart = this->textCursor().block().blockNumber();
+//        selectRange.posInBlockStart = this->textCursor().positionInBlock();
         QTextEdit::mousePressEvent(e);
     }
 }
@@ -604,6 +609,6 @@ void MkEdit::cursorPositionChangedHandle()
             selectRange.end = cursor.selectionEnd();
         }
 
-        emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect(), selectRange.start, selectRange.end);
+        emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect(), &selectRange);
     }
 }

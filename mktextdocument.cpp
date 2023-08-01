@@ -39,12 +39,13 @@ void MkTextDocument::clear()
     QTextDocument::clear();
 }
 
-void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, int selectionStart, int selectionEnd)
+void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * editSelectRange)
 {
-    selectRange.start = this->findBlock(selectionStart).blockNumber();
-    selectRange.end = this->findBlock(selectionEnd).blockNumber();
-
-    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, false);
+    if(editSelectRange){
+        this->selectRange.start = this->findBlock(editSelectRange->start).blockNumber();
+        this->selectRange.end = this->findBlock(editSelectRange->end).blockNumber();
+    }
+    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, editSelectRange, false);
 }
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
@@ -57,7 +58,7 @@ void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bo
 {
     resetTextBlockFormat(blockNumber);
     identifyUserData(showAll, hasSelection);
-    hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber, showAll);
+    hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber, showAll, nullptr);
 }
 
 void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
@@ -772,7 +773,7 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect)
 {
     showMKSymbolsFromSavedBlocks(&rect, blockNumber);
-    hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll);
+    hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll, nullptr);
 }
 
 void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo)
@@ -818,7 +819,7 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo
     }
 }
 
-void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll, const bool clearPushCheckBoxData)
+void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
 {
     if(disableMarkdownState){
         return;
@@ -1038,7 +1039,7 @@ void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
         QString allTexts = this->toPlainText();
         this->setPlainText(allTexts);
     }else{
-        hideMKSymbolsFromDrawingRect(rect, false, -1,false, false);
+        hideMKSymbolsFromDrawingRect(rect, false, -1,false,nullptr,false);
     }
 }
 
