@@ -58,6 +58,8 @@ private:
 struct SelectRange{
     int start           = NO_SELECTION_POS;
     int end             = NO_SELECTION_POS;
+    int currentposInBlock      = NO_SELECTION_POS;
+    int currentBlockPos        = NO_SELECTION_POS;
     int blockStart      = NO_SELECTION_POS;
     int posInBlockStart = NO_SELECTION_POS;
     int blockEnd        = NO_SELECTION_POS;
@@ -171,7 +173,7 @@ public slots:
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void showSymbols(QTextBlock &block,const QString &symbol);
-    void showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);
+    void showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * selectRange = nullptr);
     void showSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void autoCompleteCodeBlock(int blockNumber,bool &success);

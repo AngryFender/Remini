@@ -604,11 +604,21 @@ void MkEdit::cursorPositionChangedHandle()
         if(!cursor.hasSelection()){
             selectRange.start = -1;
             selectRange.end = -1;
+            selectRange.currentposInBlock = cursor.positionInBlock();
+            selectRange.currentBlockPos = cursor.block().position();
         }else{
             selectRange.start = cursor.selectionStart();
             selectRange.end = cursor.selectionEnd();
         }
 
         emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect(), &selectRange);
+
+        if(!cursor.hasSelection()){
+            cursor.movePosition(QTextCursor::StartOfLine,QTextCursor::MoveAnchor,selectRange.currentBlockPos);
+            for(int rep = 0; rep < selectRange.currentposInBlock; rep++){
+                cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
+            }
+            this->setTextCursor(cursor);
+        }
     }
 }

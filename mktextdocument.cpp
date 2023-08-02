@@ -445,7 +445,6 @@ void MkTextDocument::hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     QString textBlock = block.text();
     bool isLink = false;
     int linkEnd = 0, linkStart = 0;
-    int linkTitleEnd = -1, linkTitleStart = -1;
 
     const QString *symbol;
     int symbolPos = -1;
@@ -501,7 +500,7 @@ void MkTextDocument::showSymbols(QTextBlock &block, const QString &symbol)
 
 }
 
-void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData)
+void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * selectRange)
 {
     QString textBlock = block.text();
     const int blockPos = block.position();
@@ -524,6 +523,15 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
 
     for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
     {
+        int cursorPos = (*it)->getPos();
+        int symbolLen = (*it)->getSymbol().length();
+
+        if(selectRange){
+            if(cursorPos< selectRange->currentposInBlock){
+                selectRange->currentposInBlock = selectRange->currentposInBlock+symbolLen;
+            }
+        }
+
         showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
 
         if((*it)->getSymbol() == LINK_SYMBOL_URL_START){
@@ -895,7 +903,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                         if(formatData->isHidden()){
                             formatData->setHidden(false);
                             resetTextBlockFormat(block);
-                            showAllFormatSymbolsInTextBlock(block, formatData);
+                            showAllFormatSymbolsInTextBlock(block, formatData, editSelectRange);
                         }
                         QTextCursor cursor(block);
                         for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
