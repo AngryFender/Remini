@@ -504,7 +504,7 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
 {
     QString textBlock = block.text();
     const int blockPos = block.position();
-    int index = 0;
+     int index = 0;
     for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
         if(*cp == u'☑' || *cp == u'☐'){
             checkMarkPositions.removeAll(blockPos + index);
@@ -536,6 +536,13 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
 
         if((*it)->getSymbol() == LINK_SYMBOL_URL_START){
             int pos = (*it)->getPos();
+
+            if(selectRange){
+                if(pos< selectRange->currentposInBlock){
+                    selectRange->currentposInBlock = selectRange->currentposInBlock+formatData->getLinkUrl(pos).length();
+                }
+            }
+
             textBlock.insert(pos+1,formatData->getLinkUrl(pos));
         }
     }
@@ -543,6 +550,12 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     cursor.movePosition(QTextCursor::StartOfBlock);
     cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
     cursor.insertText(textBlock);
+    cursor.movePosition(QTextCursor::StartOfBlock);
+
+    if((selectRange)){
+        selectRange->isCursorCaculated = true;
+        selectRange->currentBlockNo = block.blockNumber();
+    }
 }
 
 void MkTextDocument::showSymbolsAtPos(QString &text, int pos, const QString &symbol)

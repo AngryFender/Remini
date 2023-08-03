@@ -7,6 +7,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
     fileSaveTimer.setInterval(FILE_SAVE_TIMEOUT);
     regexUrl.setPattern("(https?|ftp|file)://[\\w\\d._-]+(?:\\.[\\w\\d._-]+)+[\\w\\d._-]*(?:(?:/[\\w\\d._-]+)*/?)?(?:\\?[\\w\\d_=-]+(?:&[\\w\\d_=-]+)*)?(?:#[\\w\\d_-]+)?");
+    savedBlockNumber= -1;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     undoAction.setText("Undo         Ctrl+Z");
@@ -606,15 +607,20 @@ void MkEdit::cursorPositionChangedHandle()
             selectRange.end = -1;
             selectRange.currentposInBlock = cursor.positionInBlock();
             selectRange.currentBlockPos = cursor.block().position();
+            selectRange.isCursorCaculated = false;
         }else{
             selectRange.start = cursor.selectionStart();
             selectRange.end = cursor.selectionEnd();
         }
 
+
+
         emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect(), &selectRange);
 
-        if(!cursor.hasSelection()){
-            cursor.movePosition(QTextCursor::StartOfLine,QTextCursor::MoveAnchor,selectRange.currentBlockPos);
+        if(!cursor.hasSelection() && selectRange.isCursorCaculated){
+            cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position());
+            cursor.movePosition(QTextCursor::StartOfLine,QTextCursor::MoveAnchor);
+
             for(int rep = 0; rep < selectRange.currentposInBlock; rep++){
                 cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
             }

@@ -60,10 +60,12 @@ struct SelectRange{
     int end             = NO_SELECTION_POS;
     int currentposInBlock      = NO_SELECTION_POS;
     int currentBlockPos        = NO_SELECTION_POS;
+    int currentBlockNo         = NO_SELECTION_POS;
     int blockStart      = NO_SELECTION_POS;
     int posInBlockStart = NO_SELECTION_POS;
     int blockEnd        = NO_SELECTION_POS;
     int posInBlockEnd   = NO_SELECTION_POS;
+    bool isCursorCaculated  = false;
 };
 
 class MkTextDocument : public QTextDocument
