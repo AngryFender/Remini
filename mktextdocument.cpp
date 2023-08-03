@@ -508,6 +508,12 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
         if(*cp == u'☑' || *cp == u'☐'){
             checkMarkPositions.removeAll(blockPos + index);
+
+            if(selectRange){
+                if(index < selectRange->currentposInBlock){
+                    selectRange->currentposInBlock--;
+                }
+            }
         }
 
         QVector<QPair<int, int>>::iterator it = linkPositions.begin();
@@ -527,7 +533,7 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
         int symbolLen = (*it)->getSymbol().length();
 
         if(selectRange){
-            if(cursorPos< selectRange->currentposInBlock){
+            if(cursorPos <= selectRange->currentposInBlock){
                 selectRange->currentposInBlock = selectRange->currentposInBlock+symbolLen;
             }
         }

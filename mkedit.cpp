@@ -613,8 +613,6 @@ void MkEdit::cursorPositionChangedHandle()
             selectRange.end = cursor.selectionEnd();
         }
 
-
-
         emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect(), &selectRange);
 
         if(!cursor.hasSelection() && selectRange.isCursorCaculated){

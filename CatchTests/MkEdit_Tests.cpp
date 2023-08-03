@@ -250,3 +250,68 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of 6 word where fi
     REQUIRE(currentPositionOfTextCursorInBlock == cursorPosition + symbolLength);
 }
 
+TEST_CASE("MkEdit move cursor to the middle of the characters after checkbox", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    int symbolLength = 3+3;   // '- [' + 'x] '
+    int cursorPosition = 4;     // ☑che
+    int minusCheckBoxCount = 1; // ☑
+    int newLinePos = 21;
+
+    doc.setPlainText("- [x] check1 \n **new line**");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(newLinePos);
+    edit.setTextCursor(cursor);
+    QString text = edit.toPlainText();
+    REQUIRE("☑check1 \n **new line**" == text);
+
+    cursor.setPosition(cursorPosition);
+    edit.setTextCursor(cursor);
+
+    QString text1 = edit.toPlainText();
+    REQUIRE("- [x] check1 \n new line" == text1);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == cursorPosition + symbolLength - minusCheckBoxCount);
+
+}
+
+TEST_CASE("MkEdit move cursor to the middle of the 2nd characters after checkbox", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    int symbolLength = 3+3+3+3;   // '- [' + 'x] ' + '- [' + 'x] '
+    int cursorPosition = 5;     // ☑☑che
+    int minusCheckBoxCount = 2; // ☑☑
+    int newLinePos = 27;
+
+    doc.setPlainText("- [x] - [x] check1 \n **new line**");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(newLinePos);
+    edit.setTextCursor(cursor);
+    QString text = edit.toPlainText();
+    REQUIRE("☑☑check1 \n **new line**" == text);
+
+    cursor.setPosition(cursorPosition);
+    edit.setTextCursor(cursor);
+
+    QString text1 = edit.toPlainText();
+    REQUIRE("- [x] - [x] check1 \n new line" == text1);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == cursorPosition + symbolLength - minusCheckBoxCount);
+}
+
