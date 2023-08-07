@@ -33,12 +33,15 @@ jobs:
       run: |
         mkdir build
         cd build
-        run: cmake -DCMAKE_BUILD_TYPE=Release -B. -DQt6_DIR=${{ github.workspace }}\Remini\Qt\6.5.0\{arch}
+        cmake -DCMAKE_BUILD_TYPE=Release -B. -DQt6_DIR=${{ github.workspace }}\Remini\Qt\6.5.0\{arch}
 
     - name: Build the Qt project with CMake
       run: cmake --build build --config Release
 
-    - name: Test
+    - name: Run test
       run: |
         cd CatchTests
-        run: ${{ github.workspace }}\Remini\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe ReminiTests.exe
+        ${{ github.workspace }}\Remini\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe ReminiTests.exe
+        ReminiTests.exe
+
+        
