@@ -9,22 +9,38 @@ on:
 jobs:
   build:
 
-    runs-on: windows
+    runs-on: windows-latest
 
     steps:
-    - name: Qt
+    - name: Checkout Repo
+      uses: actions/checkout@v1
+      
+    - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
-        version: '5.15.2'
+        version: '6.5.0'
         host: 'windows'
         target: 'desktop'
         arch: 'win64msvc201964'
         dir: '${{ github.workspace }}/Remini/' 
-        install-deps: 'true'
-        modules: 'widgets'
-        cache: 'false'
+        cache: 'true'
         cache-key-prefix: 'install-qt-action'
         setup-python: 'false'
-        tools: 'toolsifw toolsqtcreator,qt.tools.qtcreator'
-        set-env: 'true'
-        tools-only: 'false'
+        tools: 'tools_cmake'
+
+    - name: Install Visual Studio Build Tools
+      run: choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional"
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B. -DQt6_DIR=${{ github.workspace }}/Remini/Qt/6.5.0/{arch}
+
+    - name: Build the Qt project with CMake
+      run: cmake --build build --config Release
+
+    - name: Test
+      run: |
+        cd CatchTests
+        run: ${{ github.workspace }}/Remini/Qt/6.5.0/msvc2019_64/bin/windeployqt.exe ReminiTests.exe
