@@ -28,15 +28,12 @@ jobs:
         cache-key-prefix: 'install-qt-action'
         setup-python: 'false'
         tools: 'tools_cmake'
-
-    - name: Install Visual Studio Build Tools
-      run: choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional"
-
+        
     - name: Configure CMake
       run: |
         mkdir build
         cd build
-        run: cmake -DCMAKE_BUILD_TYPE=Release -B. -DQt6_DIR=${{ github.workspace }}/Remini/Qt/6.5.0/{arch}
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B. -DQt6_DIR=${{ github.workspace }}\Remini\Qt\6.5.0\{arch}
 
     - name: Build the Qt project with CMake
       run: cmake --build build --config Release
@@ -44,4 +41,4 @@ jobs:
     - name: Test
       run: |
         cd CatchTests
-        run: ${{ github.workspace }}/Remini/Qt/6.5.0/msvc2019_64/bin/windeployqt.exe ReminiTests.exe
+        run: ${{ github.workspace }}\Remini\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe ReminiTests.exe
