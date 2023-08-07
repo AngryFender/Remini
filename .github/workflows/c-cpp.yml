@@ -28,6 +28,9 @@ jobs:
         cache-key-prefix: 'install-qt-action'
         setup-python: 'false'
         tools: 'tools_cmake'
+
+    - name: Install Catch2
+      run: choco install catch2
         
     - name: Configure CMake
       run: cmake -DCMAKE_BUILD_TYPE=Release -B="Build" -DQt6_DIR="D:\a\Remini\Remini\Remini\Qt\6.5.0\msvc2019_64"
