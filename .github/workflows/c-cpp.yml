@@ -18,11 +18,12 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
+        aqtversion: '==3.1.*'
         version: '6.5.0'
         host: 'windows'
         target: 'desktop'
-        arch: 'win64msvc201964'
-        dir: '${{ github.workspace }}/Remini/' 
+        arch: 'win64_msvc2019_64'
+        dir: '${{ github.workspace }}\Remini\' 
         cache: 'true'
         cache-key-prefix: 'install-qt-action'
         setup-python: 'false'
