@@ -33,7 +33,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -B. -DQt6_DIR=${{ github.workspace }}\Remini\Qt\6.5.0\{arch}
+        cmake -DCMAKE_BUILD_TYPE=Release -B. -DQt6_DIR="D:\a\Remini\Remini\Remini\Qt\6.5.0\msvc2019_64"
 
     - name: Build the Qt project with CMake
       run: cmake --build build --config Release
