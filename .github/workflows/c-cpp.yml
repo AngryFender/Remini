@@ -47,7 +47,8 @@ jobs:
 
     - name: Run test
       run: |
-        cd Build/CatchTests
+        echo "Workspace path is ${{ github.workspace }}"
+        cd D:\a\Remini\Remini\Build\CatchTests\Release\
         ${{ github.workspace }}\Remini\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe ReminiTests.exe
         ReminiTests.exe
 
