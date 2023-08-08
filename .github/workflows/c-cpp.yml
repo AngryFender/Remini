@@ -15,6 +15,17 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v1
       
+    - name: Install Catch2
+      uses: Legion2/download-release-action@v2.1.0
+      with:
+        repository: catchorg/Catch2
+        tag: 'v2.13.10'
+        path: /releases/download/v2.13.10/
+        file: catch.hpp
+
+    - name: set environment variable
+      run: echo "CATCH_INCLUDE_DIR=$(Get-Location)" >> $env:GITHUB_ENV
+      
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
@@ -28,9 +39,6 @@ jobs:
         cache-key-prefix: 'install-qt-action'
         setup-python: 'false'
         tools: 'tools_cmake'
-
-    - name: Install Catch2
-      run: choco install catch2
         
     - name: Configure CMake
       run: cmake -DCMAKE_BUILD_TYPE=Release -B="Build" -DQt6_DIR="D:\a\Remini\Remini\Remini\Qt\6.5.0\msvc2019_64"
