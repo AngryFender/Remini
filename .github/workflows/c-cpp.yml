@@ -15,14 +15,15 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v1
       
-    - name: Download catch.hpp
+    - name: Download catch.hpp and setup Environment Variable
       run: |
+        mkdir Catch2
+        cd Catch2
         $url = "https://github.com/catchorg/Catch2/releases/download/v2.13.10/catch.hpp"
         $output = "catch.hpp"
         Invoke-WebRequest -Uri $url -OutFile $output
-
-    - name: set environment variable
-      run: echo "CATCH_INCLUDE_DIR=$(Get-Location)" >> $env:GITHUB_ENV
+        echo "CATCH_INCLUDE_DIR=$(Get-Location)" >> $env:GITHUB_ENV
+        cd ..
       
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
