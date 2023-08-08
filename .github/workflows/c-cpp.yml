@@ -15,13 +15,11 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v1
       
-    - name: Install Catch2
-      uses: Legion2/download-release-action@v2.1.0
-      with:
-        repository: catchorg/Catch2
-        tag: 'v2.13.10'
-        path: /releases/download/v2.13.10/
-        file: catch.hpp
+    - name: Download catch.hpp
+      run: |
+        $url = "https://github.com/catchorg/Catch2/releases/download/v2.13.10/catch.hpp"
+        $output = "catch.hpp"
+        Invoke-WebRequest -Uri $url -OutFile $output
 
     - name: set environment variable
       run: echo "CATCH_INCLUDE_DIR=$(Get-Location)" >> $env:GITHUB_ENV
