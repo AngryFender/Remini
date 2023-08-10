@@ -89,7 +89,9 @@ protected:
     QPoint contextMenuPos;
 
     QRegularExpression regexUrl;
-    QRegularExpressionMatch match;
+    QRegularExpression regexFolderFile;
+    QRegularExpressionMatch matchUrl;
+    QRegularExpressionMatch matchFolderFile;
 
     QRect getVisibleRect();
     void clearMkEffects();

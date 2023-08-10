@@ -7,6 +7,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
     fileSaveTimer.setInterval(FILE_SAVE_TIMEOUT);
     regexUrl.setPattern("(https?|ftp|file)://[\\w\\d._-]+(?:\\.[\\w\\d._-]+)+[\\w\\d._-]*(?:(?:/[\\w\\d._-]+)*/?)?(?:\\?[\\w\\d_=-]+(?:&[\\w\\d_=-]+)*)?(?:#[\\w\\d_-]+)?");
+    regexFolderFile.setPattern("^[a-zA-Z]:\\\\[\\\\\\S|*\\S]?.*$");
     savedBlockNumber= -1;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -405,17 +406,28 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     preUndoSetup();
 
     QString link = source->text();
-    match = regexUrl.match(link);
-    if (match.hasMatch() && !link.contains("](")) {
+    matchUrl = regexUrl.match(link);
+    matchFolderFile = regexFolderFile.match(link);
+    if (matchUrl.hasMatch() && !link.contains("](")) {
         QTextCursor cursor = this->textCursor();
         int pos = cursor.position()+1;
         QString symbolsWithLink = "[]("+link+")";
         cursor.insertText(symbolsWithLink);
         cursor.setPosition(pos);
         this->setTextCursor(cursor);
-    }else{
+    }else if(matchFolderFile.hasMatch()) {
+        QTextCursor cursor = this->textCursor();
+        int pos = cursor.position()+1;
+        QString symbolsWithLink = "[](file:///"+link+")";
+        cursor.insertText(symbolsWithLink);
+        cursor.setPosition(pos);
+        this->setTextCursor(cursor);
+    }
+    else{
         QTextEdit::insertFromMimeData(source);
     }
+
+
 
     postUndoSetup();
     emit fileSave();
