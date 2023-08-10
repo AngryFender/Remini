@@ -7,7 +7,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
     fileSaveTimer.setInterval(FILE_SAVE_TIMEOUT);
     regexUrl.setPattern("(https?|ftp|file)://[\\w\\d._-]+(?:\\.[\\w\\d._-]+)+[\\w\\d._-]*(?:(?:/[\\w\\d._-]+)*/?)?(?:\\?[\\w\\d_=-]+(?:&[\\w\\d_=-]+)*)?(?:#[\\w\\d_-]+)?");
-    regexFolderFile.setPattern("^[a-zA-Z]:\\\\[\\\\\\S|*\\S]?.*$");
+    regexFolderFile.setPattern("[a-zA-Z]:[\\\\/](?:[^\\\\/]+[\\\\/])*([^\\\\/]+\\.*)");
     savedBlockNumber= -1;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
