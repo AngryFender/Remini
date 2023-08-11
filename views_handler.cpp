@@ -84,9 +84,6 @@ void ViewsHandler::initConnection()
     QObject::connect(this,  &ViewsHandler::fileDelete,
                      &proxyModel, &NavigationProxyModel::deleteFileFolderHandler);
 
-    QObject::connect(viewTree, &NavigationView::openLocation,
-                     &proxyModel,&NavigationProxyModel::openLocationHandler);
-
     QObject::connect(viewText, &MkEdit::checkRightClockOnCodeBlock,
                      &mkGuiDocument, &MkTextDocument::checkRightClockOnCodeBlockHandle);
 
@@ -104,6 +101,9 @@ void ViewsHandler::initConnection()
 
     QObject::connect(viewTree, &NavigationView::openLocation,
                      &proxyModel,&NavigationProxyModel::openLocationHandler);
+
+    QObject::connect(viewTree, &NavigationView::copyFolderFilePath,
+                     &proxyModel,&NavigationProxyModel::copyFileFolderHandler);
 
     QObject::connect(viewTree, &NavigationView::newFileCreated,
                      this, &ViewsHandler::fileDisplay);

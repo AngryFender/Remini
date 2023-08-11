@@ -13,12 +13,14 @@ NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
     renameFileAction.setText("Rename");
     deleteFileAction.setText("Delete");
     openLocationAction.setText("Open Location");
+    copyPath.setText("Copy Path");
 
     connect(&addFileAction, &QAction::triggered, this, &NavigationView::addFile);
     connect(&addFolderAction, &QAction::triggered, this, &NavigationView::addFolder);
     connect(&renameFileAction, &QAction::triggered, this, &NavigationView::renameFile);
     connect(&deleteFileAction, &QAction::triggered, this, &NavigationView::deleteFile);
     connect(&openLocationAction, &QAction::triggered, this, &NavigationView::openFileFolder);
+    connect(&copyPath, &QAction::triggered, this, &NavigationView::copyFileFolderPath);
     connect(this, &NavigationView::customContextMenuRequested, this, &NavigationView::ContextMenuHandler);
     connect(&expandTimer,&QTimer::timeout, this, &NavigationView::expandTimerHandler);
 
@@ -98,6 +100,7 @@ void NavigationView::ContextMenuHandler(QPoint pos)
         menu.addAction(&addFileAction);
         menu.addAction(&addFolderAction);
         menu.addAction(&openLocationAction);
+        menu.addAction(&copyPath);
         menu.exec(viewport()->mapToGlobal(pos));
         return;
     }
@@ -116,6 +119,7 @@ void NavigationView::ContextMenuHandler(QPoint pos)
     menu.addAction(&renameFileAction);
     menu.addAction(&deleteFileAction);
     menu.addAction(&openLocationAction);
+    menu.addAction(&copyPath);
     menu.exec(viewport()->mapToGlobal(pos));
 }
 
@@ -153,6 +157,12 @@ void NavigationView::openFileFolder()
 {
     auto index = lastClickedIndex;
     emit openLocation(index);
+}
+
+void NavigationView::copyFileFolderPath()
+{
+    auto index = lastClickedIndex;
+    emit copyFolderFilePath(index);
 }
 
 void NavigationView::folderChangedHandler()

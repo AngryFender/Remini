@@ -7,7 +7,8 @@
 #include <QUrl>
 #include <QObject>
 #include <Windows.h>
-#include <shellapi.h>
+#include <QClipboard>
+#include <QApplication>
 
 class NavigationProxyModel : public QSortFilterProxyModel{
 
@@ -24,6 +25,7 @@ public slots:
     void createFolderHandler(QModelIndex& index, QString &name);
     void deleteFileFolderHandler(QModelIndex& index);
     void openLocationHandler(QModelIndex& index);
+    void copyFileFolderHandler(QModelIndex& index);
     void createAllFoldersList(QModelIndex index, QStringList &listPath);
     void createAllFilesList(QModelIndex index, QStringList &listPath);
 signals:

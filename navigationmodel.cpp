@@ -122,6 +122,27 @@ void NavigationProxyModel::openLocationHandler(QModelIndex &index)
     }
     QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath));
 }
+
+void NavigationProxyModel::copyFileFolderHandler(QModelIndex &index)
+{
+    QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
+    if(!model)
+        return ;
+
+    QModelIndex sourceIndex = this->mapToSource(index);
+
+    QString path;
+
+    if(!sourceIndex.isValid()){
+        path = model->rootPath();
+    }else{
+        QFileInfo fileInfo = model->fileInfo(sourceIndex);
+        path = fileInfo.absoluteFilePath();
+    }
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(path);
+}
+
 void NavigationProxyModel::createAllFoldersList(QModelIndex index, QStringList &listPath)
 {
     QFileSystemModel * model =  qobject_cast<QFileSystemModel*>(this->sourceModel());
