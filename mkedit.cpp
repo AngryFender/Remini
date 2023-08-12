@@ -415,7 +415,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
         cursor.insertText(symbolsWithLink);
         cursor.setPosition(pos);
         this->setTextCursor(cursor);
-    }else if(matchFolderFile.hasMatch()) {
+    }else if(matchFolderFile.hasMatch() && !link.contains("](")) {
         QTextCursor cursor = this->textCursor();
         int pos = cursor.position()+1;
         QString symbolsWithLink = "[](file:///"+link+")";

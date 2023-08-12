@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 #include "mkedit.h"
 #include <QApplication>
+#include <QClipboard>
 
 TEST_CASE("MkEdit simple text", "[MkEdit]")
 {
@@ -314,4 +315,90 @@ TEST_CASE("MkEdit move cursor to the middle of the 2nd characters after checkbox
     int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
     REQUIRE(currentPositionOfTextCursorInBlock == cursorPosition + symbolLength - minusCheckBoxCount);
 }
+
+TEST_CASE("MkEdit paste link from clipboard", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QString link = "https://www.google.com/";
+    int initialPos = 0;
+
+    edit.setDocument(&doc);
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(link);
+    QKeyEvent *keyPressEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    edit.keyPressEvent(keyPressEvent);
+    QString text = edit.toPlainText();
+    REQUIRE("[](https://www.google.com/)" == text);
+}
+
+TEST_CASE("MkEdit paste link from clipboard then check if the cursor is at the middle of []", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QString link = "https://www.google.com/";
+    int initialPos = 0;
+    int desiredPos = 1;
+
+    edit.setDocument(&doc);
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(link);
+    QKeyEvent *keyPressEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    edit.keyPressEvent(keyPressEvent);
+    QString text = edit.toPlainText();
+    REQUIRE("[](https://www.google.com/)" == text);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
+}
+
+
+TEST_CASE("MkEdit type inside bold format then check if the cursor is at the right place", "[MkEdit]")
+{
+
+    MkTextDocument doc;
+    MkEdit edit;
+    int initialPos = 4; //**bo
+    int desiredPos = 5; //**bop
+    QKeyEvent *keyPressEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_P, Qt::NoModifier, QString("p"));
+
+    doc.setPlainText("**bold**");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    edit.keyPressEvent(keyPressEvent);
+
+    QString text = edit.toPlainText();
+    REQUIRE("**bopld**" == text);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
+
+}
+
 
