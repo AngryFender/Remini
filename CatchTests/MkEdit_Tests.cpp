@@ -2,6 +2,7 @@
 #include "mkedit.h"
 #include <QApplication>
 #include <QClipboard>
+#include <QScopedPointer>
 
 TEST_CASE("MkEdit simple text", "[MkEdit]")
 {
@@ -327,14 +328,35 @@ TEST_CASE("MkEdit paste link from clipboard", "[MkEdit]")
 
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(link);
-    QKeyEvent *keyPressEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier);
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
 
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
-    edit.keyPressEvent(keyPressEvent);
+    edit.keyPressEvent(keyPressEvent.data());
     QString text = edit.toPlainText();
     REQUIRE("[](https://www.google.com/)" == text);
+}
+
+TEST_CASE("MkEdit paste path from clipboard", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QString link = "C:\\Users\\Public";
+    int initialPos = 0;
+
+    edit.setDocument(&doc);
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(link);
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("[](file:///C:\\Users\\Public)" == text);
 }
 
 TEST_CASE("MkEdit paste link from clipboard then check if the cursor is at the middle of []", "[MkEdit]")
@@ -349,12 +371,12 @@ TEST_CASE("MkEdit paste link from clipboard then check if the cursor is at the m
 
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(link);
-    QKeyEvent *keyPressEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier);
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
 
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
-    edit.keyPressEvent(keyPressEvent);
+    edit.keyPressEvent(keyPressEvent.data());
     QString text = edit.toPlainText();
     REQUIRE("[](https://www.google.com/)" == text);
 
@@ -362,6 +384,30 @@ TEST_CASE("MkEdit paste link from clipboard then check if the cursor is at the m
     REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
 }
 
+TEST_CASE("MkEdit paste path from clipboard then check if the cursor is at the middle of []", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QString link = "C:\\Users\\Public";
+    int initialPos = 0;
+    int desiredPos = 1;
+
+    edit.setDocument(&doc);
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(link);
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("[](file:///C:\\Users\\Public)" == text);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
+}
 
 TEST_CASE("MkEdit type inside bold format then check if the cursor is at the right place", "[MkEdit]")
 {
@@ -370,7 +416,7 @@ TEST_CASE("MkEdit type inside bold format then check if the cursor is at the rig
     MkEdit edit;
     int initialPos = 4; //**bo
     int desiredPos = 5; //**bop
-    QKeyEvent *keyPressEvent = new QKeyEvent(QEvent::KeyPress, Qt::Key_P, Qt::NoModifier, QString("p"));
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
 
     doc.setPlainText("**bold**");
     edit.setDocument(&doc);
@@ -391,7 +437,7 @@ TEST_CASE("MkEdit type inside bold format then check if the cursor is at the rig
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
-    edit.keyPressEvent(keyPressEvent);
+    edit.keyPressEvent(keyPressEvent.data());
 
     QString text = edit.toPlainText();
     REQUIRE("**bopld**" == text);
@@ -401,4 +447,88 @@ TEST_CASE("MkEdit type inside bold format then check if the cursor is at the rig
 
 }
 
+TEST_CASE("MkEdit type all strings with bold format then check if the cursor is at the right place", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    int desiredPos = 8; //**bop
+
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString(" ")));
+    edit.keyPressEvent(keyPressEvent.data());
+
+    QString testString = "**bold**";
+    foreach (QChar chara,testString) {
+        keyPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString(chara)));
+        edit.keyPressEvent(keyPressEvent.data());
+    }
+
+    keyPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+
+    keyPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+
+    keyPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
+    edit.keyPressEvent(keyPressEvent.data());
+
+    QString text = edit.toPlainText();
+    REQUIRE(" **boldp**" == text);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
+}
+
+
+TEST_CASE("MkEdit type inside link format in 2nd line then check if the cursor is at the right place", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    int initialPos = 4; //**bo
+    int desiredPos = 5; //**bop
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
+
+
+    doc.setPlainText("**bold** \n **new line**");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    edit.keyPressEvent(keyPressEvent.data());
+
+    QString text = edit.toPlainText();
+    REQUIRE("**bopld** \n new line" == text);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
+}
 
