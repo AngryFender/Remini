@@ -44,6 +44,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
                      this, &MkEdit::scrollValueUpdateHandle);
 
     this->setUndoRedoEnabled(false);
+    preUndoSetup();
 }
 
 void MkEdit::initialialCursorPosition()
