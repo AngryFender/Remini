@@ -50,6 +50,8 @@ set(PROJECT_SOURCES
         appeventfilter.cpp
         resources/icons.qrc
         startuptext.h
+        recentfilesdialog.h
+        recentfilesdialog.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

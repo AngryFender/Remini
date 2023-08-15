@@ -319,6 +319,14 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 }
 
+void ViewsHandler::openRecentFilesDialogHandle(bool show)
+{
+    if(show)
+        recentFilesView->show();
+    else
+        recentFilesView->hide();
+}
+
 void ViewsHandler::startTextSearchInAllFilesHandle()
 {
     if(textSearchAllView->isHidden()){

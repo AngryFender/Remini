@@ -50,6 +50,7 @@ private:
     void setup_views(QWidget *parent, Ui::MainWindow &ui);
 
 signals:
+    void openRecentFilesDialog(bool show);
     void startSearchAll();
 };
 #endif // MAINWINDOW_H

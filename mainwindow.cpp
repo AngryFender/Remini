@@ -24,6 +24,9 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(shiftTimer,&QTimer::timeout,
                      this, &MainWindow::shiftTimerHandle);
 
+    QObject::connect(this,&MainWindow::openRecentFilesDialog,
+                     view_handler.get(),&ViewsHandler::openRecentFilesDialogHandle);
+
     QObject::connect(this,&MainWindow::startSearchAll,
                      view_handler.get(),&ViewsHandler::startTextSearchInAllFilesHandle);
 }
@@ -57,16 +60,25 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 }
                 shiftTimer->start(200);
             }break;
+
+        case Qt::Key_Tab:
+                if( event->modifiers() == Qt::CTRL){
+                    emit openRecentFilesDialog(true);
+                }break;
+        default:;
     }
     QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Alt){
-        fileSearchBox->hide();
-        folderTreeBox->hide();
-        mkEditorBox->hide();
+    switch(event->key()){
+        case Qt::Key_Alt:{
+                fileSearchBox->hide();
+                folderTreeBox->hide();
+                mkEditorBox->hide();
+            }break;
+        case Qt::Key_Control: emit openRecentFilesDialog(false); break;
     }
     QMainWindow::keyReleaseEvent(event);
 }

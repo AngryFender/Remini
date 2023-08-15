@@ -13,6 +13,7 @@
 #include "textsearchworker.h"
 #include "ui_mainwindow.h"
 #include "searchalldialog.h"
+#include "recentfilesdialog.h"
 
 #define NAVIGATION_RATIO 100
 #define EDITOR_RAIO 200
@@ -30,16 +31,19 @@ public:
         return handle;
     }
     ~ViewsHandler(){
+        delete recentFilesView;
         delete textSearchAllView;
     }
 
 public slots:
+    void openRecentFilesDialogHandle(bool show);
     void startTextSearchInAllFilesHandle();
 
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         firstDirectoryLoad = true;
         this->parent = parent;
+        recentFilesView = new RecentFilesDialog(this->parent);
         textSearchAllView = new SearchAllDialog(this->parent);
         initViews(ui);
         initConnection();
@@ -50,6 +54,7 @@ private:
 
     QWidget *parent;
     QThread searchThread;
+    RecentFilesDialog *recentFilesView;
     SearchAllDialog *textSearchAllView;
     QFrame *viewLeftFrame;
     TextSearchWorker textSearchWorker;
