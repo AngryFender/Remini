@@ -321,8 +321,14 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
 {
-    if(show)
+    if(show){
+        QPoint pos =  this->parent->mapToGlobal( viewText->pos());
+//        pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin)-6);
+//        pos.setX(pos.x()-QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin)-6);
+        recentFilesView->setGeometry(viewText->geometry());
+        recentFilesView->move(pos);
         recentFilesView->show();
+    }
     else
         recentFilesView->hide();
 }

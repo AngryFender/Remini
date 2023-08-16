@@ -78,7 +78,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
                 folderTreeBox->hide();
                 mkEditorBox->hide();
             }break;
-        case Qt::Key_Control: emit openRecentFilesDialog(false); break;
+        case Qt::Key_Control: {emit openRecentFilesDialog(false); qDebug()<<"keyrelease";break;}
     }
     QMainWindow::keyReleaseEvent(event);
 }

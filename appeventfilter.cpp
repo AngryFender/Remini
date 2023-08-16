@@ -26,6 +26,10 @@ bool AppEventFilter::eventFilter(QObject *obj, QEvent *event)
             }
             return true;
         }
+
+        if(Qt::Key_Tab == keyEvent->key() && Qt::ControlModifier == keyEvent->modifiers()){
+            emit openRecentFiles(true);
+        }
     }
 
     if(QEvent::KeyRelease == event->type()){
@@ -36,6 +40,11 @@ bool AppEventFilter::eventFilter(QObject *obj, QEvent *event)
             emit KeyPressAlt(false);
             return false;
         }
+
+        if(Qt::Key_Control == keyEvent->key()){
+            emit openRecentFiles(false);
+        }
+
     }
 
     return false;

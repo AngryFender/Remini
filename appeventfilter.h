@@ -17,6 +17,7 @@ public:
 
 signals:
     void KeyPressAlt(bool press);       //true for press, false for release
+    void openRecentFiles(bool show);
     void viewChosen(Qt::Key key);
 
 private:
