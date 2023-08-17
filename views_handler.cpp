@@ -18,6 +18,7 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     viewText = ui.uiTextView;
     viewTitle = ui.uiTitle;
     viewLeftFrame = ui.uiLeftPane;
+    viewRightFrame = ui.uiRightPane;
 
     viewSearch->setPlaceholderText("Search Files...");
     initTreeView();
@@ -322,10 +323,8 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
 {
     if(show){
-        QPoint pos =  this->parent->mapToGlobal( viewText->pos());
-//        pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin)-6);
-//        pos.setX(pos.x()-QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin)-6);
-        recentFilesView->setGeometry(viewText->geometry());
+        QPoint pos =  this->parent->mapToGlobal( viewRightFrame->pos());
+        recentFilesView->setGeometry(viewRightFrame->geometry());
         recentFilesView->move(pos);
         recentFilesView->show();
     }

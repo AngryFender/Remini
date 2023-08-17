@@ -57,6 +57,7 @@ private:
     RecentFilesDialog *recentFilesView;
     SearchAllDialog *textSearchAllView;
     QFrame *viewLeftFrame;
+    QFrame *viewRightFrame;
     TextSearchWorker textSearchWorker;
     QFileSystemModel modelTree;
     NavigationProxyModel proxyModel;

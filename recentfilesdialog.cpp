@@ -2,5 +2,17 @@
 
 RecentFilesDialog::RecentFilesDialog(QWidget * parent):QDialog(parent)
 {
+    layout = new QVBoxLayout(this);
     this->setWindowFlags(Qt::FramelessWindowHint |Qt::ToolTip);
+
+    QListWidget *listWidget = new QListWidget(this);
+    layout->addWidget(listWidget);
+
+    for(int i = 0; i<7; i++){
+    QListWidgetItem *newItem = new QListWidgetItem;
+    QFileIconProvider iconProvider;
+    newItem->setIcon(iconProvider.icon(QFileIconProvider::File));
+    newItem->setText("File"+QString::number(i));
+    listWidget->addItem(newItem);
+    }
 }
