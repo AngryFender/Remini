@@ -11,10 +11,12 @@
 class RecentFilesDialog : public QDialog
 {
     Q_OBJECT
-public:
-    RecentFilesDialog(QWidget*parent = nullptr);
 
     QVBoxLayout * layout;
+    QListWidget *listWidget;
+public:
+    RecentFilesDialog(QWidget*parent = nullptr);
+    void show();
 };
 
 #endif // RECENTFILESDIALOG_H

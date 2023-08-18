@@ -191,8 +191,25 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     if (!fileInfo.isFile()|| !fileInfo.exists())
         return;
 
-    QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
+    QScopedPointer<QFile> file =  QScopedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
     QString fullContent = getFileContent(*file.get());
+
+    vaultPath = fileInfo.path();
+    QString relativePath = getSavedPath();
+    QString fullPath = fileInfo.absoluteFilePath();
+
+    qDebug()<<"path = "<<vaultPath;
+
+    int pathIndex = fullPath.indexOf(relativePath);
+    if (pathIndex != -1) {
+        fullPath = fullPath.mid(pathIndex + relativePath.length());
+    }
+
+    recentFileList.append(fullPath);
+
+        qDebug()<<"path = "<<recentFileList;
+
+    //vaultPath = fileInfo.path();
 
     mkGuiDocument.clear();
     mkGuiDocument.setPlainText(fullContent);
@@ -323,10 +340,13 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
 {
     if(show){
-        QPoint pos =  this->parent->mapToGlobal( viewRightFrame->pos());
-        recentFilesView->setGeometry(viewRightFrame->geometry());
-        recentFilesView->move(pos);
-        recentFilesView->show();
+        if(recentFilesView->isHidden()){
+            QPoint pos =  this->parent->mapToGlobal( viewRightFrame->pos());
+            recentFilesView->setGeometry(viewRightFrame->geometry());
+            recentFilesView->move(pos);
+            recentFilesView->setFocus(Qt::ActiveWindowFocusReason);
+            recentFilesView->show();
+        }
     }
     else
         recentFilesView->hide();

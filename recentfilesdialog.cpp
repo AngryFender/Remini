@@ -5,7 +5,7 @@ RecentFilesDialog::RecentFilesDialog(QWidget * parent):QDialog(parent)
     layout = new QVBoxLayout(this);
     this->setWindowFlags(Qt::FramelessWindowHint |Qt::ToolTip);
 
-    QListWidget *listWidget = new QListWidget(this);
+    listWidget = new QListWidget(this);
     layout->addWidget(listWidget);
 
     for(int i = 0; i<7; i++){
@@ -15,4 +15,14 @@ RecentFilesDialog::RecentFilesDialog(QWidget * parent):QDialog(parent)
     newItem->setText("File"+QString::number(i));
     listWidget->addItem(newItem);
     }
+}
+
+void RecentFilesDialog::show()
+{
+
+    QDialog::show();
+    listWidget->setFocusPolicy(Qt::StrongFocus);
+    listWidget->setFocus(Qt::MouseFocusReason);
+    listWidget->setCurrentRow(0,QItemSelectionModel::Select);
+
 }

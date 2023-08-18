@@ -80,6 +80,9 @@ private:
     QString searchedFilename;
     QMutex fileSearchMutex;
     bool firstDirectoryLoad;
+
+    QList<QString> recentFileList;
+    QString vaultPath;
 signals:
     void load_text(QString text);
     void clear_text();
