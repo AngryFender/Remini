@@ -35,6 +35,7 @@ void ViewsHandler::initTreeView()
     modelTree.setReadOnly(false);
     modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
     modelTree.setRootPath(getSavedPath());
+    vaultPath = modelTree.rootPath();
 
     proxyModel.setSourceModel(&modelTree);
     viewTree->setModel(&proxyModel);
@@ -194,22 +195,11 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     QScopedPointer<QFile> file =  QScopedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
     QString fullContent = getFileContent(*file.get());
 
-    vaultPath = fileInfo.path();
-    QString relativePath = getSavedPath();
     QString fullPath = fileInfo.absoluteFilePath();
-
-    qDebug()<<"path = "<<vaultPath;
-
-    int pathIndex = fullPath.indexOf(relativePath);
-    if (pathIndex != -1) {
-        fullPath = fullPath.mid(pathIndex + relativePath.length());
+    if (fullPath.startsWith(vaultPath)) {
+        fullPath.replace(vaultPath, "");
     }
-
     recentFileList.append(fullPath);
-
-        qDebug()<<"path = "<<recentFileList;
-
-    //vaultPath = fileInfo.path();
 
     mkGuiDocument.clear();
     mkGuiDocument.setPlainText(fullContent);
