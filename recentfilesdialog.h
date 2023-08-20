@@ -7,6 +7,7 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 #include <QFileIconProvider>
+#include <QKeyEvent>
 
 class RecentFilesDialog : public QDialog
 {
@@ -14,9 +15,19 @@ class RecentFilesDialog : public QDialog
 
     QVBoxLayout * layout;
     QListWidget *listWidget;
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
 public:
     RecentFilesDialog(QWidget*parent = nullptr);
     void show();
+public slots:
+    void updateRecentFileHandle(const QString &relativePath);
+
+signals:
+    void openFile(const QString &relativePath);
 };
 
 #endif // RECENTFILESDIALOG_H

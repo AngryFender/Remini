@@ -38,6 +38,7 @@ public:
 public slots:
     void openRecentFilesDialogHandle(bool show);
     void startTextSearchInAllFilesHandle();
+    void openRecentFileHandle(const QString &relativePath);
 
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
@@ -81,12 +82,13 @@ private:
     QMutex fileSearchMutex;
     bool firstDirectoryLoad;
 
-    QList<QString> recentFileList;
+    QMap<QString, QPair<int,int>> recentFileCursorMap;
     QString vaultPath;
 signals:
     void load_text(QString text);
     void clear_text();
     void fileDelete(QModelIndex& index);
+    void updateRecentFile(const QString &relativePath);
 
 private slots:
     void fileDisplay(const QModelIndex& index);

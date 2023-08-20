@@ -170,6 +170,12 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::autoInsertSymbol,
                      &mkGuiDocument,&MkTextDocument::autoInsertSymobolHandle);
 
+    QObject::connect(this,&ViewsHandler::updateRecentFile,
+                     recentFilesView,&RecentFilesDialog::updateRecentFileHandle);
+
+    QObject::connect(recentFilesView,&RecentFilesDialog::openFile,
+                     this,&ViewsHandler::openRecentFileHandle);
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -199,7 +205,8 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     if (fullPath.startsWith(vaultPath)) {
         fullPath.replace(vaultPath, "");
     }
-    recentFileList.append(fullPath);
+    //recentFileCursorMap.insert(fullPath,QPair<int,int>(viewText->textCursor().blockNumber(), viewText->textCursor().positionInBlock()));
+    emit updateRecentFile(fullPath);
 
     mkGuiDocument.clear();
     mkGuiDocument.setPlainText(fullContent);
@@ -334,8 +341,9 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
             QPoint pos =  this->parent->mapToGlobal( viewRightFrame->pos());
             recentFilesView->setGeometry(viewRightFrame->geometry());
             recentFilesView->move(pos);
-            recentFilesView->setFocus(Qt::ActiveWindowFocusReason);
             recentFilesView->show();
+            recentFilesView->activateWindow();
+            recentFilesView->setFocus(Qt::ActiveWindowFocusReason);
         }
     }
     else
@@ -356,4 +364,29 @@ void ViewsHandler::startTextSearchInAllFilesHandle()
         textSearchAllView->activateWindow();
         textSearchAllView->setFocusAtSearch();
     }
+}
+
+void ViewsHandler::openRecentFileHandle(const QString &relativePath)
+{
+    QString fullFilePath = vaultPath + relativePath;
+    fileInfo = QFileInfo(fullFilePath);
+    if (!fileInfo.isFile()|| !fileInfo.exists())
+        return;
+
+    QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
+    QString fullContent = getFileContent(*file.get());
+
+    mkGuiDocument.clear();
+    mkGuiDocument.setPlainText(fullContent);
+
+    viewTitle->setText(fileInfo.baseName());
+    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    viewText->update();
+
+    QPair<int,int> positions = recentFileCursorMap.value(relativePath);
+
+//    QTextCursor cursor = viewText->textCursor();
+//    cursor.setPosition(positions.first + positions.second);
+//    viewText->setTextCursor(cursor);
 }
