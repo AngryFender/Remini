@@ -173,9 +173,6 @@ void ViewsHandler::initConnection()
     QObject::connect(this,&ViewsHandler::updateRecentFile,
                      recentFilesView,&RecentFilesDialog::updateRecentFileHandle);
 
-    QObject::connect(recentFilesView,&RecentFilesDialog::openFile,
-                     this,&ViewsHandler::openRecentFileHandle);
-
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -342,12 +339,33 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
             recentFilesView->setGeometry(viewRightFrame->geometry());
             recentFilesView->move(pos);
             recentFilesView->show();
-            recentFilesView->activateWindow();
-            recentFilesView->setFocus(Qt::ActiveWindowFocusReason);
         }
     }
-    else
+    else{
+        if(!recentFilesView->isHidden()){
+            const QString& relativePath = recentFilesView->getCurrentRelativeFile();
+
+            QString fullFilePath = vaultPath + relativePath;
+            fileInfo = QFileInfo(fullFilePath);
+            if (!fileInfo.isFile()|| !fileInfo.exists())
+                return;
+
+            QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
+            QString fullContent = getFileContent(*file.get());
+
+            mkGuiDocument.clear();
+            mkGuiDocument.setPlainText(fullContent);
+
+            viewTitle->setText(fileInfo.baseName());
+            viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+            viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+            viewText->update();
+
+            emit updateRecentFile(relativePath);
+        }
         recentFilesView->hide();
+    }
+
 }
 
 void ViewsHandler::startTextSearchInAllFilesHandle()
@@ -364,29 +382,4 @@ void ViewsHandler::startTextSearchInAllFilesHandle()
         textSearchAllView->activateWindow();
         textSearchAllView->setFocusAtSearch();
     }
-}
-
-void ViewsHandler::openRecentFileHandle(const QString &relativePath)
-{
-    QString fullFilePath = vaultPath + relativePath;
-    fileInfo = QFileInfo(fullFilePath);
-    if (!fileInfo.isFile()|| !fileInfo.exists())
-        return;
-
-    QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
-    QString fullContent = getFileContent(*file.get());
-
-    mkGuiDocument.clear();
-    mkGuiDocument.setPlainText(fullContent);
-
-    viewTitle->setText(fileInfo.baseName());
-    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    viewText->update();
-
-    QPair<int,int> positions = recentFileCursorMap.value(relativePath);
-
-//    QTextCursor cursor = viewText->textCursor();
-//    cursor.setPosition(positions.first + positions.second);
-//    viewText->setTextCursor(cursor);
 }

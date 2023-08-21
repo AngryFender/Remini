@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
                      &w,&MainWindow::viewChosenHandler);
 
     QObject::connect(&filter,&AppEventFilter::openRecentFiles,
-                     &w,&MainWindow::openRecentFilesDialog);
+                     &w,&MainWindow::recentFilesHandler);
 
     QObject::connect(&a, &QApplication::focusChanged, [&](QWidget *old, QWidget *now) {
         QKeyEvent *event = new QKeyEvent(QKeyEvent::KeyRelease, Qt::Key_Alt, Qt::AltModifier);

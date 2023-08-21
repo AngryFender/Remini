@@ -15,19 +15,17 @@ class RecentFilesDialog : public QDialog
 
     QVBoxLayout * layout;
     QListWidget *listWidget;
+    QString currentPath;
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
 
 public:
     RecentFilesDialog(QWidget*parent = nullptr);
     void show();
+    const QString& getCurrentRelativeFile()const;
 public slots:
     void updateRecentFileHandle(const QString &relativePath);
-
-signals:
-    void openFile(const QString &relativePath);
 };
 
 #endif // RECENTFILESDIALOG_H

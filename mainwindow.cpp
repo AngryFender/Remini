@@ -60,11 +60,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 }
                 shiftTimer->start(200);
             }break;
-
-        case Qt::Key_Tab:
-                if( event->modifiers() == Qt::CTRL){
-                    emit openRecentFilesDialog(true);
-                }break;
         default:;
     }
     QMainWindow::keyPressEvent(event);
@@ -78,7 +73,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
                 folderTreeBox->hide();
                 mkEditorBox->hide();
             }break;
-        case Qt::Key_Control: {emit openRecentFilesDialog(false); qDebug()<<"keyrelease";break;}
     }
     QMainWindow::keyReleaseEvent(event);
 }
@@ -120,6 +114,11 @@ void MainWindow::viewChosenHandler(Qt::Key key)
         case Qt::Key_3: ui->uiTextView->activateWindow();ui->uiTextView->setFocus();break;
         default: break;
         }
+}
+
+void MainWindow::recentFilesHandler(bool show)
+{
+    emit openRecentFilesDialog(show);
 }
 
 void MainWindow::shiftTimerHandle()

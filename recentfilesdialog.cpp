@@ -23,33 +23,31 @@ void RecentFilesDialog::keyPressEvent(QKeyEvent *event)
         }
 
         listWidget->setCurrentItem(item);
+        currentPath = item->text();
     }
     QDialog::keyPressEvent(event);
-}
-
-void RecentFilesDialog::keyReleaseEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_Tab){
-        if(listWidget->count()  >0){
-            QListWidgetItem *item = listWidget->currentItem();
-            emit openFile(item->text());
-        }
-    }
-    QDialog::keyReleaseEvent(event);
 }
 
 void RecentFilesDialog::show()
 {
     QDialog::show();
+    listWidget->clearSelection();
     listWidget->setFocusPolicy(Qt::StrongFocus);
-    listWidget->setFocus(Qt::MouseFocusReason);
     listWidget->setCurrentRow(0,QItemSelectionModel::Select);
+    listWidget->activateWindow();
+    listWidget->setFocus();
 
+}
+
+const QString &RecentFilesDialog::getCurrentRelativeFile() const
+{
+    return currentPath;
 }
 
 void RecentFilesDialog::updateRecentFileHandle(const QString &relativePath)
 {
     QListWidgetItem *newItem = new QListWidgetItem;
+//    QListWidgetItem *nextItem;
     QFileIconProvider iconProvider;
     newItem->setIcon(iconProvider.icon(QFileIconProvider::File));
     newItem->setText(relativePath);
@@ -63,5 +61,10 @@ void RecentFilesDialog::updateRecentFileHandle(const QString &relativePath)
     }
     listWidget->clearSelection();
     listWidget->insertItem(0,newItem);
-    listWidget->setCurrentItem(newItem);
+//    if(listWidget->count() <= 1){
+//        listWidget->setCurrentItem(newItem);
+//        listWidget->setCurrentRow(1);
+//    }else{
+//        listWidget->setCurrentRow(1);
+//    }
 }

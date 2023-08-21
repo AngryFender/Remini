@@ -27,6 +27,7 @@ public:
 public slots:
     void KeyPressAltHandler(bool press);       //true for press, false for release
     void viewChosenHandler(Qt::Key key);
+    void recentFilesHandler(bool show);
 private slots:
     void shiftTimerHandle();
 

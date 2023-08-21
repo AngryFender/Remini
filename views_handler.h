@@ -38,7 +38,6 @@ public:
 public slots:
     void openRecentFilesDialogHandle(bool show);
     void startTextSearchInAllFilesHandle();
-    void openRecentFileHandle(const QString &relativePath);
 
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
