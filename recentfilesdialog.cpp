@@ -33,15 +33,24 @@ void RecentFilesDialog::show()
     QDialog::show();
     listWidget->clearSelection();
     listWidget->setFocusPolicy(Qt::StrongFocus);
-    listWidget->setCurrentRow(0,QItemSelectionModel::Select);
+    if(listWidget->count() ==0){
+
+    }else if(listWidget->count()==1){
+        listWidget->setCurrentRow(0,QItemSelectionModel::Select);
+    }else{
+        listWidget->setCurrentRow(1,QItemSelectionModel::Select);
+    }
     listWidget->activateWindow();
     listWidget->setFocus();
 
 }
 
-const QString &RecentFilesDialog::getCurrentRelativeFile() const
+const QString RecentFilesDialog::getCurrentRelativeFile() const
 {
-    return currentPath;
+    if(listWidget->count() ==0){
+        return "";
+    }
+    return listWidget->currentItem()->text();
 }
 
 void RecentFilesDialog::updateRecentFileHandle(const QString &relativePath)

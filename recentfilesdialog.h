@@ -23,7 +23,7 @@ protected:
 public:
     RecentFilesDialog(QWidget*parent = nullptr);
     void show();
-    const QString& getCurrentRelativeFile()const;
+    const QString getCurrentRelativeFile()const;
 public slots:
     void updateRecentFileHandle(const QString &relativePath);
 };

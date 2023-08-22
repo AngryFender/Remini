@@ -345,6 +345,11 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
         if(!recentFilesView->isHidden()){
             const QString& relativePath = recentFilesView->getCurrentRelativeFile();
 
+            if(relativePath.isEmpty()){
+                recentFilesView->hide();
+                return;
+            }
+
             QString fullFilePath = vaultPath + relativePath;
             fileInfo = QFileInfo(fullFilePath);
             if (!fileInfo.isFile()|| !fileInfo.exists())
