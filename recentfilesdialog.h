@@ -21,7 +21,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 public:
-    RecentFilesDialog(QWidget*parent = nullptr);
+    RecentFilesDialog(QWidget*parent, QListWidget * listWidget);
     void show();
     const QString getCurrentRelativeFile()const;
 public slots:

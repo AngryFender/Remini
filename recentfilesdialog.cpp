@@ -1,11 +1,11 @@
 #include "recentfilesdialog.h"
 
-RecentFilesDialog::RecentFilesDialog(QWidget * parent):QDialog(parent)
+RecentFilesDialog::RecentFilesDialog(QWidget*parent, QListWidget * listWidget):QDialog(parent)
 {
     layout = new QVBoxLayout(this);
     this->setWindowFlags(Qt::FramelessWindowHint |Qt::ToolTip);
 
-    listWidget = new QListWidget(this);
+    this->listWidget = listWidget;
     layout->addWidget(listWidget);
     listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 }

@@ -43,7 +43,8 @@ private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         firstDirectoryLoad = true;
         this->parent = parent;
-        recentFilesView = new RecentFilesDialog(this->parent);
+        recentFilesList = new QListWidget(this->parent);
+        recentFilesView = new RecentFilesDialog(this->parent,recentFilesList);
         textSearchAllView = new SearchAllDialog(this->parent);
         initViews(ui);
         initConnection();
@@ -55,6 +56,7 @@ private:
     QWidget *parent;
     QThread searchThread;
     RecentFilesDialog *recentFilesView;
+    QListWidget *recentFilesList;
     SearchAllDialog *textSearchAllView;
     QFrame *viewLeftFrame;
     QFrame *viewRightFrame;
