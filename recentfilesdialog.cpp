@@ -2,6 +2,7 @@
 
 RecentFilesDialog::RecentFilesDialog(QWidget*parent, QListWidget * listWidget):QDialog(parent)
 {
+    listWidget->setParent(this);
     layout = new QVBoxLayout(this);
     this->setWindowFlags(Qt::FramelessWindowHint |Qt::ToolTip);
 

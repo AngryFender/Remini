@@ -6,8 +6,8 @@ enable_testing()
 
 SET(CMAKE_CXX_STANDARD 17)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Gui)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Gui Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui Test)
 
 include_directories("${CMAKE_SOURCE_DIR}")
 
@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
     navigationview_tests.cpp
     mkedit_tests.cpp
     mktextdocument_tests.cpp
+    RecentFilesDialog_Tests.cpp
     ${CMAKE_SOURCE_DIR}/blockdata.cpp
     ${CMAKE_SOURCE_DIR}/mkedit.cpp
     ${CMAKE_SOURCE_DIR}/linedata.cpp
@@ -23,11 +24,15 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/formatdata.cpp
     ${CMAKE_SOURCE_DIR}/editcommand.cpp
     ${CMAKE_SOURCE_DIR}/mktextdocument.cpp
+    ${CMAKE_SOURCE_DIR}/recentfilesdialog.cpp
+
 
 )
 
-target_link_libraries(ReminiTests PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
-target_link_libraries(ReminiTests PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(ReminiTests PRIVATE Qt${QT_VERSION_MAJOR}::Gui
+                                          Qt${QT_VERSION_MAJOR}::Widgets
+                                          Qt${QT_VERSION_MAJOR}::Test)
+
 
 if (DEFINED ENV{CATCH_INCLUDE_DIR})
     set(CATCH_INCLUDE_DIR $ENV{CATCH_INCLUDE_DIR})
