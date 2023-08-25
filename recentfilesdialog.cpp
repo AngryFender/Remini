@@ -57,7 +57,6 @@ const QString RecentFilesDialog::getCurrentRelativeFile() const
 void RecentFilesDialog::updateRecentFileHandle(const QString &relativePath)
 {
     QListWidgetItem *newItem = new QListWidgetItem;
-//    QListWidgetItem *nextItem;
     QFileIconProvider iconProvider;
     newItem->setIcon(iconProvider.icon(QFileIconProvider::File));
     newItem->setText(relativePath);
@@ -71,10 +70,4 @@ void RecentFilesDialog::updateRecentFileHandle(const QString &relativePath)
     }
     listWidget->clearSelection();
     listWidget->insertItem(0,newItem);
-//    if(listWidget->count() <= 1){
-//        listWidget->setCurrentItem(newItem);
-//        listWidget->setCurrentRow(1);
-//    }else{
-//        listWidget->setCurrentRow(1);
-//    }
 }
