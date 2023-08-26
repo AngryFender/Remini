@@ -173,6 +173,9 @@ void ViewsHandler::initConnection()
     QObject::connect(this,&ViewsHandler::updateRecentFile,
                      recentFilesView,&RecentFilesDialog::updateRecentFileHandle);
 
+    QObject::connect(viewText,&MkEdit::cursorUpdate,
+                     this,&ViewsHandler::cursorUpdateHandle);
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -328,6 +331,11 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
     cursor.setPosition(block.position()+positionInBlock);
     cursor.setPosition(block.position()+positionInBlock-searchTextLength,QTextCursor::KeepAnchor);
     viewText->setTextCursor(cursor);
+
+}
+
+void ViewsHandler::cursorUpdateHandle(const int blockNo, const int posInBlock)
+{
 
 }
 
