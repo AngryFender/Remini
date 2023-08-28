@@ -84,6 +84,7 @@ private:
     bool firstDirectoryLoad;
 
     QMap<QString, QPair<int,int>> recentFileCursorMap;
+    QString currentFilePath;
     QString vaultPath;
 signals:
     void load_text(QString text);

@@ -202,6 +202,7 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     QString fullContent = getFileContent(*file.get());
 
     QString fullPath = fileInfo.absoluteFilePath();
+    currentFilePath = fullPath;
     if (fullPath.startsWith(vaultPath)) {
         fullPath.replace(vaultPath, "");
     }
@@ -336,7 +337,14 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 void ViewsHandler::cursorUpdateHandle(const int blockNo, const int posInBlock)
 {
+    if(currentFilePath.isEmpty()){
+        return;
+    }
+    qDebug()<<" current file path = "<<currentFilePath <<" blockno = "<<blockNo<<" posinblock "<<posInBlock;
 
+    qDebug()<<" value before = "<<recentFileCursorMap.value(currentFilePath);
+    recentFileCursorMap.insert(currentFilePath,QPair<int,int>(blockNo, posInBlock));
+    qDebug()<<" value after = "<<recentFileCursorMap.value(currentFilePath);
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
@@ -368,6 +376,19 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
 
             mkGuiDocument.clear();
             mkGuiDocument.setPlainText(fullContent);
+
+
+            QPair<int,int> positionPair = recentFileCursorMap.value(fullFilePath);
+            qDebug()<<"full path = "<<fullFilePath<<" text cursor position "<< positionPair;
+            QTextCursor cursor = viewText->textCursor();
+            cursor.setPosition(mkGuiDocument.findBlockByNumber(positionPair.first).position());
+            cursor.movePosition(QTextCursor::StartOfLine,QTextCursor::MoveAnchor);
+
+            for(int rep = 0; rep < positionPair.second; rep++){
+                cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
+            }
+
+            viewText->setTextCursor(cursor);
 
             viewTitle->setText(fileInfo.baseName());
             viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
