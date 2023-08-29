@@ -374,12 +374,14 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
             QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
             QString fullContent = getFileContent(*file.get());
 
+            QObject::disconnect(viewText,&MkEdit::cursorUpdate,
+                             this,&ViewsHandler::cursorUpdateHandle);
+
             mkGuiDocument.clear();
             mkGuiDocument.setPlainText(fullContent);
 
 
             QPair<int,int> positionPair = recentFileCursorMap.value(fullFilePath);
-            qDebug()<<"full path = "<<fullFilePath<<" text cursor position "<< positionPair;
             QTextCursor cursor = viewText->textCursor();
             cursor.setPosition(mkGuiDocument.findBlockByNumber(positionPair.first).position());
             cursor.movePosition(QTextCursor::StartOfLine,QTextCursor::MoveAnchor);
@@ -394,6 +396,9 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
             viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
             viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
             viewText->update();
+
+            QObject::connect(viewText,&MkEdit::cursorUpdate,
+                                this,&ViewsHandler::cursorUpdateHandle);
 
             emit updateRecentFile(relativePath);
         }
