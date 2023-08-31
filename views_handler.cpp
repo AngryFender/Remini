@@ -23,9 +23,11 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     viewSearch->setPlaceholderText("Search Files...");
     initTreeView();
 
-    mkGuiDocument.setPlainText(startupText);
-    highlighter.setDocument(&mkGuiDocument);
-    viewText->setDocument(&mkGuiDocument);
+    recentFileDocumentMap.insert("startup", QSharedPointer<MkTextDocument>(new MkTextDocument()));
+    currentdocument = recentFileDocumentMap.value("startup");
+    currentdocument->setPlainText(startupText);
+    highlighter.setDocument(currentdocument.data());
+    viewText->setDocument(currentdocument.data());
 
     initFontDefault();
 }
@@ -86,18 +88,6 @@ void ViewsHandler::initConnection()
     QObject::connect(this,  &ViewsHandler::fileDelete,
                      &proxyModel, &NavigationProxyModel::deleteFileFolderHandler);
 
-    QObject::connect(viewText, &MkEdit::checkRightClockOnCodeBlock,
-                     &mkGuiDocument, &MkTextDocument::checkRightClockOnCodeBlockHandle);
-
-    QObject::connect(viewText, &MkEdit::selectBlockCopy,
-                     &mkGuiDocument,&MkTextDocument::selectBlockCopyHandle);
-
-    QObject::connect(viewText, &MkEdit::duplicateLine,
-                     &mkGuiDocument,&MkTextDocument::duplicateLineHandle);
-
-    QObject::connect(viewText, &MkEdit::smartSelection,
-                     &mkGuiDocument,&MkTextDocument::smartSelectionHandle);
-
     QObject::connect(viewTree,&NavigationView::deleteFileFolder,
                      this, &ViewsHandler::fileDeleteDialogue);
 
@@ -112,30 +102,6 @@ void ViewsHandler::initConnection()
 
     QObject::connect(viewText,&MkEdit::fileSave,
                      this,  &ViewsHandler::fileSaveHandle);
-
-    QObject::connect(viewText,&MkEdit::cursorPosChanged,
-                     &mkGuiDocument,&MkTextDocument::cursorPosChangedHandle);
-
-    QObject::connect(viewText,&MkEdit::enterKeyPressed,
-                     &mkGuiDocument,&MkTextDocument::enterKeyPressedHandle);
-
-    QObject::connect(viewText,&MkEdit::quoteLeftKeyPressed,
-                     &mkGuiDocument,&MkTextDocument::quoteLeftKeyPressedHandle);
-
-    QObject::connect(viewText,&MkEdit::removeAllMkData,
-                     &mkGuiDocument,&MkTextDocument::removeAllMkDataHandle);
-
-    QObject::connect(viewText,&MkEdit::applyAllMkData,
-                     &mkGuiDocument,&MkTextDocument::applyAllMkDataHandle);
-
-    QObject::connect(viewText,&MkEdit::setMarkdownStatus,
-                     &mkGuiDocument,&MkTextDocument::setMarkdownHandle);
-
-    QObject::connect(&mkGuiDocument,&MkTextDocument::clearUndoStack,
-                     viewText,&MkEdit::clearUndoStackHandle);
-
-    QObject::connect(viewText,&MkEdit::drawTextBlocks,
-                     &mkGuiDocument,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(viewSearch,&QLineEdit::textChanged,
                      this,&ViewsHandler::searchFileHandle);
@@ -161,21 +127,110 @@ void ViewsHandler::initConnection()
     QObject::connect(textSearchAllView,&SearchAllDialog::showSearchedTextInFile,
                      this,&ViewsHandler::displayTextSearchedFilePosition);
 
-    QObject::connect(viewText,&MkEdit::pushCheckBox,
-                     &mkGuiDocument,&MkTextDocument::pushCheckBoxHandle);
-
-    QObject::connect(viewText,&MkEdit::pushLink,
-                     &mkGuiDocument,&MkTextDocument::pushLinkHandle);
-
-    QObject::connect(viewText,&MkEdit::autoInsertSymbol,
-                     &mkGuiDocument,&MkTextDocument::autoInsertSymobolHandle);
-
     QObject::connect(this,&ViewsHandler::updateRecentFile,
                      recentFilesView,&RecentFilesDialog::updateRecentFileHandle);
 
     QObject::connect(viewText,&MkEdit::cursorUpdate,
                      this,&ViewsHandler::cursorUpdateHandle);
 
+    connectDocument();
+
+}
+
+void ViewsHandler::connectDocument()
+{
+    QObject::connect(viewText, &MkEdit::checkRightClockOnCodeBlock,
+                     currentdocument.data(), &MkTextDocument::checkRightClockOnCodeBlockHandle);
+
+    QObject::connect(viewText, &MkEdit::selectBlockCopy,
+                     currentdocument.data(),&MkTextDocument::selectBlockCopyHandle);
+
+    QObject::connect(viewText, &MkEdit::duplicateLine,
+                     currentdocument.data(),&MkTextDocument::duplicateLineHandle);
+
+    QObject::connect(viewText, &MkEdit::smartSelection,
+                     currentdocument.data(),&MkTextDocument::smartSelectionHandle);
+
+    QObject::connect(viewText,&MkEdit::cursorPosChanged,
+                     currentdocument.data(),&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(viewText,&MkEdit::enterKeyPressed,
+                     currentdocument.data(),&MkTextDocument::enterKeyPressedHandle);
+
+    QObject::connect(viewText,&MkEdit::quoteLeftKeyPressed,
+                     currentdocument.data(),&MkTextDocument::quoteLeftKeyPressedHandle);
+
+    QObject::connect(viewText,&MkEdit::removeAllMkData,
+                     currentdocument.data(),&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(viewText,&MkEdit::applyAllMkData,
+                     currentdocument.data(),&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(viewText,&MkEdit::setMarkdownStatus,
+                     currentdocument.data(),&MkTextDocument::setMarkdownHandle);
+
+    QObject::connect(currentdocument.data(),&MkTextDocument::clearUndoStack,
+                     viewText,&MkEdit::clearUndoStackHandle);
+
+    QObject::connect(viewText,&MkEdit::drawTextBlocks,
+                     currentdocument.data(),&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(viewText,&MkEdit::pushCheckBox,
+                     currentdocument.data(),&MkTextDocument::pushCheckBoxHandle);
+
+    QObject::connect(viewText,&MkEdit::pushLink,
+                     currentdocument.data(),&MkTextDocument::pushLinkHandle);
+
+    QObject::connect(viewText,&MkEdit::autoInsertSymbol,
+                     currentdocument.data(),&MkTextDocument::autoInsertSymobolHandle);
+}
+
+void ViewsHandler::disconnectDocument()
+{
+    QObject::disconnect(viewText, &MkEdit::checkRightClockOnCodeBlock,
+                     currentdocument.data(), &MkTextDocument::checkRightClockOnCodeBlockHandle);
+
+    QObject::disconnect(viewText, &MkEdit::selectBlockCopy,
+                     currentdocument.data(),&MkTextDocument::selectBlockCopyHandle);
+
+    QObject::disconnect(viewText, &MkEdit::duplicateLine,
+                     currentdocument.data(),&MkTextDocument::duplicateLineHandle);
+
+    QObject::disconnect(viewText, &MkEdit::smartSelection,
+                     currentdocument.data(),&MkTextDocument::smartSelectionHandle);
+
+    QObject::disconnect(viewText,&MkEdit::cursorPosChanged,
+                     currentdocument.data(),&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::disconnect(viewText,&MkEdit::enterKeyPressed,
+                     currentdocument.data(),&MkTextDocument::enterKeyPressedHandle);
+
+    QObject::disconnect(viewText,&MkEdit::quoteLeftKeyPressed,
+                     currentdocument.data(),&MkTextDocument::quoteLeftKeyPressedHandle);
+
+    QObject::disconnect(viewText,&MkEdit::removeAllMkData,
+                     currentdocument.data(),&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::disconnect(viewText,&MkEdit::applyAllMkData,
+                     currentdocument.data(),&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::disconnect(viewText,&MkEdit::setMarkdownStatus,
+                     currentdocument.data(),&MkTextDocument::setMarkdownHandle);
+
+    QObject::disconnect(currentdocument.data(),&MkTextDocument::clearUndoStack,
+                     viewText,&MkEdit::clearUndoStackHandle);
+
+    QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
+                     currentdocument.data(),&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::disconnect(viewText,&MkEdit::pushCheckBox,
+                     currentdocument.data(),&MkTextDocument::pushCheckBoxHandle);
+
+    QObject::disconnect(viewText,&MkEdit::pushLink,
+                     currentdocument.data(),&MkTextDocument::pushLinkHandle);
+
+    QObject::disconnect(viewText,&MkEdit::autoInsertSymbol,
+                     currentdocument.data(),&MkTextDocument::autoInsertSymobolHandle);
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -209,8 +264,8 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     //recentFileCursorMap.insert(fullPath,QPair<int,int>(viewText->textCursor().blockNumber(), viewText->textCursor().positionInBlock()));
     emit updateRecentFile(fullPath);
 
-    mkGuiDocument.clear();
-    mkGuiDocument.setPlainText(fullContent);
+    currentdocument->clear();
+    currentdocument->setPlainText(fullContent);
 
     viewTitle->setText(fileInfo.baseName());
     viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);

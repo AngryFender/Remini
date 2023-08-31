@@ -76,6 +76,9 @@ private:
     void initTreeView();
     void initFontDefault();
     void initConnection();
+    void connectDocument();
+    void disconnectDocument();
+
     QString getFileContent(QFile& file);
     MkTextDocument mkGuiDocument;
     Highlighter highlighter;
@@ -84,7 +87,8 @@ private:
     bool firstDirectoryLoad;
 
     QMap<QString, QPair<int,int>> recentFileCursorMap;
-    QMap<QString, MkTextDocument*> recentFileDocumentMap;
+    QSharedPointer<MkTextDocument> currentdocument;
+    QMap<QString, QSharedPointer<MkTextDocument>> recentFileDocumentMap;
     QString currentFilePath;
     QString vaultPath;
 signals:
