@@ -246,6 +246,14 @@ QString ViewsHandler::getFileContent(QFile& file)
     return content;
 }
 
+void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
+{
+    //disconnect signals from old current document
+    //set current document to textview
+    //connect signals to new current document
+
+}
+
 void ViewsHandler::fileDisplay(const QModelIndex& index)
 {
     QModelIndex sourceIndex = proxyModel.mapToSource(index);
@@ -370,8 +378,8 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
     QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
     QString fullContent = getFileContent(*file.get());
 
-    mkGuiDocument.clear();
-    mkGuiDocument.setPlainText(fullContent);
+    currentdocument->clear();
+    currentdocument->setPlainText(fullContent);
 
     viewTitle->setText(fileInfo.baseName());
     viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -432,8 +440,8 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
             QObject::disconnect(viewText,&MkEdit::cursorUpdate,
                              this,&ViewsHandler::cursorUpdateHandle);
 
-            mkGuiDocument.clear();
-            mkGuiDocument.setPlainText(fullContent);
+            currentdocument->clear();
+            currentdocument->setPlainText(fullContent);
 
 
             QPair<int,int> positionPair = recentFileCursorMap.value(fullFilePath);

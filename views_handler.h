@@ -80,6 +80,7 @@ private:
     void disconnectDocument();
 
     QString getFileContent(QFile& file);
+    void setCurrentDocument(const QFileInfo &fileInfo);
     MkTextDocument mkGuiDocument;
     Highlighter highlighter;
     QString searchedFilename;
