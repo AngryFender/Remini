@@ -24,10 +24,10 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     initTreeView();
 
     recentFileDocumentMap.insert("startup", QSharedPointer<MkTextDocument>(new MkTextDocument()));
-    currentdocument = recentFileDocumentMap.value("startup");
-    currentdocument->setPlainText(startupText);
-    highlighter.setDocument(currentdocument.data());
-    viewText->setDocument(currentdocument.data());
+    currentDocument = recentFileDocumentMap.value("startup");
+    currentDocument->setPlainText(startupText);
+    highlighter.setDocument(currentDocument.data());
+    viewText->setDocument(currentDocument.data());
 
     initFontDefault();
 }
@@ -140,97 +140,97 @@ void ViewsHandler::initConnection()
 void ViewsHandler::connectDocument()
 {
     QObject::connect(viewText, &MkEdit::checkRightClockOnCodeBlock,
-                     currentdocument.data(), &MkTextDocument::checkRightClockOnCodeBlockHandle);
+                     currentDocument.data(), &MkTextDocument::checkRightClockOnCodeBlockHandle);
 
     QObject::connect(viewText, &MkEdit::selectBlockCopy,
-                     currentdocument.data(),&MkTextDocument::selectBlockCopyHandle);
+                     currentDocument.data(),&MkTextDocument::selectBlockCopyHandle);
 
     QObject::connect(viewText, &MkEdit::duplicateLine,
-                     currentdocument.data(),&MkTextDocument::duplicateLineHandle);
+                     currentDocument.data(),&MkTextDocument::duplicateLineHandle);
 
     QObject::connect(viewText, &MkEdit::smartSelection,
-                     currentdocument.data(),&MkTextDocument::smartSelectionHandle);
+                     currentDocument.data(),&MkTextDocument::smartSelectionHandle);
 
     QObject::connect(viewText,&MkEdit::cursorPosChanged,
-                     currentdocument.data(),&MkTextDocument::cursorPosChangedHandle);
+                     currentDocument.data(),&MkTextDocument::cursorPosChangedHandle);
 
     QObject::connect(viewText,&MkEdit::enterKeyPressed,
-                     currentdocument.data(),&MkTextDocument::enterKeyPressedHandle);
+                     currentDocument.data(),&MkTextDocument::enterKeyPressedHandle);
 
     QObject::connect(viewText,&MkEdit::quoteLeftKeyPressed,
-                     currentdocument.data(),&MkTextDocument::quoteLeftKeyPressedHandle);
+                     currentDocument.data(),&MkTextDocument::quoteLeftKeyPressedHandle);
 
     QObject::connect(viewText,&MkEdit::removeAllMkData,
-                     currentdocument.data(),&MkTextDocument::removeAllMkDataHandle);
+                     currentDocument.data(),&MkTextDocument::removeAllMkDataHandle);
 
     QObject::connect(viewText,&MkEdit::applyAllMkData,
-                     currentdocument.data(),&MkTextDocument::applyAllMkDataHandle);
+                     currentDocument.data(),&MkTextDocument::applyAllMkDataHandle);
 
     QObject::connect(viewText,&MkEdit::setMarkdownStatus,
-                     currentdocument.data(),&MkTextDocument::setMarkdownHandle);
+                     currentDocument.data(),&MkTextDocument::setMarkdownHandle);
 
-    QObject::connect(currentdocument.data(),&MkTextDocument::clearUndoStack,
+    QObject::connect(currentDocument.data(),&MkTextDocument::clearUndoStack,
                      viewText,&MkEdit::clearUndoStackHandle);
 
     QObject::connect(viewText,&MkEdit::drawTextBlocks,
-                     currentdocument.data(),&MkTextDocument::drawTextBlocksHandler);
+                     currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(viewText,&MkEdit::pushCheckBox,
-                     currentdocument.data(),&MkTextDocument::pushCheckBoxHandle);
+                     currentDocument.data(),&MkTextDocument::pushCheckBoxHandle);
 
     QObject::connect(viewText,&MkEdit::pushLink,
-                     currentdocument.data(),&MkTextDocument::pushLinkHandle);
+                     currentDocument.data(),&MkTextDocument::pushLinkHandle);
 
     QObject::connect(viewText,&MkEdit::autoInsertSymbol,
-                     currentdocument.data(),&MkTextDocument::autoInsertSymobolHandle);
+                     currentDocument.data(),&MkTextDocument::autoInsertSymobolHandle);
 }
 
 void ViewsHandler::disconnectDocument()
 {
     QObject::disconnect(viewText, &MkEdit::checkRightClockOnCodeBlock,
-                     currentdocument.data(), &MkTextDocument::checkRightClockOnCodeBlockHandle);
+                        currentDocument.data(), &MkTextDocument::checkRightClockOnCodeBlockHandle);
 
     QObject::disconnect(viewText, &MkEdit::selectBlockCopy,
-                     currentdocument.data(),&MkTextDocument::selectBlockCopyHandle);
+                        currentDocument.data(),&MkTextDocument::selectBlockCopyHandle);
 
     QObject::disconnect(viewText, &MkEdit::duplicateLine,
-                     currentdocument.data(),&MkTextDocument::duplicateLineHandle);
+                        currentDocument.data(),&MkTextDocument::duplicateLineHandle);
 
     QObject::disconnect(viewText, &MkEdit::smartSelection,
-                     currentdocument.data(),&MkTextDocument::smartSelectionHandle);
+                        currentDocument.data(),&MkTextDocument::smartSelectionHandle);
 
     QObject::disconnect(viewText,&MkEdit::cursorPosChanged,
-                     currentdocument.data(),&MkTextDocument::cursorPosChangedHandle);
+                        currentDocument.data(),&MkTextDocument::cursorPosChangedHandle);
 
     QObject::disconnect(viewText,&MkEdit::enterKeyPressed,
-                     currentdocument.data(),&MkTextDocument::enterKeyPressedHandle);
+                        currentDocument.data(),&MkTextDocument::enterKeyPressedHandle);
 
     QObject::disconnect(viewText,&MkEdit::quoteLeftKeyPressed,
-                     currentdocument.data(),&MkTextDocument::quoteLeftKeyPressedHandle);
+                        currentDocument.data(),&MkTextDocument::quoteLeftKeyPressedHandle);
 
     QObject::disconnect(viewText,&MkEdit::removeAllMkData,
-                     currentdocument.data(),&MkTextDocument::removeAllMkDataHandle);
+                        currentDocument.data(),&MkTextDocument::removeAllMkDataHandle);
 
     QObject::disconnect(viewText,&MkEdit::applyAllMkData,
-                     currentdocument.data(),&MkTextDocument::applyAllMkDataHandle);
+                        currentDocument.data(),&MkTextDocument::applyAllMkDataHandle);
 
     QObject::disconnect(viewText,&MkEdit::setMarkdownStatus,
-                     currentdocument.data(),&MkTextDocument::setMarkdownHandle);
+                        currentDocument.data(),&MkTextDocument::setMarkdownHandle);
 
-    QObject::disconnect(currentdocument.data(),&MkTextDocument::clearUndoStack,
+    QObject::disconnect(currentDocument.data(),&MkTextDocument::clearUndoStack,
                      viewText,&MkEdit::clearUndoStackHandle);
 
     QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
-                     currentdocument.data(),&MkTextDocument::drawTextBlocksHandler);
+                        currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
 
     QObject::disconnect(viewText,&MkEdit::pushCheckBox,
-                     currentdocument.data(),&MkTextDocument::pushCheckBoxHandle);
+                        currentDocument.data(),&MkTextDocument::pushCheckBoxHandle);
 
     QObject::disconnect(viewText,&MkEdit::pushLink,
-                     currentdocument.data(),&MkTextDocument::pushLinkHandle);
+                        currentDocument.data(),&MkTextDocument::pushLinkHandle);
 
     QObject::disconnect(viewText,&MkEdit::autoInsertSymbol,
-                     currentdocument.data(),&MkTextDocument::autoInsertSymobolHandle);
+                        currentDocument.data(),&MkTextDocument::autoInsertSymobolHandle);
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -249,14 +249,37 @@ QString ViewsHandler::getFileContent(QFile& file)
 void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
 {
     //disconnect signals from old current document
+    disconnectDocument();
+
     //set current document to textview
+
+    const QString &filePath = fileInfo.absoluteFilePath();
+    currentDocument = recentFileDocumentMap.value(filePath);
+    if(currentDocument==nullptr){
+        recentFileDocumentMap.insert(filePath, QSharedPointer<MkTextDocument>(new MkTextDocument()));
+        currentDocument = recentFileDocumentMap.value(filePath);
+        currentDocument->setFilePath(filePath);
+
+        const QScopedPointer<QFile> file = QScopedPointer<QFile>(new QFile(filePath));
+        const QString fullContent = getFileContent(*file.get());
+
+        currentDocument->setPlainText(fullContent);
+    }
+    currentDocument->setFilePath(fileInfo.absoluteFilePath());
+    highlighter.setDocument(currentDocument.data());
+    viewText->setDocument(currentDocument.data());
+
+
     //connect signals to new current document
+    connectDocument();
 
 }
 
 void ViewsHandler::fileDisplay(const QModelIndex& index)
 {
     QModelIndex sourceIndex = proxyModel.mapToSource(index);
+//    setCurrentDocument(modelTree.fileInfo(sourceIndex));
+
     fileInfo = modelTree.fileInfo(sourceIndex);
     if (!fileInfo.isFile()|| !fileInfo.exists())
         return;
@@ -272,8 +295,8 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     //recentFileCursorMap.insert(fullPath,QPair<int,int>(viewText->textCursor().blockNumber(), viewText->textCursor().positionInBlock()));
     emit updateRecentFile(fullPath);
 
-    currentdocument->clear();
-    currentdocument->setPlainText(fullContent);
+    currentDocument->clear();
+    currentDocument->setPlainText(fullContent);
 
     viewTitle->setText(fileInfo.baseName());
     viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -291,6 +314,7 @@ void ViewsHandler::fileSaveHandle()
 
     QString fullContent = viewText->toPlainText();
     QFile file(fileInfo.absoluteFilePath());
+
     if(file.open(QFile::WriteOnly))
     {
         QTextStream stream(&file);
@@ -378,8 +402,8 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
     QSharedPointer<QFile> file = QSharedPointer<QFile>(new QFile(fileInfo.absoluteFilePath()));
     QString fullContent = getFileContent(*file.get());
 
-    currentdocument->clear();
-    currentdocument->setPlainText(fullContent);
+    currentDocument->clear();
+    currentDocument->setPlainText(fullContent);
 
     viewTitle->setText(fileInfo.baseName());
     viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -440,8 +464,8 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
             QObject::disconnect(viewText,&MkEdit::cursorUpdate,
                              this,&ViewsHandler::cursorUpdateHandle);
 
-            currentdocument->clear();
-            currentdocument->setPlainText(fullContent);
+            currentDocument->clear();
+            currentDocument->setPlainText(fullContent);
 
 
             QPair<int,int> positionPair = recentFileCursorMap.value(fullFilePath);

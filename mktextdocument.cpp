@@ -39,6 +39,16 @@ void MkTextDocument::clear()
     QTextDocument::clear();
 }
 
+void MkTextDocument::setFilePath(const QString &filePath)
+{
+    this->filePath = filePath;
+}
+
+QString MkTextDocument::getFilePath() const
+{
+    return this->filePath;
+}
+
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * editSelectRange)
 {
     if(editSelectRange){
