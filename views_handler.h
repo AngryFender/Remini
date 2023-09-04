@@ -107,7 +107,6 @@ private slots:
     void navigationViewExpandedFilenameFilter();
     void doSearchWork(QString &text);
     void displayTextSearchedFilePosition(QString &filePath,int searchTextLength,int blockNumber, int positionInBlock);
-    void cursorUpdateHandle(const int blockNo, const int posInBlock);
 
 };
 

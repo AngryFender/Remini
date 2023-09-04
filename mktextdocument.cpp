@@ -44,9 +44,19 @@ void MkTextDocument::setFilePath(const QString &filePath)
     this->filePath = filePath;
 }
 
+void MkTextDocument::setFileName(const QString &fileName)
+{
+    this->fileName = fileName;
+}
+
 QString MkTextDocument::getFilePath() const
 {
     return this->filePath;
+}
+
+QString MkTextDocument::getFileName() const
+{
+    return this->fileName;
 }
 
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * editSelectRange)

@@ -84,7 +84,9 @@ public:
     QVector<QPair<int, int>>::const_iterator linkPosEnd(){return linkPositions.cend();};
 
     void setFilePath(const QString &filePath);
+    void setFileName(const QString &fileName);
     QString getFilePath() const;
+    QString getFileName() const;
 
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, SelectRange * editSelectRange);
@@ -126,6 +128,7 @@ public slots:
     QTextDocument formattedTexts;
 
     QString filePath;
+    QString fileName;
     SelectRange selectRange;
     int selectStart;
     int selectEnd;
