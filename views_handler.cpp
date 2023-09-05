@@ -241,7 +241,6 @@ QString ViewsHandler::getFileContent(QFile& file)
     {
         QTextStream stream(&file);
         content = stream.readAll();
-
     }
     file.close();
     return content;
@@ -253,7 +252,6 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
     disconnectDocument();
 
     //set current document to textview
-
     const QString &filePath = fileInfo.absoluteFilePath();
     const QString &fileName = fileInfo.baseName();
     currentDocument = recentFileDocumentMap.value(filePath);
@@ -297,7 +295,7 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     viewText->update();
 
  //   viewText->initialialCursorPosition();
-    viewText->verticalScrollBar()->setSliderPosition(0);
+ // viewText->verticalScrollBar()->setSliderPosition(0);
 }
 
 void ViewsHandler::fileSaveHandle()
