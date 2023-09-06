@@ -266,15 +266,22 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
         currentDocument->setDefaultFont(fontUi);
         viewText->setFont(fontUi);
         currentDocument->setPlainText(fullContent);
+        connectDocument();
+
+        currentDocument->setFilePath(fileInfo.absoluteFilePath());
+        highlighter.setDocument(currentDocument.data());
+        viewTitle->setText(currentDocument->getFileName());
+
+        viewText->setDocument(currentDocument.data());
+        viewText->initialialCursorPosition();
+    }else{
+
+        currentDocument->setFilePath(fileInfo.absoluteFilePath());
+        highlighter.setDocument(currentDocument.data());
+        viewTitle->setText(currentDocument->getFileName());
+        connectDocument();
+        viewText->setDocument(currentDocument.data());
     }
-    currentDocument->setFilePath(fileInfo.absoluteFilePath());
-    highlighter.setDocument(currentDocument.data());
-    viewText->setDocument(currentDocument.data());
-
-    viewTitle->setText(currentDocument->getFileName());
-    //connect signals to new current document
-    connectDocument();
-
 }
 
 void ViewsHandler::fileDisplay(const QModelIndex& index)
