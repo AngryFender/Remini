@@ -49,6 +49,18 @@ void MkTextDocument::setFileName(const QString &fileName)
     this->fileName = fileName;
 }
 
+void MkTextDocument::setCursorPos(const int blockNo, const int characterNo)
+{
+    this->blockNo = blockNo;
+    this->characterNo = characterNo;
+}
+
+void MkTextDocument::getCursorPos(int &blockNo, int &characterNo) const
+{
+    blockNo = this->blockNo;
+    characterNo = this->characterNo;
+}
+
 QString MkTextDocument::getFilePath() const
 {
     return this->filePath;

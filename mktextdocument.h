@@ -85,6 +85,8 @@ public:
 
     void setFilePath(const QString &filePath);
     void setFileName(const QString &fileName);
+    void setCursorPos(const int blockNo, const int characterNo);
+    void getCursorPos(int &blockNo, int &characterNo) const;
     QString getFilePath() const;
     QString getFileName() const;
 
@@ -129,6 +131,8 @@ public slots:
 
     QString filePath;
     QString fileName;
+    int blockNo;
+    int characterNo;
     SelectRange selectRange;
     int selectStart;
     int selectEnd;
