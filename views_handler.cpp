@@ -181,6 +181,8 @@ void ViewsHandler::connectDocument()
     QObject::connect(viewText,&MkEdit::autoInsertSymbol,
                      currentDocument.data(),&MkTextDocument::autoInsertSymobolHandle);
 
+    QObject::connect(viewText,&MkEdit::cursorUpdate,
+                     currentDocument.data(),&MkTextDocument::cursorUpdateHandle);
 
 
 }

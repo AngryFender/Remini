@@ -109,6 +109,7 @@ public slots:
     void pushLinkHandle(const int position);
     void autoInsertSymobolHandle(const int position);
     void setMarkdownHandle(bool state, QRect rect);
+    void cursorUpdateHandle(const int blockNo, const int characterNo);
 
  private:
     struct CheckingBlock{

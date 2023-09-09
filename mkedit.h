@@ -144,6 +144,7 @@ signals:
     void pushLink(int position);
     void autoInsertSymbol(const int position);
     void setMarkdownStatus(bool state, QRect rect);
+    void cursorUpdate(const int blockNo, const int characterPos);
 };
 
 #endif // MKEDIT_H

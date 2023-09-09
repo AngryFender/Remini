@@ -1102,6 +1102,11 @@ void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
     }
 }
 
+void MkTextDocument::cursorUpdateHandle(const int blockNo, const int characterNo)
+{
+
+}
+
 
 void MkTextDocument::resetFormatLocation()
 {
