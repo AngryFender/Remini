@@ -87,6 +87,8 @@ public:
     void setFileName(const QString &fileName);
     void setCursorPos(const int blockNo, const int characterNo);
     void getCursorPos(int &blockNo, int &characterNo) const;
+    int getBlockNo()const;
+    int getCharacterNo()const;
     QString getFilePath() const;
     QString getFileName() const;
 

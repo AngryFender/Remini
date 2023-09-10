@@ -61,6 +61,16 @@ void MkTextDocument::getCursorPos(int &blockNo, int &characterNo) const
     characterNo = this->characterNo;
 }
 
+int MkTextDocument::getBlockNo() const
+{
+    return this->blockNo;
+}
+
+int MkTextDocument::getCharacterNo() const
+{
+    return this->characterNo;
+}
+
 QString MkTextDocument::getFilePath() const
 {
     return this->filePath;
@@ -1104,7 +1114,8 @@ void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
 
 void MkTextDocument::cursorUpdateHandle(const int blockNo, const int characterNo)
 {
-
+    this->blockNo = blockNo;
+    this->characterNo = characterNo;
 }
 
 

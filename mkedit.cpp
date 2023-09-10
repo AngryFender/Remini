@@ -51,6 +51,8 @@ void MkEdit::initialialCursorPosition()
 {
     QTextCursor cursor = this->textCursor();
     cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+    this->setTextCursor(cursor);
+    this->verticalScrollBar()->setSliderPosition(0);
 
     int savedBlockNumber = cursor.blockNumber();
     selectRange.start = this->textCursor().selectionStart();

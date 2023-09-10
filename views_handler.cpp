@@ -184,7 +184,6 @@ void ViewsHandler::connectDocument()
     QObject::connect(viewText,&MkEdit::cursorUpdate,
                      currentDocument.data(),&MkTextDocument::cursorUpdateHandle);
 
-
 }
 
 void ViewsHandler::disconnectDocument()
@@ -234,6 +233,9 @@ void ViewsHandler::disconnectDocument()
     QObject::disconnect(viewText,&MkEdit::autoInsertSymbol,
                         currentDocument.data(),&MkTextDocument::autoInsertSymobolHandle);
 
+    QObject::disconnect(viewText,&MkEdit::cursorUpdate,
+                     currentDocument.data(),&MkTextDocument::cursorUpdateHandle);
+
 }
 
 QString ViewsHandler::getFileContent(QFile& file)
@@ -267,8 +269,8 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
 
         currentDocument->setDefaultFont(fontUi);
         viewText->setFont(fontUi);
-        currentDocument->setPlainText(fullContent);
         connectDocument();
+        currentDocument->setPlainText(fullContent);
 
         currentDocument->setFilePath(fileInfo.absoluteFilePath());
         highlighter.setDocument(currentDocument.data());
@@ -281,8 +283,18 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
         currentDocument->setFilePath(fileInfo.absoluteFilePath());
         highlighter.setDocument(currentDocument.data());
         viewTitle->setText(currentDocument->getFileName());
-        connectDocument();
         viewText->setDocument(currentDocument.data());
+
+        QTextCursor cursor = viewText->textCursor();
+        cursor.setPosition(this->currentDocument->getBlockNo());
+        cursor.movePosition(QTextCursor::StartOfLine,QTextCursor::MoveAnchor);
+
+        const int characterNo = this->currentDocument->getCharacterNo();
+        for(int rep = 0; rep < characterNo; rep++){
+            cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
+        }
+        viewText->setTextCursor(cursor);
+        connectDocument();
     }
 }
 
@@ -302,9 +314,6 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     viewText->update();
-
- //   viewText->initialialCursorPosition();
- // viewText->verticalScrollBar()->setSliderPosition(0);
 }
 
 void ViewsHandler::fileSaveHandle()
