@@ -66,6 +66,7 @@ protected:
     int widthCodeBlock;
     QPen penCodeBlock;
     int savedBlockNumber;
+    int savedCharacterNumber;
     QUndoStack undoStack;
     UndoData undoData;
     HighlightColor syntaxColor;
