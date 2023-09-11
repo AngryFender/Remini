@@ -639,6 +639,6 @@ void MkEdit::cursorPositionChangedHandle()
             }
             this->setTextCursor(cursor);
         }
+        emit cursorUpdate(this->textCursor().blockNumber(), this->textCursor().positionInBlock());
     }
-    emit cursorUpdate(this->textCursor().blockNumber(), this->textCursor().positionInBlock());
 }

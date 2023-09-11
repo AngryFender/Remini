@@ -286,11 +286,12 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
         viewText->setDocument(currentDocument.data());
 
         QTextCursor cursor = viewText->textCursor();
-        cursor.setPosition(this->currentDocument->getBlockNo());
-        cursor.movePosition(QTextCursor::StartOfLine,QTextCursor::MoveAnchor);
+        QTextBlock block = currentDocument->findBlockByNumber(this->currentDocument->getBlockNo());
+        cursor.setPosition(block.position());
+        cursor.movePosition(QTextCursor::StartOfBlock,QTextCursor::MoveAnchor);
 
         const int characterNo = this->currentDocument->getCharacterNo();
-        for(int rep = 0; rep < characterNo; rep++){
+        for(int rep = 0; rep < characterNo; ++rep){
             cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
         }
         viewText->setTextCursor(cursor);
