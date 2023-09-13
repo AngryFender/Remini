@@ -53,6 +53,9 @@ void MkEdit::initialialCursorPosition()
     QTextCursor cursor = this->textCursor();
     cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
     this->setTextCursor(cursor);
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    this->update();
     this->verticalScrollBar()->setSliderPosition(0);
 
     int savedBlockNumber = cursor.blockNumber();
