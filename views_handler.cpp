@@ -294,8 +294,8 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
         for(int rep = 0; rep < characterNo; ++rep){
             cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
         }
-        viewText->setTextCursor(cursor);
         connectDocument();
+        viewText->setTextCursor(cursor);
     }
 }
 
