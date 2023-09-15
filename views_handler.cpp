@@ -323,7 +323,8 @@ void ViewsHandler::fileSaveHandle()
         return;
 
     QString fullContent = viewText->toPlainText();
-    QFile file(fileInfo.absoluteFilePath());
+
+    QFile file(currentDocument.data()->getFilePath());
 
     if(file.open(QFile::WriteOnly))
     {
