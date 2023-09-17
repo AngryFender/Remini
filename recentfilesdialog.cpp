@@ -70,4 +70,5 @@ void RecentFilesDialog::updateRecentFileHandle(const QString &relativePath)
     }
     listWidget->clearSelection();
     listWidget->insertItem(0,newItem);
+    listWidget->setCurrentRow(0,QItemSelectionModel::Select);
 }
