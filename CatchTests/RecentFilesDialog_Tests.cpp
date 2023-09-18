@@ -153,3 +153,24 @@ TEST_CASE("adding more paths to the dialog using slots", "[RecentFilesDialog]"){
 
     delete listPtr;
 }
+
+TEST_CASE("cycling back to the last file", "[RecentFilesDialog]"){
+    QString item1 = "test1.txt";
+    QString item2 = "test2.txt";
+    QString item3 = "test3.txt";
+
+    QListWidget *listPtr = new QListWidget;
+    QScopedPointer<RecentFilesDialog> dialog ( new RecentFilesDialog(nullptr,listPtr));
+
+    dialog->updateRecentFileHandle(item1);
+    dialog->updateRecentFileHandle(item2);
+    dialog->updateRecentFileHandle(item3);
+    dialog->show();
+
+    QTest::keyPress(dialog.data(), Qt::Key_Tab);
+    QTest::keyPress(dialog.data(), Qt::Key_Tab);
+    QString result = dialog->getCurrentRelativeFile();
+    REQUIRE( result == item3);
+
+    delete listPtr;
+}
