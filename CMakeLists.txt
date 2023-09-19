@@ -52,6 +52,8 @@ set(PROJECT_SOURCES
         startuptext.h
         recentfilesdialog.h
         recentfilesdialog.cpp
+        settingsdialog.h
+        settingsdialog.cpp
     )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
