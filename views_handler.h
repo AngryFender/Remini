@@ -65,6 +65,7 @@ private:
     NavigationProxyModel proxyModel;
     MkEdit* viewText;
     QLabel* viewTitle;
+    QToolButton * viewSettingBtn;
     QLineEdit* viewSearch;
     NavigationView* viewTree;
     QFileInfo fileInfo;

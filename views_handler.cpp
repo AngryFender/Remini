@@ -19,6 +19,10 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     viewTitle = ui.uiTitle;
     viewLeftFrame = ui.uiLeftPane;
     viewRightFrame = ui.uiRightPane;
+    viewSettingBtn = ui.uiSettingBtn;
+
+    QIcon SettingsIcon(":/icons/settings.png");
+    viewSettingBtn->setIcon(SettingsIcon);
 
     viewSearch->setPlaceholderText("Search Files...");
     initTreeView();
