@@ -8,7 +8,7 @@
 class SettingsDialog : public QDialog
 {
 public:
-    SettingsDialog();
+    SettingsDialog(QWidget * parent = nullptr);
 };
 
 #endif // SETTINGSDIALOG_H

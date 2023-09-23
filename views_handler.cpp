@@ -134,6 +134,9 @@ void ViewsHandler::initConnection()
     QObject::connect(this,&ViewsHandler::updateRecentFile,
                      recentFilesView,&RecentFilesDialog::updateRecentFileHandle);
 
+    QObject::connect(viewSettingBtn,&QToolButton::pressed,
+                     this,&ViewsHandler::showSettingsBtn);
+
     connectDocument();
 
 }
@@ -429,6 +432,11 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
     cursor.setPosition(block.position()+positionInBlock-searchTextLength,QTextCursor::KeepAnchor);
     viewText->setTextCursor(cursor);
 
+}
+
+void ViewsHandler::showSettingsBtn()
+{
+    viewSettingBtn->show();
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
