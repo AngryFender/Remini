@@ -150,7 +150,7 @@
            <bool>false</bool>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true"> padding-left:35;	padding-top:10; qproperty-alignment: 'AlignVCenter | AlignLeft';</string>
           </property>
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>

@@ -436,7 +436,7 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 void ViewsHandler::showSettingsBtn()
 {
-    viewSettingBtn->show();
+    settingsDialog->show();
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)

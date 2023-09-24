@@ -14,6 +14,7 @@
 #include "ui_mainwindow.h"
 #include "searchalldialog.h"
 #include "recentfilesdialog.h"
+#include "settingsdialog.h"
 
 #define NAVIGATION_RATIO 100
 #define EDITOR_RAIO 200
@@ -46,6 +47,7 @@ private:
         recentFilesList = new QListWidget(this->parent);
         recentFilesView = new RecentFilesDialog(this->parent,recentFilesList);
         textSearchAllView = new SearchAllDialog(this->parent);
+        settingsDialog = new SettingsDialog(this->parent);
         initViews(ui);
         initConnection();
         textSearchWorker.moveToThread(&searchThread);
@@ -66,6 +68,7 @@ private:
     MkEdit* viewText;
     QLabel* viewTitle;
     QToolButton * viewSettingBtn;
+    SettingsDialog * settingsDialog;
     QLineEdit* viewSearch;
     NavigationView* viewTree;
     QFileInfo fileInfo;
