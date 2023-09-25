@@ -2,6 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QFileDialog>
 
 namespace Ui {
 class SettingsDialog;
@@ -15,6 +16,8 @@ public:
     explicit SettingsDialog(QWidget *parent = nullptr);
     ~SettingsDialog();
 
+private slots:
+    void executeFolderDialog();
 private:
     Ui::SettingsDialog *ui;
 };
