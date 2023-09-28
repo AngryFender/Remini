@@ -40,6 +40,26 @@
        </item>
       </layout>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lbl_font">
+       <property name="text">
+        <string>Font </string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lbl_theme">
+       <property name="text">
+        <string>Theme</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cmb_theme"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QFontComboBox" name="cmb_font"/>
+     </item>
     </layout>
    </item>
    <item>
