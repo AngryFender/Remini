@@ -6,6 +6,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    previewHighligher.setDocument(&this->previewDocument) ;
+    previewDocument.setPlainText(previewText);
+    ui->txt_preview->setDocument(&this->previewDocument);
+
     connect(ui->btn_vaultRootPath, &QPushButton::pressed,
             this, &SettingsDialog::executeFolderDialog);
 }
