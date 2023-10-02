@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QFileDialog>
 #include "mktextdocument.h"
-#include "mkedit.h"
 #include "highlighter.h"
 
 const QString previewText = QStringLiteral("\Multithreading Technologies in Qt"
@@ -28,8 +27,11 @@ public:
 
 private slots:
     void executeFolderDialog();
+public slots:
+    void syntaxColorUpdateHandler(HighlightColor &colors);
 private:
     Ui::SettingsDialog *ui;
+    HighlightColor previewColors;
     MkTextDocument previewDocument;
     Highlighter previewHighligher;
 };

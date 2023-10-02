@@ -80,6 +80,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::syntaxColorUpdate,
                      &highlighter,&Highlighter::syntaxColorUpdateHandler);
 
+    QObject::connect(viewText,&MkEdit::syntaxColorUpdate,
+                     settingsDialog,&SettingsDialog::syntaxColorUpdateHandler);
+
     QObject::connect(viewTree, &NavigationView::pressed,
                      this, &ViewsHandler::fileDisplay);
 

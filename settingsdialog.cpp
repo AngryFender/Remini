@@ -30,3 +30,8 @@ void SettingsDialog::executeFolderDialog()
         ui->edit_vaultRootPath->setText(selectedDir);
     }
 }
+
+void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)
+{
+    this->previewColors = colors;
+}
