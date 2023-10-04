@@ -12,6 +12,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     connect(ui->btn_vaultRootPath, &QPushButton::pressed,
             this, &SettingsDialog::executeFolderDialog);
+    QObject::connect(this,&SettingsDialog::syntaxColorUpdate,
+                     &previewHighligher,&Highlighter::syntaxColorUpdateHandler);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -34,4 +36,5 @@ void SettingsDialog::executeFolderDialog()
 void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)
 {
     this->previewColors = colors;
+    emit syntaxColorUpdate(previewColors);
 }

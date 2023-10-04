@@ -25,6 +25,8 @@ public:
     explicit SettingsDialog(QWidget *parent = nullptr);
     ~SettingsDialog();
 
+signals:
+    void syntaxColorUpdate(HighlightColor &colors);
 private slots:
     void executeFolderDialog();
 public slots:
