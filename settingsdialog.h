@@ -6,12 +6,12 @@
 #include "mktextdocument.h"
 #include "highlighter.h"
 
-const QString previewText = QStringLiteral("\Multithreading Technologies in Qt"
-"Qt offers many classes and functions for working with threads. Below are four different approaches that Qt programmers can use to implement multithreaded applications."
-"QThread: Low-Level API with Optional Event Loops"
-"QThread is the foundation of all thread control in Qt. Each QThread instance represents and controls one thread."
+const QString previewText = QStringLiteral("The header file declares several type definitions that guarantee a specified bit-size on all platforms supported by Qt for various basic types, for example qint8 which is a signed char guaranteed to be 8-bit on all platforms supported by Qt. The header file also declares the qlonglong type definition for long long int ( __int64 on Windows). "
+"Several convenience type definitions are declared: qreal for double or float, uchar for unsigned char, uint for unsigned int, ulong for unsigned long and ushort for unsigned short."
+"\"Finally, the QtMsgType definition identifies the various messages that can be generated and sent to a Qt message handler; \"QtMessageHandler is a type definition for a pointer to a function with the signature void myMessageHandler(QtMsgType, const QMessageLogContext &, const char *). QMessageLogContext class contains the line, file, and function the message was logged at. This information is created by the QMessageLogger class. initialize the new thread before starting its event loop, or to run parallel code without an event loop."
+"//Comment texts examples. "
 "\n"
-"QThread can either be instantiated directly or subclassed. Instantiating a QThread provides a parallel event loop, allowing QObject slots to be invoked in a secondary thread. Subclassing a QThread allows the application to initialize the new thread before starting its event loop, or to run parallel code without an event loop.");
+"cmake -G \"Visual Studio 17 2022\" -A x64 -S path_to_source -B \"build64\"" );
 
 namespace Ui {
 class SettingsDialog;

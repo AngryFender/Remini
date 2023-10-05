@@ -6,8 +6,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
-    previewHighligher.setDocument(&this->previewDocument) ;
     previewDocument.setPlainText(previewText);
+    previewHighligher.setDocument(&this->previewDocument) ;
     ui->txt_preview->setDocument(&this->previewDocument);
 
     connect(ui->btn_vaultRootPath, &QPushButton::pressed,
