@@ -7,7 +7,7 @@
 #include "highlighter.h"
 
 const QString previewText = QStringLiteral("The header file declares several type definitions that guarantee a specified bit-size on all platforms supported by Qt for various basic types, for example qint8 which is a signed char guaranteed to be 8-bit on all platforms supported by Qt. The header file also declares the qlonglong type definition for long long int ( __int64 on Windows). "
-"Several convenience type definitions are declared: qreal for double or float, uchar for unsigned char, uint for unsigned int, ulong for unsigned long and ushort for unsigned short."
+"Several convenience type definitions are declared: qreal for double or float, uchar for unsigned char, uint for unsigned int, ulong for unsigned long and ushort for unsigned short.\n"
 "\"Finally, the QtMsgType definition identifies the various messages that can be generated and sent to a Qt message handler; \"QtMessageHandler is a type definition for a pointer to a function with the signature void myMessageHandler(QtMsgType, const QMessageLogContext &, const char *). QMessageLogContext class contains the line, file, and function the message was logged at. This information is created by the QMessageLogger class. initialize the new thread before starting its event loop, or to run parallel code without an event loop."
 "//Comment texts examples. "
 "\n"

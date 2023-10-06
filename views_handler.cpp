@@ -305,7 +305,13 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
             cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
         }
         connectDocument();
+        QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
+                            currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
+
         viewText->setTextCursor(cursor);
+        viewText->ensureCursorVisible();
+        QObject::connect(viewText,&MkEdit::drawTextBlocks,
+                            currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
     }
 }
 
@@ -321,11 +327,7 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
         fullPath.replace(vaultPath, "");
     }
     emit updateRecentFile(fullPath);
-
-    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    viewText->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    viewText->update();
-}
+   }
 
 void ViewsHandler::fileSaveHandle()
 {
