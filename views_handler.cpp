@@ -288,6 +288,7 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
 
         viewText->setDocument(currentDocument.data());
         viewText->initialialCursorPosition();
+        return true;
     }else{
 
         currentDocument->setFilePath(fileInfo.absoluteFilePath());
@@ -305,20 +306,15 @@ void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
             cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
         }
         connectDocument();
-        QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
-                            currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
-
         viewText->setTextCursor(cursor);
-        viewText->ensureCursorVisible();
-        QObject::connect(viewText,&MkEdit::drawTextBlocks,
-                            currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
+        return false;
     }
 }
 
 void ViewsHandler::fileDisplay(const QModelIndex& index)
 {
     QModelIndex sourceIndex = proxyModel.mapToSource(index);
-    setCurrentDocument(modelTree.fileInfo(sourceIndex));
+    bool newDocument = setCurrentDocument(modelTree.fileInfo(sourceIndex));
 
     QString fullPath = this->currentDocument->getFilePath();
 
@@ -327,6 +323,10 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
         fullPath.replace(vaultPath, "");
     }
     emit updateRecentFile(fullPath);
+
+    if(!newDocument){
+        viewText->ensureCursorVisible();
+    }
    }
 
 void ViewsHandler::fileSaveHandle()

@@ -880,8 +880,8 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo
             FormatData* formatData = dynamic_cast<FormatData*>(data);
             if(formatData){
                 if(formatData->isHidden()){
-                    showAllFormatSymbolsInTextBlock(block, formatData);
                     formatData->setHidden(false);
+                    showAllFormatSymbolsInTextBlock(block, formatData);
                 }
             }
         }
@@ -904,7 +904,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
     }
 
     for(QTextBlock block = this->begin(); block != this->end(); block = block.next()){
-        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
+        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+50) && layout->blockBoundingRect(block).top() > (rect.top()-40)){
 
             int currentBlockNumber = block.blockNumber();
             QTextBlockUserData* data =block.userData();
