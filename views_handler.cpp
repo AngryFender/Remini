@@ -260,7 +260,7 @@ QString ViewsHandler::getFileContent(QFile& file)
     return content;
 }
 
-void ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
+bool ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
 {
     //disconnect signals from old current document
     disconnectDocument();
