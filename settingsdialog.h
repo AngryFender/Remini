@@ -20,6 +20,10 @@ class SettingsDialog;
 class SettingsDialog : public QDialog
 {
     Q_OBJECT
+    enum{
+        lightTheme,
+        darkTheme,
+    }ThemeOptions;
 
 public:
     explicit SettingsDialog(QWidget *parent = nullptr);
@@ -36,6 +40,8 @@ private:
     HighlightColor previewColors;
     MkTextDocument previewDocument;
     Highlighter previewHighligher;
+
+    const QString getVaultRootPath();
 };
 
 #endif // SETTINGSDIALOG_H
