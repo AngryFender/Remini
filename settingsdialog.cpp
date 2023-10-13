@@ -20,7 +20,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     ui->cmb_theme->addItem("Light Theme");
     ui->cmb_theme->addItem("Dark Theme");
-
 }
 
 SettingsDialog::~SettingsDialog()
@@ -46,9 +45,33 @@ void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)
     emit syntaxColorUpdate(previewColors);
 }
 
+void SettingsDialog::show()
+{
+    ui->edit_vaultRootPath->setText(getVaultRootPath());
+    QDialog::show();
+}
+
 const QString SettingsDialog::getVaultRootPath()
 {
+    QString currentPath = QDir::currentPath();
+    QString filePath = currentPath + CONFIG_FILE_NAME;
+    QFile file(filePath);
+
     QString vaultRootPath;
-    //todo
+
+    if(file.exists()){
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QTextStream stream(&file);
+            vaultRootPath = stream.readAll();
+        }
+    }else{
+        if (file.open(QIODevice::WriteOnly)){
+            QTextStream stream(&file);
+            stream << currentPath;
+            vaultRootPath = currentPath;
+        }
+    }
+    file.close();
     return vaultRootPath;
 }
