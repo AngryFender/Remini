@@ -322,7 +322,11 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     if (fullPath.startsWith(vaultPath)) {
         fullPath.replace(vaultPath, "");
     }
-    emit updateRecentFile(fullPath);
+
+    QFileInfo fileInfo(currentFilePath);
+    if(!fileInfo.isDir()){
+        emit updateRecentFile(fullPath);
+    }
 
     if(!newDocument){
         viewText->ensureCursorVisible();
