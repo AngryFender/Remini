@@ -72,3 +72,8 @@ void RecentFilesDialog::updateRecentFileHandle(const QString &relativePath)
     listWidget->insertItem(0,newItem);
     listWidget->setCurrentRow(0,QItemSelectionModel::Select);
 }
+
+void RecentFilesDialog::removeRecentDeletedFileHandle(const QString &relativePath)
+{
+    //find the filename and remove it from the list
+}

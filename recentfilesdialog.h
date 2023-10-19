@@ -26,6 +26,7 @@ public:
     const QString getCurrentRelativeFile()const;
 public slots:
     void updateRecentFileHandle(const QString &relativePath);
+    void removeRecentDeletedFileHandle(const QString &relativePath);
 };
 
 #endif // RECENTFILESDIALOG_H
