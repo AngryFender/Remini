@@ -95,6 +95,9 @@ void ViewsHandler::initConnection()
     QObject::connect(this,  &ViewsHandler::fileDelete,
                      &proxyModel, &NavigationProxyModel::deleteFileFolderHandler);
 
+    QObject::connect(this,  &ViewsHandler::fileDeletePath,
+                     recentFilesView, &RecentFilesDialog::removeRecentDeletedFileHandle);
+
     QObject::connect(viewTree,&NavigationView::deleteFileFolder,
                      this, &ViewsHandler::fileDeleteDialogue);
 
@@ -378,6 +381,12 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
     confirmBox->setDefaultButton(QMessageBox::No);
     if(QMessageBox::Yes == confirmBox->exec()){
         emit fileDelete(index);
+
+        QString currentFilePath = info.absoluteFilePath();
+        if (currentFilePath.startsWith(vaultPath)) {
+            currentFilePath.replace(vaultPath, "");
+        }
+        emit fileDeletePath(currentFilePath);
     }
 }
 

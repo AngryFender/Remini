@@ -100,6 +100,7 @@ signals:
     void load_text(QString text);
     void clear_text();
     void fileDelete(QModelIndex& index);
+    void fileDeletePath(const QString& path);
     void updateRecentFile(const QString &relativePath);
 
 private slots:
