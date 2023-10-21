@@ -26,6 +26,12 @@ public:
     ViewsHandler(QWidget *parent, ViewsHandler &other) = delete;
     void operator=(const ViewsHandler&) = delete;
 
+    enum DOCUMENT_STATUS{
+        NEW_DOCUMENT,
+        OLD_DOCUMENT,
+        NOT_DOCUMENT,
+    };
+
     static QSharedPointer<ViewsHandler> getInstance(QWidget *parent,Ui::MainWindow &ui)
     {
         static QSharedPointer<ViewsHandler> handle{new ViewsHandler(parent,ui) };
@@ -84,7 +90,7 @@ private:
     void disconnectDocument();
 
     QString getFileContent(QFile& file);
-    bool setCurrentDocument(const QFileInfo &fileInfo);
+    DOCUMENT_STATUS setCurrentDocument(const QFileInfo &fileInfo);
     MkTextDocument mkGuiDocument;
     Highlighter highlighter;
     QString searchedFilename;

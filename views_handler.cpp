@@ -263,8 +263,11 @@ QString ViewsHandler::getFileContent(QFile& file)
     return content;
 }
 
-bool ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
+ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
 {
+    if (!fileInfo.isFile())
+        return NOT_DOCUMENT;
+
     //disconnect signals from old current document
     disconnectDocument();
 
@@ -291,7 +294,7 @@ bool ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
 
         viewText->setDocument(currentDocument.data());
         viewText->initialialCursorPosition();
-        return true;
+        return NEW_DOCUMENT;
     }else{
 
         currentDocument->setFilePath(fileInfo.absoluteFilePath());
@@ -310,31 +313,34 @@ bool ViewsHandler::setCurrentDocument(const QFileInfo &fileInfo)
         }
         connectDocument();
         viewText->setTextCursor(cursor);
-        return false;
+        return OLD_DOCUMENT;
     }
 }
 
 void ViewsHandler::fileDisplay(const QModelIndex& index)
 {
     QModelIndex sourceIndex = proxyModel.mapToSource(index);
-    bool newDocument = setCurrentDocument(modelTree.fileInfo(sourceIndex));
+    DOCUMENT_STATUS status = setCurrentDocument(modelTree.fileInfo(sourceIndex));
+
+    if(NOT_DOCUMENT == status){
+        return;
+    }
 
     QString fullPath = this->currentDocument->getFilePath();
-
     currentFilePath = fullPath;
-    if (fullPath.startsWith(vaultPath)) {
-        fullPath.replace(vaultPath, "");
-    }
 
     QFileInfo fileInfo(currentFilePath);
     if(!fileInfo.isDir()){
+        if (fullPath.startsWith(vaultPath)) {
+            fullPath.replace(vaultPath, "");
+        }
         emit updateRecentFile(fullPath);
-    }
 
-    if(!newDocument){
-        viewText->ensureCursorVisible();
+        if(OLD_DOCUMENT == status){
+            viewText->ensureCursorVisible();
+        }
     }
-   }
+}
 
 void ViewsHandler::fileSaveHandle()
 {
