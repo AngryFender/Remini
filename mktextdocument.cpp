@@ -868,7 +868,7 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo
             if(blockData->getStatus()!=BlockData::content)
             {
                 showSymbols(block, CODEBLOCK_SYMBOL);
-                showSymbols(block, CODEBLOCK_SYMBOL);
+                //showSymbols(block, CODEBLOCK_SYMBOL);
             }
         }
         else{
