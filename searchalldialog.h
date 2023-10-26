@@ -14,7 +14,7 @@
 #include <QTreeView>
 #include <QLabel>
 
-#define KEY_PRESS_TIMEOUT 400
+#define KEY_PRESS_TIMEOUT 10
 #define PADDING 10
 
 class SearchAllDialog : public QDialog
