@@ -38,12 +38,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     penCodeBlock.setWidthF(1);
     penCodeBlock.setStyle(Qt::SolidLine);
 
-    QObject::connect(this,&MkEdit::cursorPositionChanged,
-                     this, &MkEdit::cursorPositionChangedHandle);
-
-    QObject::connect(this->verticalScrollBar(),&QScrollBar::valueChanged,
-                     this, &MkEdit::scrollValueUpdateHandle);
-
+    connectSignals();
     this->setUndoRedoEnabled(false);
     preUndoSetup();
 }
@@ -237,8 +232,8 @@ QRect MkEdit::getVisibleRect()
 
 void MkEdit::clearMkEffects()
 {
-
-    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
+    disconnectSignals();
+    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is importantp
     emit removeAllMkData(this->textCursor().blockNumber());
     if(!fileSaveTimer.isActive()){
         preUndoSetup();
@@ -253,23 +248,28 @@ void MkEdit::applyMkEffects(const bool scroll)
         this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
         this->ensureCursorVisible();
     }
+    connectSignals();
 }
 
 void MkEdit::fileSaveNow()
 {
     fileSaveTimer.stop();
+    disconnectSignals();
     postUndoSetup();
     emit fileSave();
     applyMkEffects();
+    connectSignals();
 }
 
 void MkEdit::fileSaveWithScroll(const bool scroll)
 {
     fileSaveTimer.stop();
+    disconnectSignals();
     emit removeAllMkData(this->textCursor().blockNumber());
     postUndoSetup();
     emit fileSave();
     applyMkEffects(scroll);
+    connectSignals();
 }
 
 bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
@@ -331,6 +331,22 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
     }
 
     return false;
+}
+
+void MkEdit::connectSignals()
+{
+    QObject::connect(this,&MkEdit::cursorPositionChanged,
+                     this, &MkEdit::cursorPositionChangedHandle);
+    QObject::connect(this->verticalScrollBar(),&QScrollBar::valueChanged,
+                     this, &MkEdit::scrollValueUpdateHandle);
+}
+
+void MkEdit::disconnectSignals()
+{
+    QObject::disconnect(this->verticalScrollBar(),&QScrollBar::valueChanged,
+                     this, &MkEdit::scrollValueUpdateHandle);
+    QObject::disconnect(this,&MkEdit::cursorPositionChanged,
+                     this, &MkEdit::cursorPositionChangedHandle);
 }
 
 void MkEdit::contextMenuHandler(QPoint pos)

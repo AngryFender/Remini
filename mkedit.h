@@ -101,6 +101,8 @@ protected:
     void fileSaveWithScroll(const bool scroll = true);
 
     bool isMouseOnCheckBox(QMouseEvent *e);
+    void connectSignals();
+    void disconnectSignals();
 
  public slots:
     void contextMenuHandler(QPoint pos);
