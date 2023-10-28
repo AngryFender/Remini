@@ -396,6 +396,7 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
             currentFilePath.replace(vaultPath, "");
         }
         emit fileDeletePath(currentFilePath);
+        viewTitle->setText("Startup Tips");
         currentDocument->setPlainText(startupText);
     }
 }
