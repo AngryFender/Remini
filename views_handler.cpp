@@ -143,6 +143,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewSettingBtn,&QToolButton::pressed,
                      this,&ViewsHandler::showSettingsBtn);
 
+    QObject::connect(viewTree, &NavigationView::fileRenamed,
+                     this,&ViewsHandler::fileRenamedHandler);
+
     connectDocument();
 
 }
@@ -462,6 +465,31 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 void ViewsHandler::showSettingsBtn()
 {
     settingsDialog->show();
+}
+
+void ViewsHandler::fileRenamedHandler(const QString& newName, const QString &oldName, const QModelIndex& index)
+{
+    QModelIndex sourceIndex = proxyModel.mapToSource(index);
+    DOCUMENT_STATUS status = setCurrentDocument(modelTree.fileInfo(sourceIndex));
+
+    if(NOT_DOCUMENT == status){
+        return;
+    }
+
+    QString path = this->currentDocument->getFilePath();
+    QFileInfo fileInfo(currentFilePath);
+    if(!fileInfo.isDir()){
+        if (path.startsWith(vaultPath)) {
+            path.replace(vaultPath, "");
+        }
+        int lastIndex = path.lastIndexOf(newName);
+        if(-1 != lastIndex){
+            path.remove(lastIndex,newName.length());
+            path.append(oldName);
+            recentFilesView->removeRecentDeletedFileHandle(path);
+        }
+    }
+
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)

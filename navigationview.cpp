@@ -142,6 +142,7 @@ void NavigationView::addFolder()
 void NavigationView::renameFile()
 {
     auto index = this->currentIndex();
+    editingFilename = index.data().toString();
     this->edit(index);
 }
 
@@ -192,9 +193,14 @@ void NavigationView::folderChangedHandler()
 void NavigationView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
 {
     QModelIndex selected = this->currentIndex();
+    QString finishedEditingFilename = selected.data(Qt::DisplayRole).toString();
     QTreeView::closeEditor(editor,hint);
     emit newFileCreated(selected);
+    if(editingFilename != finishedEditingFilename){
+        emit fileRenamed(finishedEditingFilename, editingFilename, selected);
+    }
 }
+
 
 void NavigationView::expandTimerHandler()
 {

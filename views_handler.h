@@ -119,7 +119,7 @@ private slots:
     void doSearchWork(QString &text);
     void displayTextSearchedFilePosition(QString &filePath,int searchTextLength,int blockNumber, int positionInBlock);
     void showSettingsBtn();
-
+    void fileRenamedHandler(const QString& newName, const QString& oldName, const QModelIndex& index);
 };
 
 #endif // VIEWS_HANDLER_H

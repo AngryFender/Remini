@@ -75,5 +75,10 @@ void RecentFilesDialog::updateRecentFileHandle(const QString &relativePath)
 
 void RecentFilesDialog::removeRecentDeletedFileHandle(const QString &relativePath)
 {
-    //find the filename and remove it from the list
+    for(int i = 0; i < listWidget->count(); ++i) {
+        QListWidgetItem *item = listWidget->item(i);
+        if(item->text() == relativePath){
+            delete listWidget->takeItem(i);
+        }
+    }
 }

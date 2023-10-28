@@ -31,6 +31,7 @@ private:
     QModelIndex lastClickedIndex;
     QTimer expandTimer;
     QTimer fileFolderCreatedTimer;
+    QString editingFilename;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -56,7 +57,7 @@ signals:
     void openLocation(QModelIndex &index);
     void copyFolderFilePath(QModelIndex &index);
     void expansionComplete();
-
+    void fileRenamed(const QString& newName,const QString& oldName, const QModelIndex& index);
 };
 
 #endif // NAVIGATIONVIEW_H
