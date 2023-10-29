@@ -396,8 +396,15 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
             currentFilePath.replace(vaultPath, "");
         }
         emit fileDeletePath(currentFilePath);
+
         viewTitle->setText("Startup Tips");
+        currentDocument = recentFileDocumentMap.value("startup");
         currentDocument->setPlainText(startupText);
+        highlighter.setDocument(currentDocument.data());
+        viewText->setDocument(currentDocument.data());
+
+        const QString filePath = info.absoluteFilePath();
+        recentFileDocumentMap.remove(filePath);
     }
 }
 
