@@ -146,6 +146,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, &NavigationView::fileRenamed,
                      this,&ViewsHandler::fileRenamedHandler);
 
+    QObject::connect(viewTree, &NavigationView::setVaultPath,
+                     this,&ViewsHandler::setVaultPathHandler);
+
     connectDocument();
 
 }
@@ -498,6 +501,21 @@ void ViewsHandler::fileRenamedHandler(const QString& newName, const QString &old
         }
     }
 
+}
+
+void ViewsHandler::setVaultPathHandler()
+{
+    QFileDialog dialog;
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setDirectory(vaultPath);
+    dialog.setOption(QFileDialog::ShowDirsOnly, true);
+
+    QString newPath;
+    if (dialog.exec()) {
+        QStringList list = dialog.selectedFiles();
+        newPath = list.first();
+    }
+    qDebug()<<"New Vault Path "<<newPath;
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)

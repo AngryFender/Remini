@@ -27,6 +27,7 @@ private:
     QAction deleteFileAction;
     QAction openLocationAction ;
     QAction copyPath;
+    QAction SetVault;
     QString newEntryName;
     QModelIndex lastClickedIndex;
     QTimer expandTimer;
@@ -46,6 +47,7 @@ protected:
     void deleteFile();
     void openFileFolder();
     void copyFileFolderPath();
+    void setVaultHandler();
     void folderChangedHandler();
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
     void expandTimerHandler();
@@ -56,6 +58,7 @@ signals:
     void newFileCreated(const QModelIndex &index);
     void openLocation(QModelIndex &index);
     void copyFolderFilePath(QModelIndex &index);
+    void setVaultPath();
     void expansionComplete();
     void fileRenamed(const QString& newName,const QString& oldName, const QModelIndex& index);
 };

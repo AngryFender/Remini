@@ -14,6 +14,7 @@ NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
     deleteFileAction.setText("Delete");
     openLocationAction.setText("Open Location");
     copyPath.setText("Copy Path");
+    SetVault.setText("Set Vault Path");
 
     connect(&addFileAction, &QAction::triggered, this, &NavigationView::addFile);
     connect(&addFolderAction, &QAction::triggered, this, &NavigationView::addFolder);
@@ -21,6 +22,7 @@ NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
     connect(&deleteFileAction, &QAction::triggered, this, &NavigationView::deleteFile);
     connect(&openLocationAction, &QAction::triggered, this, &NavigationView::openFileFolder);
     connect(&copyPath, &QAction::triggered, this, &NavigationView::copyFileFolderPath);
+    connect(&SetVault, &QAction::triggered, this, &NavigationView::setVaultHandler);
     connect(this, &NavigationView::customContextMenuRequested, this, &NavigationView::ContextMenuHandler);
     connect(&expandTimer,&QTimer::timeout, this, &NavigationView::expandTimerHandler);
 
@@ -101,6 +103,7 @@ void NavigationView::ContextMenuHandler(QPoint pos)
         menu.addAction(&addFolderAction);
         menu.addAction(&openLocationAction);
         menu.addAction(&copyPath);
+        menu.addAction(&SetVault);
         menu.exec(viewport()->mapToGlobal(pos));
         return;
     }
@@ -164,6 +167,11 @@ void NavigationView::copyFileFolderPath()
 {
     auto index = lastClickedIndex;
     emit copyFolderFilePath(index);
+}
+
+void NavigationView::setVaultHandler()
+{
+    emit setVaultPath();
 }
 
 void NavigationView::folderChangedHandler()

@@ -120,6 +120,7 @@ private slots:
     void displayTextSearchedFilePosition(QString &filePath,int searchTextLength,int blockNumber, int positionInBlock);
     void showSettingsBtn();
     void fileRenamedHandler(const QString& newName, const QString& oldName, const QModelIndex& index);
+    void setVaultPathHandler();
 };
 
 #endif // VIEWS_HANDLER_H
