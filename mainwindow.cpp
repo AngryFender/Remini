@@ -60,7 +60,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 }
                 shiftTimer->start(200);
             }break;
-        default:;
+        default:{
+                shiftTimer->stop();
+        }
     }
     QMainWindow::keyPressEvent(event);
 }
