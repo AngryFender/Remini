@@ -39,10 +39,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *event)
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
     switch(event->key()){
-        case Qt::Key_F12:{
+        case Qt::Key_F12:
                 if (themeState == darkThemeState){
                     themeState = lightThemeState;
                     this->setStyleSheet(lightTheme);
@@ -52,31 +52,24 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                     this->setStyleSheet(darkTheme);
                     QApplication::setStyle(darkThemeStyle);
                 }
-            }; break;
+                break;
 
-        case Qt::Key_Shift:{
-                if(shiftTimer->isActive()){
-                    emit startSearchAll();
-                }
-                shiftTimer->start(200);
-            }break;
-        default:{
-                shiftTimer->stop();
-        }
-    }
-    QMainWindow::keyPressEvent(event);
-}
-
-void MainWindow::keyReleaseEvent(QKeyEvent *event)
-{
-    switch(event->key()){
-        case Qt::Key_Alt:{
+        case Qt::Key_Alt:
                 fileSearchBox->hide();
                 folderTreeBox->hide();
                 mkEditorBox->hide();
-            }break;
+                break;
+
+        case Qt::Key_Shift:
+                 if(shiftTimer->isActive()){
+                    emit startSearchAll();
+                }
+                shiftTimer->start(200);
+                break;
+
+        default:
+            shiftTimer->stop();
     }
-    QMainWindow::keyReleaseEvent(event);
 }
 
 void MainWindow::KeyPressAltHandler(bool press)

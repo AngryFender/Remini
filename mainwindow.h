@@ -21,7 +21,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void keyPressEvent(QKeyEvent *event)override;
     void keyReleaseEvent(QKeyEvent *event)override;
 
 public slots:
