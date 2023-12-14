@@ -839,10 +839,10 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 }
 
 
-void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect)
+void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect, SelectRange *selectRange)
 {
     showMKSymbolsFromSavedBlocks(&rect, blockNumber);
-    hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll, nullptr);
+    hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll, selectRange);
 }
 
 void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo)
@@ -986,7 +986,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                                 }
                             }
                         }
-                        if(showAll){ //|| (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end)){
+                        if(showAll || (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end && editSelectRange)){
                             if(formatData->isHidden()){
                                 showAllFormatSymbolsInTextBlock(block, formatData);
                                 formatData->setHidden(false);

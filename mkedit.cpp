@@ -618,7 +618,7 @@ void MkEdit::clearUndoStackHandle()
 void MkEdit::scrollValueUpdateHandle(int value)
 {
     int currentBlockNumber = textCursor().blockNumber();
-    emit drawTextBlocks(textCursor().hasSelection(), currentBlockNumber,undoData.selectAll, getVisibleRect());
+    emit drawTextBlocks(textCursor().hasSelection(), currentBlockNumber,undoData.selectAll, getVisibleRect(), &selectRange);
 }
 
 void MkEdit::fileSaveHandle()
