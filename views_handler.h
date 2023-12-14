@@ -121,6 +121,7 @@ private slots:
     void showSettingsBtn();
     void fileRenamedHandler(const QString& newName, const QString& oldName, const QModelIndex& index);
     void setVaultPathHandler();
+    void connectionDrawTextBlockHandler(bool connection);
 };
 
 #endif // VIEWS_HANDLER_H

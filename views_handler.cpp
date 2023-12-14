@@ -56,6 +56,7 @@ void ViewsHandler::initTreeView()
 void ViewsHandler::initFontDefault()
 {
     fontUi.setFamily("roboto");
+    //fontUi.setFamily("DroidSansM Nerd Fonot Mono Regular");
     fontUi.setStretch(QFont::Unstretched);
     fontUi.setWeight(QFont::Normal);
     fontUi.setPointSize(13);
@@ -63,12 +64,14 @@ void ViewsHandler::initFontDefault()
 
     QFont fontTree;
     fontTree.setFamily("roboto");
+    //fontTree.setFamily("DroidSansM Nerd Fonot Mono Regular");
     fontTree.setPointSize(10);
     fontTree.setWeight(QFont::Light);
     viewTree->setFont(fontTree);
 
     QFont fontTitle;
     fontTitle.setFamily("roboto");
+    //fontTitle.setFamily("DroidSansM Nerd Fonot Mono Regular");
     fontTitle.setPointSize(fontUi.pointSize()*2);
     fontTitle.setWeight(QFont::DemiBold);
 
@@ -148,6 +151,9 @@ void ViewsHandler::initConnection()
 
     QObject::connect(viewTree, &NavigationView::setVaultPath,
                      this,&ViewsHandler::setVaultPathHandler);
+
+    QObject::connect(viewText, &MkEdit::connectionDrawTextBlock,
+                     this,&ViewsHandler::connectionDrawTextBlockHandler);
 
     connectDocument();
 
@@ -516,6 +522,19 @@ void ViewsHandler::setVaultPathHandler()
         newPath = list.first();
     }
     qDebug()<<"New Vault Path "<<newPath;
+}
+
+void ViewsHandler::connectionDrawTextBlockHandler(bool connection)
+{
+    if(connection) {
+
+        QObject::connect(viewText,&MkEdit::drawTextBlocks,
+                         currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
+
+    }else{
+        QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
+                         currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
+   }
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)

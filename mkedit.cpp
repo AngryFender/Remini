@@ -121,6 +121,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() == Qt::ControlModifier) {
         int zoomDelta = e->angleDelta().y();
+        emit connectionDrawTextBlock(false);
         emit removeAllMkData(this->textCursor().blockNumber());
         this->blockSignals(true);
         if (zoomDelta > 0) {
@@ -131,6 +132,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
                 this->zoomOut();
         }
         this->blockSignals(false);
+        emit connectionDrawTextBlock(true);
         emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
         this->ensureCursorVisible();
     }else{
@@ -234,6 +236,7 @@ void MkEdit::clearMkEffects()
 {
     disconnectSignals();
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is importantp
+    emit connectionDrawTextBlock(false);
     emit removeAllMkData(this->textCursor().blockNumber());
     if(!fileSaveTimer.isActive()){
         preUndoSetup();
@@ -243,6 +246,7 @@ void MkEdit::clearMkEffects()
 
 void MkEdit::applyMkEffects(const bool scroll)
 {
+    emit connectionDrawTextBlock(true);
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     if(scroll){
         this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
@@ -265,6 +269,7 @@ void MkEdit::fileSaveWithScroll(const bool scroll)
 {
     fileSaveTimer.stop();
     disconnectSignals();
+    emit connectionDrawTextBlock(false);
     emit removeAllMkData(this->textCursor().blockNumber());
     postUndoSetup();
     emit fileSave();
@@ -299,6 +304,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         rect.setWidth(width);
         if(rect.contains(pointer)){
             int pos = (*it);
+            emit connectionDrawTextBlock(false);
             emit removeAllMkData(this->textCursor().blockNumber());
             preUndoSetup();
             applyMkEffects(false);
@@ -320,6 +326,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
             int pos = (*it).first;
+            emit connectionDrawTextBlock(false);
             emit removeAllMkData(this->textCursor().blockNumber());
             preUndoSetup();
             applyMkEffects(false);
@@ -425,6 +432,7 @@ void MkEdit::blockColor(const QColor &color)
 
 void MkEdit::insertFromMimeData(const QMimeData *source)
 {
+    emit connectionDrawTextBlock(false);
     emit removeAllMkData(this->textCursor().blockNumber());
     preUndoSetup();
 
@@ -454,6 +462,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 
     postUndoSetup();
     emit fileSave();
+    emit connectionDrawTextBlock(true);
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
 }
 
