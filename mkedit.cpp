@@ -132,8 +132,8 @@ void MkEdit::wheelEvent(QWheelEvent *e)
                 this->zoomOut();
         }
         this->blockSignals(false);
-        emit connectionDrawTextBlock(true);
         emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+        emit connectionDrawTextBlock(true);
         this->ensureCursorVisible();
     }else{
         QTextEdit::wheelEvent(e);
@@ -246,8 +246,8 @@ void MkEdit::clearMkEffects()
 
 void MkEdit::applyMkEffects(const bool scroll)
 {
-    emit connectionDrawTextBlock(true);
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+    emit connectionDrawTextBlock(true);
     if(scroll){
         this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
         this->ensureCursorVisible();
@@ -432,38 +432,43 @@ void MkEdit::blockColor(const QColor &color)
 
 void MkEdit::insertFromMimeData(const QMimeData *source)
 {
-    emit connectionDrawTextBlock(false);
-    emit removeAllMkData(this->textCursor().blockNumber());
-    preUndoSetup();
+    bool isBlock = false;
+    QTextCursor cursor = this->textCursor();
+    emit checkIfCursorInBlock(isBlock,cursor);
 
-    QString link = source->text();
-    matchUrl = regexUrl.match(link);
-    matchFolderFile = regexFolderFile.match(link);
-    if (matchUrl.hasMatch() && !link.contains("](")) {
-        QTextCursor cursor = this->textCursor();
-        int pos = cursor.position()+1;
-        QString symbolsWithLink = "[]("+link+")";
-        cursor.insertText(symbolsWithLink);
-        cursor.setPosition(pos);
-        this->setTextCursor(cursor);
-    }else if(matchFolderFile.hasMatch() && !link.contains("](")) {
-        QTextCursor cursor = this->textCursor();
-        int pos = cursor.position()+1;
-        QString symbolsWithLink = "[](file:///"+link+")";
-        cursor.insertText(symbolsWithLink);
-        cursor.setPosition(pos);
-        this->setTextCursor(cursor);
-    }
-    else{
+    if(!isBlock){
+        emit connectionDrawTextBlock(false);
+        emit removeAllMkData(this->textCursor().blockNumber());
+        preUndoSetup();
+
+          QString link = source->text();
+        matchUrl = regexUrl.match(link);
+        matchFolderFile = regexFolderFile.match(link);
+        if (matchUrl.hasMatch() && !link.contains("](")) {
+            int pos = cursor.position()+1;
+            QString symbolsWithLink = "[]("+link+")";
+            cursor.insertText(symbolsWithLink);
+            cursor.setPosition(pos);
+            this->setTextCursor(cursor);
+        }else if(matchFolderFile.hasMatch() && !link.contains("](")) {
+            int pos = cursor.position()+1;
+            QString symbolsWithLink = "[](file:///"+link+")";
+            cursor.insertText(symbolsWithLink);
+            cursor.setPosition(pos);
+            this->setTextCursor(cursor);
+        }
+        else{
+            QTextEdit::insertFromMimeData(source);
+        }
+    }else{
         QTextEdit::insertFromMimeData(source);
     }
 
 
-
     postUndoSetup();
     emit fileSave();
-    emit connectionDrawTextBlock(true);
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+    emit connectionDrawTextBlock(true);
 }
 
 void MkEdit::mousePressEvent(QMouseEvent *e)

@@ -149,6 +149,7 @@ signals:
     void autoInsertSymbol(const int position);
     void setMarkdownStatus(bool state, QRect rect);
     void cursorUpdate(const int blockNo, const int characterPos);
+    void checkIfCursorInBlock(bool &isBlock, QTextCursor &cursor);
 };
 
 #endif // MKEDIT_H

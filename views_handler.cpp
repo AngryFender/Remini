@@ -155,6 +155,8 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText, &MkEdit::connectionDrawTextBlock,
                      this,&ViewsHandler::connectionDrawTextBlockHandler);
 
+    QObject::connect(viewText, &MkEdit::checkIfCursorInBlock,
+                     this, &ViewsHandler::checkIfCursorInBlockHandler);
     connectDocument();
 
 }
@@ -534,7 +536,18 @@ void ViewsHandler::connectionDrawTextBlockHandler(bool connection)
     }else{
         QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
                          currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
-   }
+    }
+}
+
+void ViewsHandler::checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &cursor)
+{
+    BlockData* blockData = dynamic_cast<BlockData*>(cursor.block().userData());
+    if(blockData)
+    {
+        isBlock = true;
+        return;
+    }
+    isBlock = false;
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
