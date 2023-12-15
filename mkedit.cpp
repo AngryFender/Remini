@@ -77,21 +77,25 @@ void MkEdit::paintEvent(QPaintEvent *e)
 
     QTextBlock block = this->document()->begin();
     while (block.isValid()) {
-        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+40) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
+        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+60) && layout->blockBoundingRect(block).top() > (rect.top()-15)){
             QTextBlockUserData* data =block.userData();
             BlockData* blockData = dynamic_cast<BlockData*>(data);
+            QTextBlock nextBlock = block.next();
             if(blockData){
                 if(blockData->getStatus()==BlockData::start){
                     xBlock = block.layout()->position().x()-2;
                     yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4);
                 }
-                else if(blockData->getStatus()==BlockData::end){
-                    int height = block.layout()->position().y() - yBlock + (fontSize*0.6)-scrollPos;
+                else{
+                    if(blockData->getStatus()==BlockData::end
+                        || (blockData->getStatus()==BlockData::content && layout->blockBoundingRect(nextBlock).bottom()>= (rect.bottom()+40))){
+                        int height = block.layout()->position().y() - yBlock + (fontSize*0.6)-scrollPos;
 
-                    QBrush brushDefault(codeBlockColor);
-                    painter.setBrush(brushDefault);
-                    painter.setPen(penCodeBlock);
-                    painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
+                        QBrush brushDefault(codeBlockColor);
+                        painter.setBrush(brushDefault);
+                        painter.setPen(penCodeBlock);
+                        painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
+                    }
                 }
             }else{
                 LineData* lineData = dynamic_cast<LineData*>(data);
