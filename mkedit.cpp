@@ -9,7 +9,6 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     regexUrl.setPattern("(https?|ftp|file)://[\\w\\d._-]+(?:\\.[\\w\\d._-]+)+[\\w\\d._-]*(?:(?:/[\\w\\d._-]+)*/?)?(?:\\?[\\w\\d_=-]+(?:&[\\w\\d_=-]+)*)?(?:#[\\w\\d_-]+)?");
     regexFolderFile.setPattern("[a-zA-Z]:[\\\\/](?:[^\\\\/]+[\\\\/])*([^\\\\/]+\\.*)");
     savedBlockNumber= -1;
-    savedCharacterNumber= -1;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     undoAction.setText("Undo         Ctrl+Z");
@@ -633,7 +632,6 @@ void MkEdit::diableMarkdown_internal()
 void MkEdit::cursorPositionChangedHandle()
 {
     int currentBlockNumber = textCursor().blockNumber();
-    int currentCharacterNumber = textCursor().positionInBlock();
     if(savedBlockNumber != currentBlockNumber){
         savedBlockNumber = currentBlockNumber;
 
@@ -661,11 +659,6 @@ void MkEdit::cursorPositionChangedHandle()
             }
             this->setTextCursor(cursor);
         }
-        emit cursorUpdate(this->textCursor().blockNumber(), this->textCursor().positionInBlock());
-    }else{
-        if(savedCharacterNumber != currentCharacterNumber){
-            savedCharacterNumber = currentCharacterNumber;
-            emit cursorUpdate(this->textCursor().blockNumber(), this->textCursor().positionInBlock());
-        }
+        //emit cursorUpdate(this->textCursor().blockNumber(), this->textCursor().positionInBlock());
     }
 }

@@ -298,6 +298,10 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
     //disconnect signals from old current document
     disconnectDocument();
 
+    //set the cursor position of the current document
+    QTextCursor cursor = viewText->textCursor();
+    currentDocument->setCursorPos(cursor.blockNumber(),cursor.positionInBlock()) ;
+
     //set current document to textview
     const QString &filePath = fileInfo.absoluteFilePath();
     const QString &fileName = fileInfo.baseName();

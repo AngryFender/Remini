@@ -89,7 +89,6 @@ public:
     void setFilePath(const QString &filePath);
     void setFileName(const QString &fileName);
     void setCursorPos(const int blockNo, const int characterNo);
-    void getCursorPos(int &blockNo, int &characterNo) const;
     int getBlockNo()const;
     int getCharacterNo()const;
     QString getFilePath() const;
@@ -108,7 +107,6 @@ public slots:
     void drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect, SelectRange* selectRange);
 
     void showMKSymbolsFromSavedBlocks(QRect *rect = nullptr, int cursorBlockNo = 0);
-
 
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int position);

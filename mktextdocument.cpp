@@ -55,12 +55,6 @@ void MkTextDocument::setCursorPos(const int blockNo, const int characterNo)
     this->characterNo = characterNo;
 }
 
-void MkTextDocument::getCursorPos(int &blockNo, int &characterNo) const
-{
-    blockNo = this->blockNo;
-    characterNo = this->characterNo;
-}
-
 int MkTextDocument::getBlockNo() const
 {
     return this->blockNo;

@@ -64,7 +64,6 @@ protected:
     int widthCodeBlock;
     QPen penCodeBlock;
     int savedBlockNumber;
-    int savedCharacterNumber;
     UndoData undoData;
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
