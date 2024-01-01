@@ -16,6 +16,9 @@
 #include <QAbstractTextDocumentLayout>
 #include <QQueue>
 #include <QMutex>
+#include <QTextEdit>
+#include <QUndoCommand>
+#include <QUndoStack>
 
 
 class FormatCollection{
@@ -113,6 +116,10 @@ public slots:
     void setMarkdownHandle(bool state, QRect rect);
     void cursorUpdateHandle(const int blockNo, const int characterNo);
 
+    void undoStackPush(QUndoCommand *edit);
+    void undoStackUndo();
+    void undoStackRedo();
+
  private:
     struct CheckingBlock{
         QTextBlock start;
@@ -155,6 +162,8 @@ public slots:
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
     QQueue<QTextBlock> savedBlocks;
+
+    QUndoStack undoStack;
 
     QVector<int> checkMarkPositions;
     QVector<QPair<int, int>> linkPositions;
@@ -200,10 +209,44 @@ public slots:
     QString numberListGetNextNumber(const QString &text);
 
     void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
-signals:
-    void clearUndoStack();
-
 
 };
+
+struct UndoData{
+    QTextEdit *view;
+    QTextDocument *doc;
+    QString text;
+    int cursorPos;
+    QString oldText;
+    int oldCursorPos;
+    int oldStartSelection;
+    int oldEndSelection;
+    bool undoRedoSkip;
+    bool selectAll;
+    int scrollValue;
+};
+
+class EditCommand : public QUndoCommand
+{
+public:
+    EditCommand(UndoData &data);
+
+    void undo() override;
+    void redo() override;
+
+private:
+    QTextEdit *view;
+    MkTextDocument *doc;
+    QString text;
+    int cursorPos;
+    int scrollValue;
+
+    QString oldText;
+    int oldCursorPos;
+    int oldStartSelection;
+    int oldEndSelection;
+    bool isConstructorRedo;
+};
+
 
 #endif // MKTEXTDOCUMENT_H

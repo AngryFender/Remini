@@ -193,9 +193,6 @@ void ViewsHandler::connectDocument()
     QObject::connect(viewText,&MkEdit::setMarkdownStatus,
                      currentDocument.data(),&MkTextDocument::setMarkdownHandle);
 
-    QObject::connect(currentDocument.data(),&MkTextDocument::clearUndoStack,
-                     viewText,&MkEdit::clearUndoStackHandle);
-
     QObject::connect(viewText,&MkEdit::drawTextBlocks,
                      currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
 
@@ -210,6 +207,15 @@ void ViewsHandler::connectDocument()
 
     QObject::connect(viewText,&MkEdit::cursorUpdate,
                      currentDocument.data(),&MkTextDocument::cursorUpdateHandle);
+
+    QObject::connect(viewText,&MkEdit::undoStackPushSignal,
+                     currentDocument.data(),&MkTextDocument::undoStackPush);
+
+    QObject::connect(viewText,&MkEdit::undoStackUndoSignal,
+                     currentDocument.data(),&MkTextDocument::undoStackUndo);
+
+    QObject::connect(viewText,&MkEdit::undoStackRedoSignal,
+                     currentDocument.data(),&MkTextDocument::undoStackRedo);
 
 }
 
@@ -245,9 +251,6 @@ void ViewsHandler::disconnectDocument()
     QObject::disconnect(viewText,&MkEdit::setMarkdownStatus,
                         currentDocument.data(),&MkTextDocument::setMarkdownHandle);
 
-    QObject::disconnect(currentDocument.data(),&MkTextDocument::clearUndoStack,
-                     viewText,&MkEdit::clearUndoStackHandle);
-
     QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
                         currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
 
@@ -262,6 +265,16 @@ void ViewsHandler::disconnectDocument()
 
     QObject::disconnect(viewText,&MkEdit::cursorUpdate,
                      currentDocument.data(),&MkTextDocument::cursorUpdateHandle);
+
+    QObject::disconnect(viewText,&MkEdit::undoStackPushSignal,
+                     currentDocument.data(),&MkTextDocument::undoStackPush);
+
+    QObject::disconnect(viewText,&MkEdit::undoStackUndoSignal,
+                     currentDocument.data(),&MkTextDocument::undoStackUndo);
+
+    QObject::disconnect(viewText,&MkEdit::undoStackRedoSignal,
+                     currentDocument.data(),&MkTextDocument::undoStackRedo);
+
 
 }
 

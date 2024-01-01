@@ -22,7 +22,6 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/linedata.cpp
     ${CMAKE_SOURCE_DIR}/blockdata.cpp
     ${CMAKE_SOURCE_DIR}/formatdata.cpp
-    ${CMAKE_SOURCE_DIR}/editcommand.cpp
     ${CMAKE_SOURCE_DIR}/mktextdocument.cpp
     ${CMAKE_SOURCE_DIR}/recentfilesdialog.cpp
 

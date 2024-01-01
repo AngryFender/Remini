@@ -154,7 +154,6 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Left:
     case Qt::Key_Down:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
-    case Qt::Key_V:
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}break;
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}break;
     case Qt::Key_Tab:       if( event->modifiers() == Qt::NoModifier){
@@ -173,8 +172,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) undo(); undoData.undoRedoSkip = true; fileSaveNow(); return;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) redo(); undoData.undoRedoSkip = true; fileSaveNow(); return;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); return;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); return;
 
     default: break;
     }
@@ -225,7 +224,7 @@ void MkEdit::postUndoSetup()
 
     if(!undoData.undoRedoSkip){
         EditCommand *edit = new EditCommand(undoData);
-        undoStack.push(edit);
+        emit undoStackPushSignal(edit) ;
     }
 }
 
@@ -602,21 +601,6 @@ void MkEdit::setKeywordColor(const QColor &color)
 {
     syntaxColor.keyword = color;
     emit syntaxColorUpdate(syntaxColor);
-}
-
-void MkEdit::undo()
-{
-    undoStack.undo();
-}
-
-void MkEdit::redo()
-{
-    undoStack.redo();
-}
-
-void MkEdit::clearUndoStackHandle()
-{
-    undoStack.clear();
 }
 
 void MkEdit::scrollValueUpdateHandle(int value)

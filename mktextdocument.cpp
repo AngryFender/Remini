@@ -19,7 +19,7 @@ void MkTextDocument::setPlainText(const QString &text)
 
     QTextDocument::setPlainText(text);
     identifyUserData(false);
-    emit clearUndoStack();
+    undoStack.clear();
 }
 
 void MkTextDocument::setUndoRedoText(const QString &text)
@@ -1118,6 +1118,20 @@ void MkTextDocument::cursorUpdateHandle(const int blockNo, const int characterNo
     this->characterNo = characterNo;
 }
 
+void MkTextDocument::undoStackPush(QUndoCommand *edit)
+{
+    undoStack.push(edit);
+}
+
+void MkTextDocument::undoStackUndo()
+{
+    undoStack.undo();
+}
+
+void MkTextDocument::undoStackRedo()
+{
+    undoStack.redo();
+}
 
 void MkTextDocument::resetFormatLocation()
 {
@@ -1176,4 +1190,46 @@ QString MkTextDocument::numberListGetNextNumber(const QString &text)
         return QString::number(number+1)+". ";
     }
     return "";
+}
+
+EditCommand::EditCommand(UndoData &data)
+{
+    this->view = data.view;
+    this->doc = dynamic_cast<MkTextDocument*>(data.doc);
+    this->text = data.text;
+    this->cursorPos = data.cursorPos;
+    this->scrollValue = data.scrollValue;
+
+    this->oldText = data.oldText;
+    this->oldCursorPos = data.oldCursorPos;
+    this->oldStartSelection = data.oldStartSelection;
+    this->oldEndSelection = data.oldEndSelection;
+    isConstructorRedo = true;
+
+}
+
+void EditCommand::undo()
+{
+    doc->setUndoRedoText(oldText);
+    QTextCursor textCursor = view->textCursor();
+    if(oldCursorPos == oldStartSelection){
+        textCursor.setPosition(oldEndSelection);
+        textCursor.setPosition(oldCursorPos,QTextCursor::KeepAnchor);
+    }else{
+        textCursor.setPosition(oldStartSelection);
+        textCursor.setPosition(oldEndSelection,QTextCursor::KeepAnchor);
+    }
+    view->setTextCursor(textCursor);
+}
+
+void EditCommand::redo()
+{
+    if(isConstructorRedo){
+        isConstructorRedo = false;
+    }else{
+        doc->setUndoRedoText(text);
+        QTextCursor textCursor = view->textCursor();
+        textCursor.setPosition(cursorPos);
+        view->setTextCursor(textCursor);
+    }
 }

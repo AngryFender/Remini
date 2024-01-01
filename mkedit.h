@@ -12,8 +12,6 @@
 #include <QTimer>
 #include <mktextdocument.h>
 #include <QScrollBar>
-#include <QUndoStack>
-#include <editcommand.h>
 #include <theme.h>
 
 #define FILE_SAVE_TIMEOUT 300
@@ -67,7 +65,6 @@ protected:
     QPen penCodeBlock;
     int savedBlockNumber;
     int savedCharacterNumber;
-    QUndoStack undoStack;
     UndoData undoData;
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
@@ -111,9 +108,6 @@ protected:
     void deleteContextMenu();
     void selectBlock();
     void cursorPositionChangedHandle();
-    void undo();
-    void redo();
-    void clearUndoStackHandle();
     void scrollValueUpdateHandle(int value);
 
 private slots:
@@ -150,6 +144,11 @@ signals:
     void setMarkdownStatus(bool state, QRect rect);
     void cursorUpdate(const int blockNo, const int characterPos);
     void checkIfCursorInBlock(bool &isBlock, QTextCursor &cursor);
+
+    void undoStackPushSignal(QUndoCommand *);
+    void undoStackUndoSignal();
+    void undoStackRedoSignal();
+    void undoStackClear();
 };
 
 #endif // MKEDIT_H

@@ -31,8 +31,6 @@ set(PROJECT_SOURCES
         blockdata.cpp
         linedata.h
         linedata.cpp
-        editcommand.h
-        editcommand.cpp
         theme.h
         navigationview.h
         navigationview.cpp
