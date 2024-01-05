@@ -841,14 +841,8 @@ void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, b
 
 void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo)
 {
-//    QAbstractTextDocumentLayout* layout = this->documentLayout();
     while(!savedBlocks.empty()){
         QTextBlock block = savedBlocks.takeFirst();
-
-//        if((optimiseScrolling)&&(rect!=nullptr)&&( layout->blockBoundingRect(block).bottom() < (rect->bottom()+40) && layout->blockBoundingRect(block).top() > (rect->top()-15))){
-//            qDebug()<<"optimise container size"<<savedBlocks.count();
-//            continue;
-//        }
 
         QTextBlockUserData* data =block.userData();
         if(data == nullptr){
@@ -862,7 +856,6 @@ void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo
             if(blockData->getStatus()!=BlockData::content)
             {
                 showSymbols(block, CODEBLOCK_SYMBOL);
-                //showSymbols(block, CODEBLOCK_SYMBOL);
             }
         }
         else{

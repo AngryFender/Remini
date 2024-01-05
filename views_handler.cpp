@@ -152,9 +152,6 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, &NavigationView::setVaultPath,
                      this,&ViewsHandler::setVaultPathHandler);
 
-    QObject::connect(viewText, &MkEdit::connectionDrawTextBlock,
-                     this,&ViewsHandler::connectionDrawTextBlockHandler);
-
     QObject::connect(viewText, &MkEdit::checkIfCursorInBlock,
                      this, &ViewsHandler::checkIfCursorInBlockHandler);
     connectDocument();
@@ -541,19 +538,6 @@ void ViewsHandler::setVaultPathHandler()
         newPath = list.first();
     }
     qDebug()<<"New Vault Path "<<newPath;
-}
-
-void ViewsHandler::connectionDrawTextBlockHandler(bool connection)
-{
-    if(connection) {
-
-        QObject::connect(viewText,&MkEdit::drawTextBlocks,
-                         currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
-
-    }else{
-        QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
-                         currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
-    }
 }
 
 void ViewsHandler::checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &cursor)

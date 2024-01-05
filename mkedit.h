@@ -53,6 +53,9 @@ public:
     void setQuoteColor(const QColor& color);
     void setKeywordColor(const QColor& color);
 
+    void setDocument(QTextDocument *document);
+
+
 protected:
     void insertFromMimeData(const QMimeData *source) override;
     void mousePressEvent(QMouseEvent *e) override;
@@ -64,6 +67,7 @@ protected:
     int widthCodeBlock;
     QPen penCodeBlock;
     int savedBlockNumber;
+    int savedCharacterNumber;
     UndoData undoData;
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
@@ -92,6 +96,7 @@ protected:
 
     QRect getVisibleRect();
     void clearMkEffects();
+    void removeAllMkDataFunc(int blockNumber);
     void applyMkEffects(const bool scroll = true);
     void fileSaveNow();
     void fileSaveWithScroll(const bool scroll = true);
@@ -124,7 +129,6 @@ signals:
     void smartSelection(int blockNumber, QTextCursor &cursor);
     void drawTextBlocks(bool hasSelection, int blockNumber, bool showAll, QRect rect, SelectRange *selectRange);
 
-    void connectionDrawTextBlock(bool connect);
     void removeAllMkData(int currentBlockNo);
     void applyAllMkData(bool hasSelection, int blockNumber, bool showAll, QRect rect);
     void blockColorChanged(const QColor& color);

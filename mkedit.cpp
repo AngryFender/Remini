@@ -8,7 +8,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     fileSaveTimer.setInterval(FILE_SAVE_TIMEOUT);
     regexUrl.setPattern("(https?|ftp|file)://[\\w\\d._-]+(?:\\.[\\w\\d._-]+)+[\\w\\d._-]*(?:(?:/[\\w\\d._-]+)*/?)?(?:\\?[\\w\\d_=-]+(?:&[\\w\\d_=-]+)*)?(?:#[\\w\\d_-]+)?");
     regexFolderFile.setPattern("[a-zA-Z]:[\\\\/](?:[^\\\\/]+[\\\\/])*([^\\\\/]+\\.*)");
-    savedBlockNumber= -1;
+    savedCharacterNumber = -1;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     undoAction.setText("Undo         Ctrl+Z");
@@ -44,6 +44,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
 void MkEdit::initialialCursorPosition()
 {
+    disconnectSignals();
     QTextCursor cursor = this->textCursor();
     cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
     this->setTextCursor(cursor);
@@ -57,6 +58,7 @@ void MkEdit::initialialCursorPosition()
     selectRange.end =  this->textCursor().selectionEnd();
 
     emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , getVisibleRect(), &selectRange);
+    connectSignals();
 }
 
 void MkEdit::paintEvent(QPaintEvent *e)
@@ -124,9 +126,8 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() == Qt::ControlModifier) {
         int zoomDelta = e->angleDelta().y();
-        emit connectionDrawTextBlock(false);
+        disconnectSignals();
         emit removeAllMkData(this->textCursor().blockNumber());
-        this->blockSignals(true);
         if (zoomDelta > 0) {
             if((this->currentFont().pointSizeF())<MAXIMUM_FONT_SIZE)
                 this->zoomIn();
@@ -134,9 +135,8 @@ void MkEdit::wheelEvent(QWheelEvent *e)
             if((this->currentFont().pointSizeF())>MINIMUM_FONT_SIZE)
                 this->zoomOut();
         }
-        this->blockSignals(false);
         emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-        emit connectionDrawTextBlock(true);
+        connectSignals();
         this->ensureCursorVisible();
     }else{
         QTextEdit::wheelEvent(e);
@@ -238,7 +238,6 @@ void MkEdit::clearMkEffects()
 {
     disconnectSignals();
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is importantp
-    emit connectionDrawTextBlock(false);
     emit removeAllMkData(this->textCursor().blockNumber());
     if(!fileSaveTimer.isActive()){
         preUndoSetup();
@@ -246,10 +245,17 @@ void MkEdit::clearMkEffects()
     fileSaveTimer.start();
 }
 
+void MkEdit::removeAllMkDataFunc(int blockNumber)
+{
+    disconnectSignals();
+    emit removeAllMkData(blockNumber);
+    connectSignals();
+}
+
 void MkEdit::applyMkEffects(const bool scroll)
 {
+    disconnectSignals();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-    emit connectionDrawTextBlock(true);
     if(scroll){
         this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
         this->ensureCursorVisible();
@@ -260,23 +266,18 @@ void MkEdit::applyMkEffects(const bool scroll)
 void MkEdit::fileSaveNow()
 {
     fileSaveTimer.stop();
-    disconnectSignals();
     postUndoSetup();
     emit fileSave();
     applyMkEffects();
-    connectSignals();
 }
 
 void MkEdit::fileSaveWithScroll(const bool scroll)
 {
     fileSaveTimer.stop();
-    disconnectSignals();
-    emit connectionDrawTextBlock(false);
-    emit removeAllMkData(this->textCursor().blockNumber());
+    removeAllMkDataFunc(this->textCursor().blockNumber());
     postUndoSetup();
     emit fileSave();
     applyMkEffects(scroll);
-    connectSignals();
 }
 
 bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
@@ -306,8 +307,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         rect.setWidth(width);
         if(rect.contains(pointer)){
             int pos = (*it);
-            emit connectionDrawTextBlock(false);
-            emit removeAllMkData(this->textCursor().blockNumber());
+            removeAllMkDataFunc(this->textCursor().blockNumber());
             preUndoSetup();
             applyMkEffects(false);
             emit pushCheckBox(pos);
@@ -328,14 +328,12 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
             int pos = (*it).first;
-            emit connectionDrawTextBlock(false);
-            emit removeAllMkData(this->textCursor().blockNumber());
-            preUndoSetup();
+            removeAllMkDataFunc(this->textCursor().blockNumber());
             applyMkEffects(false);
+            connectSignals();
             emit pushLink(pos);
             fileSaveWithScroll(false);
             return true;
-
         }
     }
 
@@ -436,10 +434,10 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 {
     bool isBlock = false;
     QTextCursor cursor = this->textCursor();
+    disconnectSignals();
     emit checkIfCursorInBlock(isBlock,cursor);
 
     if(!isBlock){
-        emit connectionDrawTextBlock(false);
         emit removeAllMkData(this->textCursor().blockNumber());
         preUndoSetup();
 
@@ -470,7 +468,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     postUndoSetup();
     emit fileSave();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-    emit connectionDrawTextBlock(true);
+    connectSignals();
 }
 
 void MkEdit::mousePressEvent(QMouseEvent *e)
@@ -602,10 +600,19 @@ void MkEdit::setKeywordColor(const QColor &color)
     emit syntaxColorUpdate(syntaxColor);
 }
 
+void MkEdit::setDocument(QTextDocument *document)
+{
+    disconnectSignals();
+    QTextEdit::setDocument(document);
+    connectSignals();
+}
+
 void MkEdit::scrollValueUpdateHandle(int value)
 {
     int currentBlockNumber = textCursor().blockNumber();
+    disconnectSignals();
     emit drawTextBlocks(textCursor().hasSelection(), currentBlockNumber,undoData.selectAll, getVisibleRect(), &selectRange);
+    connectSignals();
 }
 
 void MkEdit::fileSaveHandle()
@@ -632,8 +639,10 @@ void MkEdit::diableMarkdown_internal()
 void MkEdit::cursorPositionChangedHandle()
 {
     int currentBlockNumber = textCursor().blockNumber();
-    if(savedBlockNumber != currentBlockNumber){
-        savedBlockNumber = currentBlockNumber;
+    int currentCharacterNumber = textCursor().positionInBlock() + currentBlockNumber;
+
+    if(savedCharacterNumber != currentCharacterNumber){
+        savedCharacterNumber = currentCharacterNumber;
 
         QTextCursor cursor = this->textCursor();
 
@@ -648,7 +657,9 @@ void MkEdit::cursorPositionChangedHandle()
             selectRange.end = cursor.selectionEnd();
         }
 
+        disconnectSignals();
         emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect(), &selectRange);
+        connectSignals();
 
         if(!cursor.hasSelection() && selectRange.isCursorCaculated){
             cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position());
