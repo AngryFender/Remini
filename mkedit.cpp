@@ -639,7 +639,7 @@ void MkEdit::diableMarkdown_internal()
 void MkEdit::cursorPositionChangedHandle()
 {
     int currentBlockNumber = textCursor().blockNumber();
-    int currentCharacterNumber = textCursor().positionInBlock() + currentBlockNumber;
+    int currentCharacterNumber = textCursor().position();
 
     if(savedCharacterNumber != currentCharacterNumber){
         savedCharacterNumber = currentCharacterNumber;
