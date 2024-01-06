@@ -915,14 +915,14 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                     checkBlock.end = block;
                     setCodeBlockMargin(block,fontSize*3/4, fontSize, 0);
 
-                    hideSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
-                    hideSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
-
                     if(showAll ||
                       (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end)||
                       ((blockNumber >= checkBlock.start.blockNumber() && blockNumber <= checkBlock.end.blockNumber()))){
                         showSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
                         showSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
+                    }else{
+                        hideSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
+                        hideSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
                     }
 
                 }else if(blockData->getStatus()==BlockData::content){
