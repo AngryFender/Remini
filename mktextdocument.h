@@ -61,6 +61,7 @@ private:
 struct SelectRange{
     int start           = NO_SELECTION_POS;
     int end             = NO_SELECTION_POS;
+    bool hasSelection 	= false;
     int currentposInBlock      = NO_SELECTION_POS;
     int currentBlockPos        = NO_SELECTION_POS;
     int currentBlockNo         = NO_SELECTION_POS;
@@ -68,6 +69,9 @@ struct SelectRange{
     int posInBlockStart = NO_SELECTION_POS;
     int blockEnd        = NO_SELECTION_POS;
     int posInBlockEnd   = NO_SELECTION_POS;
+    int selectionFirstStartPos = NO_SELECTION_POS;
+    int selectionFirstStartBlock = NO_SELECTION_POS;
+    int selectionFirstStartPosInBlock = NO_SELECTION_POS;
     bool isCursorCaculated  = false;
 };
 

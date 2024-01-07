@@ -171,8 +171,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); return;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); return;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); scrollValueUpdateHandle(undoData.scrollValue);return;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); ;return;
 
     default: break;
     }
@@ -647,29 +647,46 @@ void MkEdit::cursorPositionChangedHandle()
         QTextCursor cursor = this->textCursor();
 
         if(!cursor.hasSelection()){
+            selectRange.hasSelection = false;
             selectRange.start = -1;
             selectRange.end = -1;
             selectRange.currentposInBlock = cursor.positionInBlock();
             selectRange.currentBlockPos = cursor.block().position();
             selectRange.isCursorCaculated = false;
+            selectRange.selectionFirstStartPos = NO_SELECTION_POS;
         }else{
+            selectRange.hasSelection = true;
             selectRange.start = cursor.selectionStart();
             selectRange.end = cursor.selectionEnd();
+            if(NO_SELECTION_POS == selectRange.selectionFirstStartPos){
+                selectRange.selectionFirstStartPos = cursor.selectionStart();
+                selectRange.selectionFirstStartBlock = cursor.blockNumber();
+                selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
+            }
         }
 
         disconnectSignals();
         emit cursorPosChanged( textCursor().hasSelection(), currentBlockNumber, getVisibleRect(), &selectRange);
-        connectSignals();
 
+        //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
         if(!cursor.hasSelection() && selectRange.isCursorCaculated){
-            cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position());
-            cursor.movePosition(QTextCursor::StartOfLine,QTextCursor::MoveAnchor);
+            cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position()+selectRange.currentposInBlock);
+            this->setTextCursor(cursor);
+        }
 
-            for(int rep = 0; rep < selectRange.currentposInBlock; rep++){
-                cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
+        //make sure selection works regardless of the formatting used
+        if(selectRange.hasSelection){
+            if(currentCharacterNumber > selectRange.selectionFirstStartPos){
+//                cursor.setPosition( this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
+                cursor.setPosition(selectRange.selectionFirstStartPos);
+                cursor.setPosition(currentCharacterNumber,QTextCursor::KeepAnchor);
+            }else{
+                cursor.clearSelection();
+                cursor.setPosition( this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock + 1);
+                cursor.setPosition(currentCharacterNumber,QTextCursor::KeepAnchor);
             }
             this->setTextCursor(cursor);
         }
-        //emit cursorUpdate(this->textCursor().blockNumber(), this->textCursor().positionInBlock());
+        connectSignals();
     }
 }
