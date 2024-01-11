@@ -1,10 +1,12 @@
 #include "navigationview.h"
 
-NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
+NavigationView::NavigationView(QWidget *parent, bool editable):QTreeView(parent)
 {
-
     this->setColumnHidden(1,true);
     this->setHeaderHidden(true);
+    if(!editable){
+        this->setEditTriggers(EditTrigger::NoEditTriggers);
+    }
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -25,7 +27,7 @@ NavigationView::NavigationView(QWidget *parent):QTreeView(parent)
     connect(&SetVault, &QAction::triggered, this, &NavigationView::setVaultHandler);
     connect(this, &NavigationView::customContextMenuRequested, this, &NavigationView::ContextMenuHandler);
     connect(&expandTimer,&QTimer::timeout, this, &NavigationView::expandTimerHandler);
-
+    connect(this,&NavigationView::clicked, this, &NavigationView::rowClicked);
 }
 
 void NavigationView::expandEveryItems(QModelIndex index)
@@ -54,33 +56,6 @@ void NavigationView::keyPressEvent(QKeyEvent *event)
             }
         }
     }
-}
-
-void NavigationView::mousePressEvent(QMouseEvent *event)
-{
-    if(event->buttons() & Qt::LeftButton)
-    {
-        QModelIndex index = indexAt(event->pos());
-        if(this->isExpanded(index))
-        {
-            this->collapse(index);
-        }
-        else
-        {
-            this->expand(index);
-        }
-    }
-    else if(event->buttons() & Qt::RightButton)
-    {
-        QModelIndex index = indexAt(event->pos());
-        this->expand(index);
-    }
-    QTreeView::mousePressEvent(event);
-}
-
-void NavigationView::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    //do nothing to avoid editing on doubleclicks
 }
 
 void NavigationView::rowsInserted(const QModelIndex &parent, int start, int end)
@@ -214,4 +189,16 @@ void NavigationView::expandTimerHandler()
 {
     expandTimer.stop();
     emit expansionComplete();
+}
+
+void NavigationView::rowClicked(const QModelIndex &index)
+{
+    if(this->isExpanded(index))
+    {
+        this->collapse(index);
+    }
+    else
+    {
+        this->expand(index);
+    }
 }

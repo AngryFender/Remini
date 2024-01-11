@@ -16,7 +16,7 @@ class NavigationView : public QTreeView
 {
     Q_OBJECT
 public:
-    NavigationView(QWidget * parent = nullptr);
+    NavigationView(QWidget * parent = nullptr, bool editable = true);
     void expandEveryItems(QModelIndex index);
     void keyPressEvent(QKeyEvent *event)override;
 private:
@@ -35,8 +35,6 @@ private:
     QString editingFilename;
 
 protected:
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void rowsInserted(const QModelIndex &parent, int start, int end) override;
 
  public slots:
@@ -51,6 +49,7 @@ protected:
     void folderChangedHandler();
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
     void expandTimerHandler();
+    void rowClicked(const QModelIndex &index);
 signals:
     void createFile(QModelIndex &index, QString &name);
     void createFolder(QModelIndex &index, QString &name);
