@@ -4,10 +4,7 @@ NavigationView::NavigationView(QWidget *parent, bool editable):QTreeView(parent)
 {
     this->setColumnHidden(1,true);
     this->setHeaderHidden(true);
-    if(!editable){
-        this->setEditTriggers(EditTrigger::NoEditTriggers);
-    }
-
+    this->editable = editable;
     this->setContextMenuPolicy(Qt::CustomContextMenu);
 
     addFileAction.setText("Add File");
@@ -68,7 +65,8 @@ void NavigationView::rowsInserted(const QModelIndex &parent, int start, int end)
 
 void NavigationView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    renameFile();
+    if(editable)
+        renameFile();
 }
 
 void NavigationView::ContextMenuHandler(QPoint pos)

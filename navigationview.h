@@ -20,6 +20,7 @@ public:
     void expandEveryItems(QModelIndex index);
     void keyPressEvent(QKeyEvent *event)override;
 private:
+    bool editable;
     QMenu menu;
     QAction addFileAction ;
     QAction addFolderAction ;
