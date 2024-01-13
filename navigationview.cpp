@@ -66,6 +66,11 @@ void NavigationView::rowsInserted(const QModelIndex &parent, int start, int end)
         folderChangedHandler();
 }
 
+void NavigationView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    renameFile();
+}
+
 void NavigationView::ContextMenuHandler(QPoint pos)
 {
     QMenu menu(this);

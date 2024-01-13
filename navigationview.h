@@ -36,7 +36,7 @@ private:
 
 protected:
     void rowsInserted(const QModelIndex &parent, int start, int end) override;
-
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
  public slots:
     void ContextMenuHandler(QPoint pos);
     void addFile();
