@@ -8,7 +8,7 @@ SearchAllDialog::SearchAllDialog(QWidget *parent):QDialog(parent)
     textView->setPlaceholderText("Search Texts");
     matchCountView = new QLabel(this);
     matchCountView->setAlignment(Qt::AlignRight);
-    searchView = new NavigationView(this);
+    searchView = new NavigationView(this,false);
 
     layout->addWidget(textView);
     layout->addWidget(matchCountView,Qt::AlignRight);
