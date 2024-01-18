@@ -539,6 +539,11 @@ void MkEdit::mouseDoubleClickEvent(QMouseEvent *e)
     }
 }
 
+void MkEdit::dragEnterEvent(QDragEnterEvent *e)
+{
+
+}
+
 QColor MkEdit::getTypeColor() const
 {
     return syntaxColor.type;

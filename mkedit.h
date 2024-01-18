@@ -15,7 +15,7 @@
 #include <theme.h>
 
 #define FILE_SAVE_TIMEOUT 300
-#define BLOCKRADIUS 3
+#define BLOCKRADIUS 4
 #define MAXIMUM_FONT_SIZE 40
 #define MINIMUM_FONT_SIZE 8
 
@@ -61,7 +61,7 @@ protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
     void mouseDoubleClickEvent(QMouseEvent *e) override;
-
+    void dragEnterEvent(QDragEnterEvent *e) override;
  private:
     QColor codeBlockColor;
     int widthCodeBlock;
