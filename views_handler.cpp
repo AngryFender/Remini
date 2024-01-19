@@ -36,16 +36,19 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     initFontDefault();
 }
 
-void ViewsHandler::initTreeView()
+void ViewsHandler::initTreeView(QString path)
 {
     modelTree.setReadOnly(false);
     modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
-    modelTree.setRootPath(getSavedPath());
+    if(path.isEmpty()){
+        path = getSavedPath();
+    }
+    modelTree.setRootPath(path);
     vaultPath = modelTree.rootPath();
 
     proxyModel.setSourceModel(&modelTree);
     viewTree->setModel(&proxyModel);
-    viewTree->setRootIndex(proxyModel.setRootIndexFromPath(getSavedPath()));
+    viewTree->setRootIndex(proxyModel.setRootIndexFromPath(path));
 
     for(int column = 1; column < proxyModel.columnCount(); column ++)
     {
@@ -538,6 +541,8 @@ void ViewsHandler::setVaultPathHandler()
         newPath = list.first();
     }
     qDebug()<<"New Vault Path "<<newPath;
+    initTreeView(newPath);
+    //clear recently opened files?
 }
 
 void ViewsHandler::checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &cursor)

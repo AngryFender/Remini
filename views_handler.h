@@ -83,7 +83,7 @@ private:
     QFont fontUi;
     QString getSavedPath();
     void initViews(Ui::MainWindow &ui);
-    void initTreeView();
+    void initTreeView(QString path = NULL);
     void initFontDefault();
     void initConnection();
     void connectDocument();
