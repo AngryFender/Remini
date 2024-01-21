@@ -31,6 +31,7 @@ void SettingsDialog::executeFolderDialog()
 {
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::Directory);
+    dialog.setDirectory(vaultRootPath);
     dialog.setOption(QFileDialog::ShowDirsOnly, true);
     if (dialog.exec()) {
         QStringList list = dialog.selectedFiles();
@@ -56,8 +57,6 @@ const QString SettingsDialog::getVaultRootPath()
     QString currentPath = QDir::currentPath();
     QString filePath = currentPath + CONFIG_FILE_NAME;
     QFile file(filePath);
-
-    QString vaultRootPath;
 
     if(file.exists()){
         if (file.open(QIODevice::ReadOnly | QIODevice::Text))

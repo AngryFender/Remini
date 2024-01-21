@@ -45,6 +45,7 @@ private:
     Highlighter previewHighligher;
 
     const QString getVaultRootPath();
+    QString vaultRootPath;
 };
 
 #endif // SETTINGSDIALOG_H

@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QMutex>
 #include <QThread>
+#include <QSettings>
 #include <mkedit.h>
 #include <navigationview.h>
 #include <navigationmodel.h>
@@ -81,7 +82,9 @@ private:
     QDialog fileDeleteConfirm;
 
     QFont fontUi;
-    QString getSavedPath();
+    QString getVaultPath();
+    void setVaultPath(QString& path);
+
     void initViews(Ui::MainWindow &ui);
     void initTreeView(QString path = NULL);
     void initFontDefault();
@@ -120,7 +123,7 @@ private slots:
     void displayTextSearchedFilePosition(QString &filePath,int searchTextLength,int blockNumber, int positionInBlock);
     void showSettingsBtn();
     void fileRenamedHandler(const QString& newName, const QString& oldName, const QModelIndex& index);
-    void setVaultPathHandler();
+    QString setVaultPathHandler();
     void checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &cursor);
 };
 

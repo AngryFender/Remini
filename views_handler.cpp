@@ -1,9 +1,42 @@
 #include "views_handler.h"
 
-QString ViewsHandler::getSavedPath()
+QString ViewsHandler::getVaultPath()
 {
-    QFile configFile("config.txt");
-    return getFileContent(configFile);
+    QFile configFile("config.ini");
+    if(configFile.exists()){
+        QSettings settings("config.ini", QSettings::IniFormat);
+        return settings.value("vault").toString();
+    }
+
+    QCoreApplication::setApplicationName("Remini");
+    QSettings settings("Remini","Remini");
+    settings.setPath(settings.IniFormat, settings.SystemScope, "config.ini");
+    QString path = settings.value("vault").toString();
+
+    QFile configAnotherFile(path);
+    if(configAnotherFile.exists()){
+        return path;
+    }
+
+    QString localVaultPath = QCoreApplication::applicationDirPath() + QDir::separator() + "Vault";
+    QDir dir;
+    if(!dir.exists(localVaultPath)){
+        dir.mkdir(localVaultPath);
+    }
+    settings.setValue("vault",localVaultPath);
+    return localVaultPath;
+}
+
+void ViewsHandler::setVaultPath(QString &path)
+{
+    QFile configFile("config.ini");
+    if(configFile.exists()){
+        QSettings settings("config.ini", QSettings::IniFormat);
+        settings.setValue("vault",path);
+    }else{
+        QSettings settings("Remini","Remini");
+        settings.setValue("vault",path);
+    }
 }
 
 void ViewsHandler::initViews(Ui::MainWindow &ui)
@@ -41,7 +74,7 @@ void ViewsHandler::initTreeView(QString path)
     modelTree.setReadOnly(false);
     modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
     if(path.isEmpty()){
-        path = getSavedPath();
+        path = getVaultPath();
     }
     modelTree.setRootPath(path);
     vaultPath = modelTree.rootPath();
@@ -58,26 +91,26 @@ void ViewsHandler::initTreeView(QString path)
 
 void ViewsHandler::initFontDefault()
 {
-    fontUi.setFamily("roboto");
-    //fontUi.setFamily("DroidSansM Nerd Fonot Mono Regular");
+    fontUi.setFamily("Roboto");
     fontUi.setStretch(QFont::Unstretched);
     fontUi.setWeight(QFont::Normal);
     fontUi.setPointSize(13);
+    fontUi.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     viewText->setFont(fontUi);
 
     QFont fontTree;
-    fontTree.setFamily("roboto");
-    //fontTree.setFamily("DroidSansM Nerd Fonot Mono Regular");
+    fontTree.setFamily("Roboto");
     fontTree.setPointSize(10);
     fontTree.setWeight(QFont::Light);
+    fontTree.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     viewTree->setFont(fontTree);
+    viewSearch->setFont(fontTree);
 
     QFont fontTitle;
-    fontTitle.setFamily("roboto");
-    //fontTitle.setFamily("DroidSansM Nerd Fonot Mono Regular");
+    fontTitle.setFamily("Roboto");
     fontTitle.setPointSize(fontUi.pointSize()*2);
     fontTitle.setWeight(QFont::DemiBold);
-
+    fontTitle.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     viewTitle->setFont(fontTitle);
 }
 
@@ -528,7 +561,7 @@ void ViewsHandler::fileRenamedHandler(const QString& newName, const QString &old
 
 }
 
-void ViewsHandler::setVaultPathHandler()
+QString ViewsHandler::setVaultPathHandler()
 {
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::Directory);
@@ -540,9 +573,13 @@ void ViewsHandler::setVaultPathHandler()
         QStringList list = dialog.selectedFiles();
         newPath = list.first();
     }
-    qDebug()<<"New Vault Path "<<newPath;
     initTreeView(newPath);
-    //clear recently opened files?
+    setVaultPath(newPath);
+
+    recentFilesList->clear();
+    recentFileCursorMap.clear();
+    return newPath;
+    //recentFileDocumentMap.clear();
 }
 
 void ViewsHandler::checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &cursor)
