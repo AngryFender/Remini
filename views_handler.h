@@ -39,8 +39,6 @@ public:
         return handle;
     }
     ~ViewsHandler(){
-        delete recentFilesView;
-        delete textSearchAllView;
     }
 
 public slots:
