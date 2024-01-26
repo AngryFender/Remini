@@ -330,6 +330,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
             int pos = (*it).first;
             removeAllMkDataFunc(this->textCursor().blockNumber());
             applyMkEffects(false);
+            preUndoSetup();
             connectSignals();
             emit pushLink(pos);
             fileSaveWithScroll(false);
