@@ -474,6 +474,11 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 
 void MkEdit::mousePressEvent(QMouseEvent *e)
 {
+    if(e->button() == Qt::RightButton && !this->textCursor().hasSelection()){
+        const QPoint pos (e->position().x(),e->position().y());
+        this->setTextCursor(this->cursorForPosition(pos));
+    }
+
     if(!isMouseOnCheckBox(e)){
 //        selectRange.blockStart = this->textCursor().block().blockNumber();
 //        selectRange.posInBlockStart = this->textCursor().positionInBlock();
