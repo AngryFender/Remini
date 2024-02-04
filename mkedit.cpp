@@ -400,9 +400,12 @@ void MkEdit::deleteContextMenu()
 void MkEdit::selectBlock()
 {
     QTextCursor cursor = this->cursorForPosition(contextMenuPos);
-
     int startPos = 0;
     int endPos = 0;
+
+    cursor.clearSelection();
+    this->setTextCursor(cursor);
+
     emit selectBlockCopy(cursor.blockNumber(), startPos, endPos);
 
     if(startPos == endPos){
