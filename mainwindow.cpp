@@ -20,8 +20,12 @@ MainWindow::MainWindow(QWidget *parent)
     QApplication::setStyle(QStyleFactory::create("fusion"));
     this->setStyleSheet(themeContents);
 
-    shiftTimer = new QTimer(this);
-    QObject::connect(shiftTimer,&QTimer::timeout,
+    rightShiftTimer = new QTimer(this);
+    leftShiftTimer = new QTimer(this);
+    QObject::connect(rightShiftTimer,&QTimer::timeout,
+                     this, &MainWindow::shiftTimerHandle);
+
+    QObject::connect(rightShiftTimer,&QTimer::timeout,
                      this, &MainWindow::shiftTimerHandle);
 
     QObject::connect(this,&MainWindow::openRecentFilesDialog,
@@ -33,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete shiftTimer;
+    delete rightShiftTimer;
     delete lightThemeStyle;
     delete darkThemeStyle;
     delete ui;
@@ -41,6 +45,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
+    switch (event->nativeScanCode()) {
+
+    case RIGHT_SHIFT_KEY:
+            if(rightShiftTimer->isActive()){
+                emit startSearchAll();
+            }
+            rightShiftTimer->start(DOUBLE_SHIFT_TIMER_MS);
+            break;
+    case LEFT_SHIFT_KEY:
+            if(leftShiftTimer->isActive()){
+                emit startFileSearch();
+            }
+            leftShiftTimer->start(DOUBLE_SHIFT_TIMER_MS);
+            break;
+    default:
+            rightShiftTimer->stop();
+    };
+
     switch(event->key()){
         case Qt::Key_F12:
                 if (themeState == darkThemeState){
@@ -60,15 +82,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
                 mkEditorBox->hide();
                 break;
 
-        case Qt::Key_Shift:
-                 if(shiftTimer->isActive()){
-                    emit startSearchAll();
-                }
-                shiftTimer->start(200);
-                break;
-
-        default:
-            shiftTimer->stop();
     }
 }
 
@@ -118,7 +131,8 @@ void MainWindow::recentFilesHandler(bool show)
 
 void MainWindow::shiftTimerHandle()
 {
-    shiftTimer->stop();
+    rightShiftTimer->stop();
+    leftShiftTimer->stop();
 }
 
 void MainWindow::setup_views(QWidget *parent, Ui::MainWindow &ui)

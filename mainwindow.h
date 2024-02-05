@@ -8,10 +8,13 @@
 #include <QTimer>
 #include <QStyleFactory>
 
+#define DOUBLE_SHIFT_TIMER_MS 200
+#define LEFT_SHIFT_KEY 42
+#define RIGHT_SHIFT_KEY 54
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
 
 class MainWindow : public QMainWindow
 {
@@ -36,7 +39,8 @@ private:
         darkThemeState,
     };
 
-    QTimer *shiftTimer;
+    QTimer *rightShiftTimer;
+    QTimer *leftShiftTimer;
     Ui::MainWindow *ui;
     QString themeContents;
     ThemeState themeState;
@@ -52,5 +56,6 @@ private:
 signals:
     void openRecentFilesDialog(bool show);
     void startSearchAll();
+    void startFileSearch();
 };
 #endif // MAINWINDOW_H
