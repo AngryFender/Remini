@@ -48,6 +48,7 @@ public slots:
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         firstDirectoryLoad = true;
+        ui.uiFrameSearchTree->hide();
         this->parent = parent;
         recentFilesList = new QListWidget(this->parent);
         recentFilesView = new RecentFilesDialog(this->parent,recentFilesList);
@@ -57,6 +58,7 @@ private:
         initConnection();
         textSearchWorker.moveToThread(&searchThread);
         viewTitle->setText("Startup Tips");
+
     }
 
 
