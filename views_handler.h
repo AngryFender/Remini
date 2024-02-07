@@ -44,6 +44,7 @@ public:
 public slots:
     void openRecentFilesDialogHandle(bool show);
     void startTextSearchInAllFilesHandle();
+    void startFileSearchHandle();
 
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
@@ -80,6 +81,10 @@ private:
     NavigationView* viewTree;
     QFileInfo fileInfo;
     QDialog fileDeleteConfirm;
+    QFrame *frameSearchTextTree;
+    QFrame *frameSearchFileTree;
+    QLineEdit *viewTextSearchEdit;
+    NavigationView *viewTextSearchTree;
 
     QFont fontUi;
     QString getVaultPath();

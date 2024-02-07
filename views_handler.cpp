@@ -41,6 +41,11 @@ void ViewsHandler::setVaultPath(QString &path)
 
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
+    frameSearchFileTree = ui.uiFrameFileTree;
+    frameSearchTextTree = ui.uiFrameSearchTree;
+    viewTextSearchEdit = ui.uiSearchText;
+    viewTextSearchTree = ui.uiSearchTree;
+
     QList<int> sizes;
     sizes << NAVIGATION_RATIO << EDITOR_RAIO;
     ui.splitter->setSizes(sizes);
@@ -632,16 +637,31 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
 
 void ViewsHandler::startTextSearchInAllFilesHandle()
 {
-    if(textSearchAllView->isHidden()){
-        proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
+//    if(textSearchAllView->isHidden()){
+//        proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
 
-        QPoint pos =  this->parent->mapToGlobal( viewLeftFrame->pos());
-        pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-6);
-        textSearchAllView->setGeometry(viewLeftFrame->geometry());
-        textSearchAllView->move(pos);
-        textSearchAllView->show();
-    }else{
-        textSearchAllView->activateWindow();
-        textSearchAllView->setFocusAtSearch();
-    }
+//        QPoint pos =  this->parent->mapToGlobal( viewLeftFrame->pos());
+//        pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-6);
+//        textSearchAllView->setGeometry(viewLeftFrame->geometry());
+//        textSearchAllView->move(pos);
+//        textSearchAllView->show();
+//    }else{
+//        textSearchAllView->activateWindow();
+//        textSearchAllView->setFocusAtSearch();
+//    }
+
+    frameSearchFileTree->hide();
+    frameSearchTextTree->show();
+
+    viewTextSearchEdit->show() ;
+    viewTextSearchTree->show() ;
+    viewTextSearchEdit->setFocus();
+
+}
+
+void ViewsHandler::startFileSearchHandle()
+{
+    frameSearchTextTree->hide();
+    frameSearchFileTree->show();
+    viewSearch->setFocus();
 }

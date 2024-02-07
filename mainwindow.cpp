@@ -33,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     QObject::connect(this,&MainWindow::startSearchAll,
                      view_handler.get(),&ViewsHandler::startTextSearchInAllFilesHandle);
+
+    QObject::connect(this,&MainWindow::startFileSearch,
+                     view_handler.get(),&ViewsHandler::startFileSearchHandle);
 }
 
 MainWindow::~MainWindow()

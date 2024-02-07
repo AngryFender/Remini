@@ -144,7 +144,7 @@
          <widget class="QFrame" name="uiFrameSearchTree">
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="NavigationView" name="UiSearchTree">
+            <widget class="NavigationView" name="uiSearchTree">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                <horstretch>0</horstretch>
