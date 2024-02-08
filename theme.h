@@ -122,10 +122,9 @@ const QString lightTheme = QStringLiteral( "QMainWindow {"
                                            "    border-style: none;"
                                            "}");
 
-const QString darkTheme = QStringLiteral( "QMessageBox { background-color: #353535; } "
-                                          "QMainWindow {"
+const QString darkTheme = QStringLiteral( "QMessageBox { background-color: #353535; } "                                          "QMainWindow {"
                                           "	background-color:#353535;"
-                                          "	border-color: transparent"
+                                          "	border-color: transparent;"
                                           "}"
                                           "QDialog {"
                                           "	background-color:#353535;"
@@ -251,6 +250,14 @@ const QString darkTheme = QStringLiteral( "QMessageBox { background-color: #3535
                                           "}"
                                           "QWidget{"
                                           "    border-style: none;"
-                                          "}");
+                                          "}"
+                                          "QLineEdit {"
+                                          "    border-style: solid;"
+                                          "    border-width: 1px;"
+                                          "	   background-color:#353535;"
+                                          "    border-radius: 3px;"
+                                          "    border-color: #707070;"
+                                          "}"
+);
 
 #endif // THEME_H

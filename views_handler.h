@@ -85,6 +85,7 @@ private:
     QFrame *frameSearchFileTree;
     QLineEdit *viewTextSearchEdit;
     NavigationView *viewTextSearchTree;
+    QLabel *viewTextSearchCount;
 
     QFont fontUi;
     QString getVaultPath();
@@ -130,6 +131,8 @@ private slots:
     void fileRenamedHandler(const QString& newName, const QString& oldName, const QModelIndex& index);
     QString setVaultPathHandler();
     void checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &cursor);
+    void textSearchChangedHandler(const QString &text);
+    void updateTextSearchViewHandler(QStandardItemModel *model, int matchCount);
 };
 
 #endif // VIEWS_HANDLER_H

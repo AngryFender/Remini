@@ -11,7 +11,7 @@ QStringList &TextSearchWorker::getListPaths()
     return listPaths;
 }
 
-void TextSearchWorker::setText(QString &text)
+void TextSearchWorker::setText(const QString &text)
 {
     this->text = text;
 }

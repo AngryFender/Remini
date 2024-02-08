@@ -19,7 +19,7 @@ class TextSearchWorker : public QObject
 public:
     explicit TextSearchWorker(QObject *parent = nullptr);
     QStringList &getListPaths();
-    void setText(QString &text);
+    void setText(const QString &text);
     void setRootPath(QString text);
 
 public slots:

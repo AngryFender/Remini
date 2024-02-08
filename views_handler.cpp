@@ -45,6 +45,9 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     frameSearchTextTree = ui.uiFrameSearchTree;
     viewTextSearchEdit = ui.uiSearchText;
     viewTextSearchTree = ui.uiSearchTree;
+    viewTextSearchCount = ui.uiTextSearchCount;
+
+    viewTextSearchEdit->setPlaceholderText("Search Texts...");
 
     QList<int> sizes;
     sizes << NAVIGATION_RATIO << EDITOR_RAIO;
@@ -175,8 +178,8 @@ void ViewsHandler::initConnection()
     QObject::connect(&textSearchWorker,&TextSearchWorker::finished,
                      &searchThread, &QThread::quit);
 
-    QObject::connect(&textSearchWorker,&TextSearchWorker::updateTextSearchView,
-                     textSearchAllView, &SearchAllDialog::updateTextSearchViewHandle);
+//    QObject::connect(&textSearchWorker,&TextSearchWorker::updateTextSearchView,
+//                     textSearchAllView, &SearchAllDialog::updateTextSearchViewHandle);
 
     QObject::connect(textSearchAllView,&SearchAllDialog::showSearchedTextInFile,
                      this,&ViewsHandler::displayTextSearchedFilePosition);
@@ -196,6 +199,13 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText, &MkEdit::checkIfCursorInBlock,
                      this, &ViewsHandler::checkIfCursorInBlockHandler);
     connectDocument();
+
+    QObject::connect(viewTextSearchEdit, &QLineEdit::textChanged,
+            this,&ViewsHandler::textSearchChangedHandler);
+
+    QObject::connect(&textSearchWorker,&TextSearchWorker::updateTextSearchView,
+                     this, &ViewsHandler::updateTextSearchViewHandler);
+
 
 }
 
@@ -596,6 +606,23 @@ void ViewsHandler::checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &curso
         return;
     }
     isBlock = false;
+}
+
+void ViewsHandler::textSearchChangedHandler(const QString &text)
+{
+    textSearchWorker.setText(text);
+    textSearchWorker.setRootPath(modelTree.rootPath());
+    searchThread.start();
+}
+
+void ViewsHandler::updateTextSearchViewHandler(QStandardItemModel *model, int matchCount)
+{
+    viewTextSearchCount->setText(QString::number(matchCount));
+
+    viewTextSearchTree->setModel(model);
+    if(model->rowCount()<=2)
+        viewTextSearchTree->expandAll();
+
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
