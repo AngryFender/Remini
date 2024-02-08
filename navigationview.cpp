@@ -27,6 +27,11 @@ NavigationView::NavigationView(QWidget *parent, bool editable):QTreeView(parent)
     connect(this,&NavigationView::clicked, this, &NavigationView::rowClicked);
 }
 
+void NavigationView::setRowsEditable(bool enable)
+{
+    this->editable = enable;
+}
+
 void NavigationView::expandEveryItems(QModelIndex index)
 {
     if(!expandTimer.isActive())

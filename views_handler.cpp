@@ -45,6 +45,7 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     frameSearchTextTree = ui.uiFrameSearchTree;
     viewTextSearchEdit = ui.uiSearchText;
     viewTextSearchTree = ui.uiSearchTree;
+    viewTextSearchTree->setRowsEditable(false);
     viewTextSearchCount = ui.uiTextSearchCount;
 
     viewTextSearchEdit->setPlaceholderText("Search Texts...");
@@ -178,12 +179,6 @@ void ViewsHandler::initConnection()
     QObject::connect(&textSearchWorker,&TextSearchWorker::finished,
                      &searchThread, &QThread::quit);
 
-//    QObject::connect(&textSearchWorker,&TextSearchWorker::updateTextSearchView,
-//                     textSearchAllView, &SearchAllDialog::updateTextSearchViewHandle);
-
-    QObject::connect(textSearchAllView,&SearchAllDialog::showSearchedTextInFile,
-                     this,&ViewsHandler::displayTextSearchedFilePosition);
-
     QObject::connect(this,&ViewsHandler::updateRecentFile,
                      recentFilesView,&RecentFilesDialog::updateRecentFileHandle);
 
@@ -205,6 +200,9 @@ void ViewsHandler::initConnection()
 
     QObject::connect(&textSearchWorker,&TextSearchWorker::updateTextSearchView,
                      this, &ViewsHandler::updateTextSearchViewHandler);
+
+    QObject::connect(viewTextSearchTree,&NavigationView::pressed,
+            this,&ViewsHandler::textSearchResultPositionSelected);
 
 
 }
@@ -612,6 +610,7 @@ void ViewsHandler::textSearchChangedHandler(const QString &text)
 {
     textSearchWorker.setText(text);
     textSearchWorker.setRootPath(modelTree.rootPath());
+    proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
     searchThread.start();
 }
 
@@ -623,6 +622,17 @@ void ViewsHandler::updateTextSearchViewHandler(QStandardItemModel *model, int ma
     if(model->rowCount()<=2)
         viewTextSearchTree->expandAll();
 
+}
+
+void ViewsHandler::textSearchResultPositionSelected(const QModelIndex &index)
+{
+    QModelIndex parentIndex = viewTextSearchTree->model()->parent(index);
+    QString filePath = parentIndex.data(Qt::UserRole).toString();
+    int searchTextLength = index.data(Qt::UserRole).toInt();
+    int blockNumber = index.data(Qt::UserRole+1).toInt();
+    int positionInBlock = index.data(Qt::UserRole+2).toInt();
+
+    displayTextSearchedFilePosition(filePath, searchTextLength, blockNumber,  positionInBlock);
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)

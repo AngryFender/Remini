@@ -17,6 +17,7 @@ class NavigationView : public QTreeView
     Q_OBJECT
 public:
     NavigationView(QWidget * parent = nullptr, bool editable = true);
+    void setRowsEditable(bool enable);
     void expandEveryItems(QModelIndex index);
     void keyPressEvent(QKeyEvent *event)override;
 private:

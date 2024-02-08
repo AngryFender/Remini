@@ -133,6 +133,7 @@ private slots:
     void checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &cursor);
     void textSearchChangedHandler(const QString &text);
     void updateTextSearchViewHandler(QStandardItemModel *model, int matchCount);
+    void textSearchResultPositionSelected(const QModelIndex &index);
 };
 
 #endif // VIEWS_HANDLER_H
