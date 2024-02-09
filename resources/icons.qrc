@@ -4,5 +4,6 @@
         <file>settings.png</file>
         <file alias="line">line.png</file>
         <file alias="angle">angle.png</file>
+        <file alias="arrow">arrow.png</file>
     </qresource>
 </RCC>
