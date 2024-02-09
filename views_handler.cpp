@@ -608,10 +608,12 @@ void ViewsHandler::checkIfCursorInBlockHandler(bool &isBlock, QTextCursor &curso
 
 void ViewsHandler::textSearchChangedHandler(const QString &text)
 {
-    textSearchWorker.setText(text);
-    textSearchWorker.setRootPath(modelTree.rootPath());
-    proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
-    searchThread.start();
+    if(!searchThread.isRunning()){
+        textSearchWorker.setText(text);
+        textSearchWorker.setRootPath(modelTree.rootPath());
+        proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
+        searchThread.start();
+    }
 }
 
 void ViewsHandler::updateTextSearchViewHandler(QStandardItemModel *model, int matchCount)
