@@ -13,7 +13,6 @@
 #include <startupText.h>
 #include "textsearchworker.h"
 #include "ui_mainwindow.h"
-#include "searchalldialog.h"
 #include "recentfilesdialog.h"
 #include "settingsdialog.h"
 
@@ -53,7 +52,6 @@ private:
         this->parent = parent;
         recentFilesList = new QListWidget(this->parent);
         recentFilesView = new RecentFilesDialog(this->parent,recentFilesList);
-        textSearchAllView = new SearchAllDialog(this->parent);
         settingsDialog = new SettingsDialog(this->parent);
         initViews(ui);
         initConnection();
@@ -67,7 +65,6 @@ private:
     QThread searchThread;
     RecentFilesDialog *recentFilesView;
     QListWidget *recentFilesList;
-    SearchAllDialog *textSearchAllView;
     QFrame *viewLeftFrame;
     QFrame *viewRightFrame;
     TextSearchWorker textSearchWorker;

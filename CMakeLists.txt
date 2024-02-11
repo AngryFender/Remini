@@ -38,8 +38,6 @@ set(PROJECT_SOURCES
         navigationmodel.cpp
         formatdata.h
         formatdata.cpp
-        searchalldialog.h
-        searchalldialog.cpp
         textsearchworker.h
         textsearchworker.cpp
         transparentdialog.h
