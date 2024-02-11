@@ -56,6 +56,8 @@ void NavigationView::keyPressEvent(QKeyEvent *event)
             {
                 this->expand(index);
             }
+        }else if(event->key() == Qt::Key_Backspace){
+            emit sendFocusToSearch(this);
         }
     }
 }

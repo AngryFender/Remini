@@ -134,6 +134,9 @@ private slots:
     void textSearchChangedHandler(const QString &text);
     void updateTextSearchViewHandler(QStandardItemModel *model, int matchCount);
     void textSearchResultPositionSelected(const QModelIndex &index);
+    void sendFocusToSearchHandler(QWidget * view);
+    void textSearchReturnPressedHandler();
+    void fileSearchReturnPressedHandler();
 };
 
 #endif // VIEWS_HANDLER_H

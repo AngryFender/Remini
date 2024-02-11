@@ -170,9 +170,6 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree,&NavigationView::expansionComplete,
                      this,&ViewsHandler::navigationViewExpandedFilenameFilter);
 
-    QObject::connect(textSearchAllView, &SearchAllDialog::startSearch,
-                     this,&ViewsHandler::doSearchWork);
-
     QObject::connect(&searchThread,&QThread::started,
                      &textSearchWorker,&TextSearchWorker::doWork);
 
@@ -193,16 +190,29 @@ void ViewsHandler::initConnection()
 
     QObject::connect(viewText, &MkEdit::checkIfCursorInBlock,
                      this, &ViewsHandler::checkIfCursorInBlockHandler);
+
+    QObject::connect(viewSearch, &QLineEdit::returnPressed,
+                     this, &ViewsHandler::fileSearchReturnPressedHandler);
+
     connectDocument();
 
     QObject::connect(viewTextSearchEdit, &QLineEdit::textChanged,
             this,&ViewsHandler::textSearchChangedHandler);
+
+    QObject::connect(viewTextSearchEdit, &QLineEdit::returnPressed,
+            this,&ViewsHandler::textSearchReturnPressedHandler);
 
     QObject::connect(&textSearchWorker,&TextSearchWorker::updateTextSearchView,
                      this, &ViewsHandler::updateTextSearchViewHandler);
 
     QObject::connect(viewTextSearchTree,&NavigationView::pressed,
             this,&ViewsHandler::textSearchResultPositionSelected);
+
+    QObject::connect(viewTextSearchTree,&NavigationView::sendFocusToSearch,
+                     this,&ViewsHandler::sendFocusToSearchHandler);
+
+    QObject::connect(viewTree,&NavigationView::sendFocusToSearch,
+                     this,&ViewsHandler::sendFocusToSearchHandler);
 
 
 }
@@ -637,6 +647,27 @@ void ViewsHandler::textSearchResultPositionSelected(const QModelIndex &index)
     displayTextSearchedFilePosition(filePath, searchTextLength, blockNumber,  positionInBlock);
 }
 
+void ViewsHandler::sendFocusToSearchHandler(QWidget *view)
+{
+    if(view == viewTextSearchTree){
+        this->viewTextSearchEdit->setFocus();
+    }else if(view == viewTree){
+        this->viewSearch->setFocus();
+    }else if(view == viewTextSearchEdit){
+
+    }
+}
+
+void ViewsHandler::textSearchReturnPressedHandler()
+{
+    this->viewTextSearchTree->setFocus();
+}
+
+void ViewsHandler::fileSearchReturnPressedHandler()
+{
+    this->viewTree->setFocus();
+}
+
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
 {
     if(show){
@@ -676,26 +707,12 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
 
 void ViewsHandler::startTextSearchInAllFilesHandle()
 {
-//    if(textSearchAllView->isHidden()){
-//        proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
-
-//        QPoint pos =  this->parent->mapToGlobal( viewLeftFrame->pos());
-//        pos.setY(pos.y()-QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight)-6);
-//        textSearchAllView->setGeometry(viewLeftFrame->geometry());
-//        textSearchAllView->move(pos);
-//        textSearchAllView->show();
-//    }else{
-//        textSearchAllView->activateWindow();
-//        textSearchAllView->setFocusAtSearch();
-//    }
-
     frameSearchFileTree->hide();
     frameSearchTextTree->show();
 
     viewTextSearchEdit->show() ;
     viewTextSearchTree->show() ;
     viewTextSearchEdit->setFocus();
-
 }
 
 void ViewsHandler::startFileSearchHandle()

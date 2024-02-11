@@ -62,6 +62,7 @@ signals:
     void setVaultPath();
     void expansionComplete();
     void fileRenamed(const QString& newName,const QString& oldName, const QModelIndex& index);
+    void sendFocusToSearch(QWidget * view);
 };
 
 #endif // NAVIGATIONVIEW_H
