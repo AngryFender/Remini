@@ -650,8 +650,10 @@ void ViewsHandler::textSearchResultPositionSelected(const QModelIndex &index)
 void ViewsHandler::sendFocusToSearchHandler(QWidget *view)
 {
     if(view == viewTextSearchTree){
+        this->viewTextSearchEdit->selectAll();
         this->viewTextSearchEdit->setFocus();
     }else if(view == viewTree){
+        this->viewSearch->selectAll();
         this->viewSearch->setFocus();
     }else if(view == viewTextSearchEdit){
 
