@@ -151,6 +151,7 @@ signals:
     void undoStackUndoSignal();
     void undoStackRedoSignal();
     void undoStackClear();
+    void escapeFocus(QWidget*view);
 };
 
 #endif // MKEDIT_H

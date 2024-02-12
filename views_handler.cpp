@@ -161,6 +161,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::fileSave,
                      this,  &ViewsHandler::fileSaveHandle);
 
+    QObject::connect(viewText,&MkEdit::escapeFocus,
+                     this,&ViewsHandler::sendFocusToSearchHandler);
+
     QObject::connect(viewSearch,&QLineEdit::textChanged,
                      this,&ViewsHandler::searchFileHandle);
 
@@ -655,8 +658,12 @@ void ViewsHandler::sendFocusToSearchHandler(QWidget *view)
     }else if(view == viewTree){
         this->viewSearch->selectAll();
         this->viewSearch->setFocus();
-    }else if(view == viewTextSearchEdit){
-
+    }else if(view == viewText){
+        if(!frameSearchTextTree->isHidden()){
+            viewTextSearchTree->setFocus();
+        }else if (!frameSearchFileTree->isHidden()){
+            viewTree->setFocus();
+        }
     }
 }
 

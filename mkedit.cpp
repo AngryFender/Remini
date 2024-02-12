@@ -146,6 +146,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
     switch(event->key()){
+    case Qt::Key_Escape: emit escapeFocus(this);return;
     case Qt::Key_Shift:
     case Qt::Key_Control:
     case Qt::Key_Up:
