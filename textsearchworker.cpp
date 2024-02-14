@@ -83,32 +83,11 @@ void TextSearchWorker::findAllMatches(int &matchCount, QStandardItem *parentItem
 QString TextSearchWorker::extractNeighbourWords(QTextDocument &document, int position)
 {
     QTextCursor cursor(&document);
-    bool prefix = true, suffix = true;
-    if(position+10< document.characterCount())
-    {
-        cursor.setPosition(position+10);
-    }else
-    {
-        suffix = false;
-        cursor.setPosition(position);
-    }
-
-    if(position-text.length()-10 >=0){
-        cursor.setPosition(position-text.length()-10,QTextCursor::KeepAnchor);
-    }
-    else
-    {
-        prefix = false;
-        cursor.setPosition(0,QTextCursor::KeepAnchor);
-    }
+    cursor.setPosition(position, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
 
     QString matchingWords = cursor.selectedText();
-    if(suffix){
-        matchingWords = matchingWords+"...";
-    }
-    if(prefix){
-        matchingWords = "..."+matchingWords;
-    }
     return matchingWords;
 }
 
