@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(rightShiftTimer,&QTimer::timeout,
                      this, &MainWindow::shiftTimerHandle);
 
-    QObject::connect(rightShiftTimer,&QTimer::timeout,
+    QObject::connect(leftShiftTimer,&QTimer::timeout,
                      this, &MainWindow::shiftTimerHandle);
 
     QObject::connect(this,&MainWindow::openRecentFilesDialog,
@@ -55,15 +55,18 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
                 emit startSearchAll();
             }
             rightShiftTimer->start(DOUBLE_SHIFT_TIMER_MS);
+            leftShiftTimer->stop();
             break;
     case LEFT_SHIFT_KEY:
             if(leftShiftTimer->isActive()){
                 emit startFileSearch();
             }
             leftShiftTimer->start(DOUBLE_SHIFT_TIMER_MS);
+            rightShiftTimer->stop();
             break;
     default:
             rightShiftTimer->stop();
+            leftShiftTimer->stop();
     };
 
     switch(event->key()){
