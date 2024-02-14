@@ -551,8 +551,8 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
     cursor.setPosition(block.position());
     viewText->setTextCursor(cursor);
 
-    cursor.setPosition(block.position()+positionInBlock);
-    cursor.setPosition(block.position()+positionInBlock-searchTextLength,QTextCursor::KeepAnchor);
+    cursor.setPosition(block.position()+positionInBlock-searchTextLength, QTextCursor::MoveAnchor);
+    cursor.setPosition(block.position()+positionInBlock,QTextCursor::KeepAnchor);
     viewText->setTextCursor(cursor);
 
 }
