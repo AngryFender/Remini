@@ -154,6 +154,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Left:
     case Qt::Key_Down:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
+    case Qt::Key_V:         if( event->modifiers() == Qt::CTRL) {pasteTextAction.trigger();return;}break;
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}break;
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}break;
     case Qt::Key_Tab:       if( event->modifiers() == Qt::NoModifier){
@@ -466,6 +467,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
             QTextEdit::insertFromMimeData(source);
         }
     }else{
+        preUndoSetup();
         QTextEdit::insertFromMimeData(source);
     }
 
