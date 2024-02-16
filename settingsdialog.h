@@ -35,6 +35,10 @@ signals:
     void syntaxColorUpdate(HighlightColor &colors);
 private slots:
     void executeFolderDialog();
+    void updateFontHandler(const QFont &f);
+    void updateFontSizeHandler(const QString &text );
+    void updateStretchHandler(const int index);
+    void updateWeightHandler(const int index);
 public slots:
     void syntaxColorUpdateHandler(HighlightColor &colors);
     void show();
