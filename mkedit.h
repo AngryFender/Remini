@@ -54,7 +54,7 @@ public:
     void setKeywordColor(const QColor& color);
 
     void setDocument(QTextDocument *document);
-
+    void setFont(const QFont &font);
 
 protected:
     void insertFromMimeData(const QMimeData *source) override;

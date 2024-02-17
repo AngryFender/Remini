@@ -624,6 +624,22 @@ void MkEdit::setDocument(QTextDocument *document)
     connectSignals();
 }
 
+void MkEdit::setFont(const QFont &font)
+{
+    QFont menuFont = font;
+    menuFont.setPointSize(10);
+    undoAction.setFont(menuFont);
+    redoAction.setFont(menuFont);
+    copyTextAction.setFont(menuFont);
+    pasteTextAction.setFont(menuFont);
+    deleteTextAction.setFont(menuFont);
+    selectAllAction.setFont(menuFont);
+    selectBlockAction.setFont(menuFont);
+    disableMarkdown.setFont(menuFont);
+
+    QTextEdit::setFont(font);
+}
+
 void MkEdit::scrollValueUpdateHandle(int value)
 {
     int currentBlockNumber = textCursor().blockNumber();
