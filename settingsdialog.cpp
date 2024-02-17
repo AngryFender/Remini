@@ -1,6 +1,8 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
+#include <QSettings>
+
 SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
@@ -151,10 +153,14 @@ void SettingsDialog::updateWeightHandler(const int weight)
 
 void SettingsDialog::saveSettingsHandler()
 {
-   //write to registry
-
+    QSettings settings("Remini","Remini");
     const QFont font = ui->txt_preview->font();
     emit updateUiSettings(font);
+
+    settings.setValue("font",font.family());
+    settings.setValue("fontsize",font.pointSize());
+    settings.setValue("stretch",font.stretch());
+    settings.setValue("weight",font.weight());
 }
 
 void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)

@@ -100,27 +100,13 @@ void ViewsHandler::initTreeView(QString path)
 
 void ViewsHandler::initFontDefault()
 {
-    fontUi.setFamily("Roboto");
-    fontUi.setStretch(QFont::Unstretched);
-    fontUi.setWeight(QFont::Normal);
-    fontUi.setPointSize(13);
-    fontUi.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
-    viewText->setFont(fontUi);
-
-    QFont fontTree;
-    fontTree.setFamily("Roboto");
-    fontTree.setPointSize(10);
-    fontTree.setWeight(QFont::Light);
-    fontTree.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
-    viewTree->setFont(fontTree);
-    viewSearch->setFont(fontTree);
-
-    QFont fontTitle;
-    fontTitle.setFamily("Roboto");
-    fontTitle.setPointSize(fontUi.pointSize()*2);
-    fontTitle.setWeight(QFont::DemiBold);
-    fontTitle.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
-    viewTitle->setFont(fontTitle);
+    QSettings settings("Remini","Remini");
+    QFont font;
+    font.setFamily(settings.value("font").toString());
+    font.setPointSize(settings.value("fontsize").toInt());
+    font.setStretch(settings.value("stretch").toInt());
+    font.setWeight((QFont::Weight)settings.value("weight").toInt());
+    updateUiSettingsHandler(font);
 }
 
 void ViewsHandler::initConnection()
@@ -376,8 +362,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         const QScopedPointer<QFile> file = QScopedPointer<QFile>(new QFile(filePath));
         const QString fullContent = getFileContent(*file.get());
 
-        currentDocument->setDefaultFont(fontUi);
-        viewText->setFont(fontUi);
+        currentDocument->setDefaultFont(fontBase);
+        viewText->setFont(fontBase);
         connectDocument();
         currentDocument->setPlainText(fullContent);
 
@@ -404,8 +390,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         for(int rep = 0; rep < characterNo; ++rep){
             cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
         }
-        currentDocument->setDefaultFont(fontUi);
-        viewText->setFont(fontUi);
+        currentDocument->setDefaultFont(fontBase);
+        viewText->setFont(fontBase);
         connectDocument();
         viewText->setTextCursor(cursor);
         return OLD_DOCUMENT;
@@ -439,11 +425,12 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
 
 void ViewsHandler::updateUiSettingsHandler(const QFont &font)
 {
-    fontUi = font;
-    viewText->setFont(fontUi);
+    fontBase = font;
+    viewText->setFont(fontBase);
 
     QFont fontTitle = font;
-    fontTitle.setPointSize(fontUi.pointSize()*2);
+    fontTitle.setPointSize(fontBase.pointSize()*2);
+    fontTitle.setWeight(QFont::DemiBold);
     viewTitle->setFont(fontTitle);
 
     QFont fontView = font;
@@ -490,9 +477,9 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
             QScopedPointer<QMessageBox> confirmBox(new QMessageBox(parent));
             confirmBox->setWindowTitle("Unable to Delete");
             confirmBox->setText("The folder is not empty           ");
-            confirmBox->setFont(fontUi);
+            confirmBox->setFont(fontBase);
             confirmBox->setStandardButtons(QMessageBox::Ok);
-            confirmBox->button(QMessageBox::Ok)->setFont(fontUi);
+            confirmBox->button(QMessageBox::Ok)->setFont(fontBase);
             confirmBox->exec();
             return;
         }
@@ -502,11 +489,11 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
     confirmBox->setStyleSheet(parent->styleSheet());
     confirmBox->setWindowTitle("Delete");
     confirmBox->setText("Are you sure you want to delete");
-    confirmBox->setFont(fontUi);
+    confirmBox->setFont(fontBase);
     confirmBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     confirmBox->setDefaultButton(QMessageBox::No);
-    confirmBox->button(QMessageBox::Yes)->setFont(fontUi);
-    confirmBox->button(QMessageBox::No)->setFont(fontUi);
+    confirmBox->button(QMessageBox::Yes)->setFont(fontBase);
+    confirmBox->button(QMessageBox::No)->setFont(fontBase);
    if(QMessageBox::Yes == confirmBox->exec()){
         emit fileDelete(index);
 

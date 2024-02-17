@@ -83,8 +83,8 @@ private:
     QLineEdit *viewTextSearchEdit;
     NavigationView *viewTextSearchTree;
     QLabel *viewTextSearchCount;
-
-    QFont fontUi;
+    
+    QFont fontBase;
     QString getVaultPath();
     void setVaultPath(QString& path);
 
