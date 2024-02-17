@@ -6,5 +6,6 @@
         <file alias="angle">angle.png</file>
         <file alias="arrow">arrow.png</file>
         <file alias="downarrow">downarrow.png</file>
+        <file alias="mainIcon">application.ico</file>
     </qresource>
 </RCC>

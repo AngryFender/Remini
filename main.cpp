@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QIcon icon(":/icons/application.png");
+    QIcon icon(":/icons/mainIcon");
     a.setWindowIcon(icon);
     AppEventFilter filter;
     a.installEventFilter(&filter);
