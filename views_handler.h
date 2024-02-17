@@ -117,6 +117,7 @@ signals:
 
 private slots:
     void fileDisplay(const QModelIndex& index);
+    void updateUiSettingsHandler(const QFont &font);
     void fileSaveHandle();
     void fileDeleteDialogue(QModelIndex& index);
     void searchFileHandle(const QString &filename);

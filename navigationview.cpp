@@ -62,6 +62,19 @@ void NavigationView::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void NavigationView::setFont(const QFont &font)
+{
+    addFileAction.setFont(font);
+    addFolderAction.setFont(font);
+    renameFileAction.setFont(font);
+    deleteFileAction.setFont(font);
+    openLocationAction.setFont(font);
+    copyPath.setFont(font);
+    SetVault.setFont(font);
+
+    QTreeView::setFont(font);
+}
+
 void NavigationView::rowsInserted(const QModelIndex &parent, int start, int end)
 {
     QTreeView::rowsInserted(parent,start,end);

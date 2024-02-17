@@ -29,19 +29,22 @@ class SettingsDialog : public QDialog
 
 public:
     explicit SettingsDialog(QWidget *parent = nullptr);
+    void setFont(const QFont &font);
     ~SettingsDialog();
-
+    
 signals:
     void syntaxColorUpdate(HighlightColor &colors);
+    void updateUiSettings(const QFont &font);
 private slots:
     void executeFolderDialog();
     void updateFontHandler(const QFont &f);
     void updateFontSizeHandler(const QString &text );
     void updateStretchHandler(const int index);
     void updateWeightHandler(const int index);
+    void saveSettingsHandler();
 public slots:
     void syntaxColorUpdateHandler(HighlightColor &colors);
-    void show();
+    void show(const QString &vaultPath, const QFont &font);
 private:
     Ui::SettingsDialog *ui;
     HighlightColor previewColors;

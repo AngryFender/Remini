@@ -20,6 +20,7 @@ public:
     void setRowsEditable(bool enable);
     void expandEveryItems(QModelIndex index);
     void keyPressEvent(QKeyEvent *event)override;
+    void setFont(const QFont &font);
 private:
     bool editable;
     QMenu menu;

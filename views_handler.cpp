@@ -131,6 +131,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::syntaxColorUpdate,
                      settingsDialog,&SettingsDialog::syntaxColorUpdateHandler);
 
+    QObject::connect(settingsDialog,&SettingsDialog::updateUiSettings,
+                     this,&ViewsHandler::updateUiSettingsHandler);
+
     QObject::connect(viewTree, &NavigationView::pressed,
                      this, &ViewsHandler::fileDisplay);
 
@@ -401,6 +404,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         for(int rep = 0; rep < characterNo; ++rep){
             cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
         }
+        currentDocument->setDefaultFont(fontUi);
+        viewText->setFont(fontUi);
         connectDocument();
         viewText->setTextCursor(cursor);
         return OLD_DOCUMENT;
@@ -430,6 +435,28 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
             viewText->ensureCursorVisible();
         }
     }
+}
+
+void ViewsHandler::updateUiSettingsHandler(const QFont &font)
+{
+    fontUi = font;
+    viewText->setFont(fontUi);
+
+    QFont fontTitle = font;
+    fontTitle.setPointSize(fontUi.pointSize()*2);
+    viewTitle->setFont(fontTitle);
+
+    QFont fontView = font;
+    fontView.setPointSize(10);
+    fontView.setWeight(QFont::Light);
+    fontView.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
+
+    viewTree->setFont(fontView);
+    viewSearch->setFont(fontView);
+    viewTextSearchCount->setFont(fontView);
+    viewTextSearchEdit->setFont(fontView);
+    viewTextSearchTree->setFont(fontView);
+    settingsDialog->setFont(fontView);
 }
 
 void ViewsHandler::fileSaveHandle()
@@ -463,7 +490,9 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
             QScopedPointer<QMessageBox> confirmBox(new QMessageBox(parent));
             confirmBox->setWindowTitle("Unable to Delete");
             confirmBox->setText("The folder is not empty           ");
+            confirmBox->setFont(fontUi);
             confirmBox->setStandardButtons(QMessageBox::Ok);
+            confirmBox->button(QMessageBox::Ok)->setFont(fontUi);
             confirmBox->exec();
             return;
         }
@@ -473,9 +502,12 @@ void ViewsHandler::fileDeleteDialogue(QModelIndex &index)
     confirmBox->setStyleSheet(parent->styleSheet());
     confirmBox->setWindowTitle("Delete");
     confirmBox->setText("Are you sure you want to delete");
+    confirmBox->setFont(fontUi);
     confirmBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     confirmBox->setDefaultButton(QMessageBox::No);
-    if(QMessageBox::Yes == confirmBox->exec()){
+    confirmBox->button(QMessageBox::Yes)->setFont(fontUi);
+    confirmBox->button(QMessageBox::No)->setFont(fontUi);
+   if(QMessageBox::Yes == confirmBox->exec()){
         emit fileDelete(index);
 
         QString currentFilePath = info.absoluteFilePath();
@@ -559,7 +591,7 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 void ViewsHandler::showSettingsBtn()
 {
-    settingsDialog->show();
+    settingsDialog->show(vaultPath, viewText->font());
 }
 
 void ViewsHandler::fileRenamedHandler(const QString& newName, const QString &oldName, const QModelIndex& index)

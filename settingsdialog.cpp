@@ -44,16 +44,41 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
                     &previewHighligher,&Highlighter::syntaxColorUpdateHandler);
 
     QObject::connect(ui->cmb_font,&QFontComboBox::currentFontChanged,
-                    this, &SettingsDialog::updateFontHandler);
+                    this,&SettingsDialog::updateFontHandler);
 
     QObject::connect(ui->ledit_font_size,&QLineEdit::textChanged,
-                    this, &SettingsDialog::updateFontSizeHandler);
+                    this,&SettingsDialog::updateFontSizeHandler);
 
     QObject::connect(ui->cmb_stretch,&QComboBox::currentIndexChanged,
-                    this, &SettingsDialog::updateStretchHandler);
+                    this,&SettingsDialog::updateStretchHandler);
 
     QObject::connect(ui->cmb_weight,&QComboBox::currentIndexChanged,
-                    this, &SettingsDialog::updateWeightHandler);
+                    this,&SettingsDialog::updateWeightHandler);
+
+    QObject::connect(ui->btn_dialog,&QDialogButtonBox::accepted,
+                     this,&SettingsDialog::saveSettingsHandler);
+}
+
+void SettingsDialog::setFont(const QFont &font)
+{
+    ui->btn_dialog->setFont(font);
+    ui->cmb_font->setFont(font);
+    ui->lbl_font->setFont(font);
+    ui->lbl_font_size->setFont(font);
+    ui->ledit_font_size->setFont(font);
+    ui->edit_vaultRootPath->setFont(font);
+    ui->lbl_vaultRootPath->setFont(font);
+    ui->btn_vaultRootPath->setFont(font);
+    ui->lbl_theme->setFont(font);
+    ui->cmb_theme->setFont(font);
+    ui->lbl_weight->setFont(font);
+    ui->cmb_weight->setFont(font);
+    ui->lbl_stretch->setFont(font);
+    ui->cmb_stretch->setFont(font);
+    ui->lbl_preview->setFont(font);
+    ui->btn_dialog->setFont(font);
+    ui->btn_dialog->button(QDialogButtonBox::Ok)->setFont(font);
+    ui->btn_dialog->button(QDialogButtonBox::Cancel)->setFont(font);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -76,8 +101,9 @@ void SettingsDialog::executeFolderDialog()
 
 void SettingsDialog::updateFontHandler(const QFont &f)
 {
-    ui->txt_preview->setFont(f);
-    ui->txt_preview->update();
+    QFont font = ui->txt_preview->font();
+    font.setFamily(f.family());
+    ui->txt_preview->setFont(font);
 }
 
 void SettingsDialog::updateFontSizeHandler(const QString &text)
@@ -123,15 +149,58 @@ void SettingsDialog::updateWeightHandler(const int weight)
     ui->txt_preview->setFont(font);
 }
 
+void SettingsDialog::saveSettingsHandler()
+{
+   //write to registry
+
+    const QFont font = ui->txt_preview->font();
+    emit updateUiSettings(font);
+}
+
 void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)
 {
     this->previewColors = colors;
     emit syntaxColorUpdate(previewColors);
 }
 
-void SettingsDialog::show()
+void SettingsDialog::show(const QString &vaultPath, const QFont &font)
 {
-    ui->edit_vaultRootPath->setText(getVaultRootPath());
+    ui->edit_vaultRootPath->setText(vaultPath);
+    ui->cmb_font->setCurrentIndex(ui->cmb_font->findText(font.family()));
+    ui->ledit_font_size->setText(QString::number(font.pointSize()));
+
+    int index_weight = 0;
+    switch(font.weight()){
+    case QFont::Thin: index_weight = 0;break;
+    case QFont::Light:index_weight = 1;break;
+    case QFont::Normal:index_weight = 2;break;
+    case QFont::Medium:index_weight = 3;break;
+    case QFont::DemiBold:index_weight = 4;break;
+    case QFont::Bold:index_weight = 5;break;
+    case QFont::ExtraBold:index_weight = 6;break;
+    case QFont::Black:index_weight = 7;break;
+    default: break;
+    }
+    ui->cmb_weight->setCurrentIndex(index_weight);
+
+    int index_stretch = 0;
+    switch(font.stretch()){
+    case QFont::AnyStretch:index_stretch = 0;break;
+    case QFont::UltraCondensed:index_stretch = 1;break;
+    case QFont::ExtraCondensed:index_stretch = 2;break;
+    case QFont::Condensed:index_stretch = 3;break;
+    case QFont::SemiCondensed:index_stretch = 4;break;
+    case QFont::Unstretched:index_stretch = 5;break;
+    case QFont::SemiExpanded:index_stretch = 6;break;
+    case QFont::Expanded:index_stretch = 7;break;
+    case QFont::ExtraExpanded:index_stretch = 8;break;
+    case QFont::UltraExpanded:index_stretch = 9;break;
+    default: break;
+    }
+    ui->cmb_stretch->setCurrentIndex(index_stretch);
+
+    ui->txt_preview->setFont(font);
+    ui->txt_preview->update();
     QDialog::show();
 }
 
