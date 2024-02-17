@@ -102,10 +102,10 @@ void ViewsHandler::initFontDefault()
 {
     QSettings settings("Remini","Remini");
     QFont font;
-    font.setFamily(settings.value("font").toString());
-    font.setPointSize(settings.value("fontsize").toInt());
-    font.setStretch(settings.value("stretch").toInt());
-    font.setWeight((QFont::Weight)settings.value("weight").toInt());
+    font.setFamily(settings.value("font","Calibri").toString());
+    font.setPointSize(settings.value("fontsize",14).toInt());
+    font.setStretch(settings.value("stretch",0).toInt());
+    font.setWeight((QFont::Weight)settings.value("weight",1).toInt());
     updateUiSettingsHandler(font);
 }
 
