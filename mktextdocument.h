@@ -33,9 +33,9 @@ public:
         bold.setFontWeight(QFont::ExtraBold);
         italic.setFontItalic(true);
         strikethrough.setFontStrikeOut(true);
-        heading1.setFontPointSize(fontSize *2);
-        heading2.setFontPointSize(fontSize *1.5);
-        heading3.setFontPointSize(fontSize *1.25);
+        heading1.setFontPointSize(fontSize *1.5);
+        heading2.setFontPointSize(fontSize *1.30);
+        heading3.setFontPointSize(fontSize *1.15);
         link.setFontUnderline(true);
         link.setUnderlineColor(linkColor);
         link.setForeground(linkColor);
