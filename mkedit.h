@@ -63,6 +63,7 @@ protected:
  private:
     QColor codeBlockColor;
     int widthCodeBlock;
+    QBrush brushDefault;
     QPen penCodeBlock;
     int savedCharacterNumber;
     UndoData undoData;

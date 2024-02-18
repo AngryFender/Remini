@@ -64,14 +64,17 @@ void MkEdit::initialialCursorPosition()
 void MkEdit::paintEvent(QPaintEvent *e)
 {
     QPainter painter(viewport());
+    painter.save();
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
+
     int xBlock =0, yBlock =0;
     int fontSize = this->document()->defaultFont().pointSizeF();
     int scrollPos = this->verticalScrollBar()->value();
-    penCodeBlock.setColor(codeBlockColor);
+    painter.setBrush(brushDefault);
+    painter.setPen(penCodeBlock);
 
     QAbstractTextDocumentLayout* layout = this->document()->documentLayout();
     QRect rect = getVisibleRect();
@@ -84,7 +87,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
             QTextBlock nextBlock = block.next();
             if(blockData){
                 if(blockData->getStatus()==BlockData::start){
-                    xBlock = block.layout()->position().x()-2;
+                    xBlock = this->x();
                     yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4);
                 }
                 else{
@@ -92,9 +95,6 @@ void MkEdit::paintEvent(QPaintEvent *e)
                         || (blockData->getStatus()==BlockData::content && layout->blockBoundingRect(nextBlock).bottom()>= (rect.bottom()+40))){
                         int height = block.layout()->position().y() - yBlock + (fontSize*0.6)-scrollPos;
 
-                        QBrush brushDefault(codeBlockColor);
-                        painter.setBrush(brushDefault);
-                        painter.setPen(penCodeBlock);
                         painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
                     }
                 }
@@ -102,10 +102,9 @@ void MkEdit::paintEvent(QPaintEvent *e)
                 LineData* lineData = dynamic_cast<LineData*>(data);
                 if(lineData){
                     if(lineData->getStatus() == LineData::horizontalLine && lineData->getDraw()){
-                        int lineX1 = block.layout()->position().x()-2;
+                        int lineX1 = this->x();
                         int lineY1 = block.layout()->position().y()+fontSize-scrollPos;
-                        int lineX2 = block.layout()->position().x()-2+widthCodeBlock;
-                        painter.setPen(penCodeBlock);
+                        int lineX2 = this->x()+widthCodeBlock;
                         painter.drawLine(lineX1,lineY1,lineX2,lineY1);
                     }
                 }
@@ -113,13 +112,14 @@ void MkEdit::paintEvent(QPaintEvent *e)
         }
         block = block.next();
     }
+    painter.restore();
     QTextEdit::paintEvent(e);
 }
 
 void MkEdit::resizeEvent(QResizeEvent *event)
 {
     QTextEdit::resizeEvent(event);
-    widthCodeBlock = event->size().width() - this->verticalScrollBar()->width();
+    widthCodeBlock = event->size().width()+2 - this->verticalScrollBar()->width()/2;
 }
 
 void MkEdit::wheelEvent(QWheelEvent *e)
@@ -432,6 +432,13 @@ void MkEdit::blockColor(const QColor &color)
     if (codeBlockColor != color) {
         codeBlockColor = color;
         emit blockColorChanged(codeBlockColor);
+
+        brushDefault.setColor(codeBlockColor);
+        brushDefault.setStyle(Qt::SolidPattern);
+
+        penCodeBlock.setColor(codeBlockColor);
+        penCodeBlock.setWidth(2);
+
         update();
     }
 }
