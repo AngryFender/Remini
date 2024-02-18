@@ -16,8 +16,6 @@
 
 #define FILE_SAVE_TIMEOUT 300
 #define BLOCKRADIUS 4
-#define MAXIMUM_FONT_SIZE 40
-#define MINIMUM_FONT_SIZE 8
 
 class MkEdit : public QTextEdit
 {

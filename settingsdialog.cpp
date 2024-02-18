@@ -59,6 +59,22 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     QObject::connect(ui->btn_dialog,&QDialogButtonBox::accepted,
                      this,&SettingsDialog::saveSettingsHandler);
+
+    QObject::connect(ui->btn_plus,&QPushButton::clicked,
+                    this,[this]()
+                    {
+                        int size = this->ui->ledit_font_size->text().toInt();
+                        size = std::min(MAXIMUM_FONT_SIZE,size+1);
+                        ui->ledit_font_size->setText(QString::number(size));
+                    });
+
+    QObject::connect(ui->btn_minus,&QPushButton::clicked,
+                    this,[this]()
+                    {
+                        int size = this->ui->ledit_font_size->text().toInt();
+                        size = std::max(MINIMUM_FONT_SIZE,size-1);
+                        ui->ledit_font_size->setText(QString::number(size));
+                    });
 }
 
 void SettingsDialog::setFont(const QFont &font)

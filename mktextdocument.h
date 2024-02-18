@@ -21,6 +21,9 @@
 #include <QUndoStack>
 
 
+#define MAXIMUM_FONT_SIZE 30
+#define MINIMUM_FONT_SIZE 7
+
 class FormatCollection{
 public:
     FormatCollection(int fontSize){
