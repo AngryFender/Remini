@@ -18,6 +18,7 @@ public:
 
 public slots:
     void syntaxColorUpdateHandler(HighlightColor& colors);
+    void updateSearchText(const QString &text);
 protected:
     void highlightBlock(const QString &text) override;
 private:
@@ -35,6 +36,7 @@ private:
     QRegularExpression commentStartExpression;
     QRegularExpression commentEndExpression;
     QRegularExpression regexCodeBlock;
+    QRegularExpression searchMatchExpression;
 
     QTextCharFormat tickMarkFormat;
     QTextCharFormat unTickMarkFormat;
@@ -44,7 +46,7 @@ private:
     QTextCharFormat multiLineCommentFormat;
     QTextCharFormat quotationFormat;
     QTextCharFormat functionFormat;
-    QTextCharFormat headingFormat;
+    QTextCharFormat searchMatchFormat;
 
     QTextCharFormat formatBlock;
     QTextCharFormat formatNormal;

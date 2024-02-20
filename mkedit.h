@@ -27,6 +27,7 @@ class MkEdit : public QTextEdit
     Q_PROPERTY(QColor commentColor READ getCommentColor WRITE setCommentColor NOTIFY commentColorChanged)
     Q_PROPERTY(QColor quoteColor READ getQuoteColor WRITE setQuoteColor NOTIFY quoteColorChanged)
     Q_PROPERTY(QColor keywordColor READ getKeywordColor WRITE setKeywordColor NOTIFY keywordColorChanged)
+    Q_PROPERTY(QColor searchMatchColor READ getSearchMatchColor WRITE setSearchMatchColor NOTIFY searchMatchColorChanged)
 
 public:
     explicit MkEdit(QWidget *parent = nullptr);
@@ -43,12 +44,14 @@ public:
     QColor getArgumentColor() const;
     QColor getCommentColor() const;
     QColor getQuoteColor() const;
+    QColor getSearchMatchColor() const;
     QColor getKeywordColor() const;
     void setTypeColor(const QColor& color);
     void setMethodColor(const QColor& color);
     void setArgumentColor(const QColor& color);
     void setCommentColor(const QColor& color);
     void setQuoteColor(const QColor& color);
+    void setSearchMatchColor(const QColor& color);
     void setKeywordColor(const QColor& color);
 
     void setDocument(QTextDocument *document);
@@ -137,6 +140,7 @@ signals:
     void argumentColorChanged(const QColor &color);
     void commentColorChanged(const QColor &color);
     void quoteColorChanged(const QColor &color);
+    void searchMatchColorChanged(const QColor &color);
     void keywordColorChanged(const QColor &color);
 
     void pushCheckBox(int position);

@@ -12,6 +12,7 @@ struct HighlightColor
     QColor comment;
     QColor quote;
     QColor keyword;
+    QColor searchMatch;
 };
 
 const QString lightTheme = QStringLiteral( "QMainWindow {"
@@ -140,6 +141,7 @@ const QString darkTheme = QStringLiteral( "QMessageBox { background-color: #3535
                                           "    qproperty-argumentColor: #fdfd96;"
                                           "    qproperty-commentColor: #737373;"
                                           "    qproperty-quoteColor: #92DEE4;"
+                                          "    qproperty-searchMatchColor: #2BB340;"
                                           "    qproperty-keywordColor: #FF9991;"
                                           "		background-color:#353535;"
                                           "		border-style: none;"

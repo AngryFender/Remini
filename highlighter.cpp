@@ -38,6 +38,13 @@ void Highlighter::highlightBlock(const QString &text)
         setFormat(startIndex, commentLength, multiLineCommentFormat);
         startIndex = text.indexOf(commentStartExpression, startIndex + commentLength);
     }
+
+    QRegularExpressionMatchIterator searchMatchIterator = searchMatchExpression.globalMatch(text);
+    while(searchMatchIterator.hasNext()){
+        QRegularExpressionMatch match = searchMatchIterator.next();
+        setFormat(match.capturedStart(), match.capturedLength(), searchMatchFormat);
+    }
+
 }
 
 void Highlighter::initColors()
@@ -105,13 +112,9 @@ void Highlighter::initColors()
     commentStartExpression = QRegularExpression(QStringLiteral("/\\*"));
     commentEndExpression = QRegularExpression(QStringLiteral("\\*/"));
 
-    headingFormat.setFontPointSize(1);
-    headingFormat.setForeground(Qt::white);
-
-    formatBlock.setFontPointSize(1);
-    formatBlock.setForeground(Qt::white);
     regexCodeBlock.setPattern("^```+.*");
 
+    searchMatchFormat.setBackground(syntaxColor.searchMatch);
     initialised = true;
 }
 
@@ -122,7 +125,15 @@ void Highlighter::syntaxColorUpdateHandler(HighlightColor &colors)
     syntaxColor.method = colors.method;
     syntaxColor.comment = colors.comment;
     syntaxColor.quote = colors.quote ;
-    syntaxColor.type = colors.type ;
+    syntaxColor.type = colors.type;
+    syntaxColor.searchMatch = colors.searchMatch;
 
     initColors();
+}
+
+void Highlighter::updateSearchText(const QString &text)
+{
+    searchMatchExpression.setPattern(text);
+    searchMatchExpression.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+    rehighlight();
 }

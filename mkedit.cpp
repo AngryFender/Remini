@@ -593,6 +593,11 @@ QColor MkEdit::getKeywordColor() const
     return syntaxColor.keyword;
 }
 
+QColor MkEdit::getSearchMatchColor() const
+{
+    return syntaxColor.searchMatch;
+}
+
 void MkEdit::setTypeColor(const QColor &color)
 {
     syntaxColor.type = color;
@@ -616,6 +621,11 @@ void MkEdit::setCommentColor(const QColor &color)
 void MkEdit::setQuoteColor(const QColor &color)
 {
     syntaxColor.quote = color;
+}
+
+void MkEdit::setSearchMatchColor(const QColor &color)
+{
+    syntaxColor.searchMatch = color;
 }
 
 void MkEdit::setKeywordColor(const QColor &color)
