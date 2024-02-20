@@ -646,6 +646,8 @@ void ViewsHandler::textSearchChangedHandler(const QString &text)
         proxyModel.createAllFilesList(viewTree->rootIndex(), textSearchWorker.getListPaths());
         searchThread.start();
     }
+
+    highlighter.updateSearchText(text);
 }
 
 void ViewsHandler::updateTextSearchViewHandler(QStandardItemModel *model, int matchCount)
@@ -736,6 +738,8 @@ void ViewsHandler::openRecentFilesDialogHandle(bool show)
 void ViewsHandler::startTextSearchInAllFilesHandle()
 {
     frameSearchFileTree->hide();
+
+    highlighter.updateSearchText(viewTextSearchEdit->text());
     frameSearchTextTree->show();
 
     viewTextSearchEdit->show() ;
@@ -746,6 +750,7 @@ void ViewsHandler::startTextSearchInAllFilesHandle()
 void ViewsHandler::startFileSearchHandle()
 {
     frameSearchTextTree->hide();
+    highlighter.updateSearchText("");
     frameSearchFileTree->show();
     viewSearch->setFocus();
 }
