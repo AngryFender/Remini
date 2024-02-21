@@ -88,6 +88,7 @@ protected:
     QAction selectAllAction;
     QAction selectBlockAction;
     QAction disableMarkdown;
+    QAction lineWrapAction;
     QPoint contextMenuPos;
 
     QRegularExpression regexUrl;
@@ -118,7 +119,7 @@ protected:
 private slots:
     void fileSaveHandle();
     void diableMarkdown_internal();
-
+    void lineWrapHandler();
 signals:
     void cursorPosChanged(bool hasSelection, int blockNumber, QRect rect, SelectRange *selectRange);
     void fileSave();

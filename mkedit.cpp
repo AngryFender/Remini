@@ -19,6 +19,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     selectAllAction.setText("Select All    Ctrl+A");
     selectBlockAction.setText("Copy Block");
     disableMarkdown.setText("Disable Markdown");
+    lineWrapAction.setText("Disable line-wrap");
 
     connect(&undoAction, &QAction::triggered, this, &MkEdit::undoContextMenu);
     connect(&redoAction, &QAction::triggered, this, &MkEdit::redoContextMenu);
@@ -28,6 +29,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     connect(&selectAllAction, &QAction::triggered, this, &MkEdit::selectAll);
     connect(&selectBlockAction, &QAction::triggered, this, &MkEdit::selectBlock);
     connect(&disableMarkdown, &QAction::triggered,this, &MkEdit::diableMarkdown_internal);
+    connect(&lineWrapAction, &QAction::triggered,this, &MkEdit::lineWrapHandler);
     connect(this, &MkEdit::customContextMenuRequested,
             this, &MkEdit::contextMenuHandler);
 
@@ -378,6 +380,7 @@ void MkEdit::contextMenuHandler(QPoint pos)
     menu.addAction(&selectAllAction);
     menu.addSeparator();
     menu.addAction(&disableMarkdown);
+    menu.addAction(&lineWrapAction);
     menu.exec(viewport()->mapToGlobal(pos));
 }
 
@@ -653,6 +656,7 @@ void MkEdit::setFont(const QFont &font)
     selectAllAction.setFont(menuFont);
     selectBlockAction.setFont(menuFont);
     disableMarkdown.setFont(menuFont);
+    lineWrapAction.setFont(menuFont);
 
     QTextEdit::setFont(font);
 }
@@ -683,6 +687,17 @@ void MkEdit::diableMarkdown_internal()
     }else{
         disableMarkdown.setText("Disable Markdown");
         emit setMarkdownStatus(true, getVisibleRect());
+    }
+}
+
+void MkEdit::lineWrapHandler()
+{
+    if("Enable line-wrap" == lineWrapAction.text()){
+        this->setLineWrapMode(QTextEdit::WidgetWidth);
+        lineWrapAction.setText("Disable line-wrap");
+    }else{
+        this->setLineWrapMode(QTextEdit::NoWrap);
+        lineWrapAction.setText("Enable line-wrap");
     }
 }
 
