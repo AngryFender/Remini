@@ -87,7 +87,8 @@ QString TextSearchWorker::extractNeighbourWords(QTextDocument &document, int pos
     cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
 
-    QString matchingWords = cursor.selectedText();
+    QString matchingWords = cursor.selectedText().trimmed();
+
     return matchingWords;
 }
 
