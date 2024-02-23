@@ -1,8 +1,8 @@
 #ifndef WINDOWAPI_H
 #define WINDOWAPI_H
 
-#include "iwindowapi.h"
 #include "Windows.h"
+#include "iwindowapi.h"
 
 class WindowApi : public IWindowApi
 {
@@ -12,7 +12,7 @@ public:
 
     // IWindowApi interface
 public:
-    void SetWindowsHookExInvoke(int idHook, HOOKPROC lpfn, HINSTANCE hmod, DWORD dwThreadId) override;
+    void SetWindowsHookExInvoke(int idHook, keyboardEventCallBack lpfn, void *hmod, unsigned long dwThreadId) override;
 };
 
 #endif // WINDOWAPI_H

@@ -1,21 +1,17 @@
 #ifndef IWINDOWAPI_H
 #define IWINDOWAPI_H
 
-
 class IWindowApi{
-public:
-    using HHOOK = void*;
-    using HOOKPROC = long long (*)(int, unsigned long, long);
-    using HINSTANCE = void*;
-    using DWORD = unsigned long;
 
 public:
+    using keyboardEventCallBack = long long (*)(int, unsigned long, long);
+
     IWindowApi(){};
     virtual ~IWindowApi()=default;
     virtual void SetWindowsHookExInvoke(int idHook,
-                                        HOOKPROC  lpfn,
-                                        HINSTANCE hmod,
-                                        DWORD     dwThreadId)=0;
+                                        keyboardEventCallBack  lpfn,
+                                        void* hmod,
+                                        unsigned long  dwThreadId)=0;
 
 };
 

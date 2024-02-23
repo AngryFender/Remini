@@ -10,8 +10,9 @@ WindowApi::~WindowApi()
 
 }
 
-void WindowApi::SetWindowsHookExInvoke(int idHook, HOOKPROC lpfn, HINSTANCE hmod, DWORD dwThreadId)
+void WindowApi::SetWindowsHookExInvoke(int idHook, keyboardEventCallBack lpfn, void *hmod, unsigned long dwThreadId)
 {
- //    keyboardEventHook= SetWindowsHookEx(idHook, lpfn, hmod, dwThreadId);
+      SetWindowsHookExA(idHook, (HOOKPROC)lpfn,(HINSTANCE) hmod, (DWORD)dwThreadId)	;
 }
+
 
