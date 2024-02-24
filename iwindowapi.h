@@ -20,6 +20,12 @@ public:
                                 WPARAM wParam,
                                 LPARAM  lParam) = 0;
 
+    virtual BOOL UnhookWindowsHookExInoke(
+                                HHOOK hhk) = 0;
+
+protected:
+    void cleanUp(){};
+
 };
 
 #endif // IWINDOWAPI_H

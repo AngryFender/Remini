@@ -2,7 +2,12 @@
 
 void WindowApi::SetWindowsHookExInvoke(int idHook, HOOKPROC lpfn, HINSTANCE hmod, DWORD dwThreadId)
 {
-   keyboardHookProc = SetWindowsHookExW(idHook, (HOOKPROC)lpfn ,(HINSTANCE) hmod, (DWORD)dwThreadId);
+    keyboardProcHook = SetWindowsHookExW(idHook, (HOOKPROC)lpfn ,(HINSTANCE) hmod, (DWORD)dwThreadId);
+}
+
+BOOL WindowApi::UnhookWindowsHookExInoke(HHOOK hhk)
+{
+    return UnhookWindowsHookEx(hhk);
 }
 
 LRESULT WindowApi::CallNextHookExInvoke(HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam)
@@ -10,7 +15,12 @@ LRESULT WindowApi::CallNextHookExInvoke(HHOOK hhk, int nCode, WPARAM wParam, LPA
     return CallNextHookEx(hhk, nCode, wParam, lParam);
 }
 
-LRESULT WindowApi::detechKeys(int code, WPARAM wParam, LPARAM lParam)
+void WindowApi::cleanUp()
 {
-    return instance().CallNextHookExInvoke(keyboardHookProc,code ,wParam,lParam)    ;
+    UnhookWindowsHookExInoke(keyboardProcHook);
+}
+
+LRESULT WindowApi::detectKeys(int code, WPARAM wParam, LPARAM lParam)
+{
+    return instance().CallNextHookExInvoke(keyboardProcHook,code ,wParam,lParam)    ;
 }
