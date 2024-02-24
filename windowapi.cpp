@@ -1,18 +1,16 @@
 #include "windowapi.h"
 
-WindowApi::WindowApi()
+void WindowApi::SetWindowsHookExInvoke(int idHook, HOOKPROC lpfn, HINSTANCE hmod, DWORD dwThreadId)
 {
-
+   keyboardHookProc = SetWindowsHookExW(idHook, (HOOKPROC)lpfn ,(HINSTANCE) hmod, (DWORD)dwThreadId);
 }
 
-WindowApi::~WindowApi()
+LRESULT WindowApi::CallNextHookExInvoke(HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam)
 {
-
+    return CallNextHookEx(hhk, nCode, wParam, lParam);
 }
 
-void WindowApi::SetWindowsHookExInvoke(int idHook, keyboardEventCallBack lpfn, void *hmod, unsigned long dwThreadId)
+LRESULT WindowApi::detechKeys(int code, WPARAM wParam, LPARAM lParam)
 {
-      SetWindowsHookExA(idHook, (HOOKPROC)lpfn,(HINSTANCE) hmod, (DWORD)dwThreadId)	;
+    return instance().CallNextHookExInvoke(keyboardHookProc,code ,wParam,lParam)    ;
 }
-
-
