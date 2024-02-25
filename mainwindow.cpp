@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    win = &WindowApi::instance();
     ui->setupUi(this);
     setup_views(this, *ui);
 
@@ -36,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     QObject::connect(this,&MainWindow::startFileSearch,
                      view_handler.get(),&ViewsHandler::startFileSearchHandle);
+
+    QObject::connect(win, &WindowApi::showApp,
+                     this,&MainWindow::showHideApp);
 }
 
 MainWindow::~MainWindow()
@@ -132,7 +136,16 @@ void MainWindow::viewChosenHandler(Qt::Key key)
 
 void MainWindow::recentFilesHandler(bool show)
 {
-    emit openRecentFilesDialog(show);
+        emit openRecentFilesDialog(show);
+}
+
+void MainWindow::showHideApp()
+{
+    if(this->isMinimized()){
+        this->showNormal();
+    }else{
+        this->showMinimized();
+    }
 }
 
 void MainWindow::shiftTimerHandle()

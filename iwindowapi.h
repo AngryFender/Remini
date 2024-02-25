@@ -1,15 +1,17 @@
 #ifndef IWINDOWAPI_H
 #define IWINDOWAPI_H
 
+#include <QObject>
 #include <Windows.h>
 
-class IWindowApi{
-
+class IWindowApi: public QObject
+{
+    Q_OBJECT
 public:
 
     IWindowApi(){};
     virtual ~IWindowApi()=default;
-    virtual void SetWindowsHookExInvoke(int idHook,
+    virtual HHOOK SetWindowsHookExInvoke(int idHook,
                                         HOOKPROC  lpfn,
                                         HINSTANCE hmod,
                                         DWORD dwThreadId)=0;

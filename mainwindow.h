@@ -5,6 +5,7 @@
 #include "./ui_mainwindow.h"
 #include "transparentdialog.h"
 #include "views_handler.h"
+#include "windowapi.h"
 #include <QTimer>
 #include <QStyleFactory>
 
@@ -31,6 +32,7 @@ public slots:
     void viewChosenHandler(Qt::Key key);
     void recentFilesHandler(bool show);
 private slots:
+    void showHideApp();
     void shiftTimerHandle();
 
 private:
@@ -39,6 +41,7 @@ private:
         darkThemeState,
     };
 
+    WindowApi * win;
     QTimer *rightShiftTimer;
     QTimer *leftShiftTimer;
     Ui::MainWindow *ui;

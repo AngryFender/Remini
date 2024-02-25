@@ -4,27 +4,41 @@
 #include <Windows.h>
 #include <QSharedPointer>
 #include "iwindowapi.h"
+#include <QDebug>
+#include <QObject>
 
+#define KEY_J 0x4A
+#define KEY_ALT 164
 
 class WindowApi : public IWindowApi
 {
+    Q_OBJECT
 private:
-    static HHOOK keyboardProcHook;
+    static inline HHOOK keyboardProcHook;
+    static inline bool isKeyJPressedDown = false;
+    static inline bool isKeyAltPressedDown = false;
     WindowApi(){};
     ~WindowApi(){ cleanUp();};
+
 public:
     static WindowApi& instance(){
         static WindowApi instance;
-        instance.SetWindowsHookExInvoke((int)WH_KEYBOARD_LL, detectKeys, 0, 0);
+
+        if(keyboardProcHook == nullptr){
+            keyboardProcHook = instance.SetWindowsHookExInvoke((int)WH_KEYBOARD_LL, detectKeys, 0, 0);
+        }
         return instance;
     };
 
     static LRESULT CALLBACK detectKeys(int code, WPARAM wParam, LPARAM lParam);
 
-    void SetWindowsHookExInvoke(int idHook, HOOKPROC lpfn, HINSTANCE hmod, DWORD dwThreadId) override;
+    HHOOK SetWindowsHookExInvoke(int idHook, HOOKPROC lpfn, HINSTANCE hmod, DWORD dwThreadId) override;
     BOOL UnhookWindowsHookExInoke(HHOOK hhk) override;
 
     LRESULT CallNextHookExInvoke(HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam) override;
+
+signals:
+    void showApp();
 
 protected:
     void cleanUp();
