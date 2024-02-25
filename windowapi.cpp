@@ -54,7 +54,6 @@ LRESULT WindowApi::detectKeys(int code, WPARAM wParam, LPARAM lParam)
 
             if(isKeyAltPressedDown && isKeyJPressedDown){
                 emit WindowApi::instance().showApp();
-                isKeyAltPressedDown = false;
                 isKeyJPressedDown = false;
                 return 1;
             }

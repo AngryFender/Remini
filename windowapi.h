@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <QSharedPointer>
 #include "iwindowapi.h"
-#include <QDebug>
 #include <QObject>
 
 #define KEY_J 0x4A
