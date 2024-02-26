@@ -66,7 +66,6 @@ void MkEdit::initialialCursorPosition()
 void MkEdit::paintEvent(QPaintEvent *e)
 {
     QPainter painter(viewport());
-    painter.save();
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -107,14 +106,17 @@ void MkEdit::paintEvent(QPaintEvent *e)
                         int lineX1 = this->x();
                         int lineY1 = block.layout()->position().y()+fontSize-scrollPos;
                         int lineX2 = this->x()+widthCodeBlock;
+
+                        painter.save();
+                        painter.setPen(whitePen);
                         painter.drawLine(lineX1,lineY1,lineX2,lineY1);
+                        painter.restore();
                     }
                 }
             }
         }
         block = block.next();
     }
-    painter.restore();
     QTextEdit::paintEvent(e);
 }
 
@@ -441,6 +443,10 @@ void MkEdit::blockColor(const QColor &color)
 
         penCodeBlock.setColor(codeBlockColor);
         penCodeBlock.setWidth(2);
+
+        whitePen.setColor(Qt::gray);
+        whitePen.setCapStyle(Qt::RoundCap);
+        whitePen.setWidth(2);
 
         update();
     }

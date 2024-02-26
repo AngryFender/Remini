@@ -68,6 +68,7 @@ protected:
     int widthCodeBlock;
     QBrush brushDefault;
     QPen penCodeBlock;
+    QPen whitePen;
     int savedCharacterNumber;
     UndoData undoData;
     HighlightColor syntaxColor;
