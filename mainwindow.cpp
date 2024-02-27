@@ -47,7 +47,7 @@ MainWindow::~MainWindow()
     delete rightShiftTimer;
     delete lightThemeStyle;
     delete darkThemeStyle;
-    delete ui;
+    //delete ui;
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
