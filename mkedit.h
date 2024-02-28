@@ -94,8 +94,10 @@ protected:
 
     QRegularExpression regexUrl;
     QRegularExpression regexFolderFile;
+    QRegularExpression regexCodeBlock;
     QRegularExpressionMatch matchUrl;
     QRegularExpressionMatch matchFolderFile;
+    QRegularExpressionMatch matchCodeBlockRegex;
 
     QRect getVisibleRect();
     void clearMkEffects();

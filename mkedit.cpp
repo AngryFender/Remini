@@ -7,6 +7,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
     fileSaveTimer.setInterval(FILE_SAVE_TIMEOUT);
     regexUrl.setPattern("(https?|ftp|file)://[\\w\\d._-]+(?:\\.[\\w\\d._-]+)+[\\w\\d._-]*(?:(?:/[\\w\\d._-]+)*/?)?(?:\\?[\\w\\d_=-]+(?:&[\\w\\d_=-]+)*)?(?:#[\\w\\d_-]+)?");
+    regexCodeBlock.setPattern("```(?s)(.*?)```");
     regexFolderFile.setPattern("[a-zA-Z]:[\\\\/](?:[^\\\\/]+[\\\\/])*([^\\\\/]+\\.*)");
     savedCharacterNumber = -1;
 
@@ -459,34 +460,49 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     disconnectSignals();
     emit checkIfCursorInBlock(isBlock,cursor);
 
-    if(!isBlock){
-        emit removeAllMkData(this->textCursor().blockNumber());
+    QString text = source->text();
+    matchCodeBlockRegex = regexCodeBlock.match(text);
+
+    //if the mime text itself is a code block
+    if(matchCodeBlockRegex.hasMatch()){
+        emit removeAllMkData(cursor.blockNumber());
         preUndoSetup();
 
-          QString link = source->text();
-        matchUrl = regexUrl.match(link);
-        matchFolderFile = regexFolderFile.match(link);
-        if (matchUrl.hasMatch() && !link.contains("](")) {
-            int pos = cursor.position()+1;
-            QString symbolsWithLink = "[]("+link+")";
-            cursor.insertText(symbolsWithLink);
-            cursor.setPosition(pos);
-            this->setTextCursor(cursor);
-        }else if(matchFolderFile.hasMatch() && !link.contains("](")) {
-            int pos = cursor.position()+1;
-            QString symbolsWithLink = "[](file:///"+link+")";
-            cursor.insertText(symbolsWithLink);
-            cursor.setPosition(pos);
-            this->setTextCursor(cursor);
+        if(isBlock){
+            cursor.insertBlock();
         }
-        else{
+        cursor.insertText(text);
+    }else{
+
+        if(!isBlock){
+            emit removeAllMkData(this->textCursor().blockNumber());
+            preUndoSetup();
+
+            QString link = source->text();
+            matchUrl = regexUrl.match(link);
+            matchFolderFile = regexFolderFile.match(link);
+            if (matchUrl.hasMatch() && !link.contains("](")) {
+                int pos = cursor.position()+1;
+                QString symbolsWithLink = "[]("+link+")";
+                cursor.insertText(symbolsWithLink);
+                cursor.setPosition(pos);
+                this->setTextCursor(cursor);
+            }else if(matchFolderFile.hasMatch() && !link.contains("](")) {
+                int pos = cursor.position()+1;
+                QString symbolsWithLink = "[](file:///"+link+")";
+                cursor.insertText(symbolsWithLink);
+                cursor.setPosition(pos);
+                this->setTextCursor(cursor);
+            }
+            else{
+                QTextEdit::insertFromMimeData(source);
+            }
+        }else{
+            emit removeAllMkData(cursor.blockNumber());
+            preUndoSetup();
             QTextEdit::insertFromMimeData(source);
         }
-    }else{
-        preUndoSetup();
-        QTextEdit::insertFromMimeData(source);
     }
-
 
     postUndoSetup();
     emit fileSave();
