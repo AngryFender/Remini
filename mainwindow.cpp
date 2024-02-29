@@ -83,12 +83,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
                 }
                 break;
 
-        case Qt::Key_Alt:
-                fileSearchBox->hide();
-                folderTreeBox->hide();
-                mkEditorBox->hide();
-                break;
-
     }
 }
 
