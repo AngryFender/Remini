@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "./ui_mainwindow.h"
-#include "transparentdialog.h"
 #include "views_handler.h"
 #include "windowapi.h"
 #include <QTimer>
@@ -28,9 +27,8 @@ public:
     void keyReleaseEvent(QKeyEvent *event)override;
 
 public slots:
-    void KeyPressAltHandler(bool press);       //true for press, false for release
-    void viewChosenHandler(Qt::Key key);
     void recentFilesHandler(bool show);
+
 private slots:
     void showHideApp();
     void shiftTimerHandle();
@@ -51,9 +49,6 @@ private:
     QStyle *lightThemeStyle;
     QStyle *darkThemeStyle;
 
-    TransparentDialog * fileSearchBox;
-    TransparentDialog * folderTreeBox;
-    TransparentDialog * mkEditorBox;
     void setup_views(QWidget *parent, Ui::MainWindow &ui);
 
 signals:

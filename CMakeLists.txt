@@ -40,8 +40,6 @@ set(PROJECT_SOURCES
         formatdata.cpp
         textsearchworker.h
         textsearchworker.cpp
-        transparentdialog.h
-        transparentdialog.cpp
         appeventfilter.h
         appeventfilter.cpp
         resources/icons.qrc

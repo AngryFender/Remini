@@ -9,10 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setup_views(this, *ui);
 
-    fileSearchBox = new TransparentDialog(nullptr,"1");
-    folderTreeBox = new TransparentDialog(this,"2");
-    mkEditorBox = new TransparentDialog(this,"3");
-
     lightThemeStyle = QStyleFactory::create("windowsvista");
     darkThemeStyle = QStyleFactory::create("fusion");
 
@@ -40,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QObject::connect(win, &WindowApi::showApp,
                      this,&MainWindow::showHideApp);
+
 }
 
 MainWindow::~MainWindow()
@@ -93,45 +90,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
                 break;
 
     }
-}
-
-void MainWindow::KeyPressAltHandler(bool press)
-{
-    if(press){
-        QPoint fileSearchPos = mapToGlobal(ui->uiSearch->pos());
-        fileSearchPos.setY(fileSearchPos.y()-15);
-        fileSearchBox->setGeometry(ui->uiSearch->geometry());
-        fileSearchBox->move(fileSearchPos);
-        if(fileSearchBox->isHidden())fileSearchBox->show();
-
-        QPoint folderTreePos = mapToGlobal(ui->uiTreeView->pos());
-        folderTreeBox->setGeometry(ui->uiTreeView->geometry());
-        folderTreeBox->move(folderTreePos);
-        if(folderTreeBox->isHidden())folderTreeBox->show();
-
-        QPoint mkEditorPos = QWidget::mapToGlobal(ui->uiRightPane->pos());
-        mkEditorBox->setGeometry(ui->uiRightPane->geometry());
-        mkEditorBox->move(mkEditorPos);
-        if(mkEditorBox->isHidden())mkEditorBox->show();
-    }else{
-        fileSearchBox->hide();
-        folderTreeBox->hide();
-        mkEditorBox->hide();
-    }
-}
-
-void MainWindow::viewChosenHandler(Qt::Key key)
-{
-    fileSearchBox->hide();
-    folderTreeBox->hide();
-    mkEditorBox->hide();
-    switch(key){
-        case Qt::Key_1:ui->uiSearch->activateWindow();  ui->uiSearch->setFocus();break;
-        case Qt::Key_Slash: ui->uiSearch->activateWindow(); ui->uiSearch->setText("/"); ui->uiSearch->setFocus();break;
-        case Qt::Key_2: ui->uiTreeView->activateWindow();ui->uiTreeView->setFocus();break;
-        case Qt::Key_3: ui->uiTextView->activateWindow();ui->uiTextView->setFocus();break;
-        default: break;
-        }
 }
 
 void MainWindow::recentFilesHandler(bool show)

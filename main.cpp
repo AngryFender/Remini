@@ -12,11 +12,6 @@ int main(int argc, char *argv[])
     AppEventFilter filter;
     a.installEventFilter(&filter);
     MainWindow w;
-//    QObject::connect(&filter,&AppEventFilter::KeyPressAlt,
-//                     &w,&MainWindow::KeyPressAltHandler);
-
-//    QObject::connect(&filter,&AppEventFilter::viewChosen,
-//                     &w,&MainWindow::viewChosenHandler);
 
     QObject::connect(&filter,&AppEventFilter::openRecentFiles,
                      &w,&MainWindow::recentFilesHandler);
