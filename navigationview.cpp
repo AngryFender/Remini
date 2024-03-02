@@ -127,6 +127,7 @@ void NavigationView::ContextMenuHandler(QPoint pos)
 void NavigationView::addFile()
 {
     auto index = lastClickedIndex;
+    this->expand(index);
     QString fileName;
     emit createFile(index, fileName);
     newEntryName = fileName;
@@ -135,6 +136,7 @@ void NavigationView::addFile()
 void NavigationView::addFolder()
 {
     auto index = lastClickedIndex;
+    this->expand(index);
     QString folderName;
     emit createFolder(index, folderName);
     newEntryName = folderName;
