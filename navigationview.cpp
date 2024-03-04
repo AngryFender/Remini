@@ -128,8 +128,15 @@ void NavigationView::addFile()
 {
     auto index = lastClickedIndex;
     this->expand(index);
+
+    emit emptySearch();
+    this->scrollTo(index);
+
+    const QList<QModelIndex> selections = this->selectedIndexes();
+    QModelIndex current = selections.first();
+
     QString fileName;
-    emit createFile(index, fileName);
+    emit createFile(current, fileName);
     newEntryName = fileName;
 }
 
@@ -137,8 +144,15 @@ void NavigationView::addFolder()
 {
     auto index = lastClickedIndex;
     this->expand(index);
+
+    emit emptySearch();
+    this->scrollTo(index);
+
+    const QList<QModelIndex> selections = this->selectedIndexes();
+    QModelIndex current = selections.first();
+
     QString folderName;
-    emit createFolder(index, folderName);
+    emit createFolder(current, folderName);
     newEntryName = folderName;
 }
 

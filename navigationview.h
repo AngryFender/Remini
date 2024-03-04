@@ -54,6 +54,7 @@ protected:
     void expandTimerHandler();
     void rowClicked(const QModelIndex &index);
 signals:
+    void emptySearch();
     void createFile(QModelIndex &index, QString &name);
     void createFolder(QModelIndex &index, QString &name);
     void deleteFileFolder(QModelIndex &index);

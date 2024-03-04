@@ -135,6 +135,7 @@ private slots:
     void sendFocusToSearchHandler(QWidget * view);
     void textSearchReturnPressedHandler();
     void fileSearchReturnPressedHandler();
+    void emptySearchHandler();
 };
 
 #endif // VIEWS_HANDLER_H

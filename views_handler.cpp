@@ -186,6 +186,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewSearch, &QLineEdit::returnPressed,
                      this, &ViewsHandler::fileSearchReturnPressedHandler);
 
+    QObject::connect(viewTree, &NavigationView::emptySearch,
+                     this, &ViewsHandler::emptySearchHandler);
+
     connectDocument();
 
     QObject::connect(viewTextSearchEdit, &QLineEdit::textChanged,
@@ -696,6 +699,11 @@ void ViewsHandler::textSearchReturnPressedHandler()
 void ViewsHandler::fileSearchReturnPressedHandler()
 {
     this->viewTree->setFocus();
+}
+
+void ViewsHandler::emptySearchHandler()
+{
+    this->viewSearch->clear();
 }
 
 void ViewsHandler::openRecentFilesDialogHandle(bool show)
