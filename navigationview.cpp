@@ -208,6 +208,7 @@ void NavigationView::folderChangedHandler()
         QString name = model()->data(fileIndex, Qt::DisplayRole).toString();
         if(name == newEntryName){
             this->setCurrentIndex(fileIndex);
+            editingFilename = name;
             emit newFileCreated(fileIndex);
             this->edit(fileIndex);
             newEntryName = "";
