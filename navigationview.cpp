@@ -137,6 +137,8 @@ void NavigationView::addFile()
 
     QString fileName;
     emit createFile(current, fileName);
+
+    lastClickedIndex = current;
     newEntryName = fileName;
 }
 
@@ -153,6 +155,8 @@ void NavigationView::addFolder()
 
     QString folderName;
     emit createFolder(current, folderName);
+
+    lastClickedIndex = current;
     newEntryName = folderName;
 }
 
