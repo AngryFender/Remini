@@ -534,12 +534,13 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
 
     QTextDocument *doc = this->document();
     MkTextDocument *mkDoc = dynamic_cast<MkTextDocument*>(doc);
+    QFontMetrics metrics(this->currentFont());
 
     if(nullptr == mkDoc){
         return;
     }
 
-    int width = this->document()->defaultFont().pointSize()*1.30;
+    int width = metrics.horizontalAdvance(CHECKED_PIC);
     int last = this->document()->lastBlock().position()+this->document()->lastBlock().length();
 
     QTextCursor cursor(this->textCursor());
@@ -558,6 +559,8 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
     }
 
     int linkTextWidth = 0;
+    int averageCharacterWidth = metrics.horizontalAdvance("t");
+
     for(auto it = mkDoc->linkPosBegin(); it!= mkDoc->linkPosEnd(); ++it){
         if((*it).first >last ||(*it).second >last ){
             continue;
@@ -565,7 +568,7 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
         cursor.setPosition((*it).first);
 
         rect = this->cursorRect(cursor);
-        linkTextWidth = ((*it).second - (*it).first) *this->document()->defaultFont().pointSize()*0.55;
+        linkTextWidth = ((*it).second - (*it).first) * averageCharacterWidth;
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
             this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
