@@ -74,7 +74,7 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     currentDocument->setPlainText(startupText);
     highlighter.setDocument(currentDocument.data());
     viewText->setDocument(currentDocument.data());
-
+    viewTitle->setMinimumSize(10,30);
     initFontDefault();
 }
 
