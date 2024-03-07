@@ -300,7 +300,9 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         return false;
     }
 
-    int width = this->document()->defaultFont().pointSize()*1.30;
+    QFontMetrics metrics(this->currentFont());
+    int width = metrics.horizontalAdvance(CHECKED_PIC);
+    int averageCharacterWidth = metrics.horizontalAdvance("t");
     int last = this->document()->lastBlock().position()+this->document()->lastBlock().length();
 
     QTextCursor cursor(this->textCursor());
@@ -331,7 +333,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         cursor.setPosition((*it).first);
 
         rect = this->cursorRect(cursor);
-        linkTextWidth = ((*it).second - (*it).first) *this->document()->defaultFont().pointSize()*0.55;
+        linkTextWidth = ((*it).second - (*it).first) * averageCharacterWidth;
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
             int pos = (*it).first;
