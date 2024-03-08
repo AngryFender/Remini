@@ -78,8 +78,8 @@ QString MkTextDocument::getFileName() const
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * editSelectRange)
 {
     if(editSelectRange){
-        this->selectRange.start = this->findBlock(editSelectRange->start).blockNumber();
-        this->selectRange.end = this->findBlock(editSelectRange->end).blockNumber();
+        this->selectRange.startBlock = this->findBlock(editSelectRange->start).blockNumber();
+        this->selectRange.endBlock = this->findBlock(editSelectRange->end).blockNumber();
     }
     hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, editSelectRange, false);
 }
@@ -916,7 +916,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                     setCodeBlockMargin(block,fontSize*3/4, fontSize, 0);
 
                     if(showAll ||
-                      (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end)||
+                        (currentBlockNumber >= selectRange.startBlock && currentBlockNumber <= selectRange.endBlock)||
                       ((blockNumber >= checkBlock.start.blockNumber() && blockNumber <= checkBlock.end.blockNumber()))){
                         showSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
                         showSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
@@ -932,13 +932,13 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
             else{
                 LineData* lineData = dynamic_cast<LineData*>(data);
                 if(lineData){
-                    if((blockNumber == currentBlockNumber)&&(selectRange.start == NO_SELECTION_POS)&&(selectRange.end == NO_SELECTION_POS)){
+                    if((blockNumber == currentBlockNumber)&&(selectRange.startBlock == NO_SELECTION_POS)&&(selectRange.endBlock == NO_SELECTION_POS)){
                         lineData->setDraw(false);
                         showSymbols(block, lineData->getSymbol());
                     }else{
                         lineData->setDraw(true);
                         hideSymbols(block, lineData->getSymbol());
-                        if(showAll || (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end)){
+                        if(showAll || (currentBlockNumber >= selectRange.startBlock && currentBlockNumber <= selectRange.endBlock)){
                             lineData->setDraw(false);
                             showSymbols(block, lineData->getSymbol());
                         }
@@ -982,7 +982,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                             }
                         }
 
-                        if(showAll || (currentBlockNumber >= selectRange.start && currentBlockNumber <= selectRange.end && editSelectRange)){
+                        if(showAll || (currentBlockNumber >= selectRange.startBlock && currentBlockNumber <= selectRange.endBlock && editSelectRange)){
                             if(formatData->isHidden()){
                                 showAllFormatSymbolsInTextBlock(block, formatData);
                                 formatData->setHidden(false);
