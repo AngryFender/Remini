@@ -133,12 +133,13 @@ void NavigationView::addFile()
     this->scrollTo(index);
 
     const QList<QModelIndex> selections = this->selectedIndexes();
-    QModelIndex current = selections.first();
+    if(!selections.empty() && lastClickedIndex.isValid()){
+        index = selections.first();
+    }
 
     QString fileName;
-    emit createFile(current, fileName);
-
-    lastClickedIndex = current;
+    emit createFile(index, fileName);
+    lastClickedIndex = index;
     newEntryName = fileName;
 }
 
@@ -151,12 +152,13 @@ void NavigationView::addFolder()
     this->scrollTo(index);
 
     const QList<QModelIndex> selections = this->selectedIndexes();
-    QModelIndex current = selections.first();
+    if(!selections.isEmpty() && lastClickedIndex.isValid()){
+        index = selections.first();
+    }
 
     QString folderName;
-    emit createFolder(current, folderName);
-
-    lastClickedIndex = current;
+    emit createFolder(index, folderName);
+    lastClickedIndex = index;
     newEntryName = folderName;
 }
 
