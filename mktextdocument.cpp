@@ -28,6 +28,26 @@ void MkTextDocument::setUndoRedoText(const QString &text)
     QTextDocument::setPlainText(text);
 }
 
+void MkTextDocument::setUndoSelectRange(const SelectRange range)
+{
+    this->undoSelectRange = range;
+}
+
+void MkTextDocument::setRedoSelectRange(const SelectRange range)
+{
+    this->redoSelectRange = range;
+}
+
+const SelectRange &MkTextDocument::getUndoSelectRange() const
+{
+    return this->undoSelectRange;
+}
+
+const SelectRange &MkTextDocument::getRedoSelectRange() const
+{
+    return this->redoSelectRange;
+}
+
 void MkTextDocument::clear()
 {
     while(!savedBlocks.empty()){
@@ -75,13 +95,23 @@ QString MkTextDocument::getFileName() const
     return this->fileName;
 }
 
-void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * editSelectRange)
+void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * range)
 {
-    if(editSelectRange){
-        this->selectRange.startBlock = this->findBlock(editSelectRange->start).blockNumber();
-        this->selectRange.endBlock = this->findBlock(editSelectRange->end).blockNumber();
+    if(range){
+        if(range->hasSelection){
+            if(range->selectionFirstStartBlock < range->selectionEndBlock){
+                this->selectRange.startBlock = range->selectionFirstStartBlock;
+                this->selectRange.endBlock   = range->selectionEndBlock;
+            }else{
+                this->selectRange.startBlock = range->selectionEndBlock;
+                this->selectRange.endBlock   =  range->selectionFirstStartBlock;
+            }
+        }else{
+            this->selectRange.startBlock = -1;
+            this->selectRange.endBlock = -1;
+        }
     }
-    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, editSelectRange, false);
+    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, false);
 }
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
@@ -1202,20 +1232,14 @@ EditCommand::EditCommand(UndoData &data)
     this->oldEndSelection = data.oldEndSelection;
     isConstructorRedo = true;
 
+    this->oldSelectRange = data.oldSelectRange;
+    this->selectRange = data.selectRange;
 }
 
 void EditCommand::undo()
 {
     doc->setUndoRedoText(oldText);
-    QTextCursor textCursor = view->textCursor();
-    if(oldCursorPos == oldStartSelection){
-        textCursor.setPosition(oldEndSelection);
-        textCursor.setPosition(oldCursorPos,QTextCursor::KeepAnchor);
-    }else{
-        textCursor.setPosition(oldStartSelection);
-        textCursor.setPosition(oldEndSelection,QTextCursor::KeepAnchor);
-    }
-    view->setTextCursor(textCursor);
+    doc->setUndoSelectRange(this->oldSelectRange);
 }
 
 void EditCommand::redo()
@@ -1224,8 +1248,6 @@ void EditCommand::redo()
         isConstructorRedo = false;
     }else{
         doc->setUndoRedoText(text);
-        QTextCursor textCursor = view->textCursor();
-        textCursor.setPosition(cursorPos);
-        view->setTextCursor(textCursor);
+        doc->setRedoSelectRange(selectRange);
     }
 }

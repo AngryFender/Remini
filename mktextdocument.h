@@ -77,7 +77,10 @@ struct SelectRange{
     int selectionFirstStartPos = NO_SELECTION_POS;
     int selectionFirstStartBlock = NO_SELECTION_POS;
     int selectionFirstStartPosInBlock = NO_SELECTION_POS;
+    int selectionEndBlock 			  = NO_SELECTION_POS;
+    int selectionEndPosInBlock        = NO_SELECTION_POS;
     bool isCursorCaculated  = false;
+    bool isFirstMousePress  = false;
 };
 
 class MkTextDocument : public QTextDocument
@@ -87,6 +90,10 @@ public:
     explicit MkTextDocument(QObject *parent = nullptr);
     void setPlainText(const QString &text);
     void setUndoRedoText(const QString &text);
+    void setUndoSelectRange(const SelectRange range);
+    void setRedoSelectRange(const SelectRange range);
+    const SelectRange &getUndoSelectRange() const;
+    const SelectRange &getRedoSelectRange() const;
     void clear() override;
 
     QVector<int>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
@@ -104,7 +111,7 @@ public:
     QString getFileName() const;
 
 public slots:
-    void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, SelectRange * editSelectRange);
+    void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, SelectRange * range);
     void removeAllMkDataHandle(int blockNo);
     void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll, QRect rect);
     void enterKeyPressedHandle(int blockNumber);
@@ -178,6 +185,9 @@ public slots:
     QColor linkColor;
     bool disableMarkdownState;
 
+    SelectRange undoSelectRange;
+    SelectRange redoSelectRange;
+
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, bool hasSelection = false);
@@ -226,11 +236,17 @@ struct UndoData{
     int cursorPos;
     QString oldText;
     int oldCursorPos;
+    int oldCursorBlock;
+    int oldCursorPosInBlock;
     int oldStartSelection;
+    int oldStartSelectionBlock;
+    int oldStartSelectionPosInBlock;
     int oldEndSelection;
     bool undoRedoSkip;
     bool selectAll;
     int scrollValue;
+    SelectRange oldSelectRange;
+    SelectRange selectRange;
 };
 
 class EditCommand : public QUndoCommand
@@ -253,6 +269,8 @@ private:
     int oldStartSelection;
     int oldEndSelection;
     bool isConstructorRedo;
+    SelectRange oldSelectRange;
+    SelectRange selectRange;
 };
 
 

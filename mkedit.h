@@ -74,6 +74,7 @@ protected:
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
     SelectRange selectRange;
+    SelectRange oldSelectRange;
 
     void quoteLeftKey();
     void smartSelectionSetup();
@@ -109,6 +110,9 @@ protected:
     bool isMouseOnCheckBox(QMouseEvent *e);
     void connectSignals();
     void disconnectSignals();
+
+    void showSelectionAfterUndo();
+    void showSelectionAfterRedo();
 
  public slots:
     void contextMenuHandler(QPoint pos);
