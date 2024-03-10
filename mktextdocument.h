@@ -62,8 +62,6 @@ private:
 
 #define NO_SELECTION_POS -1
 struct SelectRange{
-    int start           = NO_SELECTION_POS;
-    int end             = NO_SELECTION_POS;
     int startBlock      = NO_SELECTION_POS;
     int endBlock        = NO_SELECTION_POS;
     bool hasSelection 	= false;

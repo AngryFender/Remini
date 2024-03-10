@@ -57,8 +57,6 @@ void MkEdit::initialialCursorPosition()
     this->verticalScrollBar()->setSliderPosition(0);
 
     int savedBlockNumber = cursor.blockNumber();
-    selectRange.start = this->textCursor().selectionStart();
-    selectRange.end =  this->textCursor().selectionEnd();
 
     emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , getVisibleRect(), &selectRange);
     connectSignals();
@@ -208,7 +206,7 @@ void MkEdit::showSelectionAfterUndo(){
         selectRange.hasSelection = false;
     }
 
-    disconnectSignals();
+    QObject::disconnect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
     {
         //first show all the Markdown symbols in the editor
         emit cursorPosChanged( range.hasSelection, currentBlockNo, getVisibleRect(), &selectRange);
@@ -226,8 +224,8 @@ void MkEdit::showSelectionAfterUndo(){
 
         //highlight the selection
         this->setTextCursor(textCursor);
-        }
-    connectSignals();
+    }
+    QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
 }
 
 void MkEdit::quoteLeftKey()
