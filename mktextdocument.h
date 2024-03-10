@@ -68,13 +68,7 @@ struct SelectRange{
     int endBlock        = NO_SELECTION_POS;
     bool hasSelection 	= false;
     int currentposInBlock      = NO_SELECTION_POS;
-    int currentBlockPos        = NO_SELECTION_POS;
     int currentBlockNo         = NO_SELECTION_POS;
-    int blockStart      = NO_SELECTION_POS;
-    int posInBlockStart = NO_SELECTION_POS;
-    int blockEnd        = NO_SELECTION_POS;
-    int posInBlockEnd   = NO_SELECTION_POS;
-    int selectionFirstStartPos = NO_SELECTION_POS;
     int selectionFirstStartBlock = NO_SELECTION_POS;
     int selectionFirstStartPosInBlock = NO_SELECTION_POS;
     int selectionEndBlock 			  = NO_SELECTION_POS;
@@ -233,18 +227,10 @@ struct UndoData{
     QString text;
     int cursorPos;
     QString oldText;
-    int oldCursorPos;
-    int oldCursorBlock;
-    int oldCursorPosInBlock;
-    int oldStartSelection;
-    int oldStartSelectionBlock;
-    int oldStartSelectionPosInBlock;
-    int oldEndSelection;
     bool undoRedoSkip;
     bool selectAll;
     int scrollValue;
     SelectRange oldSelectRange;
-    SelectRange selectRange;
 };
 
 class EditCommand : public QUndoCommand
@@ -263,9 +249,6 @@ private:
     int scrollValue;
 
     QString oldText;
-    int oldCursorPos;
-    int oldStartSelection;
-    int oldEndSelection;
     bool isConstructorRedo;
     SelectRange oldSelectRange;
 };

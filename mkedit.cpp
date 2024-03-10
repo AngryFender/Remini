@@ -195,21 +195,39 @@ void MkEdit::showSelectionAfterUndo(){
     SelectRange range = mkDoc->getUndoSelectRange();
 
     QTextCursor textCursor = this->textCursor();
-
+    int currentBlockNo = -1;
     if(range.hasSelection){
-        int startInDoc = this->document()->findBlockByNumber(range.selectionFirstStartBlock).position() + range.selectionFirstStartPosInBlock;
-        int endInDoc   = this->document()->findBlockByNumber(range.selectionEndBlock).position() + range.selectionEndPosInBlock;
-
-        qDebug()<<"startBlock :"<< range.selectionFirstStartBlock<<" PosInBlock :"<< range.selectionFirstStartPosInBlock
-                 <<" endBlock :"<< range.selectionEndBlock << " PosInBlock :"<< range.selectionEndPosInBlock;
-        textCursor.clearSelection();
-        textCursor.setPosition(startInDoc);
-        textCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
+        selectRange.hasSelection = true;
+        selectRange.selectionFirstStartBlock = range.selectionFirstStartBlock;
+        selectRange.selectionFirstStartPosInBlock = range.selectionFirstStartPosInBlock;
+        selectRange.selectionEndBlock = range.selectionEndBlock;
+        selectRange.selectionEndPosInBlock = range.selectionEndPosInBlock;
+        currentBlockNo = range.selectionEndBlock;
     }else{
-        int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
-        textCursor.setPosition(cursorPos);
+        currentBlockNo = range.currentBlockNo;
+        selectRange.hasSelection = false;
     }
-    this->setTextCursor(textCursor);
+
+    disconnectSignals();
+    {
+        //first show all the Markdown symbols in the editor
+        emit cursorPosChanged( range.hasSelection, currentBlockNo, getVisibleRect(), &selectRange);
+
+        if(range.hasSelection){
+            int startInDoc = this->document()->findBlockByNumber(range.selectionFirstStartBlock).position() + range.selectionFirstStartPosInBlock;
+            int endInDoc   = this->document()->findBlockByNumber(range.selectionEndBlock).position() + range.selectionEndPosInBlock;
+            textCursor.clearSelection();
+            textCursor.setPosition(startInDoc);
+            textCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
+        }else{
+            int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
+            textCursor.setPosition(cursorPos);
+        }
+
+        //highlight the selection
+        this->setTextCursor(textCursor);
+        }
+    connectSignals();
 }
 
 void MkEdit::quoteLeftKey()
@@ -241,23 +259,18 @@ void MkEdit::preUndoSetup()
     undoData.view               = this;
     undoData.doc                = this->document();
     undoData.oldText            = this->document()->toPlainText();
-    undoData.oldCursorPos       = this->textCursor().position();
-    undoData.oldCursorBlock     = this->textCursor().blockNumber();
-    undoData.oldCursorPosInBlock= this->textCursor().positionInBlock();
-    undoData.oldStartSelection  = this->textCursor().selectionStart();
-    undoData.oldEndSelection    = this->textCursor().selectionEnd();
     undoData.undoRedoSkip       = false;
     undoData.selectAll          = false;
     undoData.oldSelectRange     = this->selectRange;
-    undoData.oldSelectRange.currentBlockNo = this->textCursor().blockNumber();
-    undoData.oldSelectRange.currentposInBlock = this->textCursor().positionInBlock();
+    undoData.oldSelectRange.hasSelection     	= this->textCursor().hasSelection();
+    undoData.oldSelectRange.currentBlockNo 		= this->textCursor().blockNumber();
+    undoData.oldSelectRange.currentposInBlock 	= this->textCursor().positionInBlock();
 }
 
 void MkEdit::postUndoSetup()
 {
     undoData.text               = this->document()->toPlainText();
     undoData.cursorPos          = this->textCursor().position();
-    undoData.selectRange.hasSelection = this->textCursor().hasSelection();
 
     if(!undoData.undoRedoSkip){
         EditCommand *edit = new EditCommand(undoData);
@@ -782,7 +795,6 @@ void MkEdit::cursorPositionChangedHandle()
         selectRange.hasSelection = false;
         selectRange.currentBlockNo = cursor.blockNumber();
         selectRange.currentposInBlock = cursor.positionInBlock();
-        selectRange.currentBlockPos = cursor.block().position();
         selectRange.isCursorCaculated = false;
 
         selectRange.selectionEndBlock = selectRange.selectionFirstStartBlock;

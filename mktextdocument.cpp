@@ -1215,13 +1215,8 @@ EditCommand::EditCommand(UndoData &data)
     this->text = data.text;
     this->cursorPos = data.cursorPos;
     this->scrollValue = data.scrollValue;
-
     this->oldText = data.oldText;
-    this->oldCursorPos = data.oldCursorPos;
-    this->oldStartSelection = data.oldStartSelection;
-    this->oldEndSelection = data.oldEndSelection;
     isConstructorRedo = true;
-
     this->oldSelectRange = data.oldSelectRange;
 }
 
