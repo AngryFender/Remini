@@ -111,6 +111,7 @@ protected:
     void disconnectSignals();
 
     void showSelectionAfterUndo();
+    void setSelectionUsingArrowKeys(bool isShiftPressed);
 
  public slots:
     void contextMenuHandler(QPoint pos);

@@ -150,12 +150,12 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
 {
     switch(event->key()){
     case Qt::Key_Escape: emit escapeFocus(this);return;
-    case Qt::Key_Shift:
-    case Qt::Key_Control:
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
-    case Qt::Key_Down:
+    case Qt::Key_Down: setSelectionUsingArrowKeys(event->modifiers() == Qt::SHIFT);
+    case Qt::Key_Shift:
+    case Qt::Key_Control:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
     case Qt::Key_V:         if( event->modifiers() == Qt::CTRL) {pasteTextAction.trigger();return;}break;
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}break;
@@ -226,6 +226,23 @@ void MkEdit::showSelectionAfterUndo(){
         this->setTextCursor(textCursor);
     }
     QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
+}
+
+void MkEdit::setSelectionUsingArrowKeys(bool isShiftPressed)
+{
+    QTextCursor cursor = this->textCursor();
+    if(!isShiftPressed){
+        selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
+        selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
+        selectRange.hasSelection = false;
+        emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), getVisibleRect(), &selectRange);
+        return;
+    }
+
+    if(!cursor.hasSelection()){
+        selectRange.selectionFirstStartBlock = cursor.blockNumber();
+        selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
+    }
 }
 
 void MkEdit::quoteLeftKey()
