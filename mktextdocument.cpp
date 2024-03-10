@@ -967,7 +967,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                 }
                 FormatData* formatData = dynamic_cast<FormatData*>(data);
                 if(formatData){
-                    if((blockNumber == currentBlockNumber)/*&&(selectRange.start == NO_SELECTION_POS)&&(selectRange.end == NO_SELECTION_POS)*/){
+                    if(blockNumber == currentBlockNumber || (currentBlockNumber >= selectRange.startBlock && currentBlockNumber <= selectRange.endBlock && editSelectRange)){
                         if(formatData->isHidden()){
                             formatData->setHidden(false);
                             resetTextBlockFormat(block);

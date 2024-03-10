@@ -737,7 +737,9 @@ void MkEdit::setFont(const QFont &font)
 void MkEdit::scrollValueUpdateHandle(int value)
 {
     disconnectSignals();
-    emit drawTextBlocks(textCursor().hasSelection(), textCursor().blockNumber(),undoData.selectAll, getVisibleRect(), &selectRange);
+    {
+        emit drawTextBlocks(textCursor().hasSelection(), textCursor().blockNumber(),undoData.selectAll, getVisibleRect(), &selectRange);
+    }
     connectSignals();
 }
 
@@ -777,7 +779,6 @@ void MkEdit::cursorPositionChangedHandle()
 {
     QTextCursor cursor = this->textCursor();
 
-    qDebug()<<"cursorchanged: block:"<< selectRange.currentBlockNo<<" posInBlock: "<<selectRange.currentposInBlock;
     bool isCalcuatedForStartPos = true;
     if(selectRange.isFirstMousePress){
         isCalcuatedForStartPos = false;
@@ -826,19 +827,8 @@ void MkEdit::cursorPositionChangedHandle()
 
         QTextCursor newCursor = this->textCursor();
         newCursor.clearSelection();
-
-//        qDebug()<<"startBlock ="<<selectRange.selectionFirstStartBlock
-//             <<" startBlockPos ="<< this->document()->findBlockByNumber(this->selectRange.selectionFirstStartBlock).position()
-//             <<" startPosInBlock ="<<selectRange.selectionFirstStartPosInBlock
-//             <<" startPos ="<<startInDoc
-//             <<" endBlock ="<<selectRange.selectionEndBlock
-//             <<" endPosInBlock ="<<selectRange.selectionEndPosInBlock
-//             <<" endPos ="<<endInDoc;
-
-
         newCursor.setPosition(startInDoc);
         newCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
-
         this->setTextCursor(newCursor);
     }
     connectSignals();
