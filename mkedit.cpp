@@ -179,7 +179,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); scrollValueUpdateHandle(undoData.scrollValue); showSelectionAfterUndo(); return;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); showSelectionAfterRedo(); return;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); return;
 
     default: break;
     }
@@ -200,31 +200,8 @@ void MkEdit::showSelectionAfterUndo(){
         int startInDoc = this->document()->findBlockByNumber(range.selectionFirstStartBlock).position() + range.selectionFirstStartPosInBlock;
         int endInDoc   = this->document()->findBlockByNumber(range.selectionEndBlock).position() + range.selectionEndPosInBlock;
 
-        textCursor.clearSelection();
-        textCursor.setPosition(startInDoc);
-        textCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
-    }else{
-        int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
-        textCursor.setPosition(cursorPos);
-    }
-
-    this->setTextCursor(textCursor);
-}
-
-void MkEdit::showSelectionAfterRedo()
-{
-    MkTextDocument *mkDoc = dynamic_cast<MkTextDocument*>(this->document());
-    if(nullptr == mkDoc){
-        return ;
-    }
-    SelectRange range = mkDoc->getRedoSelectRange();
-
-    QTextCursor textCursor = this->textCursor();
-
-    if(range.hasSelection){
-        int startInDoc = this->document()->findBlockByNumber(range.selectionFirstStartBlock).position() + range.selectionFirstStartPosInBlock;
-        int endInDoc   = this->document()->findBlockByNumber(range.selectionEndBlock).position() + range.selectionEndPosInBlock;
-
+        qDebug()<<"startBlock :"<< range.selectionFirstStartBlock<<" PosInBlock :"<< range.selectionFirstStartPosInBlock
+                 <<" endBlock :"<< range.selectionEndBlock << " PosInBlock :"<< range.selectionEndPosInBlock;
         textCursor.clearSelection();
         textCursor.setPosition(startInDoc);
         textCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
@@ -281,8 +258,6 @@ void MkEdit::postUndoSetup()
     undoData.text               = this->document()->toPlainText();
     undoData.cursorPos          = this->textCursor().position();
     undoData.selectRange.hasSelection = this->textCursor().hasSelection();
-    undoData.selectRange.currentBlockNo = this->textCursor().blockNumber();
-    undoData.selectRange.currentposInBlock = this->textCursor().positionInBlock();
 
     if(!undoData.undoRedoSkip){
         EditCommand *edit = new EditCommand(undoData);
@@ -791,6 +766,7 @@ void MkEdit::cursorPositionChangedHandle()
 {
     QTextCursor cursor = this->textCursor();
 
+    qDebug()<<"cursorchanged: block:"<< selectRange.currentBlockNo<<" posInBlock: "<<selectRange.currentposInBlock;
     bool isCalcuatedForStartPos = true;
     if(selectRange.isFirstMousePress){
         isCalcuatedForStartPos = false;
@@ -812,7 +788,6 @@ void MkEdit::cursorPositionChangedHandle()
         selectRange.selectionEndBlock = selectRange.selectionFirstStartBlock;
         selectRange.selectionEndPosInBlock = selectRange.selectionFirstStartPosInBlock;
 
-        qDebug()<<"cursorchanged: block:"<< selectRange.currentBlockNo<<" posInBlock: "<<selectRange.currentposInBlock;
 
     }else{
         selectRange.hasSelection = true;

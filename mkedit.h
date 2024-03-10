@@ -112,7 +112,6 @@ protected:
     void disconnectSignals();
 
     void showSelectionAfterUndo();
-    void showSelectionAfterRedo();
 
  public slots:
     void contextMenuHandler(QPoint pos);

@@ -91,9 +91,7 @@ public:
     void setPlainText(const QString &text);
     void setUndoRedoText(const QString &text);
     void setUndoSelectRange(const SelectRange range);
-    void setRedoSelectRange(const SelectRange range);
     const SelectRange &getUndoSelectRange() const;
-    const SelectRange &getRedoSelectRange() const;
     void clear() override;
 
     QVector<int>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
@@ -270,7 +268,6 @@ private:
     int oldEndSelection;
     bool isConstructorRedo;
     SelectRange oldSelectRange;
-    SelectRange selectRange;
 };
 
 

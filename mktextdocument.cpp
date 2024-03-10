@@ -33,19 +33,9 @@ void MkTextDocument::setUndoSelectRange(const SelectRange range)
     this->undoSelectRange = range;
 }
 
-void MkTextDocument::setRedoSelectRange(const SelectRange range)
-{
-    this->redoSelectRange = range;
-}
-
 const SelectRange &MkTextDocument::getUndoSelectRange() const
 {
     return this->undoSelectRange;
-}
-
-const SelectRange &MkTextDocument::getRedoSelectRange() const
-{
-    return this->redoSelectRange;
 }
 
 void MkTextDocument::clear()
@@ -1233,7 +1223,6 @@ EditCommand::EditCommand(UndoData &data)
     isConstructorRedo = true;
 
     this->oldSelectRange = data.oldSelectRange;
-    this->selectRange = data.selectRange;
 }
 
 void EditCommand::undo()
@@ -1248,6 +1237,9 @@ void EditCommand::redo()
         isConstructorRedo = false;
     }else{
         doc->setUndoRedoText(text);
-        doc->setRedoSelectRange(selectRange);
+
+        QTextCursor cursor = this->view->textCursor();
+        cursor.setPosition(this->cursorPos);
+        this->view->setTextCursor(cursor);
     }
 }
