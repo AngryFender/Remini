@@ -484,8 +484,11 @@ void MkEdit::selectBlock()
     cursor.setPosition(startPos);
     cursor.setPosition(endPos,QTextCursor::KeepAnchor);
 
-    this->setTextCursor(cursor);
-
+    disconnectSignals();
+    {
+        this->setTextCursor(cursor);
+    }
+    connectSignals();
     copy();
 }
 
