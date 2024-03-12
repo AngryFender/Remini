@@ -56,6 +56,8 @@ public:
 
     void setDocument(QTextDocument *document);
     void setFont(const QFont &font);
+    void connectSignals();
+    void disconnectSignals();
 
 protected:
     void insertFromMimeData(const QMimeData *source) override;
@@ -107,9 +109,6 @@ protected:
     void fileSaveWithScroll(const bool scroll = true);
 
     bool isMouseOnCheckBox(QMouseEvent *e);
-    void connectSignals();
-    void disconnectSignals();
-
     void showSelectionAfterUndo();
     void setSelectionUsingArrowKeys(bool isShiftPressed);
 
