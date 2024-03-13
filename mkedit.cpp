@@ -588,9 +588,12 @@ void MkEdit::mousePressEvent(QMouseEvent *e)
             selectRange.selectionFirstStartPosInBlock = selectRange.selectionEndPosInBlock = textCursor().positionInBlock();
         }
 
-//        selectRange.blockStart = this->textCursor().block().blockNumber();
-//        selectRange.posInBlockStart = this->textCursor().positionInBlock();
+        bool selectionState = textCursor().hasSelection();
+        isCursorChangedHandleTriggered = false;
         QTextEdit::mousePressEvent(e);
+        if(selectionState != textCursor().hasSelection() && !isCursorChangedHandleTriggered){
+            cursorPositionChangedHandle();
+        }
     }
 }
 
@@ -799,16 +802,13 @@ void MkEdit::lineWrapHandler()
 
 void MkEdit::cursorPositionChangedHandle()
 {
+    isCursorChangedHandleTriggered = true;
     QTextCursor cursor = this->textCursor();
 
     if(selectRange.isFirstMousePress){
         isCalcuatedForStartPos = false;
         selectRange.isFirstMousePress = false;
         selectRange.isCursorCaculated = false;
-        selectRange.selectionFirstStartBlock = cursor.blockNumber();
-        selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
-        selectRange.selectionEndBlock = cursor.blockNumber();
-        selectRange.selectionEndPosInBlock = cursor.positionInBlock();
         if(!cursor.hasSelection()){
             selectRange.selectionFirstStartBlock = cursor.blockNumber();
             selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();

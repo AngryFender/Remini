@@ -77,6 +77,7 @@ protected:
     QTimer fileSaveTimer;
     SelectRange selectRange;
     bool isCalcuatedForStartPos;
+    bool isCursorChangedHandleTriggered;
 
     void quoteLeftKey();
     void smartSelectionSetup();
