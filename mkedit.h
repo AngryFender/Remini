@@ -76,6 +76,7 @@ protected:
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
     SelectRange selectRange;
+    bool isCalcuatedForStartPos;
 
     void quoteLeftKey();
     void smartSelectionSetup();

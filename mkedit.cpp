@@ -584,6 +584,8 @@ void MkEdit::mousePressEvent(QMouseEvent *e)
     if(!isMouseOnCheckBox(e)){
         if(e->button() == Qt::LeftButton){
             selectRange.isFirstMousePress = true;
+            selectRange.selectionFirstStartBlock = selectRange.selectionEndBlock = textCursor().blockNumber();
+            selectRange.selectionFirstStartPosInBlock = selectRange.selectionEndPosInBlock = textCursor().positionInBlock();
         }
 
 //        selectRange.blockStart = this->textCursor().block().blockNumber();
@@ -799,7 +801,6 @@ void MkEdit::cursorPositionChangedHandle()
 {
     QTextCursor cursor = this->textCursor();
 
-    bool isCalcuatedForStartPos = true;
     if(selectRange.isFirstMousePress){
         isCalcuatedForStartPos = false;
         selectRange.isFirstMousePress = false;
@@ -808,6 +809,12 @@ void MkEdit::cursorPositionChangedHandle()
         selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
         selectRange.selectionEndBlock = cursor.blockNumber();
         selectRange.selectionEndPosInBlock = cursor.positionInBlock();
+        if(!cursor.hasSelection()){
+            selectRange.selectionFirstStartBlock = cursor.blockNumber();
+            selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
+        }
+        selectRange.selectionEndBlock = selectRange.selectionFirstStartBlock;
+        selectRange.selectionEndPosInBlock = selectRange.selectionFirstStartPosInBlock;
     }
 
     if(!cursor.hasSelection()){
@@ -835,7 +842,8 @@ void MkEdit::cursorPositionChangedHandle()
         this->setTextCursor(cursor);
     }
 
-    if(!isCalcuatedForStartPos){
+    if(!isCalcuatedForStartPos && selectRange.selectionFirstStartBlock == selectRange.currentBlockNo){
+        isCalcuatedForStartPos = true;
         selectRange.selectionFirstStartBlock = selectRange.currentBlockNo;
         selectRange.selectionFirstStartPosInBlock = selectRange.currentposInBlock;
     }
