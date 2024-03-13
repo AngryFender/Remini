@@ -372,6 +372,21 @@ TEST_CASE("MkTextDocument link texts false positive", "[MkTextDocument]")
     REQUIRE("abc](123" == text);
 }
 
+TEST_CASE("MkTextDocument local link texts, with () round brackets in the path", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+    SelectRange selectRange;
+
+    doc.setPlainText("[microsoft](file:///C:\\Program Files (x86)\\Microsoft)");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
+
+    QString text = edit.toPlainText();
+    REQUIRE("microsoft" == text);
+}
+
 TEST_CASE("MkTextDocument strikethrough", "[MkTextDocument]")
 {
     MkTextDocument doc;
