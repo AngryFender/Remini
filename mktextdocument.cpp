@@ -347,7 +347,7 @@ void MkTextDocument::convertCharacterToCheckboxSymbol(const QChar &single, QStri
 
 bool MkTextDocument::convertCharacterToLinkSymbol(const QChar &single, QString &text)
 {
-    if(single == '[' || single == ']' ||single == '(' || single == ')'){
+    if(single == '[' || single == ']' ||single == '(' || single == ')' || single == '\\'){
         text+=single;
         return true;
     }
@@ -373,7 +373,7 @@ void MkTextDocument::composeSymbolCombination(int length, const QString &text, i
     if(index2<length){
         convertCharacterToLinkSymbol(text[index1], result);
         convertCharacterToLinkSymbol(text[index2], result);
-        if(result == LINK_SYMBOL_MID){
+        if(result == LINK_SYMBOL_MID || result == LINK_SYMBOL_URL_END_FALSE){
             return;
         }
     }

@@ -20,6 +20,7 @@
 #define LINK_SYMBOL_MID "]("
 #define LINK_SYMBOL_URL_START "("
 #define LINK_SYMBOL_URL_END ")"
+#define LINK_SYMBOL_URL_END_FALSE ")\\"
 
 
 #define CHECKED_PIC "☑"
