@@ -101,7 +101,7 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
             this->selectRange.endBlock = -1;
         }
     }
-    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, false);
+    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, true);
 }
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
