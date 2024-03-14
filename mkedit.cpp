@@ -10,6 +10,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     regexCodeBlock.setPattern("```(?s)(.*?)```");
     regexFolderFile.setPattern("[a-zA-Z]:[\\\\/](?:[^\\\\/]+[\\\\/])*([^\\\\/]+\\.*)");
     savedCharacterNumber = -1;
+    isShiftKeyPressed = false;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     undoAction.setText("Undo         Ctrl+Z");
@@ -150,11 +151,11 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
 {
     switch(event->key()){
     case Qt::Key_Escape: emit escapeFocus(this);return;
+    case Qt::Key_Shift: isShiftKeyPressed = true;
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
     case Qt::Key_Down: setSelectionUsingArrowKeys(event->modifiers() == Qt::SHIFT);
-    case Qt::Key_Shift:
     case Qt::Key_Control:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
     case Qt::Key_V:         if( event->modifiers() == Qt::CTRL) {pasteTextAction.trigger();return;}break;
@@ -183,6 +184,15 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     }
 
     applyMkEffects();
+}
+
+void MkEdit::keyReleaseEvent(QKeyEvent *event)
+{
+    switch(event->key()){
+    case Qt::Key_Shift: isShiftKeyPressed = false;
+        default: break;
+    }
+    QTextEdit::keyReleaseEvent(event);
 }
 
 void MkEdit::showSelectionAfterUndo(){
@@ -584,8 +594,6 @@ void MkEdit::mousePressEvent(QMouseEvent *e)
     if(!isMouseOnCheckBox(e)){
         if(e->button() == Qt::LeftButton){
             selectRange.isFirstMousePress = true;
-            selectRange.selectionFirstStartBlock = selectRange.selectionEndBlock = textCursor().blockNumber();
-            selectRange.selectionFirstStartPosInBlock = selectRange.selectionEndPosInBlock = textCursor().positionInBlock();
         }
 
         bool selectionState = textCursor().hasSelection();
@@ -805,7 +813,7 @@ void MkEdit::cursorPositionChangedHandle()
     isCursorChangedHandleTriggered = true;
     QTextCursor cursor = this->textCursor();
 
-    if(selectRange.isFirstMousePress){
+    if(selectRange.isFirstMousePress && !isShiftKeyPressed){
         isCalcuatedForStartPos = false;
         selectRange.isFirstMousePress = false;
         selectRange.isCursorCaculated = false;
@@ -842,7 +850,7 @@ void MkEdit::cursorPositionChangedHandle()
         this->setTextCursor(cursor);
     }
 
-    if(!isCalcuatedForStartPos && selectRange.selectionFirstStartBlock == selectRange.currentBlockNo){
+    if(!isCalcuatedForStartPos && selectRange.selectionFirstStartBlock == selectRange.currentBlockNo && !isShiftKeyPressed){
         isCalcuatedForStartPos = true;
         selectRange.selectionFirstStartBlock = selectRange.currentBlockNo;
         selectRange.selectionFirstStartPosInBlock = selectRange.currentposInBlock;

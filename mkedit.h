@@ -34,6 +34,7 @@ public:
     void initialialCursorPosition();
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event)override;
+    void keyReleaseEvent(QKeyEvent *event)override;
     void resizeEvent(QResizeEvent *event)override;
     void wheelEvent(QWheelEvent *e)override;
     QColor blockColor() const;
@@ -78,6 +79,7 @@ protected:
     SelectRange selectRange;
     bool isCalcuatedForStartPos;
     bool isCursorChangedHandleTriggered;
+    bool isShiftKeyPressed;
 
     void quoteLeftKey();
     void smartSelectionSetup();
