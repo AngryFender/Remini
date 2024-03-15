@@ -750,6 +750,33 @@ void MkEdit::setDocument(QTextDocument *document)
     connectSignals();
 }
 
+void MkEdit::setMkState(bool enable)
+{
+    showMarkDown = enable;
+    QTextCursor cursor = this->textCursor();
+    QTextBlock block = this->document()->findBlockByNumber(cursor.blockNumber());
+
+    if(enable){
+        disableMarkdown.setText("Disable Markdown");
+        emit setMarkdownStatus(true, getVisibleRect());
+    }else{
+        disableMarkdown.setText("Enable Markdown");
+        emit setMarkdownStatus(false, getVisibleRect());
+        cursor.setPosition(block.position());
+        this->setTextCursor(cursor);
+    }
+}
+
+void MkEdit::updateMkState()
+{
+    setMkState(showMarkDown);
+}
+
+bool MkEdit::getMkState()
+{
+    return showMarkDown;
+}
+
 void MkEdit::setFont(const QFont &font)
 {
     QFont menuFont = font;
@@ -783,17 +810,10 @@ void MkEdit::fileSaveHandle()
 
 void MkEdit::diableMarkdown_internal()
 {
-    QTextCursor cursor = this->textCursor();
-    QTextBlock block = this->document()->findBlockByNumber(cursor.blockNumber());
-
     if("Disable Markdown" ==disableMarkdown.text()){
-        disableMarkdown.setText("Enable Markdown");
-        emit setMarkdownStatus(false, getVisibleRect());
-        cursor.setPosition(block.position());
-        this->setTextCursor(cursor);
+        setMkState(false);
     }else{
-        disableMarkdown.setText("Disable Markdown");
-        emit setMarkdownStatus(true, getVisibleRect());
+        setMkState(true);
     }
 }
 

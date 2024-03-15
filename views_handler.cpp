@@ -74,6 +74,7 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     currentDocument->setPlainText(startupText);
     highlighter.setDocument(currentDocument.data());
     viewText->setDocument(currentDocument.data());
+    viewText->setMkState(true);
     viewTitle->setMinimumSize(10,30);
     initFontDefault();
 }
@@ -106,7 +107,7 @@ void ViewsHandler::initFontDefault()
     font.setPointSize(settings.value("fontsize",14).toInt());
     font.setStretch(settings.value("stretch",0).toInt());
     font.setWeight((QFont::Weight)settings.value("weight",1).toInt());
-    updateUiSettingsHandler(font);
+    updateUiSettingsHandler(font,true);
 }
 
 void ViewsHandler::initConnection()
@@ -375,6 +376,7 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         viewTitle->setText(currentDocument->getFileName());
 
         viewText->setDocument(currentDocument.data());
+        viewText->updateMkState();								//after connectDocuments();
         viewText->initialialCursorPosition();
         return NEW_DOCUMENT;
     }else{
@@ -383,6 +385,7 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         highlighter.setDocument(currentDocument.data());
         viewTitle->setText(currentDocument->getFileName());
         viewText->setDocument(currentDocument.data());
+
 
         QTextCursor cursor = viewText->textCursor();
         QTextBlock block = currentDocument->findBlockByNumber(this->currentDocument->getBlockNo());
@@ -396,6 +399,7 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         currentDocument->setDefaultFont(fontBase);
         viewText->setFont(fontBase);
         connectDocument();
+        viewText->updateMkState();   							//after connectDocuments();
         viewText->setTextCursor(cursor);
         return OLD_DOCUMENT;
     }
@@ -426,10 +430,11 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     }
 }
 
-void ViewsHandler::updateUiSettingsHandler(const QFont &font)
+void ViewsHandler::updateUiSettingsHandler(const QFont &font, const bool mkState)
 {
     fontBase = font;
     viewText->setFont(fontBase);
+    viewText->setMkState(mkState);
 
     QFont fontTitle = font;
     fontTitle.setPointSize(fontBase.pointSize()*2);
@@ -583,7 +588,7 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 void ViewsHandler::showSettingsBtn()
 {
-    settingsDialog->show(vaultPath, viewText->font());
+    settingsDialog->show(vaultPath, viewText->font(), viewText->getMkState());
 }
 
 void ViewsHandler::fileRenamedHandler(const QString& newName, const QString &oldName, const QModelIndex& index)

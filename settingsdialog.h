@@ -34,7 +34,7 @@ public:
     
 signals:
     void syntaxColorUpdate(HighlightColor &colors);
-    void updateUiSettings(const QFont &font);
+    void updateUiSettings(const QFont &font, const bool mkState);
 private slots:
     void executeFolderDialog();
     void updateFontHandler(const QFont &f);
@@ -44,7 +44,7 @@ private slots:
     void saveSettingsHandler();
 public slots:
     void syntaxColorUpdateHandler(HighlightColor &colors);
-    void show(const QString &vaultPath, const QFont &font);
+    void show(const QString &vaultPath, const QFont &font, const bool markdownState);
 private:
     Ui::SettingsDialog *ui;
     HighlightColor previewColors;

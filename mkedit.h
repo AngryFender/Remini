@@ -60,6 +60,9 @@ public:
     void connectSignals();
     void disconnectSignals();
 
+    void setMkState(bool enable);
+    void updateMkState();
+    bool getMkState();
 protected:
     void insertFromMimeData(const QMimeData *source) override;
     void mousePressEvent(QMouseEvent *e) override;
@@ -80,6 +83,7 @@ protected:
     bool isCalcuatedForStartPos;
     bool isCursorChangedHandleTriggered;
     bool isShiftKeyPressed;
+    bool showMarkDown;
 
     void quoteLeftKey();
     void smartSelectionSetup();

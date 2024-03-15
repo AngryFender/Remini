@@ -14,6 +14,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     previewHighligher.setDocument(&this->previewDocument) ;
     ui->txt_preview->setDocument(&this->previewDocument);
 
+    ui->cmb_mkState->addItem("Enabled");
+    ui->cmb_mkState->addItem("Disabled");
+
     ui->cmb_theme->addItem("Light Theme");
     ui->cmb_theme->addItem("Dark Theme");
 
@@ -80,6 +83,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 void SettingsDialog::setFont(const QFont &font)
 {
     ui->btn_dialog->setFont(font);
+    ui->cmb_mkState->setFont(font);
     ui->cmb_font->setFont(font);
     ui->lbl_font->setFont(font);
     ui->lbl_font_size->setFont(font);
@@ -171,7 +175,12 @@ void SettingsDialog::saveSettingsHandler()
 {
     QSettings settings("Remini","Remini");
     const QFont font = ui->txt_preview->font();
-    emit updateUiSettings(font);
+
+    bool mkState = false;
+    if(ui->cmb_mkState->currentText() == "Enabled"){
+        mkState = true;
+    }
+    emit updateUiSettings(font, mkState);
 
     settings.setValue("font",font.family());
     settings.setValue("fontsize",font.pointSize());
@@ -185,9 +194,14 @@ void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)
     emit syntaxColorUpdate(previewColors);
 }
 
-void SettingsDialog::show(const QString &vaultPath, const QFont &font)
+void SettingsDialog::show(const QString &vaultPath, const QFont &font, const bool markdownState)
 {
     ui->edit_vaultRootPath->setText(vaultPath);
+    if(markdownState){
+        ui->cmb_mkState->setCurrentIndex(0);
+    }else{
+        ui->cmb_mkState->setCurrentIndex(1);
+    }
     ui->cmb_font->setCurrentIndex(ui->cmb_font->findText(font.family()));
     ui->ledit_font_size->setText(QString::number(font.pointSize()));
 
