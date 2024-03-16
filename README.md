@@ -6,7 +6,12 @@
 # ![reminiicon](https://github.com/AngryFender/Remini/assets/29480834/b1361084-1532-47bd-b755-f1c375dbc510) Remini 
 Remini is an ongoing attempt to create a simple, lightweight real-time Markdown Renderer in Qt Widgets. The primary goal of this app is note taking for programming purposes. Reading and understanding codes and cli-commands are made easy using QSyntaxHighlighter and custom Markdown Renderer. Taking notes and editing are made easy by the real-time cursor detection which either shows the Markdown symbols per line when editing and hides the symbols in other lines.
 
-![remini](https://github.com/AngryFender/Remini/assets/29480834/8c0a9ca5-23e9-48de-864c-6ffc099d7df6)
+
+
+
+https://github.com/AngryFender/Remini/assets/29480834/2fc6bc0e-da17-424a-8036-dc9708bac8fe
+
+
 ## Features
 
 - [x]  **Lexer from scratch**
