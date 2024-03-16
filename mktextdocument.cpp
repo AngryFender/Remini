@@ -1101,8 +1101,8 @@ void MkTextDocument::autoInsertSymobolHandle(const int position)
     cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
 
     QString text = cursor.selectedText().toLower();
-    QString checkedSymbol = QString(CHECK_SYMBOL_START) + QString(CHECKED_SYMBOL_END);
-    QString unCheckSymbol = QString(CHECK_SYMBOL_START) + QString(UNCHECKED_SYMBOL_END);
+    QString checkedSymbol = QString(CHECK_SYMBOL_START) + QString(CHECKED_SYMBOL_END) + " ";
+    QString unCheckSymbol = QString(CHECK_SYMBOL_START) + QString(UNCHECKED_SYMBOL_END) + " ";
     if(text == "check" || text == "ch"){
         cursor.insertText(checkedSymbol);
     }else if(text == "uncheck" || text == "uch"){
