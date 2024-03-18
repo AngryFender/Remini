@@ -21,7 +21,8 @@
 #define LINK_SYMBOL_URL_START "("
 #define LINK_SYMBOL_URL_END ")"
 #define LINK_SYMBOL_URL_END_FALSE ")\\"
-
+#define LINK_SYMBOL_MID_LONG "](<"
+#define LINK_SYMBOL_URL_END_LONG ">)"
 
 #define CHECKED_PIC "☑"
 #define UNCHECKED_PIC "☐"
