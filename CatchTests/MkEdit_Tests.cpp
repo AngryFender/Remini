@@ -447,6 +447,172 @@ TEST_CASE("MkEdit type inside bold format then check if the cursor is at the rig
 
 }
 
+TEST_CASE("MkEdit undo after typing inside bold format then check if the cursor is at the right place", "[MkEdit]")
+{
+
+    MkTextDocument doc;
+    MkEdit edit;
+    int initialPos = 4; //**bo
+    int desiredPos = 5; //**bop
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
+
+    doc.setPlainText("**bold**");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    edit.keyPressEvent(keyPressEvent.data());
+
+    QString text = edit.toPlainText();
+    REQUIRE("**bopld**" == text);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**" == text);
+}
+
+TEST_CASE("MkEdit redo after undo after typing inside bold format then check if the cursor is at the right place", "[MkEdit]")
+{
+
+    MkTextDocument doc;
+    MkEdit edit;
+    int initialPos = 4; //**bo
+    int desiredPos = 5; //**bop
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
+
+    doc.setPlainText("**bold**");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    edit.keyPressEvent(keyPressEvent.data());
+
+    QString text = edit.toPlainText();
+    REQUIRE("**bopld**" == text);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**" == text);
+
+    QScopedPointer<QKeyEvent>  redoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier)) ;
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bopld**" == text);
+}
+
+TEST_CASE("MkEdit selection check for undo after typing inside bold format then check if the cursor is at the right place", "[MkEdit]")
+{
+
+    MkTextDocument doc;
+    MkEdit edit;
+    QChar paragraphSeparator(0x2029);
+    int initialPos = 4; //**bo
+
+    doc.setPlainText("**bold**\n*italic*");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    for(int i = 0; i < 11; i ++){
+        QScopedPointer<QKeyEvent>  ShiftKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::ShiftModifier)) ;
+        edit.keyPressEvent(ShiftKeyPressEvent.data());
+    }
+
+    QString text = edit.textCursor().selectedText();
+    text.replace(paragraphSeparator, '\n');
+    REQUIRE("ld**\n*itali" == text);
+
+    QScopedPointer<QKeyEvent> randomKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("d")));
+    edit.keyPressEvent(randomKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bodc*" == text);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**\n*italic*" == text);
+
+    QString selectedTextAfterUndo = edit.textCursor().selectedText();
+    selectedTextAfterUndo.replace(paragraphSeparator, '\n');
+    REQUIRE("ld**\n*itali" == selectedTextAfterUndo);
+}
+
+
 TEST_CASE("MkEdit type all strings with bold format then check if the cursor is at the right place", "[MkEdit]")
 {
     MkTextDocument doc;
