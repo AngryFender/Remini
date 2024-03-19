@@ -612,6 +612,88 @@ TEST_CASE("MkEdit selection check for undo after typing inside bold format then 
     REQUIRE("ld**\n*itali" == selectedTextAfterUndo);
 }
 
+TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
+{
+
+    MkTextDocument doc;
+    MkEdit edit;
+    QChar paragraphSeparator(0x2029);
+    int initialPos = 4; //**bo
+
+    doc.setPlainText("**bold**\n*italic*\n~~crossed~~");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    for(int i = 0; i < 11; i ++){
+        QScopedPointer<QKeyEvent>  ShiftKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::ShiftModifier)) ;
+        edit.keyPressEvent(ShiftKeyPressEvent.data());
+    }
+
+    QString text = edit.textCursor().selectedText();
+    text.replace(paragraphSeparator, '\n');
+    REQUIRE("ld**\n*itali" == text);
+
+    QScopedPointer<QKeyEvent> randomKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("d")));
+    edit.keyPressEvent(randomKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bodc*\ncrossed" == text);
+
+    for(int i = 0; i < 11; i ++){
+        QScopedPointer<QKeyEvent>  ShiftKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::ShiftModifier)) ;
+        edit.keyPressEvent(ShiftKeyPressEvent.data());
+    }
+    text = edit.textCursor().selectedText();
+    text.replace(paragraphSeparator, '\n');
+    REQUIRE("c*\n~~crosse" == text);
+
+    QScopedPointer<QKeyEvent> randomKeyPressEvent2 (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("d")));
+    edit.keyPressEvent(randomKeyPressEvent2.data());
+    text = edit.toPlainText();
+    REQUIRE("**boddd~~" == text);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bodc*\n~~crossed~~" == text);
+
+    QString selectedTextAfterUndo = edit.textCursor().selectedText();
+    selectedTextAfterUndo.replace(paragraphSeparator, '\n');
+    REQUIRE("c*\n~~crosse" == selectedTextAfterUndo);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent2(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent2.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**\n*italic*\ncrossed" == text);
+
+    selectedTextAfterUndo = edit.textCursor().selectedText();
+    selectedTextAfterUndo.replace(paragraphSeparator, '\n');
+    REQUIRE("ld**\n*itali" == selectedTextAfterUndo);
+}
+
 
 TEST_CASE("MkEdit type all strings with bold format then check if the cursor is at the right place", "[MkEdit]")
 {
