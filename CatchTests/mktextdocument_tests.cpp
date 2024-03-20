@@ -289,7 +289,7 @@ TEST_CASE("MkTextDocument link texts", "[MkTextDocument]")
     QRect rec;
     SelectRange selectRange;
 
-    doc.setPlainText("[youtube](www.youtube.com)");
+    doc.setPlainText("[youtube](<www.youtube.com>)");
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
 
@@ -304,12 +304,12 @@ TEST_CASE("MkTextDocument link texts, hide symbols only in 1st line", "[MkTextDo
     QRect rec;
     SelectRange selectRange;
 
-    doc.setPlainText("[youtube](www.youtube.com)\n[google](www.google.com)");
+    doc.setPlainText("[youtube](<www.youtube.com>)\n[google](<www.google.com>)");
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
 
     QString text = edit.toPlainText();
-    REQUIRE("youtube\n[google](www.google.com)" == text);
+    REQUIRE("youtube\n[google](<www.google.com>)" == text);
 }
 
 TEST_CASE("MkTextDocument link texts, hide symbols only in both lines", "[MkTextDocument]")
@@ -319,7 +319,7 @@ TEST_CASE("MkTextDocument link texts, hide symbols only in both lines", "[MkText
     QRect rec;
     SelectRange selectRange;
 
-    doc.setPlainText("[youtube](www.youtube.com)\n[google](www.google.com)");
+    doc.setPlainText("[youtube](<www.youtube.com>)\n[google](<www.google.com>)");
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 2,rec,&selectRange);
 
@@ -334,7 +334,7 @@ TEST_CASE("MkTextDocument link texts with underscore", "[MkTextDocument]")
     QRect rec;
     SelectRange selectRange;
 
-    doc.setPlainText("[lang_explain](https://sqlite.org/lang_explain.html)");
+    doc.setPlainText("[lang_explain](<https://sqlite.org/lang_explain.html>)");
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
 
@@ -349,7 +349,7 @@ TEST_CASE("MkTextDocument link texts with empty title", "[MkTextDocument]")
     QRect rec;
     SelectRange selectRange;
 
-    doc.setPlainText("[](www.google.com)");
+    doc.setPlainText("[](<www.google.com>)");
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
 
@@ -364,12 +364,12 @@ TEST_CASE("MkTextDocument link texts false positive", "[MkTextDocument]")
     QRect rec;
     SelectRange selectRange;
 
-    doc.setPlainText("abc](123");
+    doc.setPlainText("abc](<123");
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
 
     QString text = edit.toPlainText();
-    REQUIRE("abc](123" == text);
+    REQUIRE("abc](<123" == text);
 }
 
 TEST_CASE("MkTextDocument local link texts, with () round brackets in the path", "[MkTextDocument]")
@@ -379,7 +379,7 @@ TEST_CASE("MkTextDocument local link texts, with () round brackets in the path",
     QRect rec;
     SelectRange selectRange;
 
-    doc.setPlainText("[microsoft](file:///C:\\Program Files (x86)\\Microsoft)");
+    doc.setPlainText("[microsoft](<file:///C:\\Program Files (x86)\\Microsoft>)");
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
 
@@ -701,7 +701,7 @@ TEST_CASE("MkTextDocument link texts with underscore, setMarkdown = true", "[MkT
     QRect rec;
     SelectRange selectRange;
 
-    doc.setPlainText("[lang_explain](https://sqlite.org/lang_explain.html)");
+    doc.setPlainText("[lang_explain](<https://sqlite.org/lang_explain.html>)");
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
 

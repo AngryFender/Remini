@@ -136,7 +136,7 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of fourth Markdown
     int cursorPosition = 22;     // bold italic strike goo
     int newLinePos = 71;
 
-    doc.setPlainText("**bold** _italic_ ~~strike~~ [google](https://www.google.com/) \n **new line**");
+    doc.setPlainText("**bold** _italic_ ~~strike~~ [google](<https://www.google.com/>) \n **new line**");
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -153,7 +153,7 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of fourth Markdown
     edit.setTextCursor(cursor);
 
     QString text1 = edit.toPlainText();
-    REQUIRE("**bold** _italic_ ~~strike~~ [google](https://www.google.com/) \n new line" == text1);
+    REQUIRE("**bold** _italic_ ~~strike~~ [google](<https://www.google.com/>) \n new line" == text1);
 
     int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
     REQUIRE(currentPositionOfTextCursorInBlock == cursorPosition + symbolLength);
@@ -163,11 +163,11 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of fifth Markdown 
 {
     MkTextDocument doc;
     MkEdit edit;
-    int symbolLength = 2+2+1+1+2+2+1+26+1;   // '**' + '**' + '_' + '_' + '~~' + '~~' + '[' + '](https://www.google.com/)' + '['
+    int symbolLength = 2+2+1+1+2+2+1+28+1;   // '**' + '**' + '_' + '_' + '~~' + '~~' + '[' + '](<https://www.google.com/>)' + '['
     int cursorPosition = 32;     // bold italic strike google youtub
     int newLinePos = 106;
 
-    doc.setPlainText("**bold** _italic_ ~~strike~~ [google](https://www.google.com/) [youtube](https://www.youtube.com/) \n **new line**");
+    doc.setPlainText("**bold** _italic_ ~~strike~~ [google](<https://www.google.com/>) [youtube](<https://www.youtube.com/>) \n **new line**");
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -184,7 +184,7 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of fifth Markdown 
     edit.setTextCursor(cursor);
 
     QString text1 = edit.toPlainText();
-    REQUIRE("**bold** _italic_ ~~strike~~ [google](https://www.google.com/) [youtube](https://www.youtube.com/) \n new line" == text1);
+    REQUIRE("**bold** _italic_ ~~strike~~ [google](<https://www.google.com/>) [youtube](<https://www.youtube.com/>) \n new line" == text1);
 
     int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
     REQUIRE(currentPositionOfTextCursorInBlock == cursorPosition + symbolLength);
@@ -225,11 +225,11 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of 6 word where fi
 {
     MkTextDocument doc;
     MkEdit edit;
-    int symbolLength = 1+26+1+26+1;   // '[' + '](https://www.google.com/)' + '[' + '](https://www.google.com/)' + '['
+    int symbolLength = 1+28+1+28+1;   // '[' + '](<https://www.google.com/>)' + '[' + '](<https://www.google.com/>)' + '['
     int cursorPosition = 17;     // google google goo
-    int newLinePos = 185;
+    int newLinePos = 194;
 
-    doc.setPlainText("[google](https://www.google.com/) [google](https://www.google.com/) [google](https://www.google.com/) [google](https://www.google.com/) [google](https://www.google.com/) hello \n **new line**");
+    doc.setPlainText("[google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) hello \n **new line**");
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -246,7 +246,7 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of 6 word where fi
     edit.setTextCursor(cursor);
 
     QString text1 = edit.toPlainText();
-    REQUIRE("[google](https://www.google.com/) [google](https://www.google.com/) [google](https://www.google.com/) [google](https://www.google.com/) [google](https://www.google.com/) hello \n new line" == text1);
+    REQUIRE("[google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) hello \n new line" == text1);
 
     int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
     REQUIRE(currentPositionOfTextCursorInBlock == cursorPosition + symbolLength);
@@ -335,7 +335,7 @@ TEST_CASE("MkEdit paste link from clipboard", "[MkEdit]")
     edit.setTextCursor(cursor);
     edit.keyPressEvent(keyPressEvent.data());
     QString text = edit.toPlainText();
-    REQUIRE("[](https://www.google.com/)" == text);
+    REQUIRE("[](<https://www.google.com/>)" == text);
 }
 
 TEST_CASE("MkEdit paste path from clipboard", "[MkEdit]")
@@ -356,7 +356,7 @@ TEST_CASE("MkEdit paste path from clipboard", "[MkEdit]")
     edit.setTextCursor(cursor);
     edit.keyPressEvent(keyPressEvent.data());
     QString text = edit.toPlainText();
-    REQUIRE("[](file:///C:\\Users\\Public)" == text);
+    REQUIRE("[](<file:///C:\\Users\\Public>)" == text);
 }
 
 TEST_CASE("MkEdit paste link from clipboard then check if the cursor is at the middle of []", "[MkEdit]")
@@ -378,7 +378,7 @@ TEST_CASE("MkEdit paste link from clipboard then check if the cursor is at the m
     edit.setTextCursor(cursor);
     edit.keyPressEvent(keyPressEvent.data());
     QString text = edit.toPlainText();
-    REQUIRE("[](https://www.google.com/)" == text);
+    REQUIRE("[](<https://www.google.com/>)" == text);
 
     int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
     REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
@@ -403,7 +403,7 @@ TEST_CASE("MkEdit paste path from clipboard then check if the cursor is at the m
     edit.setTextCursor(cursor);
     edit.keyPressEvent(keyPressEvent.data());
     QString text = edit.toPlainText();
-    REQUIRE("[](file:///C:\\Users\\Public)" == text);
+    REQUIRE("[](<file:///C:\\Users\\Public>)" == text);
 
     int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
     REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
