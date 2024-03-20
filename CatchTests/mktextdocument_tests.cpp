@@ -387,6 +387,36 @@ TEST_CASE("MkTextDocument local link texts, with () round brackets in the path",
     REQUIRE("microsoft" == text);
 }
 
+TEST_CASE("MkTextDocument local link texts, with ()() round brackets in the path", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+    SelectRange selectRange;
+
+    doc.setPlainText("[folder](<file:///C:\\New folder(folder)\\New folder(folder)>)");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
+
+    QString text = edit.toPlainText();
+    REQUIRE("folder" == text);
+}
+
+TEST_CASE("MkTextDocument local link texts, with [,],(,),$,%,. symbols in the path", "[MkTextDocument]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QRect rec;
+    SelectRange selectRange;
+
+    doc.setPlainText("[folder](<file:///C:\\New folder(folder)\\New folder(folder)\\New folder([h]folder&&$%).))))))))\\New (this) folder>)");
+    edit.setDocument(&doc);
+    doc.cursorPosChangedHandle(false, 1,rec,&selectRange);
+
+    QString text = edit.toPlainText();
+    REQUIRE("folder" == text);
+}
+
 TEST_CASE("MkTextDocument strikethrough", "[MkTextDocument]")
 {
     MkTextDocument doc;

@@ -376,7 +376,11 @@ void MkTextDocument::composeSymbolCombination(int length, const QString &text, i
         convertCharacterToLinkSymbol(text[index3], result);
         if(result == LINK_SYMBOL_MID ||
             result == LINK_SYMBOL_URL_START ||
-            result == LINK_SYMBOL_URL_END ){
+            result == LINK_SYMBOL_URL_END ||
+            result == ")>)" ){
+            if(result == ")>)"){  //edge case
+                result = ">)";
+            }
             return;
         }
     }
