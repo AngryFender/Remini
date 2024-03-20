@@ -228,7 +228,7 @@ void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool ha
             if(locLink.start != -1){
                 if(test == LINK_SYMBOL_URL_END){
                     locLink.end = index1;
-                    QString linkText = textLink.mid(locLink.start+1, (locLink.end-locLink.start-1));
+                    QString linkText = textLink.mid(locLink.start+2, (locLink.end-locLink.start-1));
                     insertFormatLinkData(locLinkTitle,locLink, index1, index2, index3 , formatData, test, &linkText);
                 }
             }else{
@@ -312,8 +312,8 @@ void MkTextDocument::insertFormatCheckBoxData(FormatLocation &loc, int &index1, 
 
 void MkTextDocument::insertFormatLinkData(FormatLocation &locTitle, FormatLocation &locLink, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test, QString * linkText)
 {
-    locLink.end = index1;
-    if(locLink.end-locLink.start>1){
+    locLink.end = locLink.start + 2 + linkText->length() ;
+    if(locLink.end-locLink.start>3){
         formatData->addFormat(locTitle.start, locTitle.end, QString(LINK_SYMBOL_TITLE_END),linkText);
         formatData->addFormat(locLink.start, locLink.end, QString(LINK_SYMBOL_URL_END), linkText);
         locLink.reset();
@@ -347,7 +347,7 @@ void MkTextDocument::convertCharacterToCheckboxSymbol(const QChar &single, QStri
 
 bool MkTextDocument::convertCharacterToLinkSymbol(const QChar &single, QString &text)
 {
-    if(single == '[' || single == ']' ||single == '(' || single == ')' || single == '\\'){
+    if(single == '[' || single == ']' ||single == '(' || single == ')' || single == '<' || single == '>'){
         text+=single;
         return true;
     }
@@ -370,14 +370,16 @@ void MkTextDocument::composeSymbolCombination(int length, const QString &text, i
     }
 
     result.clear();
-    if(index2<length){
+    if(index3<length){
         convertCharacterToLinkSymbol(text[index1], result);
         convertCharacterToLinkSymbol(text[index2], result);
-        if(result == LINK_SYMBOL_MID || result == LINK_SYMBOL_URL_END_FALSE){
+        convertCharacterToLinkSymbol(text[index3], result);
+        if(result == LINK_SYMBOL_MID ||
+            result == LINK_SYMBOL_URL_START ||
+            result == LINK_SYMBOL_URL_END ){
             return;
         }
     }
-
     result.clear();
     if(convertCharacterToLinkSymbol(text[index1], result)){
         return;
@@ -512,7 +514,7 @@ void MkTextDocument::hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
 
         if(*symbol == LINK_SYMBOL_URL_END){
             isLink = true;
-            linkEnd = symbolPos-1;
+            linkEnd = symbolPos-2;
         }
 
         if(*symbol == LINK_SYMBOL_URL_START || isLink){
@@ -605,7 +607,7 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
                 }
             }
 
-            textBlock.insert(pos+1,formatData->getLinkUrl(pos));
+            textBlock.insert(pos+2,formatData->getLinkUrl(pos));
         }
     }
     QTextCursor cursor(block);

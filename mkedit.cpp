@@ -555,15 +555,15 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
             QString link = source->text();
             matchUrl = regexUrl.match(link);
             matchFolderFile = regexFolderFile.match(link);
-            if (matchUrl.hasMatch() && !link.contains("](")) {
+            if (matchUrl.hasMatch() && !link.contains(LINK_SYMBOL_URL_START)) {
                 int pos = cursor.position()+1;
-                QString symbolsWithLink = "[]("+link+")";
+                QString symbolsWithLink = QString(LINK_SYMBOL_TITLE_START) + LINK_SYMBOL_MID + link + LINK_SYMBOL_URL_END;
                 cursor.insertText(symbolsWithLink);
                 cursor.setPosition(pos);
                 this->setTextCursor(cursor);
-            }else if(matchFolderFile.hasMatch() && !link.contains("](")) {
+            }else if(matchFolderFile.hasMatch() && !link.contains(LINK_SYMBOL_URL_START)) {
                 int pos = cursor.position()+1;
-                QString symbolsWithLink = "[](file:///"+link+")";
+                QString symbolsWithLink =  QString(LINK_SYMBOL_TITLE_START) + LINK_SYMBOL_MID + "file:///"+link+LINK_SYMBOL_URL_END;
                 cursor.insertText(symbolsWithLink);
                 cursor.setPosition(pos);
                 this->setTextCursor(cursor);
