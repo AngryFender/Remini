@@ -409,6 +409,99 @@ TEST_CASE("MkEdit paste path from clipboard then check if the cursor is at the m
     REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
 }
 
+TEST_CASE("MkEdit using tab to insert links symbols ", "[MkEdit]")
+{
+
+    MkTextDocument doc;
+    MkEdit edit;
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
+
+    doc.setPlainText("lk");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::autoInsertSymbol,
+                     &doc,&MkTextDocument::autoInsertSymobolHandle);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(2);
+    edit.setTextCursor(cursor);
+
+    QScopedPointer<QKeyEvent> tabKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier, QString("    ")));
+    edit.keyPressEvent(tabKeyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("[](<>)" == text);
+}
+
+TEST_CASE("MkEdit undo after using tab to insert links symbols ", "[MkEdit]")
+{
+
+    MkTextDocument doc;
+    MkEdit edit;
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
+
+    doc.setPlainText("lk");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::autoInsertSymbol,
+                     &doc,&MkTextDocument::autoInsertSymobolHandle);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(2);
+    edit.setTextCursor(cursor);
+
+    QScopedPointer<QKeyEvent> tabKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier, QString("    ")));
+    edit.keyPressEvent(tabKeyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("[](<>)" == text);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("lk" == text);
+}
+
 TEST_CASE("MkEdit type inside bold format then check if the cursor is at the right place", "[MkEdit]")
 {
 
