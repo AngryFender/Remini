@@ -1114,7 +1114,7 @@ void MkTextDocument::autoInsertSymobolHandle(const int position)
     }else if(text == "uncheck" || text == "uch"){
         cursor.insertText(unCheckSymbol);
     }else if(text == "link" || text == "lk"){
-        cursor.insertText("[]()");
+        cursor.insertText(QString(LINK_SYMBOL_TITLE_START)+QString(LINK_SYMBOL_MID) + QString(LINK_SYMBOL_URL_END));
     }else{
         cursor.setPosition(position);
         cursor.insertText("    ");
