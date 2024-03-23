@@ -96,7 +96,12 @@ void MainWindow::showHideApp()
     if(this->isMinimized()){
         this->showNormal();
     }else{
-        this->showMinimized();
+        if(QWidget::winId() == win->GetForegroundWindowInvoke()){
+            this->showMinimized();
+        }else{
+            this->showMinimized();
+            this->showNormal();
+        }
     }
 }
 

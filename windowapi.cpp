@@ -15,9 +15,10 @@ LRESULT WindowApi::CallNextHookExInvoke(HHOOK hhk, int nCode, WPARAM wParam, LPA
     return CallNextHookEx(hhk, nCode, wParam, lParam);
 }
 
-BOOL WindowApi::BringWindowToTopInvoke(HWND hWnd)
+WId WindowApi::GetForegroundWindowInvoke()
 {
-    return BringWindowToTop(hWnd);
+    WId wid = reinterpret_cast<WId>(GetForegroundWindow());
+    return wid;
 }
 
 void WindowApi::cleanUp()

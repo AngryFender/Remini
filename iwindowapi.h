@@ -1,6 +1,7 @@
 #ifndef IWINDOWAPI_H
 #define IWINDOWAPI_H
 
+#include "qwindowdefs.h"
 #include <QObject>
 #include <Windows.h>
 
@@ -22,10 +23,9 @@ public:
                                 WPARAM wParam,
                                 LPARAM  lParam) = 0;
 
-    virtual BOOL UnhookWindowsHookExInoke(
-                                HHOOK hhk) = 0;
+    virtual BOOL UnhookWindowsHookExInoke(HHOOK hhk) = 0;
 
-    virtual BOOL BringWindowToTopInvoke( HWND hWnd ) = 0;
+    virtual WId GetForegroundWindowInvoke() = 0;
 
 protected:
     void cleanUp(){};
