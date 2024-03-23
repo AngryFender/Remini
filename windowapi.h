@@ -33,9 +33,9 @@ public:
 
     HHOOK SetWindowsHookExInvoke(int idHook, HOOKPROC lpfn, HINSTANCE hmod, DWORD dwThreadId) override;
     BOOL UnhookWindowsHookExInoke(HHOOK hhk) override;
-
     LRESULT CallNextHookExInvoke(HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam) override;
 
+    BOOL BringWindowToTopInvoke(HWND hWnd) override;
 signals:
     void showApp();
 

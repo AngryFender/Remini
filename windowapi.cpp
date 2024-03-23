@@ -15,6 +15,11 @@ LRESULT WindowApi::CallNextHookExInvoke(HHOOK hhk, int nCode, WPARAM wParam, LPA
     return CallNextHookEx(hhk, nCode, wParam, lParam);
 }
 
+BOOL WindowApi::BringWindowToTopInvoke(HWND hWnd)
+{
+    return BringWindowToTop(hWnd);
+}
+
 void WindowApi::cleanUp()
 {
     UnhookWindowsHookExInoke(keyboardProcHook);

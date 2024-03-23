@@ -25,6 +25,8 @@ public:
     virtual BOOL UnhookWindowsHookExInoke(
                                 HHOOK hhk) = 0;
 
+    virtual BOOL BringWindowToTopInvoke( HWND hWnd ) = 0;
+
 protected:
     void cleanUp(){};
 
