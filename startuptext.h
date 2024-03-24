@@ -12,8 +12,8 @@ const QString startupText = QStringLiteral("Keyboard Shortcuts:\n"
                                            " - Right click \"Disable Markdown\" will show markdown symbols\n"
                                            " - Right click \"Disable WordWrap\" will disable word warpping \n"
                                            "\n"
-                                           "Path Config:\n"
-                                           " - Check config.txt in the exe folder to update the root path\n"
+                                           "Vault Path :\n"
+                                           " - Right click context menu on the navigation view or open settings\n"
                                            "\n"
                                            );
 
