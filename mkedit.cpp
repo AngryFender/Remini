@@ -150,7 +150,6 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
     switch(event->key()){
-    case Qt::Key_Escape: emit escapeFocus(this);return;
     case Qt::Key_Shift: isShiftKeyPressed = true;
     case Qt::Key_Up:
     case Qt::Key_Right:

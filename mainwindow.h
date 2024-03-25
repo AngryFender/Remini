@@ -55,5 +55,6 @@ signals:
     void openRecentFilesDialog(bool show);
     void startSearchAll();
     void startFileSearch();
+    void sendFocusToNavigationView();
 };
 #endif // MAINWINDOW_H

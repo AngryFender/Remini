@@ -44,7 +44,7 @@ public slots:
     void openRecentFilesDialogHandle(bool show);
     void startTextSearchInAllFilesHandle();
     void startFileSearchHandle();
-
+    void sendFocusToNavigationViewHandler();
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         firstDirectoryLoad = true;

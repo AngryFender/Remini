@@ -34,6 +34,9 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this,&MainWindow::startFileSearch,
                      view_handler.get(),&ViewsHandler::startFileSearchHandle);
 
+    QObject::connect(this,&MainWindow::sendFocusToNavigationView,
+                     view_handler.get(),&ViewsHandler::sendFocusToNavigationViewHandler);
+
     QObject::connect(win, &WindowApi::showApp,
                      this,&MainWindow::showHideApp);
 
@@ -71,6 +74,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     };
 
     switch(event->key()){
+        case Qt::Key_Escape:
+            emit sendFocusToNavigationView();
+            break;
         case Qt::Key_F12:
                 if (themeState == darkThemeState){
                     themeState = lightThemeState;

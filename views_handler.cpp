@@ -769,3 +769,12 @@ void ViewsHandler::startFileSearchHandle()
     frameSearchFileTree->show();
     viewSearch->setFocus();
 }
+
+void ViewsHandler::sendFocusToNavigationViewHandler()
+{
+    if(!frameSearchFileTree->isHidden()){
+        viewTree->setFocus();
+    }else{
+        viewTextSearchTree->setFocus();
+    }
+}
