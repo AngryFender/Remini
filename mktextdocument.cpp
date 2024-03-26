@@ -410,6 +410,29 @@ void MkTextDocument::composeSymbolCombination(int length, const QString &text, i
 
 }
 
+void MkTextDocument::composeOnlyLinkSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result)
+{
+    result.clear();
+    if(index3<length){
+        convertCharacterToLinkSymbol(text[index1], result);
+        convertCharacterToLinkSymbol(text[index2], result);
+        convertCharacterToLinkSymbol(text[index3], result);
+        if(result == LINK_SYMBOL_MID ||
+            result == LINK_SYMBOL_URL_START ||
+            result == LINK_SYMBOL_URL_END ||
+            result == ")>)" ){
+            if(result == ")>)"){  //edge case
+                result = ">)";
+            }
+            return;
+        }
+    }
+    result.clear();
+    if(convertCharacterToLinkSymbol(text[index1], result)){
+        return;
+    }
+}
+
 void MkTextDocument::setCodeBlockMargin(QTextBlock &block, int leftMargin,int rightMargin, int topMargin)
 {
     QTextCursor cursor(block);

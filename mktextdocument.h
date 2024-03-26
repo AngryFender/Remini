@@ -193,6 +193,7 @@ public slots:
     void convertCharacterToCheckboxSymbol(const QChar &single, QString &text);
     bool convertCharacterToLinkSymbol(const QChar &single, QString &text);
     void composeSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result);
+    void composeOnlyLinkSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result);
 
     void setCodeBlockMargin(QTextBlock &block, int leftMargin=0,int rightMargin =0, int topMargin = 0);
     void stripUserData();
