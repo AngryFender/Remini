@@ -99,6 +99,7 @@ public:
     int getCharacterNo()const;
     QString getFilePath() const;
     QString getFileName() const;
+    QTextDocument* getRawDocument();
 
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, SelectRange * range);
@@ -142,6 +143,7 @@ public slots:
 
     QTextDocument originalTexts;
     QTextDocument formattedTexts;
+    QTextDocument rawDocument;
 
     QString filePath;
     QString fileName;

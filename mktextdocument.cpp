@@ -85,6 +85,11 @@ QString MkTextDocument::getFileName() const
     return this->fileName;
 }
 
+QTextDocument *MkTextDocument::getRawDocument()
+{
+    return &rawDocument;
+}
+
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * range)
 {
     if(range){
