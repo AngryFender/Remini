@@ -330,6 +330,7 @@ void MkEdit::removeAllMkDataFunc(int blockNumber)
 void MkEdit::applyMkEffects(const bool scroll)
 {
     disconnectSignals();
+    emit saveRawDocument();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     if(scroll){
         this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);

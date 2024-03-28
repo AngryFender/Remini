@@ -242,6 +242,9 @@ void ViewsHandler::connectDocument()
     QObject::connect(viewText,&MkEdit::applyAllMkData,
                      currentDocument.data(),&MkTextDocument::applyAllMkDataHandle);
 
+    QObject::connect(viewText,&MkEdit::saveRawDocument,
+                     currentDocument.data(),&MkTextDocument::saveRawDocumentHandler);
+
     QObject::connect(viewText,&MkEdit::setMarkdownStatus,
                      currentDocument.data(),&MkTextDocument::setMarkdownHandle);
 
@@ -296,6 +299,10 @@ void ViewsHandler::disconnectDocument()
 
     QObject::disconnect(viewText,&MkEdit::removeAllMkData,
                         currentDocument.data(),&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::disconnect(viewText,&MkEdit::saveRawDocument,
+                     currentDocument.data(),&MkTextDocument::saveRawDocumentHandler);
+
 
     QObject::disconnect(viewText,&MkEdit::applyAllMkData,
                         currentDocument.data(),&MkTextDocument::applyAllMkDataHandle);

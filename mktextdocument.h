@@ -112,6 +112,7 @@ public slots:
     void duplicateLineHandle(int blockNumber);
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
     void drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect, SelectRange* selectRange);
+    void saveRawDocumentHandler();
 
     void showMKSymbolsFromSavedBlocks(QRect *rect = nullptr, int cursorBlockNo = 0);
 

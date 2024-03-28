@@ -18,6 +18,7 @@ void MkTextDocument::setPlainText(const QString &text)
         return;
 
     QTextDocument::setPlainText(text);
+    this->rawDocument.setPlainText(text);
     identifyUserData(false);
     undoStack.clear();
 }
@@ -111,8 +112,10 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
 {
-    showMKSymbolsFromSavedBlocks(nullptr, blockNo);
-    stripUserData();
+//    showMKSymbolsFromSavedBlocks(nullptr, blockNo);
+//    stripUserData();
+
+    this->setPlainText(this->rawDocument.toPlainText());
 }
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll,QRect rect)
@@ -890,6 +893,11 @@ void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, b
 {
     showMKSymbolsFromSavedBlocks(&rect, blockNumber);
     hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll, selectRange);
+}
+
+void MkTextDocument::saveRawDocumentHandler()
+{
+    this->rawDocument.setPlainText(this->toPlainText());
 }
 
 void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo)
