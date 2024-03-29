@@ -112,10 +112,10 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
 {
-//    showMKSymbolsFromSavedBlocks(nullptr, blockNo);
-//    stripUserData();
+    showMKSymbolsFromSavedBlocks(nullptr, blockNo);
+    stripUserData();
 
-    this->setPlainText(this->rawDocument.toPlainText());
+//    this->setPlainText(this->rawDocument.toPlainText());
 }
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll,QRect rect)
