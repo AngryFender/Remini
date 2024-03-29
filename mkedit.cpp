@@ -313,7 +313,23 @@ void MkEdit::clearMkEffects()
 {
     disconnectSignals();
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is importantp
+
+    QTextCursor cursor = this->textCursor();
+    int blockNumber = cursor.blockNumber();
+    int posInBlock = cursor.positionInBlock();
+    bool hasSeleclion = cursor.hasSelection();
+
     emit removeAllMkData(this->textCursor().blockNumber());
+
+    if(hasSeleclion){
+        cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
+        cursor.setPosition(this->document()->findBlockByNumber(blockNumber).position() + posInBlock, QTextCursor::KeepAnchor);
+    }else{
+        cursor.setPosition(this->document()->findBlockByNumber(blockNumber).position() + posInBlock);
+    }
+
+    this->setTextCursor(cursor);
+
     if(!fileSaveTimer.isActive()){
         preUndoSetup();
     }
