@@ -151,6 +151,9 @@ void ViewsHandler::initConnection()
     QObject::connect(viewText,&MkEdit::fileSave,
                      this,  &ViewsHandler::fileSaveHandle);
 
+     QObject::connect(viewText,&MkEdit::fileSaveRaw,
+                     this,  &ViewsHandler::fileSaveRawHandle);
+
     QObject::connect(viewText,&MkEdit::escapeFocus,
                      this,&ViewsHandler::sendFocusToSearchHandler);
 
@@ -476,6 +479,24 @@ void ViewsHandler::fileSaveHandle()
         stream<<fullContent;
         file.close();
     }
+}
+
+void ViewsHandler::fileSaveRawHandle()
+{
+    if(!viewText->hasFocus())
+        return;
+
+    QString fullContent = viewText->toPlainText();
+
+    QFile file(currentDocument.data()->getFilePath());
+
+    if(file.open(QFile::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream<<fullContent;
+        file.close();
+    }
+
 }
 
 void ViewsHandler::fileDeleteDialogue(QModelIndex &index)

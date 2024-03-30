@@ -119,6 +119,7 @@ private slots:
     void fileDisplay(const QModelIndex& index);
     void updateUiSettingsHandler(const QFont &font, const bool mkState);
     void fileSaveHandle();
+    void fileSaveRawHandle();
     void fileDeleteDialogue(QModelIndex& index);
     void searchFileHandle(const QString &filename);
     void navigationAllPathLoaded(QString path);

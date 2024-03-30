@@ -355,6 +355,11 @@ void MkEdit::applyMkEffects(const bool scroll)
     connectSignals();
 }
 
+void MkEdit::fileSaveUsingRaw()
+{
+    emit fileSaveRaw();
+}
+
 void MkEdit::fileSaveNow()
 {
     fileSaveTimer.stop();
@@ -764,6 +769,15 @@ void MkEdit::setDocument(QTextDocument *document)
     disconnectSignals();
     QTextEdit::setDocument(document);
     connectSignals();
+}
+
+QString MkEdit::toPlainText() const
+{
+    MkTextDocument *mkDoc = dynamic_cast<MkTextDocument*>(this->document());
+    if(nullptr == mkDoc){
+        return QTextEdit::toPlainText();
+    }
+    return mkDoc->toPlainText();
 }
 
 void MkEdit::setMkState(bool enable)
