@@ -771,13 +771,13 @@ void MkEdit::setDocument(QTextDocument *document)
     connectSignals();
 }
 
-QString MkEdit::toPlainText() const
+QString MkEdit::rawPlainText() const
 {
     MkTextDocument *mkDoc = dynamic_cast<MkTextDocument*>(this->document());
     if(nullptr == mkDoc){
         return QTextEdit::toPlainText();
     }
-    return mkDoc->toPlainText();
+    return mkDoc->getRawDocument()->toPlainText();
 }
 
 void MkEdit::setMkState(bool enable)

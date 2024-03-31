@@ -486,7 +486,7 @@ void ViewsHandler::fileSaveRawHandle()
     if(!viewText->hasFocus())
         return;
 
-    QString fullContent = viewText->toPlainText();
+    QString fullContent = viewText->rawPlainText();
 
     QFile file(currentDocument.data()->getFilePath());
 

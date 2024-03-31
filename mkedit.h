@@ -56,7 +56,7 @@ public:
     void setKeywordColor(const QColor& color);
 
     void setDocument(QTextDocument *document);
-    QString toPlainText() const;
+    QString rawPlainText() const;
 
     void setFont(const QFont &font);
     void connectSignals();
