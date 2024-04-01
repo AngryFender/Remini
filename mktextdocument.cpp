@@ -27,6 +27,7 @@ void MkTextDocument::setUndoRedoText(const QString &text)
 {
     QTextDocument::clear();
     QTextDocument::setPlainText(text);
+    this->rawDocument.setPlainText(text);
 }
 
 void MkTextDocument::setUndoSelectRange(const SelectRange range)
@@ -112,10 +113,12 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
 {
-    showMKSymbolsFromSavedBlocks(nullptr, blockNo);
-    stripUserData();
+//    showMKSymbolsFromSavedBlocks(nullptr, blockNo);
+//    stripUserData();
 
 //    this->setPlainText(this->rawDocument.toPlainText());
+    QTextDocument::setPlainText(this->rawDocument.toPlainText());
+    //identifyUserData(false);
 }
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll,QRect rect)
@@ -1254,11 +1257,12 @@ EditCommand::EditCommand(UndoData &data)
     this->view = data.view;
     this->doc = dynamic_cast<MkTextDocument*>(data.doc);
     this->text = data.text;
-    this->cursorPos = data.cursorPos;
     this->scrollValue = data.scrollValue;
     this->oldText = data.oldText;
     isConstructorRedo = true;
     this->oldSelectRange = data.oldSelectRange;
+    this->blockNo = data.blockNo;
+    this->posInBlock = data.posInBlock;
 }
 
 void EditCommand::undo()
@@ -1275,7 +1279,9 @@ void EditCommand::redo()
         doc->setUndoRedoText(text);
 
         QTextCursor cursor = this->view->textCursor();
-        cursor.setPosition(this->cursorPos);
+        cursor.setPosition(this->view->document()->findBlockByNumber(this->blockNo).position());
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, this->posInBlock);
+
         this->view->setTextCursor(cursor);
     }
 }

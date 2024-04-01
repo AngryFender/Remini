@@ -283,9 +283,9 @@ void MkEdit::preUndoSetup()
 {
     undoData.view               = this;
     undoData.doc                = this->document();
-    undoData.oldText            = this->document()->toPlainText();
     undoData.undoRedoSkip       = false;
     undoData.selectAll          = false;
+    undoData.oldText            = this->document()->toPlainText();
     undoData.oldSelectRange     = this->selectRange;
     undoData.oldSelectRange.hasSelection     	= this->textCursor().hasSelection();
     undoData.oldSelectRange.currentBlockNo 		= this->textCursor().blockNumber();
@@ -294,8 +294,16 @@ void MkEdit::preUndoSetup()
 
 void MkEdit::postUndoSetup()
 {
-    undoData.text               = this->document()->toPlainText();
-    undoData.cursorPos          = this->textCursor().position();
+
+    MkTextDocument * mkDoc = dynamic_cast<MkTextDocument*>(this->document());
+    if(nullptr == mkDoc){
+        undoData.text = this->document()->toPlainText();
+    }else{
+        undoData.text = mkDoc->getRawDocument()->toPlainText();
+    }
+
+    undoData.blockNo 	= this->textCursor().blockNumber();
+    undoData.posInBlock = this->textCursor().positionInBlock();
 
     if(!undoData.undoRedoSkip){
         EditCommand *edit = new EditCommand(undoData);
@@ -318,11 +326,11 @@ void MkEdit::clearMkEffects()
     QTextCursor cursor = this->textCursor();
     int blockNumber = cursor.blockNumber();
     int posInBlock = cursor.positionInBlock();
-    bool hasSeleclion = cursor.hasSelection();
+    bool hasSelection = cursor.hasSelection();
 
     emit removeAllMkData(this->textCursor().blockNumber());
 
-    if(hasSeleclion){
+    if(hasSelection){
         cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
         cursor.setPosition(this->document()->findBlockByNumber(blockNumber).position() + posInBlock, QTextCursor::KeepAnchor);
     }else{
@@ -347,7 +355,6 @@ void MkEdit::removeAllMkDataFunc(int blockNumber)
 void MkEdit::applyMkEffects(const bool scroll)
 {
     disconnectSignals();
-    emit saveRawDocument();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     if(scroll){
         this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
@@ -364,18 +371,21 @@ void MkEdit::fileSaveUsingRaw()
 void MkEdit::fileSaveNow()
 {
     fileSaveTimer.stop();
+    emit saveRawDocument();
     postUndoSetup();
-    emit fileSave();
+    //emit fileSave();
+    emit fileSaveRaw();
     applyMkEffects();
 }
 
 void MkEdit::fileSaveWithScroll(const bool scroll)
 {
     fileSaveTimer.stop();
-    removeAllMkDataFunc(this->textCursor().blockNumber());
+    //removeAllMkDataFunc(this->textCursor().blockNumber());
     postUndoSetup();
-    emit fileSave();
-    applyMkEffects(scroll);
+    //emit fileSave();
+    emit fileSaveRaw();
+    //applyMkEffects(scroll);
 }
 
 bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
@@ -407,9 +417,9 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         rect.setWidth(width);
         if(rect.contains(pointer)){
             int pos = (*it);
-            removeAllMkDataFunc(this->textCursor().blockNumber());
+            //removeAllMkDataFunc(this->textCursor().blockNumber());
             preUndoSetup();
-            applyMkEffects(false);
+            //applyMkEffects(false);
             emit pushCheckBox(pos);
             fileSaveWithScroll(false);
             return true;

@@ -227,7 +227,8 @@ struct UndoData{
     QTextEdit *view;
     QTextDocument *doc;
     QString text;
-    int cursorPos;
+    int blockNo;
+    int posInBlock;
     QString oldText;
     bool undoRedoSkip;
     bool selectAll;
@@ -247,7 +248,8 @@ private:
     QTextEdit *view;
     MkTextDocument *doc;
     QString text;
-    int cursorPos;
+    int blockNo;
+    int posInBlock;
     int scrollValue;
 
     QString oldText;
