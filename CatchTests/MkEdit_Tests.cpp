@@ -623,6 +623,9 @@ TEST_CASE("MkEdit redo after undo after typing inside bold format then check if 
     QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
                      &doc,&MkTextDocument::undoStackRedo);
 
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
@@ -676,6 +679,9 @@ TEST_CASE("MkEdit selection check for undo after typing inside bold format then 
 
     QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
                      &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
 
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(initialPos);
@@ -737,6 +743,9 @@ TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
     QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
                      &doc,&MkTextDocument::undoStackRedo);
 
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
@@ -765,6 +774,12 @@ TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
 
     QScopedPointer<QKeyEvent> randomKeyPressEvent2 (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("d")));
     edit.keyPressEvent(randomKeyPressEvent2.data());
+
+    int currentPosition = edit.textCursor().position();
+    int expectedPosition = 6;
+
+    REQUIRE( currentPosition == expectedPosition);
+
     text = edit.toPlainText();
     REQUIRE("**boddd~~" == text);
 
@@ -807,6 +822,10 @@ TEST_CASE("MkEdit type all strings with bold format then check if the cursor is 
 
     QObject::connect(&edit,&MkEdit::applyAllMkData,
                      &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
 
 
     QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString(" ")));
