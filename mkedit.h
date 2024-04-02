@@ -115,7 +115,6 @@ protected:
     void clearMkEffects();
     void removeAllMkDataFunc(int blockNumber);
     void applyMkEffects(const bool scroll = true);
-    void fileSaveUsingRaw();
     void fileSaveNow();
     void fileSaveWithScroll(const bool scroll = true);
 

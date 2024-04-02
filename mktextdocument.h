@@ -142,8 +142,6 @@ public slots:
         }
     };
 
-    QTextDocument originalTexts;
-    QTextDocument formattedTexts;
     QTextDocument rawDocument;
 
     QString filePath;

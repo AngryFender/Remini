@@ -363,17 +363,11 @@ void MkEdit::applyMkEffects(const bool scroll)
     connectSignals();
 }
 
-void MkEdit::fileSaveUsingRaw()
-{
-    emit fileSaveRaw();
-}
-
 void MkEdit::fileSaveNow()
 {
     fileSaveTimer.stop();
     emit saveRawDocument();
     postUndoSetup();
-    //emit fileSave();
     emit fileSaveRaw();
     applyMkEffects();
 }
