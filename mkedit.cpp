@@ -281,11 +281,17 @@ void MkEdit::tabKeyPressed()
 
 void MkEdit::preUndoSetup()
 {
+    MkTextDocument * mkDoc = dynamic_cast<MkTextDocument*>(this->document());
+    if(nullptr == mkDoc){
+        undoData.oldText = this->document()->toPlainText();
+    }else{
+        undoData.oldText = mkDoc->getRawDocument()->toPlainText();
+    }
+
     undoData.view               = this;
     undoData.doc                = this->document();
     undoData.undoRedoSkip       = false;
     undoData.selectAll          = false;
-    undoData.oldText            = this->document()->toPlainText();
     undoData.oldSelectRange     = this->selectRange;
     undoData.oldSelectRange.hasSelection     	= this->textCursor().hasSelection();
     undoData.oldSelectRange.currentBlockNo 		= this->textCursor().blockNumber();
