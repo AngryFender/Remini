@@ -667,6 +667,37 @@ void MkTextDocument::showSymbolsAtPos(QString &text, int pos, const QString &sym
     text.insert(pos,symbol);
 }
 
+void MkTextDocument::extractSymbolsInBlock(QTextBlock &block)
+{
+    QTextBlockUserData* data =block.userData();
+    if(data == nullptr){
+        return;
+    }
+
+    BlockData* blockData = dynamic_cast<BlockData*>(data);
+    if(blockData)
+    {
+        if(blockData->getStatus()!=BlockData::content)
+        {
+            showSymbols(block, CODEBLOCK_SYMBOL);
+        }
+    }
+    else{
+        LineData* lineData = dynamic_cast<LineData*>(data);
+        if(lineData){
+            lineData->setDraw(false);
+            showSymbols(block, lineData->getSymbol());
+        }
+        FormatData* formatData = dynamic_cast<FormatData*>(data);
+        if(formatData){
+            if(formatData->isHidden()){
+                formatData->setHidden(false);
+                showAllFormatSymbolsInTextBlock(block, formatData);
+            }
+        }
+    }
+}
+
 void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
 {
     QTextCursor editCursor(this->findBlockByNumber(blockNumber));

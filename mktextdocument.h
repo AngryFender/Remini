@@ -210,6 +210,8 @@ public slots:
     void showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * selectRange = nullptr);
     void showSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
+    void extractSymbolsInBlock(QTextBlock &block);
+
     void autoCompleteCodeBlock(int blockNumber,bool &success);
     BlockData* checkValidCodeBlock(QTextBlock &block);
 
