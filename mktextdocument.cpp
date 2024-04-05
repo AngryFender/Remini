@@ -667,7 +667,7 @@ void MkTextDocument::showSymbolsAtPos(QString &text, int pos, const QString &sym
     text.insert(pos,symbol);
 }
 
-void MkTextDocument::extractSymbolsInBlock(QTextBlock &block)
+void MkTextDocument::extractSymbolsInBlock(QTextBlock &block, QString &result)
 {
     QTextBlockUserData* data =block.userData();
     if(data == nullptr){
@@ -692,10 +692,25 @@ void MkTextDocument::extractSymbolsInBlock(QTextBlock &block)
         if(formatData){
             if(formatData->isHidden()){
                 formatData->setHidden(false);
-                showAllFormatSymbolsInTextBlock(block, formatData);
+                showFormatSymbolsInTextBlock(block, formatData, result);
             }
         }
     }
+}
+
+void MkTextDocument::showFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, QString &result)
+{
+    QString textBlock = block.text();
+    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
+    {
+        showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
+
+        if((*it)->getSymbol() == LINK_SYMBOL_URL_START){
+            int pos = (*it)->getPos();
+            textBlock.insert(pos+2,formatData->getLinkUrl(pos));
+        }
+    }
+    result = textBlock;
 }
 
 void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)
