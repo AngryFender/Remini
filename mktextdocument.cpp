@@ -113,12 +113,7 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
 {
-//    showMKSymbolsFromSavedBlocks(nullptr, blockNo);
-//    stripUserData();
-
-//    this->setPlainText(this->rawDocument.toPlainText());
     QTextDocument::setPlainText(this->rawDocument.toPlainText());
-    //identifyUserData(false);
 }
 
 void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll,QRect rect)
@@ -690,10 +685,7 @@ void MkTextDocument::extractSymbolsInBlock(QTextBlock &block, QString &result)
         }
         FormatData* formatData = dynamic_cast<FormatData*>(data);
         if(formatData){
-            if(formatData->isHidden()){
-                formatData->setHidden(false);
-                showFormatSymbolsInTextBlock(block, formatData, result);
-            }
+            showFormatSymbolsInTextBlock(block, formatData, result);
         }
     }
 }
@@ -1113,6 +1105,7 @@ void MkTextDocument::pushCheckBoxHandle(const int position)
     cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
 
     QTextBlock block = findBlock(position);
+    int blockNo = block.blockNumber();
     QTextBlockUserData* data =block.userData();
     FormatData* formatData = dynamic_cast<FormatData*>(data);
 
@@ -1158,6 +1151,17 @@ void MkTextDocument::pushCheckBoxHandle(const int position)
                 index2++;
         }
     }
+
+    //update the pushing checking actions on the raw document as well
+    QTextBlock rawBlock(block);
+    QString rawString;
+    extractSymbolsInBlock(rawBlock, rawString);
+
+    QTextCursor cursorRaw(&rawDocument);
+    cursorRaw.setPosition(rawDocument.findBlockByLineNumber(blockNo).position());
+    cursorRaw.movePosition(QTextCursor::StartOfBlock);
+    cursorRaw.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    cursorRaw.insertText(rawString);
 }
 
 void MkTextDocument::pushLinkHandle(const int position)

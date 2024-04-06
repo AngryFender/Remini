@@ -378,14 +378,11 @@ void MkEdit::fileSaveNow()
     applyMkEffects();
 }
 
-void MkEdit::fileSaveWithScroll(const bool scroll)
+void MkEdit::fileSaveWithScroll()
 {
     fileSaveTimer.stop();
-    //removeAllMkDataFunc(this->textCursor().blockNumber());
     postUndoSetup();
-    //emit fileSave();
     emit fileSaveRaw();
-    //applyMkEffects(scroll);
 }
 
 bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
@@ -417,11 +414,13 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         rect.setWidth(width);
         if(rect.contains(pointer)){
             int pos = (*it);
-            //removeAllMkDataFunc(this->textCursor().blockNumber());
+
+            disconnectSignals();
             preUndoSetup();
-            //applyMkEffects(false);
             emit pushCheckBox(pos);
-            fileSaveWithScroll(false);
+            fileSaveWithScroll();
+            connectSignals();
+
             return true;
         }
     }

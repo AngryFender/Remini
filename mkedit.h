@@ -116,7 +116,7 @@ protected:
     void removeAllMkDataFunc(int blockNumber);
     void applyMkEffects(const bool scroll = true);
     void fileSaveNow();
-    void fileSaveWithScroll(const bool scroll = true);
+    void fileSaveWithScroll();
 
     bool isMouseOnCheckBox(QMouseEvent *e);
     void showSelectionAfterUndo();
