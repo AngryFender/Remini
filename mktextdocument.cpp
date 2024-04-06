@@ -1166,10 +1166,6 @@ void MkTextDocument::pushCheckBoxHandle(const int position)
 
 void MkTextDocument::pushLinkHandle(const int position)
 {
-    QTextCursor cursor(this);
-    cursor.setPosition(position);
-    cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
-
     QTextBlock block = findBlock(position);
     QTextBlockUserData* data =block.userData();
     FormatData* formatData = dynamic_cast<FormatData*>(data);
