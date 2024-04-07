@@ -255,6 +255,18 @@ void MkEdit::setSelectionUsingArrowKeys(bool isShiftPressed)
     }
 }
 
+void MkEdit::restoreTextCursor(int blockNo, int posInBlock, bool hasSelection)
+{
+    QTextCursor cursor = this->textCursor();
+    if(hasSelection){
+        cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
+        cursor.setPosition(this->document()->findBlockByNumber(blockNo).position() + posInBlock, QTextCursor::KeepAnchor);
+    }else{
+        cursor.setPosition(this->document()->findBlockByNumber(blockNo).position() + posInBlock);
+    }
+    this->setTextCursor(cursor);
+}
+
 void MkEdit::quoteLeftKey()
 {
     bool success =false;
@@ -557,6 +569,10 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 {
     bool isBlock = false;
     QTextCursor cursor = this->textCursor();
+    int cursorBlockNo = cursor.blockNumber();
+    int cursorPosInBlock = cursor.positionInBlock();
+    bool hasSelection = cursor.hasSelection();
+
     disconnectSignals();
     emit checkIfCursorInBlock(isBlock,cursor);
 
@@ -566,6 +582,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     //if the mime text itself is a code block
     if(matchCodeBlockRegex.hasMatch()){
         emit removeAllMkData(cursor.blockNumber());
+        restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
         preUndoSetup();
 
         if(isBlock){
@@ -576,6 +593,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 
         if(!isBlock){
             emit removeAllMkData(this->textCursor().blockNumber());
+            restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
             preUndoSetup();
 
             QString link = source->text();
@@ -599,13 +617,16 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
             }
         }else{
             emit removeAllMkData(cursor.blockNumber());
+            restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
             preUndoSetup();
+
             QTextEdit::insertFromMimeData(source);
         }
     }
 
     postUndoSetup();
-    emit fileSave();
+    emit saveRawDocument();
+    emit fileSaveRaw();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     connectSignals();
 }

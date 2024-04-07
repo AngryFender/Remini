@@ -122,7 +122,9 @@ protected:
     void showSelectionAfterUndo();
     void setSelectionUsingArrowKeys(bool isShiftPressed);
 
- public slots:
+    void restoreTextCursor(int blockNo, int posInBlock, bool hasSelection);
+
+public slots:
     void contextMenuHandler(QPoint pos);
     void undoContextMenu();
     void redoContextMenu();
