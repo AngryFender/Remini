@@ -624,8 +624,8 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
         }
     }
 
-    postUndoSetup();
     emit saveRawDocument();
+    postUndoSetup();
     emit fileSaveRaw();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     connectSignals();
