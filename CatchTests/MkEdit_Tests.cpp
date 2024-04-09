@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QScopedPointer>
+#include <QTest>
 
 TEST_CASE("MkEdit simple text", "[MkEdit]")
 {
@@ -709,6 +710,59 @@ TEST_CASE("MkEdit selection check for undo after typing inside bold format then 
     QString selectedTextAfterUndo = edit.textCursor().selectedText();
     selectedTextAfterUndo.replace(paragraphSeparator, '\n');
     REQUIRE("ld**\n*itali" == selectedTextAfterUndo);
+}
+
+TEST_CASE("MkEdit paste from clipboard into MkEdit", "[MkEdit]")
+{
+
+    MkTextDocument doc;
+    MkEdit edit;
+    QChar paragraphSeparator(0x2029);
+    int initialPos = 0;
+
+    doc.setPlainText("");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    QMimeData data;
+    data.setText("test data");
+
+    // Set text to the clipboard
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->setText("test data");
+
+    // Simulate paste from clipboard
+    QTest::keyClicks(&edit, QGuiApplication::clipboard()->text());
+
+    QString text = edit.toPlainText();
+    REQUIRE("test data" == text);
 }
 
 TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
