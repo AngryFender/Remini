@@ -717,6 +717,7 @@ TEST_CASE("MkEdit paste from clipboard into MkEdit", "[MkEdit]")
     MkTextDocument doc;
     MkEdit edit;
     int initialPos = 0;
+    QString clipboardText = "test data";
 
     doc.setPlainText("");
     edit.setDocument(&doc);
@@ -749,16 +750,14 @@ TEST_CASE("MkEdit paste from clipboard into MkEdit", "[MkEdit]")
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
 
-    QMimeData data;
-    data.setText("test data");
-
     // Set text to the clipboard
-    QClipboard *clipboard = QGuiApplication::clipboard();
-    clipboard->setText("test data");
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(clipboardText);
 
     // Simulate paste from clipboard
-    QTest::keyClicks(&edit, QGuiApplication::clipboard()->text());
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
 
+    edit.keyPressEvent(keyPressEvent.data());
     QString text = edit.toPlainText();
     REQUIRE("test data" == text);
 }
@@ -768,6 +767,7 @@ TEST_CASE("MkEdit undo paste from clipboard into MkEdit", "[MkEdit]")
     MkTextDocument doc;
     MkEdit edit;
     int initialPos = 0;
+    QString clipboardText = "test data";
 
     doc.setPlainText("");
     edit.setDocument(&doc);
@@ -800,16 +800,14 @@ TEST_CASE("MkEdit undo paste from clipboard into MkEdit", "[MkEdit]")
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
 
-    QMimeData data;
-    data.setText("test data");
-
     // Set text to the clipboard
-    QClipboard *clipboard = QGuiApplication::clipboard();
-    clipboard->setText("test data");
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(clipboardText);
 
     // Simulate paste from clipboard
-    QTest::keyClicks(&edit, QGuiApplication::clipboard()->text());
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
 
+    edit.keyPressEvent(keyPressEvent.data());
     QString text = edit.toPlainText();
     REQUIRE("test data" == text);
 
@@ -817,6 +815,63 @@ TEST_CASE("MkEdit undo paste from clipboard into MkEdit", "[MkEdit]")
     edit.keyPressEvent(undoKeyPressEvent.data());
     text = edit.toPlainText();
     REQUIRE("" == text);
+}
+
+TEST_CASE("MkEdit redo paste from clipboard into MkEdit", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    int initialPos = 0;
+    QString clipboardText= "test data";
+
+    doc.setPlainText("");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(clipboardText);
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
+
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("test data" == text);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("" == text);
+
+    QScopedPointer<QKeyEvent>  redoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier)) ;
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("test data" == text);
 }
 
 TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
