@@ -874,6 +874,137 @@ TEST_CASE("MkEdit redo paste from clipboard into MkEdit", "[MkEdit]")
     REQUIRE("test data" == text);
 }
 
+TEST_CASE("MkEdit correct cursor position for undo/redo paste from clipboard into MkEdit", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    int initialPos = 23;
+    QString clipboardText = "caterpillar";
+
+    doc.setPlainText("I Turned Myself Into A Pickle, Morty!");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    //select the word "Pickle"
+    for(int i = 0; i < 6; i ++){
+        QScopedPointer<QKeyEvent>  ShiftKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::ShiftModifier)) ;
+        edit.keyPressEvent(ShiftKeyPressEvent.data());
+    }
+
+    // Set text to the clipboard
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(clipboardText);
+
+    // Simulate paste from clipboard
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
+
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("I Turned Myself Into A caterpillar, Morty!" == text);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("I Turned Myself Into A Pickle, Morty!" == text);
+
+    QString selectedText = edit.textCursor().selectedText();
+    REQUIRE("Pickle" == selectedText);
+}
+
+TEST_CASE("MkEdit correct multiple lines, cursor position for undo/redo paste from clipboard into MkEdit", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QChar paragraphSeparator(0x2029);
+    int initialPos = 23;
+    QString clipboardText = "Wubba Lubba Dub Dub!";
+
+    doc.setPlainText("I Turned Myself Into A Pickle, Morty!\nHe Turned Himself Into Akira!\nBut Life Is Made Of Little Concessions");
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    //select the word "Pickle"
+    for(int i = 0; i < 83; i ++){
+        QScopedPointer<QKeyEvent>  ShiftKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::ShiftModifier)) ;
+        edit.keyPressEvent(ShiftKeyPressEvent.data());
+    }
+
+    // Set text to the clipboard
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(clipboardText);
+
+    // Simulate paste from clipboard
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
+
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("I Turned Myself Into A Wubba Lubba Dub Dub!" == text);
+
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("I Turned Myself Into A Pickle, Morty!\nHe Turned Himself Into Akira!\nBut Life Is Made Of Little Concessions" == text);
+
+    QString selectedText = edit.textCursor().selectedText();
+    selectedText.replace(paragraphSeparator, '\n');
+    REQUIRE("Pickle, Morty!\nHe Turned Himself Into Akira!\nBut Life Is Made Of Little Concessions" == selectedText);
+}
+
+
 TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
 {
 
