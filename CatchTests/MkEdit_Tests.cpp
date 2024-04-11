@@ -1186,3 +1186,94 @@ TEST_CASE("MkEdit type inside link format in 2nd line then check if the cursor i
     REQUIRE(currentPositionOfTextCursorInBlock == desiredPos);
 }
 
+TEST_CASE("MkEdit checkbox mouse click with undo/redo", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    int initialPos = 30;
+
+    edit.setDocument(&doc);
+    doc.setPlainText("- [x]  option1\n- [x]  option2\n");
+
+    QObject::connect(&edit,&MkEdit::drawTextBlocks,
+                     &doc,&MkTextDocument::drawTextBlocksHandler);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::pushCheckBox,
+                     &doc,&MkTextDocument::pushCheckBoxHandle);
+
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+
+    QAbstractTextDocumentLayout* layout = doc.documentLayout();
+    QTextBlock block1 = doc.findBlockByNumber(0);
+    QTextBlock block2 = doc.findBlockByNumber(1);
+
+    QRectF firstRect = layout->blockBoundingRect(block1);
+    QRectF secondRect = layout->blockBoundingRect(block2);
+    QRect combineRect(0, 0, firstRect.width() + 10, firstRect.height() + secondRect.height() + 10 );
+
+    // apply markdown formats and update checkbox positions from screen to text cursor position
+    doc.applyAllMkDataHandle(false, 3, false, combineRect);
+
+    int countCheckBoxes = 0;
+    for(auto it = doc.checkMarkPosBegin(); it!= doc.checkMarkPosEnd(); it++){
+        countCheckBoxes++;
+    }
+    REQUIRE(countCheckBoxes>0);
+
+    QString text = edit.toPlainText();
+    REQUIRE("☑ option1\n☑ option2\n"==text);
+
+    //mouse press on the checkbox to remove the tick
+    QPoint firstCheckBocPoint(6,6);
+    QTest::mousePress(edit.viewport(), Qt::LeftButton,Qt::NoModifier,firstCheckBocPoint);
+
+    text = edit.toPlainText();
+    REQUIRE("☐ option1\n☑ option2\n"==text);
+
+    //check if the raw document is updated from the mouse click
+    text = doc.getRawDocument()->toPlainText();
+    REQUIRE("- [ ]  option1\n- [x]  option2\n" == text);
+
+    //undo
+    QScopedPointer<QKeyEvent>  undoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier)) ;
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("☑ option1\n☑ option2\n"==text);
+
+    text = doc.getRawDocument()->toPlainText();
+    REQUIRE("- [x]  option1\n- [x]  option2\n" == text);
+
+    //redo
+    QScopedPointer<QKeyEvent>  redoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier)) ;
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("☐ option1\n☑ option2\n"==text);
+
+    text = doc.getRawDocument()->toPlainText();
+    REQUIRE("- [ ]  option1\n- [x]  option2\n" == text);
+}
