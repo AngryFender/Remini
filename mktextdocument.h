@@ -75,6 +75,11 @@ struct SelectRange{
     bool isFirstMousePress  = false;
 };
 
+struct RawBlockInfo{
+    int rawFirstBlock  = NO_SELECTION_POS;
+    int rawEndBlock    = NO_SELECTION_POS;
+};
+
 class MkTextDocument : public QTextDocument
 {
     Q_OBJECT
@@ -149,8 +154,8 @@ public slots:
     int blockNo;
     int characterNo;
     SelectRange selectRange;
-    int selectStart;
-    int selectEnd;
+    RawBlockInfo rawBlockInfo;
+
     FormatLocation locBoldA;
     FormatLocation locBoldU;
     FormatLocation locItalicA;

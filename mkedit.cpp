@@ -909,8 +909,6 @@ void MkEdit::cursorPositionChangedHandle()
 
         selectRange.selectionEndBlock = selectRange.selectionFirstStartBlock;
         selectRange.selectionEndPosInBlock = selectRange.selectionFirstStartPosInBlock;
-
-
     }else{
         selectRange.hasSelection = true;
         selectRange.selectionEndBlock = cursor.blockNumber();
