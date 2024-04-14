@@ -76,6 +76,7 @@ struct SelectRange{
 };
 
 struct RawBlockInfo{
+    bool hasSelection = false;
     int rawFirstBlock  = NO_SELECTION_POS;
     int rawEndBlock    = NO_SELECTION_POS;
 };

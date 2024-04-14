@@ -95,7 +95,11 @@ QTextDocument *MkTextDocument::getRawDocument()
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * range)
 {
     if(range){
+        this->rawBlockInfo.hasSelection = range->hasSelection;
         if(range->hasSelection){
+            this->rawBlockInfo.rawFirstBlock = range->selectionFirstStartBlock;
+            this->rawBlockInfo.rawEndBlock = range->selectionEndBlock;
+
             if(range->selectionFirstStartBlock < range->selectionEndBlock){
                 this->selectRange.startBlock = range->selectionFirstStartBlock;
                 this->selectRange.endBlock   = range->selectionEndBlock;
@@ -106,9 +110,13 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
         }else{
             this->selectRange.startBlock = -1;
             this->selectRange.endBlock = -1;
+            this->rawBlockInfo.rawFirstBlock = range->currentBlockNo;
         }
     }
     hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, true);
+
+    //1. insert raw text in new cursor blocks
+    //2. format texts from previous cursor blocks
 }
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
