@@ -108,18 +108,32 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
                 this->selectRange.endBlock   =  range->selectionFirstStartBlock;
             }
         }else{
-            this->selectRange.startBlock = -1;
-            this->selectRange.endBlock = -1;
+            //this->selectRange.startBlock = -1;
+            //this->selectRange.endBlock = -1;
+            this->selectRange.startBlock = range->selectionFirstStartBlock;
+            this->selectRange.endBlock = range->selectionFirstStartBlock;
             this->rawBlockInfo.rawFirstBlock = range->currentBlockNo;
         }
     }
-    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, true);
+    //hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, true);
 
 
-    //1. insert raw text in new cursor blocks
-    scanShowMkSymbolsInRangeOfBlocks(range, true);
+    // insert raw text in new cursor blocks
+    QTextCursor cursor(this);
 
-    //2. format texts from previous cursor blocks
+    int curr = this->selectRange.startBlock;
+    while(curr <= this->selectRange.endBlock){
+
+        cursor.setPosition(this->findBlockByNumber(curr).position());
+        cursor.movePosition(QTextCursor::StartOfBlock);
+        cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+        cursor.insertText(rawDocument.findBlockByNumber(curr).text());
+        curr++;
+    }
+    //scanShowMkSymbolsInRangeOfBlocks(range, true);
+
+    // format texts from previous cursor blocks
+
 
 }
 
