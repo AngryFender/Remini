@@ -949,7 +949,7 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
 
 void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect, SelectRange *selectRange)
 {
-    showMKSymbolsFromSavedBlocks(&rect, blockNumber);
+    //showMKSymbolsFromSavedBlocks(&rect, blockNumber);
     hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll, selectRange);
 }
 
@@ -1002,7 +1002,6 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
 
     int fontSize =this->defaultFont().pointSize();
     FormatCollection formatCollection(fontSize);
-    QAbstractTextDocumentLayout* layout = this->documentLayout();
     CheckingBlock checkBlock;
     if(clearPushCheckBoxData){
         checkMarkPositions.clear();
@@ -1010,7 +1009,6 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
     }
 
     for(QTextBlock block = this->begin(); block != this->end(); block = block.next()){
-        if( layout->blockBoundingRect(block).bottom() < (rect.bottom()+200) && layout->blockBoundingRect(block).top() > (rect.top()-40)){
 
             int currentBlockNumber = block.blockNumber();
             QTextBlockUserData* data =block.userData();
@@ -1111,7 +1109,6 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                 }
             }
             savedBlocks.append(block);
-        }
     }
 }
 
