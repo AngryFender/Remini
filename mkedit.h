@@ -131,7 +131,6 @@ public slots:
     void deleteContextMenu();
     void selectBlock();
     void cursorPositionChangedHandle();
-    void scrollValueUpdateHandle(int value);
 
 private slots:
     void fileSaveHandle();

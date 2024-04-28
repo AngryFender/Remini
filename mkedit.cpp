@@ -176,7 +176,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); scrollValueUpdateHandle(undoData.scrollValue); showSelectionAfterUndo(); return;}break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); /*scrollValueUpdateHandle(undoData.scrollValue);*/ showSelectionAfterUndo(); return;}break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); return;}break;
 
     default: break;
@@ -375,8 +375,8 @@ void MkEdit::applyMkEffects(const bool scroll)
     disconnectSignals();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
     if(scroll){
-        this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
-        this->ensureCursorVisible();
+       this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+       // this->ensureCursorVisible();
     }
     connectSignals();
 }
@@ -461,14 +461,10 @@ void MkEdit::connectSignals()
 {
     QObject::connect(this,&MkEdit::cursorPositionChanged,
                      this, &MkEdit::cursorPositionChangedHandle);
-    QObject::connect(this->verticalScrollBar(),&QScrollBar::valueChanged,
-                     this, &MkEdit::scrollValueUpdateHandle);
 }
 
 void MkEdit::disconnectSignals()
 {
-    QObject::disconnect(this->verticalScrollBar(),&QScrollBar::valueChanged,
-                     this, &MkEdit::scrollValueUpdateHandle);
     QObject::disconnect(this,&MkEdit::cursorPositionChanged,
                      this, &MkEdit::cursorPositionChangedHandle);
 }
@@ -848,15 +844,6 @@ void MkEdit::setFont(const QFont &font)
     lineWrapAction.setFont(menuFont);
 
     QTextEdit::setFont(font);
-}
-
-void MkEdit::scrollValueUpdateHandle(int value)
-{
-    disconnectSignals();
-    {
-        emit drawTextBlocks(textCursor().hasSelection(), textCursor().blockNumber(),undoData.selectAll, getVisibleRect(), &selectRange);
-    }
-    connectSignals();
 }
 
 void MkEdit::fileSaveHandle()
