@@ -79,6 +79,8 @@ struct RawBlockInfo{
     bool hasSelection = false;
     int rawFirstBlock  = NO_SELECTION_POS;
     int rawEndBlock    = NO_SELECTION_POS;
+    int oldRawFirstBlock  = NO_SELECTION_POS;
+    int oldRawEndBlock    = NO_SELECTION_POS;
 };
 
 class MkTextDocument : public QTextDocument

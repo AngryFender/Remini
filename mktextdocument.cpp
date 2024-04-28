@@ -97,25 +97,31 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
     if(range){
         this->rawBlockInfo.hasSelection = range->hasSelection;
         if(range->hasSelection){
-            this->rawBlockInfo.rawFirstBlock = range->selectionFirstStartBlock;
-            this->rawBlockInfo.rawEndBlock = range->selectionEndBlock;
-
-            if(range->selectionFirstStartBlock < range->selectionEndBlock){
-                this->selectRange.startBlock = range->selectionFirstStartBlock;
-                this->selectRange.endBlock   = range->selectionEndBlock;
-            }else{
-                this->selectRange.startBlock = range->selectionEndBlock;
-                this->selectRange.endBlock   =  range->selectionFirstStartBlock;
-            }
+            this->selectRange.startBlock = std::min(range->selectionFirstStartBlock,range->selectionEndBlock);
+            this->selectRange.endBlock = std::max(range->selectionFirstStartBlock,range->selectionEndBlock);
+            this->rawBlockInfo.rawFirstBlock = this->selectRange.startBlock;
+            this->rawBlockInfo.rawEndBlock = this->selectRange.endBlock;
         }else{
             //this->selectRange.startBlock = -1;
             //this->selectRange.endBlock = -1;
-            this->selectRange.startBlock = range->selectionFirstStartBlock;
-            this->selectRange.endBlock = range->selectionFirstStartBlock;
-            this->rawBlockInfo.rawFirstBlock = range->currentBlockNo;
+            this->selectRange.startBlock = this->selectRange.endBlock = range->selectionFirstStartBlock;
+            this->rawBlockInfo.rawFirstBlock = this->rawBlockInfo.rawEndBlock = this->selectRange.startBlock;
         }
     }
     //hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, true);
+
+
+    //render previously shown raw texts
+    int renderBlockNo = this->rawBlockInfo.oldRawFirstBlock;
+    while(renderBlockNo <= this->rawBlockInfo.oldRawEndBlock){
+        if( renderBlockNo >= this->rawBlockInfo.rawFirstBlock &&
+            renderBlockNo <= this->rawBlockInfo.rawEndBlock){
+
+        }
+
+        renderBlockNo++;
+    }
+
 
 
     // insert raw text in new cursor blocks
@@ -134,7 +140,8 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
 
     // format texts from previous cursor blocks
 
-
+    this->rawBlockInfo.oldRawFirstBlock = this->rawBlockInfo.rawFirstBlock;
+    this->rawBlockInfo.oldRawEndBlock = this->rawBlockInfo.rawEndBlock;
 }
 
 void MkTextDocument::scanShowMkSymbolsInRangeOfBlocks(SelectRange * range,const bool clearPushCheckBoxData)
