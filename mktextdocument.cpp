@@ -35,9 +35,20 @@ void MkTextDocument::setUndoSelectRange(const SelectRange range)
     this->undoSelectRange = range;
 }
 
+void MkTextDocument::setRedoSelectRange(const int blockNo, const int posInBlock)
+{
+    this->redoSelectRange.currentBlockNo = blockNo;
+    this->redoSelectRange.currentposInBlock = posInBlock;
+}
+
 const SelectRange &MkTextDocument::getUndoSelectRange() const
 {
     return this->undoSelectRange;
+}
+
+const SelectRange &MkTextDocument::getRedoSelectRange() const
+{
+    return this->redoSelectRange;
 }
 
 void MkTextDocument::clear()
@@ -1343,5 +1354,6 @@ void EditCommand::redo()
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, this->posInBlock);
 
         this->view->setTextCursor(cursor);
+        doc->setRedoSelectRange(this->blockNo, this->posInBlock);
     }
 }
