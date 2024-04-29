@@ -91,7 +91,9 @@ public:
     void setPlainText(const QString &text);
     void setUndoRedoText(const QString &text);
     void setUndoSelectRange(const SelectRange range);
+    void setRedoSelectRange(const int blockNo, const int posInBlock);
     const SelectRange &getUndoSelectRange() const;
+    const SelectRange &getRedoSelectRange() const;
     void clear() override;
 
     QVector<int>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
@@ -186,7 +188,6 @@ public slots:
 
     SelectRange undoSelectRange;
     SelectRange redoSelectRange;
-
 
     void resetFormatLocation();
     void identifyUserData(bool showAll, bool hasSelection = false);

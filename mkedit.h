@@ -120,6 +120,7 @@ protected:
 
     bool isMouseOnCheckBox(QMouseEvent *e);
     void showSelectionAfterUndo();
+    void showSelectionAfterRedo();
     void setSelectionUsingArrowKeys(bool isShiftPressed);
 
     void restoreTextCursor(int blockNo, int posInBlock, bool hasSelection);
@@ -131,7 +132,6 @@ public slots:
     void deleteContextMenu();
     void selectBlock();
     void cursorPositionChangedHandle();
-    void scrollValueUpdateHandle(int value);
 
 private slots:
     void fileSaveHandle();
