@@ -176,8 +176,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; showSelectionAfterUndo();fileSaveNow(); return;}break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; showSelectionAfterRedo();fileSaveNow(); return;}break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterUndo(); return;}break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterRedo(); return;}break;
 
     default: break;
     }
@@ -234,6 +234,13 @@ void MkEdit::showSelectionAfterUndo(){
 
         //highlight the selection
         this->setTextCursor(textCursor);
+
+        //ensure the textcursor is visible
+        this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+        if(!isTextCursorVisible()){
+            this->ensureCursorVisible();
+        }
+
     }
     QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
 }
@@ -604,6 +611,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     QString text = source->text();
     matchCodeBlockRegex = regexCodeBlock.match(text);
 
+    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
     //if the mime text itself is a code block
     if(matchCodeBlockRegex.hasMatch()){
         emit removeAllMkData(cursor.blockNumber());
@@ -653,6 +661,12 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     postUndoSetup();
     emit fileSaveRaw();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+
+    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+    if(!isTextCursorVisible()){
+        this->ensureCursorVisible();
+    }
+
     connectSignals();
 }
 
