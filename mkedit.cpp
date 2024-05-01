@@ -176,8 +176,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); showSelectionAfterUndo(); return;}break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); showSelectionAfterRedo(); return;}break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; showSelectionAfterUndo();fileSaveNow(); return;}break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; showSelectionAfterRedo();fileSaveNow(); return;}break;
 
     default: break;
     }
@@ -362,7 +362,7 @@ QRect MkEdit::getVisibleRect()
 void MkEdit::clearMkEffects()
 {
     disconnectSignals();
-    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is importantp
+    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
 
     QTextCursor cursor = this->textCursor();
     int blockNumber = cursor.blockNumber();
@@ -397,8 +397,10 @@ void MkEdit::applyMkEffects(const bool scroll)
 {
     disconnectSignals();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-    if(scroll){
-       this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+
+    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+    if(!isTextCursorVisible()){
+        this->ensureCursorVisible();
     }
     connectSignals();
 }
@@ -417,6 +419,11 @@ void MkEdit::fileSaveWithScroll()
     fileSaveTimer.stop();
     postUndoSetup();
     emit fileSaveRaw();
+}
+
+bool MkEdit::isTextCursorVisible()
+{
+    return this->cursorRect().contains(getVisibleRect());
 }
 
 bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)

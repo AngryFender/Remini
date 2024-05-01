@@ -117,6 +117,7 @@ protected:
     void applyMkEffects(const bool scroll = true);
     void fileSaveNow();
     void fileSaveWithScroll();
+    bool isTextCursorVisible();
 
     bool isMouseOnCheckBox(QMouseEvent *e);
     void showSelectionAfterUndo();
