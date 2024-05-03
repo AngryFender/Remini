@@ -616,6 +616,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     if(matchCodeBlockRegex.hasMatch()){
         emit removeAllMkData(cursor.blockNumber());
         restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
+        cursor = this->textCursor();
         preUndoSetup();
 
         if(isBlock){
@@ -627,6 +628,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
         if(!isBlock){
             emit removeAllMkData(this->textCursor().blockNumber());
             restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
+            cursor = this->textCursor();
             preUndoSetup();
 
             QString link = source->text();
@@ -651,6 +653,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
         }else{
             emit removeAllMkData(cursor.blockNumber());
             restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
+            cursor = this->textCursor();
             preUndoSetup();
 
             QTextEdit::insertFromMimeData(source);
