@@ -241,6 +241,10 @@ void MkEdit::showSelectionAfterUndo(){
             this->ensureCursorVisible();
         }
 
+        if(range.isCheckBox){
+            this->verticalScrollBar()->setSliderPosition(range.scrollValue);
+        }
+
     }
     QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
 }
@@ -264,6 +268,11 @@ void MkEdit::showSelectionAfterRedo()
         int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
         textCursor.setPosition(cursorPos);
         this->setTextCursor(textCursor);
+
+        if(range.isCheckBox){
+            this->verticalScrollBar()->setSliderPosition(range.scrollValue);
+        }
+
     }
     QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
 }
@@ -370,6 +379,7 @@ void MkEdit::clearMkEffects()
 {
     disconnectSignals();
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
+    undoData.isCheckBox = false;
 
     QTextCursor cursor = this->textCursor();
     int blockNumber = cursor.blockNumber();
@@ -464,6 +474,8 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
             int pos = (*it);
 
             disconnectSignals();
+            undoData.scrollValue = this->verticalScrollBar()->sliderPosition();
+            undoData.isCheckBox = true;
             preUndoSetup();
             emit pushCheckBox(pos);
             fileSaveWithScroll();
@@ -612,6 +624,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     matchCodeBlockRegex = regexCodeBlock.match(text);
 
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
+    undoData.isCheckBox = false;
     //if the mime text itself is a code block
     if(matchCodeBlockRegex.hasMatch()){
         emit removeAllMkData(cursor.blockNumber());
