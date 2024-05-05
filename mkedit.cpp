@@ -154,7 +154,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
-    case Qt::Key_Down: setSelectionUsingArrowKeys(event->modifiers() == Qt::SHIFT);
+    case Qt::Key_Down: setSelectionUsingArrowKeys(event->modifiers() == Qt::SHIFT);break;
     case Qt::Key_Control:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
     case Qt::Key_V:         if( event->modifiers() == Qt::CTRL) {pasteTextAction.trigger();return;}break;
@@ -284,7 +284,9 @@ void MkEdit::setSelectionUsingArrowKeys(bool isShiftPressed)
         selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
         selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
         selectRange.hasSelection = false;
+        disconnectSignals();
         emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), getVisibleRect(), &selectRange);
+        connectSignals();
         return;
     }
 

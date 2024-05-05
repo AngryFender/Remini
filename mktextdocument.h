@@ -234,6 +234,7 @@ public slots:
     void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
 
     void scanShowMkSymbolsInRangeOfBlocks(SelectRange *range, const bool clearPushCheckBoxData);
+    void hideMkSymbolsInRangeOfBlocks(SelectRange *range, const bool clearPushCheckBoxData);
 };
 
 struct UndoData{

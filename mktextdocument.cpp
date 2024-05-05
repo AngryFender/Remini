@@ -123,35 +123,21 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
     }
     //hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, true);
 
-
-    //render previously shown raw texts
-    int renderBlockNo = this->rawBlockInfo.oldRawFirstBlock;
-    while(renderBlockNo <= this->rawBlockInfo.oldRawEndBlock){
-        if( renderBlockNo >= this->rawBlockInfo.rawFirstBlock &&
-            renderBlockNo <= this->rawBlockInfo.rawEndBlock){
-
-        }
-
-        renderBlockNo++;
-    }
-
-
-
-    // insert raw text in new cursor blocks
+    //insert corresponding raw texts into each blocks
     QTextCursor cursor(this);
-
     int curr = this->selectRange.startBlock;
     while(curr <= this->selectRange.endBlock){
-
-        cursor.setPosition(this->findBlockByNumber(curr).position());
-        cursor.movePosition(QTextCursor::StartOfBlock);
-        cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
-        cursor.insertText(rawDocument.findBlockByNumber(curr).text());
+        if(!(curr >= this->rawBlockInfo.oldRawFirstBlock && curr <= this->rawBlockInfo.oldRawEndBlock)){
+            cursor.setPosition(this->findBlockByNumber(curr).position());
+            cursor.movePosition(QTextCursor::StartOfBlock);
+            cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+            cursor.insertText(rawDocument.findBlockByNumber(curr).text());
+        }
         curr++;
     }
-    //scanShowMkSymbolsInRangeOfBlocks(range, true);
 
-    // format texts from previous cursor blocks
+    //render blocks with previously shown raw texts
+    hideMkSymbolsInRangeOfBlocks(&this->selectRange,true);
 
     this->rawBlockInfo.oldRawFirstBlock = this->rawBlockInfo.rawFirstBlock;
     this->rawBlockInfo.oldRawEndBlock = this->rawBlockInfo.rawEndBlock;
@@ -162,6 +148,124 @@ void MkTextDocument::scanShowMkSymbolsInRangeOfBlocks(SelectRange * range,const 
     //iterate from the first selected block to end selected block
 
 }
+
+void MkTextDocument::hideMkSymbolsInRangeOfBlocks(SelectRange *range, const bool clearPushCheckBoxData)
+{
+    // if(disableMarkdownState){
+    //     return;
+    // }
+
+    int fontSize =this->defaultFont().pointSize();
+    FormatCollection formatCollection(fontSize);
+    CheckingBlock checkBlock;
+    // if(clearPushCheckBoxData){
+    //     checkMarkPositions.clear();
+    //     linkPositions.clear();
+    // }
+
+    int currentBlockNumber = this->rawBlockInfo.oldRawFirstBlock;
+    while(currentBlockNumber <= this->rawBlockInfo.oldRawEndBlock){
+        if(!(currentBlockNumber >= this->rawBlockInfo.rawFirstBlock && currentBlockNumber <= this->rawBlockInfo.rawEndBlock)){
+
+            QTextBlock block = this->findBlockByNumber(currentBlockNumber);
+
+            QRegularExpressionMatch matchCodeBlock = regexCodeBlock.match(block.text());
+            // if(matchCodeBlock.hasMatch()){
+            //     BlockData *blockData = new BlockData;
+            //     block.setUserData(blockData);
+
+            //     if(!openBlock){
+            //         openBlock = true;
+            //         blockData->setStatus(BlockData::start);
+            //     }
+            //     else{
+            //         openBlock = false;
+            //         blockData->setStatus(BlockData::end);
+            //     }
+            // }
+            // else{
+            //     if(openBlock){
+            //         BlockData *blockData = new BlockData;
+            //         blockData->setStatus(BlockData::content);
+            //         tBlock.setUserData(blockData);
+            //     }
+            //     else{
+                    QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(block.text());
+                    if(matchHorizontalLine.hasMatch()){
+                        LineData *lineData = new LineData;
+                        block.setUserData(lineData);
+                    }
+                    identifyFormatData(block, false, false);
+               // }
+
+
+            QTextBlockUserData* data =block.userData();
+            if(data == nullptr){
+                currentBlockNumber++;
+                continue;
+            }
+
+            BlockData* blockData = dynamic_cast<BlockData*>(data);
+            if(blockData)
+            {
+                if(blockData->getStatus()==BlockData::start)
+                {
+                    checkBlock.start = block;
+                    setCodeBlockMargin(block, fontSize*3/4, fontSize, fontSize);
+                }
+                else if(blockData->getStatus()==BlockData::end)
+                {
+                    if(!checkBlock.start.isValid()){
+                        currentBlockNumber++;
+                        continue;
+                    }
+                    checkBlock.end = block;
+                    setCodeBlockMargin(block,fontSize*3/4, fontSize, 0);
+
+                    hideSymbols(checkBlock.start, CODEBLOCK_SYMBOL);
+                    hideSymbols(checkBlock.end, CODEBLOCK_SYMBOL);
+
+                }else if(blockData->getStatus()==BlockData::content){
+                    setCodeBlockMargin(block, fontSize*5/3, fontSize, 0);
+                }
+            }
+            else{
+                LineData* lineData = dynamic_cast<LineData*>(data);
+                if(lineData){
+                    lineData->setDraw(true);
+                    hideSymbols(block, lineData->getSymbol());
+                }
+                FormatData* formatData = dynamic_cast<FormatData*>(data);
+                if(formatData){
+                    QTextCursor cursor(block);
+
+                    if(!formatData->isHidden()){
+                        formatData->setHidden(true);
+                        resetTextBlockFormat(block);
+                        hideAllFormatSymbolsInTextBlock(block,formatData);
+
+                        if(!formatData->isHiddenFormatsEmpty()){
+                            for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                            {
+                                applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), cursor, formatCollection, false);
+                            }
+                        }
+                    }else{
+                        if(!formatData->isHiddenFormatsEmpty()){
+                            for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                            {
+                                applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), cursor, formatCollection, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+        currentBlockNumber++;
+    }
+}
+
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
 {
     QTextDocument::setPlainText(this->rawDocument.toPlainText());
