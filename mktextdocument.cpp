@@ -35,10 +35,12 @@ void MkTextDocument::setUndoSelectRange(const SelectRange range)
     this->undoSelectRange = range;
 }
 
-void MkTextDocument::setRedoSelectRange(const int blockNo, const int posInBlock)
+void MkTextDocument::setRedoSelectRange(const int blockNo, const int posInBlock, const bool isCheckBox, const int scrollValue)
 {
     this->redoSelectRange.currentBlockNo = blockNo;
     this->redoSelectRange.currentposInBlock = posInBlock;
+    this->redoSelectRange.isCheckBox = isCheckBox;
+    this->redoSelectRange.scrollValue = scrollValue;
 }
 
 const SelectRange &MkTextDocument::getUndoSelectRange() const
@@ -1355,6 +1357,8 @@ EditCommand::EditCommand(UndoData &data)
     this->oldSelectRange = data.oldSelectRange;
     this->blockNo = data.blockNo;
     this->posInBlock = data.posInBlock;
+    this->oldSelectRange.isCheckBox = data.isCheckBox;
+    this->oldSelectRange.scrollValue = data.scrollValue;
 }
 
 void EditCommand::undo()
@@ -1375,6 +1379,6 @@ void EditCommand::redo()
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, this->posInBlock);
 
         this->view->setTextCursor(cursor);
-        doc->setRedoSelectRange(this->blockNo, this->posInBlock);
+        doc->setRedoSelectRange(this->blockNo, this->posInBlock,  this->oldSelectRange.isCheckBox, this->oldSelectRange.scrollValue );
     }
 }

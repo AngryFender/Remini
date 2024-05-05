@@ -65,6 +65,7 @@ struct SelectRange{
     int startBlock      = NO_SELECTION_POS;
     int endBlock        = NO_SELECTION_POS;
     bool hasSelection 	= false;
+    bool isCheckBox 	= false;
     int currentposInBlock      = NO_SELECTION_POS;
     int currentBlockNo         = NO_SELECTION_POS;
     int selectionFirstStartBlock = NO_SELECTION_POS;
@@ -73,6 +74,7 @@ struct SelectRange{
     int selectionEndPosInBlock        = NO_SELECTION_POS;
     bool isCursorCaculated  = false;
     bool isFirstMousePress  = false;
+    int scrollValue;
 };
 
 struct RawBlockInfo{
@@ -91,7 +93,7 @@ public:
     void setPlainText(const QString &text);
     void setUndoRedoText(const QString &text);
     void setUndoSelectRange(const SelectRange range);
-    void setRedoSelectRange(const int blockNo, const int posInBlock);
+    void setRedoSelectRange(const int blockNo, const int posInBlock, const bool isCheckBox, const int scrollValue);
     const SelectRange &getUndoSelectRange() const;
     const SelectRange &getRedoSelectRange() const;
     void clear() override;
@@ -245,6 +247,7 @@ struct UndoData{
     bool selectAll;
     int scrollValue;
     SelectRange oldSelectRange;
+    bool isCheckBox;
 };
 
 class EditCommand : public QUndoCommand

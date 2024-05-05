@@ -176,8 +176,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey(); fileSaveNow(); return;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); showSelectionAfterUndo(); return;}break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow(); showSelectionAfterRedo(); return;}break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterUndo(); return;}break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterRedo(); return;}break;
 
     default: break;
     }
@@ -234,6 +234,17 @@ void MkEdit::showSelectionAfterUndo(){
 
         //highlight the selection
         this->setTextCursor(textCursor);
+
+        //ensure the textcursor is visible
+        this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+        if(!isTextCursorVisible()){
+            this->ensureCursorVisible();
+        }
+
+        if(range.isCheckBox){
+            this->verticalScrollBar()->setSliderPosition(range.scrollValue);
+        }
+
     }
     QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
 }
@@ -257,6 +268,11 @@ void MkEdit::showSelectionAfterRedo()
         int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
         textCursor.setPosition(cursorPos);
         this->setTextCursor(textCursor);
+
+        if(range.isCheckBox){
+            this->verticalScrollBar()->setSliderPosition(range.scrollValue);
+        }
+
     }
     QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
 }
@@ -362,7 +378,8 @@ QRect MkEdit::getVisibleRect()
 void MkEdit::clearMkEffects()
 {
     disconnectSignals();
-    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is importantp
+    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
+    undoData.isCheckBox = false;
 
     QTextCursor cursor = this->textCursor();
     int blockNumber = cursor.blockNumber();
@@ -397,8 +414,10 @@ void MkEdit::applyMkEffects(const bool scroll)
 {
     disconnectSignals();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-    if(scroll){
-       this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+
+    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+    if(!isTextCursorVisible()){
+        this->ensureCursorVisible();
     }
     connectSignals();
 }
@@ -417,6 +436,11 @@ void MkEdit::fileSaveWithScroll()
     fileSaveTimer.stop();
     postUndoSetup();
     emit fileSaveRaw();
+}
+
+bool MkEdit::isTextCursorVisible()
+{
+    return this->cursorRect().contains(getVisibleRect());
 }
 
 bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
@@ -450,6 +474,8 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
             int pos = (*it);
 
             disconnectSignals();
+            undoData.scrollValue = this->verticalScrollBar()->sliderPosition();
+            undoData.isCheckBox = true;
             preUndoSetup();
             emit pushCheckBox(pos);
             fileSaveWithScroll();
@@ -597,10 +623,13 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     QString text = source->text();
     matchCodeBlockRegex = regexCodeBlock.match(text);
 
+    undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
+    undoData.isCheckBox = false;
     //if the mime text itself is a code block
     if(matchCodeBlockRegex.hasMatch()){
         emit removeAllMkData(cursor.blockNumber());
         restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
+        cursor = this->textCursor();
         preUndoSetup();
 
         if(isBlock){
@@ -612,6 +641,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
         if(!isBlock){
             emit removeAllMkData(this->textCursor().blockNumber());
             restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
+            cursor = this->textCursor();
             preUndoSetup();
 
             QString link = source->text();
@@ -636,6 +666,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
         }else{
             emit removeAllMkData(cursor.blockNumber());
             restoreTextCursor(cursorBlockNo, cursorPosInBlock, hasSelection);
+            cursor = this->textCursor();
             preUndoSetup();
 
             QTextEdit::insertFromMimeData(source);
@@ -646,6 +677,12 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     postUndoSetup();
     emit fileSaveRaw();
     emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+
+    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+    if(!isTextCursorVisible()){
+        this->ensureCursorVisible();
+    }
+
     connectSignals();
 }
 
