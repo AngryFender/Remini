@@ -1414,10 +1414,19 @@ void MkTextDocument::numberListDetect(int blockNumber)
 
     regexNumbering.setPattern("^( {0,}|\\s{2,})\\d+\\.\\s*.*$");                    //look for " 10. abc123 abc123", "   1. abc123 abc"," 10. abc123 abc123","   1. abc123 abc","10. abc123 abc123","1. abc123 abc","10. abc123","1. abc123"," 1. ",
     QRegularExpressionMatch matchNumbering = regexNumbering.match(lineText);
+
+    regexBulletPoints.setPattern("^\\s*-\\s*") ;
+    QRegularExpressionMatch matchBulletPoint = regexBulletPoints.match(lineText);
+
     if(matchNumbering.hasMatch()){
         int spaces = numberListGetSpaces(matchNumbering.captured(0));
         editCursor.insertText(QString("").leftJustified(spaces,' '));
         editCursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
+        return;
+    }else if(matchBulletPoint.hasMatch()){
+        int spaces = numberListGetSpaces(matchBulletPoint.captured(0));
+        editCursor.insertText(QString("").leftJustified(spaces,' '));
+        editCursor.insertText("- ");
         return;
     }
     else{

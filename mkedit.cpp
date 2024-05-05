@@ -263,7 +263,7 @@ void MkEdit::showSelectionAfterRedo()
     QObject::disconnect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
     {
         //first show all the Markdown symbols in the editor
-        emit cursorPosChanged( range.hasSelection, currentBlockNo, getVisibleRect(), &selectRange);
+        emit cursorPosChanged( false, currentBlockNo, getVisibleRect(), &range);
 
         int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
         textCursor.setPosition(cursorPos);

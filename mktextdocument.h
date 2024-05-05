@@ -178,6 +178,7 @@ public slots:
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
+    QRegularExpression regexBulletPoints;
     QQueue<QTextBlock> savedBlocks;
 
     QUndoStack undoStack;
