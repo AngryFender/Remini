@@ -148,9 +148,6 @@ void ViewsHandler::initConnection()
     QObject::connect(viewTree, &NavigationView::newFileCreated,
                      this, &ViewsHandler::fileDisplay);
 
-    QObject::connect(viewText,&MkEdit::fileSave,
-                     this,  &ViewsHandler::fileSaveHandle);
-
      QObject::connect(viewText,&MkEdit::fileSaveRaw,
                      this,  &ViewsHandler::fileSaveRawHandle);
 
@@ -456,23 +453,6 @@ void ViewsHandler::updateUiSettingsHandler(const QFont &font, const bool mkState
     viewTextSearchEdit->setFont(fontView);
     viewTextSearchTree->setFont(fontView);
     settingsDialog->setFont(fontView);
-}
-
-void ViewsHandler::fileSaveHandle()
-{
-    if(!viewText->hasFocus())
-        return;
-
-    QString fullContent = viewText->toPlainText();
-
-    QFile file(currentDocument.data()->getFilePath());
-
-    if(file.open(QFile::WriteOnly))
-    {
-        QTextStream stream(&file);
-        stream<<fullContent;
-        file.close();
-    }
 }
 
 void ViewsHandler::fileSaveRawHandle()

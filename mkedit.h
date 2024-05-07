@@ -113,7 +113,6 @@ protected:
 
     QRect getVisibleRect();
     void clearMkEffects();
-    void removeAllMkDataFunc(int blockNumber);
     void applyMkEffects(const bool scroll = true);
     void fileSaveNow();
     void fileSaveWithScroll();
@@ -140,7 +139,6 @@ private slots:
     void lineWrapHandler();
 signals:
     void cursorPosChanged(bool hasSelection, int blockNumber, QRect rect, SelectRange *selectRange);
-    void fileSave();
     void fileSaveRaw();
     void enterKeyPressed(int blockNumber);
     void quoteLeftKeyPressed(int blockNumber,bool &success);

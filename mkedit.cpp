@@ -130,8 +130,6 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 {
     if (e->modifiers() == Qt::ControlModifier) {
         int zoomDelta = e->angleDelta().y();
-        disconnectSignals();
-        emit removeAllMkData(this->textCursor().blockNumber());
         if (zoomDelta > 0) {
             if((this->currentFont().pointSizeF())<MAXIMUM_FONT_SIZE)
                 this->zoomIn();
@@ -139,8 +137,6 @@ void MkEdit::wheelEvent(QWheelEvent *e)
             if((this->currentFont().pointSizeF())>MINIMUM_FONT_SIZE)
                 this->zoomOut();
         }
-        emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
-        connectSignals();
         this->ensureCursorVisible();
     }else{
         QTextEdit::wheelEvent(e);
@@ -401,13 +397,6 @@ void MkEdit::clearMkEffects()
         preUndoSetup();
     }
     fileSaveTimer.start();
-}
-
-void MkEdit::removeAllMkDataFunc(int blockNumber)
-{
-    disconnectSignals();
-    emit removeAllMkData(blockNumber);
-    connectSignals();
 }
 
 void MkEdit::applyMkEffects(const bool scroll)
