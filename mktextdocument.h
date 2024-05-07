@@ -123,8 +123,6 @@ public slots:
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
     void saveRawDocumentHandler();
 
-    void showMKSymbolsFromSavedBlocks(QRect *rect = nullptr, int cursorBlockNo = 0);
-
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int position);
     void autoInsertSymobolHandle(const int position);
@@ -176,7 +174,6 @@ public slots:
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
     QRegularExpression regexBulletPoints;
-    QQueue<QTextBlock> savedBlocks;
 
     QUndoStack undoStack;
 

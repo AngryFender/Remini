@@ -55,10 +55,6 @@ const SelectRange &MkTextDocument::getRedoSelectRange() const
 
 void MkTextDocument::clear()
 {
-    while(!savedBlocks.empty()){
-        savedBlocks.dequeue();
-    }
-    savedBlocks.clear();
     checkMarkPositions.clear();
     linkPositions.clear();
     QTextDocument::clear();
@@ -953,42 +949,6 @@ void MkTextDocument::saveRawDocumentHandler()
     this->rawDocument.setPlainText(this->toPlainText());
 }
 
-void MkTextDocument::showMKSymbolsFromSavedBlocks(QRect *rect, int cursorBlockNo)
-{
-    while(!savedBlocks.empty()){
-        QTextBlock block = savedBlocks.takeFirst();
-
-        QTextBlockUserData* data =block.userData();
-        if(data == nullptr){
-            block = block.next();
-            continue;
-        }
-
-        BlockData* blockData = dynamic_cast<BlockData*>(data);
-        if(blockData)
-        {
-            if(blockData->getStatus()!=BlockData::content)
-            {
-                showSymbols(block, CODEBLOCK_SYMBOL);
-            }
-        }
-        else{
-            LineData* lineData = dynamic_cast<LineData*>(data);
-            if(lineData){
-                lineData->setDraw(false);
-                showSymbols(block, lineData->getSymbol());
-            }
-            FormatData* formatData = dynamic_cast<FormatData*>(data);
-            if(formatData){
-                if(formatData->isHidden()){
-                    formatData->setHidden(false);
-                    showAllFormatSymbolsInTextBlock(block, formatData);
-                }
-            }
-        }
-    }
-}
-
 void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
 {
     if(disableMarkdownState){
@@ -1103,7 +1063,6 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection,
                     }
                 }
             }
-            savedBlocks.append(block);
     }
 }
 
@@ -1219,9 +1178,7 @@ void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
     disableMarkdownState = !state;
 
     if(disableMarkdownState){
-        showMKSymbolsFromSavedBlocks(&rect,0);
-        QString allTexts = this->toPlainText();
-        this->setPlainText(allTexts);
+        this->setPlainText(this->rawDocument.toPlainText());
     }else{
         hideMKSymbolsFromDrawingRect(rect, false, -1,false,nullptr,false);
     }
