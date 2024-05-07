@@ -148,7 +148,6 @@ signals:
     void selectBlockCopy(int blockNumber, int &startPos, int &endPos);
     void duplicateLine(int blockNumber);
     void smartSelection(int blockNumber, QTextCursor &cursor);
-    void drawTextBlocks(bool hasSelection, int blockNumber, bool showAll, QRect rect, SelectRange *selectRange);
     void saveRawDocument();
 
     void removeAllMkData(int currentBlockNo);

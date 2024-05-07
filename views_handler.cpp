@@ -251,9 +251,6 @@ void ViewsHandler::connectDocument()
     QObject::connect(viewText,&MkEdit::setMarkdownStatus,
                      currentDocument.data(),&MkTextDocument::setMarkdownHandle);
 
-    QObject::connect(viewText,&MkEdit::drawTextBlocks,
-                     currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
-
     QObject::connect(viewText,&MkEdit::pushCheckBox,
                      currentDocument.data(),&MkTextDocument::pushCheckBoxHandle);
 
@@ -312,9 +309,6 @@ void ViewsHandler::disconnectDocument()
 
     QObject::disconnect(viewText,&MkEdit::setMarkdownStatus,
                         currentDocument.data(),&MkTextDocument::setMarkdownHandle);
-
-    QObject::disconnect(viewText,&MkEdit::drawTextBlocks,
-                        currentDocument.data(),&MkTextDocument::drawTextBlocksHandler);
 
     QObject::disconnect(viewText,&MkEdit::pushCheckBox,
                         currentDocument.data(),&MkTextDocument::pushCheckBoxHandle);

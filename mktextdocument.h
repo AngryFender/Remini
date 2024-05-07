@@ -121,7 +121,6 @@ public slots:
     void selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos);
     void duplicateLineHandle(int blockNumber);
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
-    void drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect, SelectRange* selectRange);
     void saveRawDocumentHandler();
 
     void showMKSymbolsFromSavedBlocks(QRect *rect = nullptr, int cursorBlockNo = 0);
@@ -231,8 +230,6 @@ public slots:
     QString numberListGetNextNumber(const QString &text);
 
     void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
-
-    void scanShowMkSymbolsInRangeOfBlocks(SelectRange *range, const bool clearPushCheckBoxData);
 };
 
 struct UndoData{

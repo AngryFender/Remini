@@ -128,19 +128,8 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
     }
     hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, true);
 
-
-    //1. insert raw text in new cursor blocks
-    scanShowMkSymbolsInRangeOfBlocks(range, true);
-
-    //2. format texts from previous cursor blocks
-
 }
 
-void MkTextDocument::scanShowMkSymbolsInRangeOfBlocks(SelectRange * range,const bool clearPushCheckBoxData)
-{
-    //iterate from the first selected block to end selected block
-
-}
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
 {
     QTextDocument::setPlainText(this->rawDocument.toPlainText());
@@ -957,13 +946,6 @@ void MkTextDocument::smartSelectionHandle(int blockNumber, QTextCursor &cursor)
     }
     cursor.setPosition(start+ currentBlockPos);
     cursor.setPosition(end + currentBlockPos,QTextCursor::KeepAnchor);
-}
-
-
-void MkTextDocument::drawTextBlocksHandler(bool hasSelection, int blockNumber, bool showAll, QRect rect, SelectRange *selectRange)
-{
-    //showMKSymbolsFromSavedBlocks(&rect, blockNumber);
-    hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber,showAll, selectRange);
 }
 
 void MkTextDocument::saveRawDocumentHandler()

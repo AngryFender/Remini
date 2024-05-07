@@ -556,9 +556,6 @@ TEST_CASE("MkEdit using tab to insert links symbols ", "[MkEdit]")
     doc.setPlainText("lk");
     edit.setDocument(&doc);
 
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
-
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
 
@@ -599,9 +596,6 @@ TEST_CASE("MkEdit undo after using tab to insert links symbols ", "[MkEdit]")
 
     doc.setPlainText("lk");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -651,9 +645,6 @@ TEST_CASE("MkEdit type inside bold format then check if the cursor is at the rig
     doc.setPlainText("**bold**");
     edit.setDocument(&doc);
 
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
-
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
 
@@ -688,9 +679,6 @@ TEST_CASE("MkEdit undo after typing inside bold format then check if the cursor 
 
     doc.setPlainText("**bold**");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -738,9 +726,6 @@ TEST_CASE("MkEdit redo after undo after typing inside bold format then check if 
 
     doc.setPlainText("**bold**");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -795,9 +780,6 @@ TEST_CASE("MkEdit selection check for undo after typing inside bold format then 
 
     doc.setPlainText("**bold**\n*italic*");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -858,9 +840,6 @@ TEST_CASE("MkEdit paste from clipboard into MkEdit", "[MkEdit]")
     doc.setPlainText("");
     edit.setDocument(&doc);
 
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
-
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
 
@@ -907,9 +886,6 @@ TEST_CASE("MkEdit undo paste from clipboard into MkEdit", "[MkEdit]")
 
     doc.setPlainText("");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -962,9 +938,6 @@ TEST_CASE("MkEdit redo paste from clipboard into MkEdit", "[MkEdit]")
 
     doc.setPlainText("");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -1019,9 +992,6 @@ TEST_CASE("MkEdit correct cursor position for undo/redo paste from clipboard int
 
     doc.setPlainText("I Turned Myself Into A Pickle, Morty!");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -1084,9 +1054,6 @@ TEST_CASE("MkEdit correct multiple lines, cursor position for undo/redo paste fr
 
     doc.setPlainText("I Turned Myself Into A Pickle, Morty!\nHe Turned Himself Into Akira!\nBut Life Is Made Of Little Concessions");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -1151,9 +1118,6 @@ TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
 
     doc.setPlainText("**bold**\n*italic*\n~~crossed~~");
     edit.setDocument(&doc);
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
@@ -1241,9 +1205,6 @@ TEST_CASE("MkEdit type all strings with bold format then check if the cursor is 
 
     edit.setDocument(&doc);
 
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
-
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
 
@@ -1297,9 +1258,6 @@ TEST_CASE("MkEdit type inside link format in 2nd line then check if the cursor i
     doc.setPlainText("**bold** \n **new line**");
     edit.setDocument(&doc);
 
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
-
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
 
@@ -1330,9 +1288,6 @@ TEST_CASE("MkEdit checkbox mouse click with undo/redo", "[MkEdit]")
 
     edit.setDocument(&doc);
     doc.setPlainText("- [x]  option1\n- [x]  option2\n");
-
-    QObject::connect(&edit,&MkEdit::drawTextBlocks,
-                     &doc,&MkTextDocument::drawTextBlocksHandler);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
