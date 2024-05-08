@@ -5,6 +5,7 @@
 
 MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
 
+    paragraphSeparator = QChar(0x2029);
     fileSaveTimer.setInterval(FILE_SAVE_TIMEOUT);
     regexUrl.setPattern("(https?|ftp|file)://[\\w\\d._-]+(?:\\.[\\w\\d._-]+)+[\\w\\d._-]*(?:(?:/[\\w\\d._-]+)*/?)?(?:\\?[\\w\\d_=-]+(?:&[\\w\\d_=-]+)*)?(?:#[\\w\\d_-]+)?");
     regexCodeBlock.setPattern("```(?s)(.*?)```");
@@ -339,10 +340,14 @@ void MkEdit::preUndoSetup()
     undoData.doc                = this->document();
     undoData.undoRedoSkip       = false;
     undoData.selectAll          = false;
+    undoData.selectionText      = this->textCursor().selectedText().replace(paragraphSeparator, '\n');
     undoData.oldSelectRange     = this->selectRange;
     undoData.oldSelectRange.hasSelection     	= this->textCursor().hasSelection();
     undoData.oldSelectRange.currentBlockNo 		= this->textCursor().blockNumber();
     undoData.oldSelectRange.currentposInBlock 	= this->textCursor().positionInBlock();
+
+    undoData.oldblockText = this->document()->findBlockByNumber(this->textCursor().blockNumber()).text();
+    qDebug()<<undoData.oldblockText<<" start:"<<undoData.oldSelectRange.selectionFirstStartBlock<<" end:"<< undoData.oldSelectRange.selectionEndBlock;
 }
 
 void MkEdit::postUndoSetup()
@@ -358,6 +363,9 @@ void MkEdit::postUndoSetup()
     undoData.blockNo 	= this->textCursor().blockNumber();
     undoData.posInBlock = this->textCursor().positionInBlock();
 
+    undoData.newblockText = this->document()->findBlockByNumber(this->textCursor().blockNumber()).text();
+
+    qDebug()<<undoData.newblockText<<" start:"<<undoData.oldSelectRange.selectionFirstStartBlock<<" end:"<< undoData.oldSelectRange.selectionEndBlock;
     if(!undoData.undoRedoSkip){
         EditCommand *edit = new EditCommand(undoData);
         emit undoStackPushSignal(edit) ;
@@ -382,7 +390,7 @@ void MkEdit::clearMkEffects()
     int posInBlock = cursor.positionInBlock();
     bool hasSelection = cursor.hasSelection();
 
-    emit removeAllMkData(this->textCursor().blockNumber());
+    //emit removeAllMkData(this->textCursor().blockNumber());
 
     if(hasSelection){
         cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
@@ -402,7 +410,7 @@ void MkEdit::clearMkEffects()
 void MkEdit::applyMkEffects(const bool scroll)
 {
     disconnectSignals();
-    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+   // emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){

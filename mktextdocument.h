@@ -229,10 +229,19 @@ public slots:
     void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
 };
 
+enum UndoAction{
+    added = 0,
+    edited,
+    deleted,
+};
+
 struct UndoData{
     QTextEdit *view;
     QTextDocument *doc;
     QString text;
+    QString selectionText;
+    QString oldblockText;
+    QString newblockText;
     int blockNo;
     int posInBlock;
     QString oldText;
@@ -241,6 +250,7 @@ struct UndoData{
     int scrollValue;
     SelectRange oldSelectRange;
     bool isCheckBox;
+    UndoAction action;
 };
 
 class EditCommand : public QUndoCommand
@@ -262,6 +272,10 @@ private:
     QString oldText;
     bool isConstructorRedo;
     SelectRange oldSelectRange;
+
+    UndoAction action;
+    QString oldBlockText;
+    QString newBlockText;
 };
 
 

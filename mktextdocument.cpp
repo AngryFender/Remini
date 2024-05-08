@@ -1277,20 +1277,30 @@ EditCommand::EditCommand(UndoData &data)
 {
     this->view = data.view;
     this->doc = dynamic_cast<MkTextDocument*>(data.doc);
-    this->text = data.text;
+    //this->text = data.text;
     this->scrollValue = data.scrollValue;
-    this->oldText = data.oldText;
+    //this->oldText = data.oldText;
     isConstructorRedo = true;
     this->oldSelectRange = data.oldSelectRange;
     this->blockNo = data.blockNo;
     this->posInBlock = data.posInBlock;
     this->oldSelectRange.isCheckBox = data.isCheckBox;
     this->oldSelectRange.scrollValue = data.scrollValue;
+    this->action = data.action;
+    this->oldBlockText = data.oldblockText;
+    this->newBlockText = data.newblockText;
 }
 
 void EditCommand::undo()
 {
-    doc->setUndoRedoText(oldText);
+    //doc->setUndoRedoText(oldText);
+
+    QTextCursor cursor = this->view->textCursor();
+    cursor.setPosition(this->view->document()->findBlockByNumber(this->oldSelectRange.currentBlockNo).position());
+    cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    cursor.insertText(this->oldBlockText);
+
     doc->setUndoSelectRange(this->oldSelectRange);
 }
 
@@ -1299,9 +1309,15 @@ void EditCommand::redo()
     if(isConstructorRedo){
         isConstructorRedo = false;
     }else{
-        doc->setUndoRedoText(text);
+        // doc->setUndoRedoText(text);
+
 
         QTextCursor cursor = this->view->textCursor();
+        cursor.setPosition(this->view->document()->findBlockByNumber(this->oldSelectRange.currentBlockNo).position());
+        cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        cursor.insertText(this->newBlockText);
+
         cursor.setPosition(this->view->document()->findBlockByNumber(this->blockNo).position());
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, this->posInBlock);
 

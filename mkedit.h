@@ -73,6 +73,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *e) override;
  private:
     QColor codeBlockColor;
+    QChar paragraphSeparator;
     int widthCodeBlock;
     QBrush brushDefault;
     QPen penCodeBlock;
