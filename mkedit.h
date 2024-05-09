@@ -149,7 +149,7 @@ signals:
     void saveRawDocument();
 
     void removeAllMkData(int currentBlockNo);
-    void applyAllMkData(bool hasSelection, int blockNumber, bool showAll, QRect rect);
+    void applyAllMkData(int blockNumber, bool showAll, SelectRange *range);
     void blockColorChanged(const QColor& color);
     void syntaxColorUpdate(HighlightColor& colors);
 

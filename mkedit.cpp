@@ -402,7 +402,8 @@ void MkEdit::clearMkEffects()
 void MkEdit::applyMkEffects(const bool scroll)
 {
     disconnectSignals();
-    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+
+    emit applyAllMkData(this->textCursor().blockNumber(), undoData.selectAll, &selectRange);
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){
@@ -665,7 +666,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     emit saveRawDocument();
     postUndoSetup();
     emit fileSaveRaw();
-    emit applyAllMkData( this->textCursor().hasSelection(), this->textCursor().blockNumber(), undoData.selectAll, getVisibleRect());
+    emit applyAllMkData( this->textCursor().blockNumber(), undoData.selectAll, &selectRange);
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){

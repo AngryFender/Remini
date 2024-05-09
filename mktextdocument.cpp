@@ -19,7 +19,7 @@ void MkTextDocument::setPlainText(const QString &text)
 
     QTextDocument::setPlainText(text);
     this->rawDocument.setPlainText(text);
-    identifyUserData(false);
+    identifyUserData();
     undoStack.clear();
 }
 
@@ -122,7 +122,7 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
             this->rawBlockInfo.rawFirstBlock = range->currentBlockNo;
         }
     }
-    hideMKSymbolsFromDrawingRect(rect,hasSelection,blockNumber,false, range, true);
+    hideMKSymbolsFromDrawingRect(blockNumber,false, range, true);
 
 }
 
@@ -131,14 +131,16 @@ void MkTextDocument::removeAllMkDataHandle(int blockNo)
     QTextDocument::setPlainText(this->rawDocument.toPlainText());
 }
 
-void MkTextDocument::applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll,QRect rect)
+void MkTextDocument::applyAllMkDataHandle(int blockNumber, bool showAll, SelectRange*range)
 {
-    resetTextBlockFormat(blockNumber);
-    identifyUserData(showAll, hasSelection);
-    hideMKSymbolsFromDrawingRect(rect, hasSelection, blockNumber, showAll, nullptr);
+    QTextBlock block = this->findBlockByNumber(blockNumber);
+    block.setUserData(NULL);
+
+    identifyUserData();
+    hideMKSymbolsFromDrawingRect(blockNumber, showAll, nullptr,true);
 }
 
-void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
+void MkTextDocument::identifyUserData()
 {
     bool openBlock = false;
 
@@ -170,7 +172,7 @@ void MkTextDocument::identifyUserData(bool showAll, bool hasSelection)
                     LineData *lineData = new LineData;
                     tBlock.setUserData(lineData);
                 }
-                identifyFormatData(tBlock, showAll, hasSelection);
+                identifyFormatData(tBlock);
             }
         }
     }
@@ -213,13 +215,13 @@ void MkTextDocument::formatAllLines(const QTextDocument &original, MkTextDocumen
                     LineData *lineData = new LineData;
                     cursor.block().setUserData(lineData);
                 }
-                identifyFormatData(block, false, false);
+                identifyFormatData(block);
             }
         }
         cursor.insertText(blockText);
     }
 }
-void MkTextDocument::identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection)
+void MkTextDocument::identifyFormatData(QTextBlock &block)
 {
     resetFormatLocation();
     FormatData *formatData = new FormatData;
@@ -949,7 +951,7 @@ void MkTextDocument::saveRawDocumentHandler()
     this->rawDocument.setPlainText(this->toPlainText());
 }
 
-void MkTextDocument::hideMKSymbolsFromDrawingRect(QRect rect, bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
+void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
 {
     if(disableMarkdownState){
         return;
@@ -1180,7 +1182,7 @@ void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
     if(disableMarkdownState){
         this->setPlainText(this->rawDocument.toPlainText());
     }else{
-        hideMKSymbolsFromDrawingRect(rect, false, -1,false,nullptr,false);
+        hideMKSymbolsFromDrawingRect(-1,false,nullptr,false);
     }
 }
 

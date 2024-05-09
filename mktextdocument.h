@@ -114,7 +114,7 @@ public:
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, SelectRange * range);
     void removeAllMkDataHandle(int blockNo);
-    void applyAllMkDataHandle(bool hasSelection, int blockNumber, bool showAll, QRect rect);
+    void applyAllMkDataHandle(int blockNumber, bool showAll, SelectRange*range);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
     void checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid);
@@ -187,10 +187,10 @@ public slots:
     SelectRange redoSelectRange;
 
     void resetFormatLocation();
-    void identifyUserData(bool showAll, bool hasSelection = false);
+    void identifyUserData();
     void formatAllLines(const QTextDocument &original, MkTextDocument &formatted);
 
-    void identifyFormatData(QTextBlock &block, bool showAll, bool hasSelection = false);
+    void identifyFormatData(QTextBlock &block);
     void insertHeadingData( const QString &text, int &index1, FormatData *formatData);
     void insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
     void insertFormatCheckBoxData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
@@ -226,7 +226,7 @@ public slots:
     int numberListGetSpaces(const QString &text);
     QString numberListGetNextNumber(const QString &text);
 
-    void hideMKSymbolsFromDrawingRect(QRect rect,bool hasSelection, int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
+    void hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
 };
 
 struct UndoData{

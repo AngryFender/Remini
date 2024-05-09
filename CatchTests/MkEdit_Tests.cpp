@@ -1328,7 +1328,7 @@ TEST_CASE("MkEdit checkbox mouse click with undo/redo", "[MkEdit]")
     QRect combineRect(0, 0, firstRect.width() + 10, firstRect.height() + secondRect.height() + 10 );
 
     // apply markdown formats and update checkbox positions from screen to text cursor position
-    doc.applyAllMkDataHandle(false, 3, false, combineRect);
+    doc.applyAllMkDataHandle(3, false, nullptr);
 
     int countCheckBoxes = 0;
     for(auto it = doc.checkMarkPosBegin(); it!= doc.checkMarkPosEnd(); it++){
