@@ -6,7 +6,8 @@ MkTextDocument::MkTextDocument(QObject *parent)
 {
     regexCodeBlock.setPattern(CODEBLOCK_SYMBOL);
     regexHorizontalLine.setPattern(HORIZONTALLINE_SYMBOL);
-
+    regexBulletCheckBox.setPattern("\\s*- - \\[.\\] \\s*");
+    regexCheckBox.setPattern("\\s*- \\[.\\] \\s*");
     this->setUndoRedoEnabled(false);
     linkColor.setRgb(51,102,204);
     disableMarkdownState = false;
@@ -1234,10 +1235,31 @@ void MkTextDocument::numberListDetect(int blockNumber)
     regexBulletPoints.setPattern("^\\s*-\\s*") ;
     QRegularExpressionMatch matchBulletPoint = regexBulletPoints.match(lineText);
 
+    QRegularExpressionMatch matchCheckBox = regexCheckBox.match(lineText);
+    QRegularExpressionMatch matchBulletCheckBox = regexBulletCheckBox.match(lineText);
+
     if(matchNumbering.hasMatch()){
         int spaces = numberListGetSpaces(matchNumbering.captured(0));
         editCursor.insertText(QString("").leftJustified(spaces,' '));
         editCursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
+        return;
+    }else if(matchBulletCheckBox.hasMatch()){
+        int spaces = numberListGetSpaces(matchBulletPoint.captured(0));
+        editCursor.insertText(QString("").leftJustified(spaces,' '));
+        if(matchCheckBox.captured(0).contains("x")){
+            editCursor.insertText("- - [x]  ");
+        }else{
+            editCursor.insertText("- - [ ]  ");
+        }
+        return;
+    }else if(matchCheckBox.hasMatch()){
+        int spaces = numberListGetSpaces(matchBulletPoint.captured(0));
+        editCursor.insertText(QString("").leftJustified(spaces,' '));
+        if(matchCheckBox.captured(0).contains("x")){
+            editCursor.insertText("- [x]  ");
+        }else{
+            editCursor.insertText("- [ ]  ");
+        }
         return;
     }else if(matchBulletPoint.hasMatch()){
         int spaces = numberListGetSpaces(matchBulletPoint.captured(0));

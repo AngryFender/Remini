@@ -173,6 +173,8 @@ public slots:
     QRegularExpression regexCodeBlock;
     QRegularExpression regexHorizontalLine;
     QRegularExpression regexNumbering;
+    QRegularExpression regexCheckBox;
+    QRegularExpression regexBulletCheckBox;
     QRegularExpression regexBulletPoints;
 
     QUndoStack undoStack;
