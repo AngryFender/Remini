@@ -243,6 +243,8 @@ struct UndoData{
     int scrollValue;
     SelectRange oldSelectRange;
     bool isCheckBox;
+    QString oldBlock;
+    QString newBlock;
 };
 
 class EditCommand : public QUndoCommand
@@ -253,10 +255,19 @@ public:
     void undo() override;
     void redo() override;
 
+    enum UndoType{
+        unknown,
+        singleBlockEdit,
+        multiBlockEdit,
+    };
+
 private:
+    UndoType undoType;
     QTextEdit *view;
     MkTextDocument *doc;
     QString text;
+    QString oldBlock;
+    QString newBlock;
     int blockNo;
     int posInBlock;
     int scrollValue;
@@ -264,6 +275,7 @@ private:
     QString oldText;
     bool isConstructorRedo;
     SelectRange oldSelectRange;
+
 };
 
 

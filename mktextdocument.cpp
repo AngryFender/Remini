@@ -1310,6 +1310,15 @@ EditCommand::EditCommand(UndoData &data)
     this->posInBlock = data.posInBlock;
     this->oldSelectRange.isCheckBox = data.isCheckBox;
     this->oldSelectRange.scrollValue = data.scrollValue;
+    this->oldBlock = data.oldBlock;
+
+    if(oldSelectRange.currentBlockNo == blockNo){
+        this->undoType = singleBlockEdit;
+        this->newBlock = data.newBlock;
+        this->oldBlock = data.oldBlock;
+    }else{
+        this->undoType = multiBlockEdit;
+    }
 }
 
 void EditCommand::undo()
