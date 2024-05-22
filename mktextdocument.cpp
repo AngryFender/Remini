@@ -31,6 +31,15 @@ void MkTextDocument::setUndoRedoText(const QString &text)
     this->rawDocument.setPlainText(text);
 }
 
+void MkTextDocument::setUndoRedoText(const int blockNo, const QString &text)
+{
+    QTextCursor cursor(this);
+    cursor.setPosition(findBlockByNumber(blockNo).position());
+    cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    cursor.insertText(text);
+}
+
 void MkTextDocument::setUndoSelectRange(const SelectRange range)
 {
     this->undoSelectRange = range;
@@ -1301,9 +1310,7 @@ EditCommand::EditCommand(UndoData &data)
 {
     this->view = data.view;
     this->doc = dynamic_cast<MkTextDocument*>(data.doc);
-    this->text = data.text;
     this->scrollValue = data.scrollValue;
-    this->oldText = data.oldText;
     isConstructorRedo = true;
     this->oldSelectRange = data.oldSelectRange;
     this->blockNo = data.blockNo;
@@ -1312,18 +1319,24 @@ EditCommand::EditCommand(UndoData &data)
     this->oldSelectRange.scrollValue = data.scrollValue;
     this->oldBlock = data.oldBlock;
 
-    if(oldSelectRange.currentBlockNo == blockNo){
+    if(oldSelectRange.currentBlockNo == blockNo  && !data.isCheckBox){
         this->undoType = singleBlockEdit;
         this->newBlock = data.newBlock;
         this->oldBlock = data.oldBlock;
     }else{
         this->undoType = multiBlockEdit;
+        this->oldText = data.oldText;
+        this->text = data.text;
     }
 }
 
 void EditCommand::undo()
 {
-    doc->setUndoRedoText(oldText);
+    if(undoType == singleBlockEdit){
+        doc->setUndoRedoText(oldSelectRange.currentBlockNo, this->oldBlock);
+    }else{
+        doc->setUndoRedoText(oldText);
+    }
     doc->setUndoSelectRange(this->oldSelectRange);
 }
 
@@ -1332,7 +1345,12 @@ void EditCommand::redo()
     if(isConstructorRedo){
         isConstructorRedo = false;
     }else{
-        doc->setUndoRedoText(text);
+
+        if(undoType == singleBlockEdit){
+            doc->setUndoRedoText(this->blockNo, this->newBlock);
+        }else{
+            doc->setUndoRedoText(text);
+        }
 
         QTextCursor cursor = this->view->textCursor();
         cursor.setPosition(this->view->document()->findBlockByNumber(this->blockNo).position());

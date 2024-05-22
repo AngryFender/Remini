@@ -343,6 +343,7 @@ void MkEdit::preUndoSetup()
     undoData.oldSelectRange.hasSelection     	= this->textCursor().hasSelection();
     undoData.oldSelectRange.currentBlockNo 		= this->textCursor().blockNumber();
     undoData.oldSelectRange.currentposInBlock 	= this->textCursor().positionInBlock();
+    undoData.oldBlock = this->document()->findBlockByNumber(this->textCursor().blockNumber()).text();
 }
 
 void MkEdit::postUndoSetup()
@@ -357,6 +358,7 @@ void MkEdit::postUndoSetup()
 
     undoData.blockNo 	= this->textCursor().blockNumber();
     undoData.posInBlock = this->textCursor().positionInBlock();
+    undoData.newBlock   = this->document()->findBlockByNumber(this->textCursor().blockNumber()).text();
 
     if(!undoData.undoRedoSkip){
         EditCommand *edit = new EditCommand(undoData);
