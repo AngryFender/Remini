@@ -147,6 +147,7 @@ signals:
     void duplicateLine(int blockNumber);
     void smartSelection(int blockNumber, QTextCursor &cursor);
     void saveRawDocument();
+    void saveSingleRawBlock(int blockNumber);
 
     void removeAllMkData(int currentBlockNo);
     void applyAllMkData(int blockNumber, bool showAll, SelectRange *range);

@@ -961,6 +961,18 @@ void MkTextDocument::saveRawDocumentHandler()
     this->rawDocument.setPlainText(this->toPlainText());
 }
 
+void MkTextDocument::saveSingleRawBlockHandler(int blockNumber)
+{
+    qDebug()<<this->rawDocument.toPlainText();
+    QTextCursor rawCursor(&this->rawDocument);
+    rawCursor.setPosition(this->rawDocument.findBlockByNumber(blockNumber).position());
+    rawCursor.movePosition(QTextCursor::StartOfBlock,QTextCursor::MoveAnchor);
+    rawCursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+    rawCursor.insertText(this->findBlockByNumber(blockNumber).text());
+
+    qDebug()<<this->rawDocument.toPlainText();
+}
+
 void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
 {
     if(disableMarkdownState){
@@ -1323,10 +1335,12 @@ EditCommand::EditCommand(UndoData &data)
         this->undoType = singleBlockEdit;
         this->newBlock = data.newBlock;
         this->oldBlock = data.oldBlock;
+        data.isSingle = true;
     }else{
         this->undoType = multiBlockEdit;
         this->oldText = data.oldText;
         this->text = data.text;
+        data.isSingle = false;
     }
 }
 

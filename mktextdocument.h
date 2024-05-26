@@ -123,6 +123,7 @@ public slots:
     void duplicateLineHandle(int blockNumber);
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
     void saveRawDocumentHandler();
+    void saveSingleRawBlockHandler(int blockNumber);
 
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int position);
@@ -246,6 +247,7 @@ struct UndoData{
     bool isCheckBox;
     QString oldBlock;
     QString newBlock;
+    bool isSingle;
 };
 
 class EditCommand : public QUndoCommand
