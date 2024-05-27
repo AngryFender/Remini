@@ -414,6 +414,16 @@ void MkEdit::applyMkEffects(const bool scroll)
     connectSignals();
 }
 
+bool MkEdit::checkSingleBlock()
+{
+    if(undoData.oldSelectRange.currentBlockNo == this->textCursor().blockNumber()  && !undoData.isCheckBox){
+        undoData.isSingle = true;
+    }else{
+        undoData.isSingle = false;
+    }
+    return undoData.isSingle;
+}
+
 void MkEdit::fileSaveNow()
 {
     fileSaveTimer.stop();

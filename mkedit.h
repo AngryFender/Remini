@@ -114,6 +114,7 @@ protected:
     QRect getVisibleRect();
     void clearMkEffects();
     void applyMkEffects(const bool scroll = true);
+    bool checkSingleBlock();
     void fileSaveNow();
     void fileSaveWithScroll();
     bool isTextCursorVisible();
