@@ -248,6 +248,7 @@ struct UndoData{
     QString oldBlock;
     QString newBlock;
     bool isSingle;
+    bool forceMulti;
 };
 
 class EditCommand : public QUndoCommand

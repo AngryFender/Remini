@@ -161,6 +161,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
                                 tabKeyPressed();
                                 fileSaveNow(); return;
                             }break;
+    case Qt::Key_Delete: undoData.forceMulti = true ;break;
     }
 
     clearMkEffects();
@@ -178,7 +179,11 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     default: break;
     }
 
-    emit saveRawDocument();
+    if(checkSingleBlock()){
+        emit saveSingleRawBlock(this->textCursor().blockNumber());
+    }else{
+        emit saveRawDocument();
+    }
     applyMkEffects();
 }
 
@@ -373,7 +378,7 @@ QRect MkEdit::getVisibleRect()
     return visibleRect;
 }
 
-void MkEdit::clearMkEffects()
+void MkEdit::clearMkEffects(bool isSingle)
 {
     disconnectSignals();
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
@@ -384,7 +389,9 @@ void MkEdit::clearMkEffects()
     int posInBlock = cursor.positionInBlock();
     bool hasSelection = cursor.hasSelection();
 
-    emit removeAllMkData(this->textCursor().blockNumber());
+    if(!isSingle){
+        emit removeAllMkData(this->textCursor().blockNumber());
+    }
 
     if(hasSelection){
         cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
@@ -416,8 +423,12 @@ void MkEdit::applyMkEffects(const bool scroll)
 
 bool MkEdit::checkSingleBlock()
 {
-    if(undoData.oldSelectRange.currentBlockNo == this->textCursor().blockNumber()  && !undoData.isCheckBox){
+    if(undoData.oldSelectRange.currentBlockNo == this->textCursor().blockNumber()
+        && !undoData.isCheckBox
+        && !undoData.forceMulti){
         undoData.isSingle = true;
+        undoData.isCheckBox = false;
+        undoData.forceMulti = false;
     }else{
         undoData.isSingle = false;
     }
@@ -427,7 +438,11 @@ bool MkEdit::checkSingleBlock()
 void MkEdit::fileSaveNow()
 {
     fileSaveTimer.stop();
-    emit saveRawDocument();
+    if(checkSingleBlock()){
+        emit saveSingleRawBlock(this->textCursor().blockNumber());
+    }else{
+        emit saveRawDocument();
+    }
     postUndoSetup();
     emit fileSaveRaw();
     applyMkEffects();
@@ -478,6 +493,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
             disconnectSignals();
             undoData.scrollValue = this->verticalScrollBar()->sliderPosition();
             undoData.isCheckBox = true;
+            undoData.isSingle = false;
             preUndoSetup();
             emit pushCheckBox(pos);
             fileSaveWithScroll();
@@ -627,6 +643,8 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
 
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
     undoData.isCheckBox = false;
+    undoData.forceMulti = true;
+    undoData.isSingle = false;
     //if the mime text itself is a code block
     if(matchCodeBlockRegex.hasMatch()){
         emit removeAllMkData(cursor.blockNumber());
