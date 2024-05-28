@@ -425,6 +425,9 @@ TEST_CASE("MkEdit insert new line bullet point, undo/redo", "[MkEdit]")
     QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
                      &doc,&MkTextDocument::undoStackRedo);
 
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
     QObject::connect(&edit,&MkEdit::saveRawDocument,
                      &doc,&MkTextDocument::saveRawDocumentHandler);
 
@@ -1217,6 +1220,8 @@ TEST_CASE("MkEdit type all strings with bold format then check if the cursor is 
     QObject::connect(&edit,&MkEdit::saveRawDocument,
                      &doc,&MkTextDocument::saveRawDocumentHandler);
 
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
 
 
     QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString(" ")));
@@ -1309,6 +1314,9 @@ TEST_CASE("MkEdit checkbox mouse click with undo/redo", "[MkEdit]")
 
     QObject::connect(&edit,&MkEdit::saveRawDocument,
                      &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
 
     QObject::connect(&edit,&MkEdit::pushCheckBox,
                      &doc,&MkTextDocument::pushCheckBoxHandle);
