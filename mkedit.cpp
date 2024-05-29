@@ -145,6 +145,8 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
+    bool isSingle = true;
+
     switch(event->key()){
     case Qt::Key_Shift: isShiftKeyPressed = true;
     case Qt::Key_Up:
@@ -157,14 +159,24 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}break;
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}break;
     case Qt::Key_Tab:       if( event->modifiers() == Qt::NoModifier){
-                                clearMkEffects();
+                                clearMkEffects(isSingle);
                                 tabKeyPressed();
                                 fileSaveNow(); return;
                             }break;
-    case Qt::Key_Delete: undoData.forceMulti = true ;break;
+    case Qt::Key_Delete:
+    case Qt::Key_Enter:
+    case Qt::Key_Return:    undoData.forceMulti = true;  isSingle = false; break;
+    case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
     }
 
-    clearMkEffects();
+    if(textCursor().hasSelection()){
+        undoData.forceMulti = true;
+        isSingle = false;
+    }
+
+    clearMkEffects(isSingle);
     QTextEdit::keyPressEvent(event);
 
     switch(event->key()){
@@ -427,10 +439,10 @@ bool MkEdit::checkSingleBlock()
         && !undoData.isCheckBox
         && !undoData.forceMulti){
         undoData.isSingle = true;
-        undoData.isCheckBox = false;
-        undoData.forceMulti = false;
     }else{
         undoData.isSingle = false;
+        undoData.isCheckBox = false;
+        undoData.forceMulti = false;
     }
     return undoData.isSingle;
 }
