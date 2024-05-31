@@ -169,13 +169,14 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
+    case Qt::Key_Backspace: if(textCursor().positionInBlock() == 0){ undoData.forceMulti = true; isSingle = false;}break;
+    case Qt::Key_QuoteLeft: undoData.forceMulti = true;  isSingle = false; break;
     }
 
     if(textCursor().hasSelection()){
         undoData.forceMulti = true;
         isSingle = false;
     }
-
     clearMkEffects(isSingle);
     QTextEdit::keyPressEvent(event);
 
