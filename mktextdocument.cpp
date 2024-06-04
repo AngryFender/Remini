@@ -1324,24 +1324,27 @@ EditCommand::EditCommand(UndoData &data)
     this->oldSelectRange = data.oldSelectRange;
     this->blockNo = data.blockNo;
     this->posInBlock = data.posInBlock;
-    this->oldSelectRange.isCheckBox = data.isCheckBox;
+    this->editType = data.editType;
     this->oldSelectRange.scrollValue = data.scrollValue;
     this->oldBlock = data.oldBlock;
 
-    if(data.isSingle){
-        this->undoType = singleBlockEdit;
+    if(data.editType == EditType::singleEdit){
         this->newBlock = data.newBlock;
         this->oldBlock = data.oldBlock;
+        this->oldSelectRange.isCheckBox = false;
     }else{
-        this->undoType = multiBlockEdit;
         this->oldText = data.oldText;
         this->text = data.text;
+
+        if(data.editType == EditType::checkbox){
+            this->oldSelectRange.isCheckBox = true;
+        }
     }
 }
 
 void EditCommand::undo()
 {
-    if(undoType == singleBlockEdit){
+    if(editType == singleEdit){
         doc->setUndoRedoText(oldSelectRange.currentBlockNo, this->oldBlock);
     }else{
         doc->setUndoRedoText(oldText);
@@ -1355,7 +1358,7 @@ void EditCommand::redo()
         isConstructorRedo = false;
     }else{
 
-        if(undoType == singleBlockEdit){
+        if(editType == singleEdit){
             doc->setUndoRedoText(this->blockNo, this->newBlock);
         }else{
             doc->setUndoRedoText(text);

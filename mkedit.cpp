@@ -145,7 +145,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
-    bool isSingle = true;
+    undoData.editType = singleEdit;
 
     switch(event->key()){
     case Qt::Key_Shift: isShiftKeyPressed = true;
@@ -159,25 +159,24 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_C:         if( event->modifiers() == Qt::CTRL) {QTextEdit::keyPressEvent(event);return;}break;
     case Qt::Key_S:         if( event->modifiers() == Qt::CTRL) {smartSelectionSetup(); return;}break;
     case Qt::Key_Tab:       if( event->modifiers() == Qt::NoModifier){
-                                clearMkEffects(isSingle);
+                                clearMkEffects(undoData.editType);
                                 tabKeyPressed();
                                 fileSaveNow(); return;
                             }break;
-    case Qt::Key_Delete:    if(textCursor().positionInBlock()== (textCursor().block().length()-1)){ undoData.forceMulti = true;  isSingle = false;} break;
+    case Qt::Key_Delete:    if(textCursor().positionInBlock()== (textCursor().block().length()-1)){ undoData.editType = multiEdit;} break;
     case Qt::Key_Enter:
-    case Qt::Key_Return:    undoData.forceMulti = true;  isSingle = false; break;
-    case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.forceMulti = true; isSingle = false;}break;
-    case Qt::Key_Backspace: if(textCursor().positionInBlock() == 0){ undoData.forceMulti = true; isSingle = false;}break;
-    case Qt::Key_QuoteLeft: undoData.forceMulti = true;  isSingle = false; break;
+    case Qt::Key_Return:    undoData.editType = multiEdit; break;
+    case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
+    case Qt::Key_Backspace: if(textCursor().positionInBlock() == 0){ undoData.editType = multiEdit;}break;
+    case Qt::Key_QuoteLeft: undoData.editType = multiEdit; break;
     }
 
     if(textCursor().hasSelection()){
-        undoData.forceMulti = true;
-        isSingle = false;
+        undoData.editType = multiEdit;
     }
-    clearMkEffects(isSingle);
+    clearMkEffects(undoData.editType);
     QTextEdit::keyPressEvent(event);
 
     switch(event->key()){
@@ -185,8 +184,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber());
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey();
-    case Qt::Key_Delete:    if( isSingle == false){ fileSaveNow(); return;}
-    case Qt::Key_Backspace: if( isSingle == false){ fileSaveNow(); return;}break;
+    case Qt::Key_Delete:    if( undoData.editType != EditType::singleEdit){ fileSaveNow(); return;}
+    case Qt::Key_Backspace: if( undoData.editType != EditType::singleEdit){ fileSaveNow(); return;}break;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterUndo(); return;}break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterRedo(); return;}break;
@@ -393,18 +392,17 @@ QRect MkEdit::getVisibleRect()
     return visibleRect;
 }
 
-void MkEdit::clearMkEffects(bool isSingle)
+void MkEdit::clearMkEffects(EditType editType)
 {
     disconnectSignals();
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
-    undoData.isCheckBox = false;
 
     QTextCursor cursor = this->textCursor();
     int blockNumber = cursor.blockNumber();
     int posInBlock = cursor.positionInBlock();
     bool hasSelection = cursor.hasSelection();
 
-    if(!isSingle){
+    if(editType != EditType::singleEdit){
         emit removeAllMkData(this->textCursor().blockNumber());
     }
 
@@ -439,15 +437,11 @@ void MkEdit::applyMkEffects(const bool scroll)
 bool MkEdit::checkSingleBlock()
 {
     if(undoData.oldSelectRange.currentBlockNo == this->textCursor().blockNumber()
-        && !undoData.isCheckBox
-        && !undoData.forceMulti){
-        undoData.isSingle = true;
+        && undoData.editType == EditType::singleEdit){
+        return true;
     }else{
-        undoData.isSingle = false;
-        undoData.isCheckBox = false;
-        undoData.forceMulti = false;
+        return false;
     }
-    return undoData.isSingle;
 }
 
 void MkEdit::fileSaveNow()
@@ -507,8 +501,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
 
             disconnectSignals();
             undoData.scrollValue = this->verticalScrollBar()->sliderPosition();
-            undoData.isCheckBox = true;
-            undoData.isSingle = false;
+            undoData.editType = EditType::checkbox;
             preUndoSetup();
             emit pushCheckBox(pos);
             fileSaveWithScroll();
@@ -657,9 +650,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     matchCodeBlockRegex = regexCodeBlock.match(text);
 
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
-    undoData.isCheckBox = false;
-    undoData.forceMulti = true;
-    undoData.isSingle = false;
+    undoData.editType = EditType::multiEdit;
     //if the mime text itself is a code block
     if(matchCodeBlockRegex.hasMatch()){
         emit removeAllMkData(cursor.blockNumber());

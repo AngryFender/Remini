@@ -112,7 +112,7 @@ protected:
     QRegularExpressionMatch matchCodeBlockRegex;
 
     QRect getVisibleRect();
-    void clearMkEffects(const bool isSingle = false);
+    void clearMkEffects(EditType editType = EditType::singleEdit);
     void applyMkEffects(const bool scroll = true);
     bool checkSingleBlock();
     void fileSaveNow();
