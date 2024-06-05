@@ -1344,10 +1344,11 @@ EditCommand::EditCommand(UndoData &data)
 
 void EditCommand::undo()
 {
-    if(editType == singleEdit){
-        doc->setUndoRedoText(oldSelectRange.currentBlockNo, this->oldBlock);
-    }else{
-        doc->setUndoRedoText(oldText);
+    switch(editType){
+    case singleEdit: doc->setUndoRedoText(oldSelectRange.currentBlockNo, this->oldBlock); break;
+    case checkbox:
+    case enterPressed:
+    case multiEdit: doc->setUndoRedoText(oldText); break;
     }
     doc->setUndoSelectRange(this->oldSelectRange);
 }
@@ -1357,11 +1358,11 @@ void EditCommand::redo()
     if(isConstructorRedo){
         isConstructorRedo = false;
     }else{
-
-        if(editType == singleEdit){
-            doc->setUndoRedoText(this->blockNo, this->newBlock);
-        }else{
-            doc->setUndoRedoText(text);
+        switch(editType){
+        case singleEdit: doc->setUndoRedoText(this->blockNo, this->newBlock);break;
+        case checkbox:
+        case enterPressed:
+        case multiEdit: doc->setUndoRedoText(text); break;
         }
 
         QTextCursor cursor = this->view->textCursor();
