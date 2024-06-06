@@ -189,15 +189,10 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterUndo(); return;}break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterRedo(); return;}break;
-
     default: break;
     }
 
-    if(checkSingleBlock()){
-        emit saveSingleRawBlock(this->textCursor().blockNumber());
-    }else{
-        emit saveRawDocument();
-    }
+    updateRawDocument();
     applyMkEffects();
 }
 
@@ -434,24 +429,25 @@ void MkEdit::applyMkEffects(const bool scroll)
     connectSignals();
 }
 
-bool MkEdit::checkSingleBlock()
+void MkEdit::updateRawDocument()
 {
-    if(undoData.oldSelectRange.currentBlockNo == this->textCursor().blockNumber()
-        && undoData.editType == EditType::singleEdit){
-        return true;
-    }else{
-        return false;
+    switch(undoData.editType){
+    case EditType::singleEdit:
+        if(undoData.oldSelectRange.currentBlockNo == this->textCursor().blockNumber()){
+            emit saveSingleRawBlock(textCursor().blockNumber()); return;
+        }
+    case EditType::checkbox:
+    case EditType::enterPressed:
+    case EditType::multiEdit:
+        emit saveRawDocument();
+    break;
     }
 }
 
 void MkEdit::fileSaveNow()
 {
     fileSaveTimer.stop();
-    if(checkSingleBlock()){
-        emit saveSingleRawBlock(this->textCursor().blockNumber());
-    }else{
-        emit saveRawDocument();
-    }
+    updateRawDocument();
     postUndoSetup();
     emit fileSaveRaw();
     applyMkEffects();

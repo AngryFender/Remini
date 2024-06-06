@@ -114,7 +114,8 @@ protected:
     QRect getVisibleRect();
     void clearMkEffects(EditType editType = EditType::singleEdit);
     void applyMkEffects(const bool scroll = true);
-    bool checkSingleBlock();
+
+    void updateRawDocument();
     void fileSaveNow();
     void fileSaveWithScroll();
     bool isTextCursorVisible();
@@ -149,6 +150,7 @@ signals:
     void smartSelection(int blockNumber, QTextCursor &cursor);
     void saveRawDocument();
     void saveSingleRawBlock(int blockNumber);
+    void saveDoubleRawBlock(int firstBlockNumber, int secondBlockNumber);
 
     void removeAllMkData(int currentBlockNo);
     void applyAllMkData(int blockNumber, bool showAll, SelectRange *range);
