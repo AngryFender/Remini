@@ -1328,17 +1328,17 @@ EditCommand::EditCommand(UndoData &data)
     this->oldSelectRange.scrollValue = data.scrollValue;
     this->oldBlock = data.oldBlock;
 
-    if(data.editType == EditType::singleEdit){
+    switch(editType){
+    case singleEdit:
         this->newBlock = data.newBlock;
         this->oldBlock = data.oldBlock;
         this->oldSelectRange.isCheckBox = false;
-    }else{
-        this->oldText = data.oldText;
+        break;
+    case checkbox:  this->oldSelectRange.isCheckBox = true;
+    case enterPressed:
+    case multiEdit: this->oldText = data.oldText;
         this->text = data.text;
-
-        if(data.editType == EditType::checkbox){
-            this->oldSelectRange.isCheckBox = true;
-        }
+        break;
     }
 }
 
