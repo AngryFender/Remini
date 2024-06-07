@@ -1562,6 +1562,89 @@ TEST_CASE("MkEdit pressing enter after creating code block with ```, undo/redo",
     REQUIRE("```\n```" == text);
 }
 
+TEST_CASE("MkEdit check if code block is affected by mk formatting, undo/redo", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyMkSingleBlock,
+                     &doc,&MkTextDocument::applyMkSingleBlockHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QObject::connect(&edit,&MkEdit::quoteLeftKeyPressed,
+                     &doc,&MkTextDocument::quoteLeftKeyPressedHandle);
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_QuoteLeft, Qt::NoModifier,QString("`")));
+    edit.keyPressEvent(keyPressEvent.data());
+    edit.keyPressEvent(keyPressEvent.data());
+    edit.keyPressEvent(keyPressEvent.data());
+
+    QString text = edit.toPlainText();
+    text = edit.toPlainText();
+    REQUIRE("```\n```" == text);
+
+    QString testText = "**bold**";
+    for(QChar &ch: testText)                    {
+        keyPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, ch));
+        edit.keyPressEvent(keyPressEvent.data());
+    }
+    text = edit.toPlainText();
+    REQUIRE("```**bold**\n```" == text);
+
+    auto cursor = edit.textCursor();
+    cursor.setPosition(text.length());
+    edit.setTextCursor(cursor);
+
+    keyPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**\n\n" == text);
+
+    keyPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, "a"));
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**\n\na" == text);
+
+    QScopedPointer<QKeyEvent> undoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier));
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**\n\n" == text);
+
+    QScopedPointer<QKeyEvent>  redoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier)) ;
+    edit.keyPressEvent(redoKeyPressEvent.data());
+
+    text = edit.toPlainText();
+    REQUIRE("**bold**\n\na" == text);
+}
+
 TEST_CASE("MkEdit pressing delete as the end of the text block, undo/redo", "[MkEdit]")
 {
     MkTextDocument doc;
