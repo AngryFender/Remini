@@ -150,6 +150,25 @@ void MkTextDocument::applyAllMkDataHandle(int blockNumber, bool showAll, SelectR
     hideMKSymbolsFromDrawingRect(blockNumber, showAll, nullptr,true);
 }
 
+void MkTextDocument::applyMkSingleBlockHandle(int blockNumber, SelectRange *range)
+{
+    QTextBlock block = this->findBlockByNumber(blockNumber);
+    QTextBlockUserData* data =block.userData();
+
+    BlockData* blockData = dynamic_cast<BlockData*>(data);
+    if(!blockData){
+        block.setUserData(NULL);
+        QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(block.text());
+        if(matchHorizontalLine.hasMatch()){
+            LineData *lineData = new LineData;
+            block.setUserData(lineData);
+        }
+        identifyFormatData(block);
+    }
+
+    hideMKSymbolsFromDrawingRect(blockNumber, false, nullptr,true);
+}
+
 void MkTextDocument::identifyUserData()
 {
     bool openBlock = false;

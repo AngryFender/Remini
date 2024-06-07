@@ -116,6 +116,7 @@ public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, SelectRange * range);
     void removeAllMkDataHandle(int blockNo);
     void applyAllMkDataHandle(int blockNumber, bool showAll, SelectRange*range);
+    void applyMkSingleBlockHandle(int blockNumber, SelectRange*range);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
     void checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid);

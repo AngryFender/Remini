@@ -242,6 +242,9 @@ void ViewsHandler::connectDocument()
     QObject::connect(viewText,&MkEdit::applyAllMkData,
                      currentDocument.data(),&MkTextDocument::applyAllMkDataHandle);
 
+    QObject::connect(viewText,&MkEdit::applyMkSingleBlock,
+                     currentDocument.data(),&MkTextDocument::applyMkSingleBlockHandle);
+
     QObject::connect(viewText,&MkEdit::saveSingleRawBlock,
                      currentDocument.data(),&MkTextDocument::saveSingleRawBlockHandler);
 
@@ -308,6 +311,9 @@ void ViewsHandler::disconnectDocument()
 
     QObject::disconnect(viewText,&MkEdit::applyAllMkData,
                         currentDocument.data(),&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::disconnect(viewText,&MkEdit::applyMkSingleBlock,
+                     currentDocument.data(),&MkTextDocument::applyMkSingleBlockHandle);
 
     QObject::disconnect(viewText,&MkEdit::setMarkdownStatus,
                         currentDocument.data(),&MkTextDocument::setMarkdownHandle);

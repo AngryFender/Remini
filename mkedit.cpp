@@ -420,7 +420,12 @@ void MkEdit::applyMkEffects(const bool scroll)
 {
     disconnectSignals();
 
-    emit applyAllMkData(this->textCursor().blockNumber(), undoData.selectAll, &selectRange);
+    switch(undoData.editType){
+    case singleEdit: emit applyMkSingleBlock(this->textCursor().blockNumber(), &selectRange); break;
+    case checkbox:
+    case enterPressed:
+    case multiEdit: emit applyAllMkData(this->textCursor().blockNumber(), undoData.selectAll, &selectRange); break;
+    }
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){

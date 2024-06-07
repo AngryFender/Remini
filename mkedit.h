@@ -154,6 +154,7 @@ signals:
 
     void removeAllMkData(int currentBlockNo);
     void applyAllMkData(int blockNumber, bool showAll, SelectRange *range);
+    void applyMkSingleBlock(int blockNumber, SelectRange *range);
     void blockColorChanged(const QColor& color);
     void syntaxColorUpdate(HighlightColor& colors);
 
