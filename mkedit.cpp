@@ -891,8 +891,6 @@ QString MkEdit::rawPlainText() const
 void MkEdit::setMkState(bool enable)
 {
     showMarkDown = enable;
-    QTextCursor cursor = this->textCursor();
-    QTextBlock block = this->document()->findBlockByNumber(cursor.blockNumber());
 
     if(enable){
         disableMarkdown.setText("Disable Markdown");
@@ -900,8 +898,6 @@ void MkEdit::setMkState(bool enable)
     }else{
         disableMarkdown.setText("Enable Markdown");
         emit setMarkdownStatus(false, getVisibleRect());
-        cursor.setPosition(block.position());
-        this->setTextCursor(cursor);
     }
 }
 

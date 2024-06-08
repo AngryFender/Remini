@@ -388,8 +388,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         viewTitle->setText(currentDocument->getFileName());
 
         viewText->setDocument(currentDocument.data());
-        viewText->updateMkState();								//after connectDocuments();
         viewText->initialialCursorPosition();
+        viewText->updateMkState();								//after connectDocuments();
         return NEW_DOCUMENT;
     }else{
 
@@ -411,8 +411,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         currentDocument->setDefaultFont(fontBase);
         viewText->setFont(fontBase);
         connectDocument();
-        viewText->updateMkState();   							//after connectDocuments();
         viewText->setTextCursor(cursor);
+        viewText->updateMkState();   							//after connectDocuments();
         return OLD_DOCUMENT;
     }
 }
