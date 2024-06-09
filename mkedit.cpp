@@ -146,7 +146,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
     undoData.editType = singleEdit;
-
+    QString blockText;
     switch(event->key()){
     case Qt::Key_Shift: isShiftKeyPressed = true;
     case Qt::Key_Up:
@@ -169,7 +169,11 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
-    case Qt::Key_Backspace: if(textCursor().positionInBlock() == 0){ undoData.editType = multiEdit;}break;
+    case Qt::Key_Backspace: blockText = this->document()->findBlockByNumber(textCursor().blockNumber()).text();
+                            if((textCursor().positionInBlock() == 0) || (blockText.right(3)=="```")){
+                                undoData.editType = multiEdit;
+                            }
+                            break;
     case Qt::Key_QuoteLeft: undoData.editType = multiEdit; break;
     }
 
