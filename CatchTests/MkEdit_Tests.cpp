@@ -1708,3 +1708,71 @@ TEST_CASE("MkEdit pressing delete as the end of the text block, undo/redo", "[Mk
     text = edit.toPlainText();
     REQUIRE("**bold***italic*" == text);
 }
+
+TEST_CASE("MkEdit pressing backspace to delele the code block symbols, undo/redo", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+
+    doc.setPlainText("```\n```");
+    edit.setDocument(&doc);
+    int initialPosition = 3;
+    int secondPosition = 7;
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QObject::connect(&edit,&MkEdit::quoteLeftKeyPressed,
+                     &doc,&MkTextDocument::quoteLeftKeyPressedHandle);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(initialPosition, QTextCursor::MoveAnchor);
+    edit.setTextCursor(cursor);
+    QString text = edit.toPlainText();
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+
+    text = edit.toPlainText();
+    REQUIRE("``\n```" == text);
+
+    QScopedPointer<QKeyEvent> undoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier));
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("```\n```" == text);
+
+    cursor.setPosition(secondPosition, QTextCursor::MoveAnchor);
+    edit.setTextCursor(cursor);
+
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("```\n``" == text);
+
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("```\n```" == text);
+}
