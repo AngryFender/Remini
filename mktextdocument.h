@@ -75,6 +75,10 @@ struct SelectRange{
     bool isCursorCaculated  = false;
     bool isFirstMousePress  = false;
     int scrollValue;
+    int rawFistBlock 		= NO_SELECTION_POS;
+    int rawEndBlock 		= NO_SELECTION_POS;
+    int oldRawFistBlock 	= NO_SELECTION_POS;
+    int oldRawEndBlock 		= NO_SELECTION_POS;
 };
 
 struct RawBlockInfo{

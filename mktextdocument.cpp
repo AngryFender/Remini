@@ -119,13 +119,8 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
             this->rawBlockInfo.rawFirstBlock = range->selectionFirstStartBlock;
             this->rawBlockInfo.rawEndBlock = range->selectionEndBlock;
 
-            if(range->selectionFirstStartBlock < range->selectionEndBlock){
-                this->selectRange.startBlock = range->selectionFirstStartBlock;
-                this->selectRange.endBlock   = range->selectionEndBlock;
-            }else{
-                this->selectRange.startBlock = range->selectionEndBlock;
-                this->selectRange.endBlock   =  range->selectionFirstStartBlock;
-            }
+            this->selectRange.startBlock = std::min(range->selectionFirstStartBlock, range->selectionEndBlock);
+            this->selectRange.endBlock = std::max(range->selectionFirstStartBlock, range->selectionEndBlock);
         }else{
             this->selectRange.startBlock = -1;
             this->selectRange.endBlock = -1;
@@ -133,7 +128,6 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
         }
     }
     hideMKSymbolsFromDrawingRect(blockNumber,false, range, true);
-
 }
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
