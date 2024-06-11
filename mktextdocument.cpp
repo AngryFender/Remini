@@ -114,20 +114,40 @@ QTextDocument *MkTextDocument::getRawDocument()
 void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * range)
 {
     if(range){
-        this->rawBlockInfo.hasSelection = range->hasSelection;
+        this->selectRange.hasSelection = range->hasSelection;
         if(range->hasSelection){
-            this->rawBlockInfo.rawFirstBlock = range->selectionFirstStartBlock;
-            this->rawBlockInfo.rawEndBlock = range->selectionEndBlock;
-
             this->selectRange.startBlock = std::min(range->selectionFirstStartBlock, range->selectionEndBlock);
             this->selectRange.endBlock = std::max(range->selectionFirstStartBlock, range->selectionEndBlock);
+            this->selectRange.rawFirstBlock = this->selectRange.startBlock;
+            this->selectRange.rawEndBlock = this->selectRange.endBlock;
         }else{
-            this->selectRange.startBlock = -1;
-            this->selectRange.endBlock = -1;
-            this->rawBlockInfo.rawFirstBlock = range->currentBlockNo;
+            this->selectRange.startBlock = this->selectRange.endBlock = range->selectionFirstStartBlock;
+            this->selectRange.rawFirstBlock = this->selectRange.rawEndBlock = this->selectRange.startBlock;
         }
     }
     hideMKSymbolsFromDrawingRect(blockNumber,false, range, true);
+
+    //hide raw text from old selection but dont hide blocks from current selection
+    int blockNo = this->selectRange.oldRawFirstBlock;
+    while(blockNo <= this->selectRange.oldRawEndBlock){
+        if(!(blockNo <= this->selectRange.rawFirstBlock && blockNo >= this->selectRange.rawEndBlock)){
+            //todo: hide mk symbols
+        }
+        blockNo++;
+    }
+
+    //show raw text from current selection but check if its already being shown
+    blockNo = this->selectRange.rawFirstBlock;
+    while(blockNo <= this->selectRange.rawEndBlock){
+        if(!(blockNo <= this->selectRange.oldRawFirstBlock && blockNo >= this->selectRange.oldRawEndBlock)){
+            //todo: show mk symbols
+        }
+        blockNo++;
+    }
+
+    this->selectRange.oldSelection = this->selectRange.hasSelection;
+    this->selectRange.oldRawFirstBlock = this->selectRange.startBlock;
+    this->selectRange.oldRawEndBlock = this->selectRange.endBlock;
 }
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
