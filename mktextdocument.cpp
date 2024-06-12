@@ -552,14 +552,20 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     case FragmentData::HEADING3:{format = formatCollection.getHeading3(); end = block.length()-1; break;}
     case FragmentData::CHECKED_END:
     case FragmentData::UNCHECKED_END:{
-        const int blockPos = block.position();
-        checkMarkPositions.append(blockPos + start);
+        const int position = block.position() + start;
+        if(!checkMarkPositions.contains(position)){
+            checkMarkPositions.append(position);
+        }
         break;
     }
     case FragmentData::LINK_TITLE:{
         format = formatCollection.getLink();
-        const int blockPos = block.position();
-        linkPositions.append(QPair<int,int>(blockPos + start, blockPos + end));
+        const int startingPosition = block.position() + start;
+        const int endingPosition = block.position() + end;
+        QPair<int,int> linePosition(startingPosition, endingPosition);
+        if(!linkPositions.contains(linePosition)){
+            linkPositions.append(linePosition);
+        }
         break;}
 
     default:break;
