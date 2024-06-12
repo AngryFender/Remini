@@ -65,6 +65,7 @@ struct SelectRange{
     int startBlock      = NO_SELECTION_POS;
     int endBlock        = NO_SELECTION_POS;
     bool hasSelection 	= false;
+    bool oldSelection 	= false;
     bool isCheckBox 	= false;
     int currentposInBlock      = NO_SELECTION_POS;
     int currentBlockNo         = NO_SELECTION_POS;
@@ -75,9 +76,9 @@ struct SelectRange{
     bool isCursorCaculated  = false;
     bool isFirstMousePress  = false;
     int scrollValue;
-    int rawFistBlock 		= NO_SELECTION_POS;
+    int rawFirstBlock 		= NO_SELECTION_POS;
     int rawEndBlock 		= NO_SELECTION_POS;
-    int oldRawFistBlock 	= NO_SELECTION_POS;
+    int oldRawFirstBlock 	= NO_SELECTION_POS;
     int oldRawEndBlock 		= NO_SELECTION_POS;
 };
 
@@ -163,7 +164,6 @@ public slots:
     int blockNo;
     int characterNo;
     SelectRange selectRange;
-    RawBlockInfo rawBlockInfo;
 
     FormatLocation locBoldA;
     FormatLocation locBoldU;
