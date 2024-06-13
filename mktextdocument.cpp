@@ -221,6 +221,24 @@ void MkTextDocument::identifyUserData()
     }
 }
 
+void MkTextDocument::identifyUserData(QTextBlock &block)
+{
+    QTextBlockUserData *data = block.userData();
+    BlockData *blockData = dynamic_cast<BlockData*>(data);
+    if(blockData){
+        return;
+    }
+
+    block.setUserData(NULL);
+    QRegularExpressionMatch matchHorizontalLine = regexHorizontalLine.match(block.text());
+    if(matchHorizontalLine.hasMatch()){
+        LineData *lineData = new LineData;
+        block.setUserData(lineData);
+    }else{
+        identifyFormatData(block);
+    }
+}
+
 void MkTextDocument::formatAllLines(const QTextDocument &original, MkTextDocument &formatted)
 {
     bool openBlock = false;

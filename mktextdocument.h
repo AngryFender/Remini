@@ -197,6 +197,7 @@ public slots:
 
     void resetFormatLocation();
     void identifyUserData();
+    void identifyUserData(QTextBlock &block);
     void formatAllLines(const QTextDocument &original, MkTextDocument &formatted);
 
     void identifyFormatData(QTextBlock &block);
