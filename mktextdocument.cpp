@@ -1142,6 +1142,54 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
                 }
             }
     }
+
+void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll, SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
+{
+    //hide raw text from old selection but dont hide blocks from current selection
+    int fontSize =this->defaultFont().pointSize();
+    FormatCollection formatCollection(fontSize);
+    QTextBlock block;
+
+    QTextCursor cursor(this);
+    int blockNo = this->selectRange.rawFirstBlock;
+    while(blockNo <= this->selectRange.rawEndBlock){
+        if(!(blockNo <= this->selectRange.oldRawFirstBlock && blockNo >= this->selectRange.oldRawEndBlock)){
+            //todo: show mk symbols
+
+            block = this->findBlockByNumber(blockNo);
+            cursor.setPosition(block.position(),QTextCursor::MoveAnchor);
+            cursor.movePosition(QTextCursor::StartOfBlock,QTextCursor::MoveAnchor);
+            cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+            cursor.insertText(this->rawDocument.findBlockByNumber(block.blockNumber()).text());
+
+            identifyUserData(block);
+            QTextBlockUserData *data = block.userData();
+            if(data == nullptr){
+                blockNo++;
+                continue;
+            }
+
+            resetTextBlockFormat(block);
+
+            LineData* lineData = dynamic_cast<LineData*>(data);
+            if(lineData){
+                lineData->setDraw(false);
+                showSymbols(block, lineData->getSymbol());
+                blockNo++;
+                continue;
+            }
+
+            FormatData* formatData = dynamic_cast<FormatData*>(data);
+            if(formatData){
+                formatData->setHidden(false);
+                for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                {
+                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), cursor, formatCollection, false);
+                }
+            }
+        }
+        blockNo++;
+    }
 }
 
 void MkTextDocument::pushCheckBoxHandle(const int position)
