@@ -1142,6 +1142,67 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
                 }
             }
     }
+    this->selectRange.oldRawFirstBlock = selectRange.selectionFirstStartBlock;
+    this->selectRange.oldRawEndBlock = selectRange.selectionEndBlock;
+}
+
+void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(int blockNumber, bool showAll, SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
+{
+    //hide raw text from old selection but dont hide blocks from current selection
+    int fontSize =this->defaultFont().pointSize();
+    FormatCollection formatCollection(fontSize);
+    QTextBlock block;
+
+    int blockNo = this->selectRange.oldRawFirstBlock;
+    while(blockNo <= this->selectRange.oldRawEndBlock){
+        if(!(blockNo <= this->selectRange.rawFirstBlock && blockNo >= this->selectRange.rawEndBlock)){
+            //todo: hide mk symbols
+            block = this->findBlockByNumber(blockNo);
+            QTextBlockUserData *data = block.userData();
+            if(data == nullptr){
+                blockNo++;
+                continue;
+            }
+
+            BlockData* blockData = dynamic_cast<BlockData*>(data);
+            if(blockData)
+            {
+                switch(blockData->getStatus()){
+                case BlockData::content: break;
+                case BlockData::start:
+                case BlockData::end: hideSymbols(block, CODEBLOCK_SYMBOL);break;
+                }
+                blockNo++;
+                continue;
+            }
+
+            resetTextBlockFormat(block);
+            LineData* lineData = dynamic_cast<LineData*>(data);
+            if(lineData){
+                lineData->setDraw(true);
+                hideSymbols(block, lineData->getSymbol());
+                blockNo++;
+                continue;
+            }
+
+            FormatData* formatData = dynamic_cast<FormatData*>(data);
+            if(formatData){
+                QTextCursor cursor(block);
+
+                formatData->setHidden(true);
+                hideAllFormatSymbolsInTextBlock(block,formatData);
+
+                if(!formatData->isHiddenFormatsEmpty()){
+                    for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                    {
+                        applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), cursor, formatCollection, false);
+                    }
+                }
+            }
+        }
+        blockNo++;
+    }
+}
 
 void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll, SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
 {
