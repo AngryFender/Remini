@@ -424,6 +424,16 @@ void MkEdit::applyMkEffects(const bool scroll)
 {
     disconnectSignals();
 
+    QTextCursor cursor = this->textCursor();
+    if(cursor.hasSelection()){
+        selectRange.hasSelection = true;
+        selectRange.startBlock = cursor.selectionStart();
+        selectRange.endBlock = cursor.selectionEnd();
+    }else{
+        selectRange.hasSelection = false;
+        selectRange.currentBlockNo = selectRange.oldBlockNo;
+    }
+
     switch(undoData.editType){
     case singleEdit: emit applyMkSingleBlock(this->textCursor().blockNumber(), &selectRange); break;
     case checkbox:
