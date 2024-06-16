@@ -124,6 +124,8 @@ protected:
     void showSelectionAfterUndo();
     void showSelectionAfterRedo();
     void setSelectionUsingArrowKeys(bool isShiftPressed);
+    void setPreArrowKeys(bool isShiftPressed);
+    void setPostArrowKeys(bool isShiftPressed);
 
     void restoreTextCursor(int blockNo, int posInBlock, bool hasSelection);
 

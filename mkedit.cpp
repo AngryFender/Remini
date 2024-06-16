@@ -308,6 +308,31 @@ void MkEdit::setSelectionUsingArrowKeys(bool isShiftPressed)
     }
 }
 
+void MkEdit::setPreArrowKeys(bool isShiftPressed)
+{
+
+}
+
+void MkEdit::setPostArrowKeys(bool isShiftPressed)
+{
+    disconnectSignals();
+    QTextCursor cursor = this->textCursor();
+    if(!isShiftPressed){
+        selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
+        selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
+        selectRange.hasSelection = false;
+        emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), getVisibleRect(), &selectRange);
+        connectSignals();
+        return;
+    }
+
+    if(!cursor.hasSelection()){
+        selectRange.selectionFirstStartBlock = cursor.blockNumber();
+        selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
+    }
+    connectSignals();
+}
+
 void MkEdit::restoreTextCursor(int blockNo, int posInBlock, bool hasSelection)
 {
     QTextCursor cursor = this->textCursor();
