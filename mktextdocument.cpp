@@ -111,7 +111,7 @@ QTextDocument *MkTextDocument::getRawDocument()
     return &rawDocument;
 }
 
-void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,QRect rect, SelectRange * range)
+void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber, SelectRange * range)
 {
     if(range){
         this->selectRange.hasSelection = range->hasSelection;
@@ -1146,7 +1146,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
     this->selectRange.oldRawEndBlock = selectRange.selectionEndBlock;
 }
 
-void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(int blockNumber, bool showAll, SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
+void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const editSelectRange)
 {
     //hide raw text from old selection but dont hide blocks from current selection
     int fontSize =this->defaultFont().pointSize();
@@ -1360,7 +1360,7 @@ void MkTextDocument::autoInsertSymobolHandle(const int position)
     }
 }
 
-void MkTextDocument::setMarkdownHandle(bool state, QRect rect)
+void MkTextDocument::setMarkdownHandle(bool state)
 {
     disableMarkdownState = !state;
 

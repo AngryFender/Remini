@@ -119,7 +119,7 @@ public:
     QTextDocument* getRawDocument();
 
 public slots:
-    void cursorPosChangedHandle(bool hasSelection, int blockNumber,QRect rect, SelectRange * range);
+    void cursorPosChangedHandle(bool hasSelection, int blockNumber, SelectRange * range);
     void removeAllMkDataHandle(int blockNo);
     void applyAllMkDataHandle(int blockNumber, bool showAll, SelectRange*range);
     void applyMkSingleBlockHandle(int blockNumber, SelectRange*range);
@@ -135,7 +135,7 @@ public slots:
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int position);
     void autoInsertSymobolHandle(const int position);
-    void setMarkdownHandle(bool state, QRect rect);
+    void setMarkdownHandle(bool state);
     void cursorUpdateHandle(const int blockNo, const int characterNo);
 
     void undoStackPush(QUndoCommand *edit);
@@ -238,7 +238,7 @@ public slots:
     QString numberListGetNextNumber(const QString &text);
 
     void hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
-    void hideMKSymbolsFromPreviousSelectedBlocks(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
+    void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const editSelectRange);
     void showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
 
 };

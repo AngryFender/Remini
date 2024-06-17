@@ -59,7 +59,7 @@ void MkEdit::initialialCursorPosition()
 
     int savedBlockNumber = cursor.blockNumber();
 
-    emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , getVisibleRect(), &selectRange);
+    emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , &selectRange);
     connectSignals();
 }
 
@@ -233,7 +233,7 @@ void MkEdit::showSelectionAfterUndo(){
     QObject::disconnect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
     {
         //first show all the Markdown symbols in the editor
-        emit cursorPosChanged( range.hasSelection, currentBlockNo, getVisibleRect(), &selectRange);
+        emit cursorPosChanged( range.hasSelection, currentBlockNo, &selectRange);
 
         if(range.hasSelection){
             int startInDoc = this->document()->findBlockByNumber(range.selectionFirstStartBlock).position() + range.selectionFirstStartPosInBlock;
@@ -277,7 +277,7 @@ void MkEdit::showSelectionAfterRedo()
     QObject::disconnect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
     {
         //first show all the Markdown symbols in the editor
-        emit cursorPosChanged( false, currentBlockNo, getVisibleRect(), &range);
+        emit cursorPosChanged( false, currentBlockNo, &range);
 
         int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
         textCursor.setPosition(cursorPos);
@@ -298,7 +298,7 @@ void MkEdit::setSelectionUsingArrowKeys(bool isShiftPressed)
         selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
         selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
         selectRange.hasSelection = false;
-        emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), getVisibleRect(), &selectRange);
+        emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), &selectRange);
         return;
     }
 
@@ -321,7 +321,7 @@ void MkEdit::setPostArrowKeys(bool isShiftPressed)
         selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
         selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
         selectRange.hasSelection = false;
-        emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), getVisibleRect(), &selectRange);
+        emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), &selectRange);
         connectSignals();
         return;
     }
@@ -933,10 +933,10 @@ void MkEdit::setMkState(bool enable)
 
     if(enable){
         disableMarkdown.setText("Disable Markdown");
-        emit setMarkdownStatus(true, getVisibleRect());
+        emit setMarkdownStatus(true);
     }else{
         disableMarkdown.setText("Enable Markdown");
-        emit setMarkdownStatus(false, getVisibleRect());
+        emit setMarkdownStatus(false);
     }
 }
 

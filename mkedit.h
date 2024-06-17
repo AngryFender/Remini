@@ -142,7 +142,7 @@ private slots:
     void diableMarkdown_internal();
     void lineWrapHandler();
 signals:
-    void cursorPosChanged(bool hasSelection, int blockNumber, QRect rect, SelectRange *selectRange);
+    void cursorPosChanged(bool hasSelection, int blockNumber, SelectRange *selectRange);
     void fileSaveRaw();
     void enterKeyPressed(int blockNumber);
     void quoteLeftKeyPressed(int blockNumber,bool &success);
@@ -171,7 +171,7 @@ signals:
     void pushCheckBox(int position);
     void pushLink(int position);
     void autoInsertSymbol(const int position);
-    void setMarkdownStatus(bool state, QRect rect);
+    void setMarkdownStatus(bool state);
     void cursorUpdate(const int blockNo, const int characterPos);
     void checkIfCursorInBlock(bool &isBlock, QTextCursor &cursor);
 
