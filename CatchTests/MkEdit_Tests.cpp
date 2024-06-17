@@ -42,19 +42,21 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of first Markdown 
     MkEdit edit;
     int symbolLength = 2;   // '**'
     int cursorPosition = 2; // bo
-    int newLinePos = 26;
+    int newLinePos = 21;
 
     doc.setPlainText("**bold** _italic_ \n **new line**");
     edit.setDocument(&doc);
+    doc.setMarkdownHandle(true);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
-
 
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(newLinePos);
     edit.setTextCursor(cursor);
     QString text = edit.toPlainText();
+
+    text = edit.toPlainText();
     REQUIRE("bold italic \n **new line**" == text);
 
     cursor.setPosition(cursorPosition);
@@ -73,19 +75,21 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of second Markdown
     MkEdit edit;
     int symbolLength = 2+2+1;   // '**' + '**' + '_'
     int cursorPosition = 8;     // bold ital
-    int newLinePos = 26;
+    int newLinePos = 21;
 
     doc.setPlainText("**bold** _italic_ \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
 
-
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(newLinePos);
     edit.setTextCursor(cursor);
     QString text = edit.toPlainText();
+
+    text = edit.toPlainText();
     REQUIRE("bold italic \n **new line**" == text);
 
     cursor.setPosition(cursorPosition);
@@ -104,9 +108,10 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of third Markdown 
     MkEdit edit;
     int symbolLength = 2+2+1+1+2;   // '**' + '**' + '_' + '_' + '~~'
     int cursorPosition = 16;     // bold italic stri
-    int newLinePos = 36;
+    int newLinePos = 23;
 
     doc.setPlainText("**bold** _italic_ ~~strike~~ \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -135,9 +140,10 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of fourth Markdown
     MkEdit edit;
     int symbolLength = 2+2+1+1+2+2+1;   // '**' + '**' + '_' + '_' + '~~' + '~~' + '['
     int cursorPosition = 22;     // bold italic strike goo
-    int newLinePos = 71;
+    int newLinePos = 31;
 
     doc.setPlainText("**bold** _italic_ ~~strike~~ [google](<https://www.google.com/>) \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -166,9 +172,10 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of fifth Markdown 
     MkEdit edit;
     int symbolLength = 2+2+1+1+2+2+1+28+1;   // '**' + '**' + '_' + '_' + '~~' + '~~' + '[' + '](<https://www.google.com/>)' + '['
     int cursorPosition = 32;     // bold italic strike google youtub
-    int newLinePos = 106;
+    int newLinePos = 40;
 
     doc.setPlainText("**bold** _italic_ ~~strike~~ [google](<https://www.google.com/>) [youtube](<https://www.youtube.com/>) \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -197,9 +204,10 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of 6 word where fi
     MkEdit edit;
     int symbolLength = 4*5;         // '**' + '**' *5
     int cursorPosition = 28;        // google google goo
-    int newLinePos = 59;
+    int newLinePos = 40;
 
     doc.setPlainText("**bold** **bold** **bold** **bold** **bold** hello \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -228,9 +236,10 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of 6 word where fi
     MkEdit edit;
     int symbolLength = 1+28+1+28+1;   // '[' + '](<https://www.google.com/>)' + '[' + '](<https://www.google.com/>)' + '['
     int cursorPosition = 17;     // google google goo
-    int newLinePos = 194;
+    int newLinePos = 48;
 
     doc.setPlainText("[google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) [google](<https://www.google.com/>) hello \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -260,9 +269,10 @@ TEST_CASE("MkEdit move cursor to the middle of the characters after checkbox", "
     int symbolLength = 3+3;   // '- [' + 'x] '
     int cursorPosition = 4;     // ☑che
     int minusCheckBoxCount = 1; // ☑
-    int newLinePos = 21;
+    int newLinePos = 14;
 
     doc.setPlainText("- [x] check1 \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -293,9 +303,10 @@ TEST_CASE("MkEdit move cursor to the middle of the 2nd characters after checkbox
     int symbolLength = 3+3+3+3;   // '- [' + 'x] ' + '- [' + 'x] '
     int cursorPosition = 5;     // ☑☑che
     int minusCheckBoxCount = 2; // ☑☑
-    int newLinePos = 27;
+    int newLinePos = 15;
 
     doc.setPlainText("- [x] - [x] check1 \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -323,6 +334,7 @@ TEST_CASE("MkEdit insert new line bullet point", "[MkEdit]")
     MkTextDocument doc;
     MkEdit edit;
     doc.setPlainText("- first");
+    doc.setMarkdownHandle(true);
     int initialPos = 7;
 
     edit.setDocument(&doc);
@@ -782,6 +794,7 @@ TEST_CASE("MkEdit selection check for undo after typing inside bold format then 
     int initialPos = 4; //**bo
 
     doc.setPlainText("**bold**\n*italic*");
+    //doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
