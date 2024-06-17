@@ -1024,7 +1024,7 @@ void MkEdit::cursorPositionChangedHandle()
     }
 
     disconnectSignals();
-    emit cursorPosChanged( textCursor().hasSelection(), textCursor().blockNumber(), getVisibleRect(), &selectRange);
+    emit cursorPosChanged( textCursor().hasSelection(), textCursor().blockNumber(), &selectRange);
 
     //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
     if(!cursor.hasSelection() && selectRange.isCursorCaculated){
