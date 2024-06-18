@@ -1367,11 +1367,10 @@ void MkTextDocument::setMarkdownHandle(bool state)
     if(disableMarkdownState){
         this->setPlainText(this->rawDocument.toPlainText());
     }else{
-
-        this->selectRange.oldRawFirstBlock = 0;
-        this->selectRange.oldRawEndBlock = this->blockCount()-1;
-
-        hideMKSymbolsFromPreviousSelectedBlocks(&this->selectRange);
+        hideMKSymbolsFromDrawingRect(-1,false,nullptr,false);
+        //this->selectRange.oldRawFirstBlock = 0;
+        //this->selectRange.oldRawEndBlock = this->blockCount()-1;
+        //hideMKSymbolsFromPreviousSelectedBlocks(&this->selectRange);
     }
 }
 
