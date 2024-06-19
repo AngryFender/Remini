@@ -148,11 +148,12 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     undoData.editType = singleEdit;
     QString blockText;
     switch(event->key()){
-    case Qt::Key_Shift: isShiftKeyPressed = true;
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
-    case Qt::Key_Down: setSelectionUsingArrowKeys(event->modifiers() == Qt::SHIFT);
+    case Qt::Key_Down: setSelectionUsingArrowKeys(event->modifiers()==Qt::SHIFT);
+    //case Qt::Key_Down: QTextEdit::keyPressEvent(event); setPostArrowKeys(event->modifiers() == Qt::SHIFT); return;
+    case Qt::Key_Shift: isShiftKeyPressed = true;
     case Qt::Key_Control:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
     case Qt::Key_V:         if( event->modifiers() == Qt::CTRL) {pasteTextAction.trigger();return;}break;
@@ -184,6 +185,10 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     QTextEdit::keyPressEvent(event);
 
     switch(event->key()){
+    // case Qt::Key_Up:
+    // case Qt::Key_Right:
+    // case Qt::Key_Left:
+    // case Qt::Key_Down: setPostArrowKeys(event->modifiers() == Qt::SHIFT);break;
     case Qt::Key_Enter:
     case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber());
     case Qt::Key_Space:     fileSaveNow(); return;
@@ -442,6 +447,14 @@ void MkEdit::clearMkEffects(EditType editType)
     if(!fileSaveTimer.isActive()){
         preUndoSetup();
     }
+
+    // cursor = this->textCursor();
+    // selectRange.oldSelection = cursor.hasSelection();
+    // selectRange.oldBlockNo = cursor.blockNumber();
+    // selectRange.oldRawFirstBlock = selectRange.selectionFirstStartBlock;
+    // selectRange.oldRawEndBlock = selectRange.selectionEndBlock;
+
+
     fileSaveTimer.start();
 }
 
@@ -463,7 +476,7 @@ void MkEdit::applyMkEffects(const bool scroll)
     case singleEdit: emit applyMkSingleBlock(this->textCursor().blockNumber(), &selectRange); break;
     case checkbox:
     case enterPressed:
-    case multiEdit: emit applyAllMkData(this->textCursor().blockNumber(), undoData.selectAll, &selectRange); break;
+    case multiEdit: emit applyAllMkData(this->textCursor().blockNumber(), undoData.selectAll); break;
     }
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
@@ -742,7 +755,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     emit saveRawDocument();
     postUndoSetup();
     emit fileSaveRaw();
-    emit applyAllMkData( this->textCursor().blockNumber(), undoData.selectAll, &selectRange);
+    emit applyAllMkData( this->textCursor().blockNumber(), undoData.selectAll);
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){

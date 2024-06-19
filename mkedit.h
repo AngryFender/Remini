@@ -155,7 +155,7 @@ signals:
     void saveDoubleRawBlock(int firstBlockNumber, int secondBlockNumber);
 
     void removeAllMkData(int currentBlockNo);
-    void applyAllMkData(int blockNumber, bool showAll, SelectRange *range);
+    void applyAllMkData(int currentBlockNumber, bool showAll);
     void applyMkSingleBlock(int blockNumber, SelectRange *range);
     void blockColorChanged(const QColor& color);
     void syntaxColorUpdate(HighlightColor& colors);

@@ -121,7 +121,7 @@ public:
 public slots:
     void cursorPosChangedHandle(bool hasSelection, int blockNumber, SelectRange * range);
     void removeAllMkDataHandle(int blockNo);
-    void applyAllMkDataHandle(int blockNumber, bool showAll, SelectRange*range);
+    void applyAllMkDataHandle(int currentBlockNumber, bool showAll);
     void applyMkSingleBlockHandle(int blockNumber, SelectRange*range);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
@@ -131,6 +131,7 @@ public slots:
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
     void saveRawDocumentHandler();
     void saveSingleRawBlockHandler(int blockNumber);
+    void saveDoubleRawBlockHandler(int firstBlockNumber, int secondBlockNumber);
 
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int position);
@@ -239,7 +240,7 @@ public slots:
 
     void hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
     void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const editSelectRange);
-    void showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
+    void showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll,SelectRange * const editSelectRange);
 
 };
 
