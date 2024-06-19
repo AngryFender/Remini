@@ -5,6 +5,11 @@ BlockData::BlockData()
     status = content;
 }
 
+BlockData::BlockData(const statusID status)
+{
+    this->status = status;
+}
+
 BlockData::statusID BlockData::getStatus() const
 {
     return status;

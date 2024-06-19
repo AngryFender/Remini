@@ -15,6 +15,7 @@ public:
     } ;
 
     BlockData();
+    BlockData(const statusID status);
     statusID getStatus() const;
     void setStatus(statusID newStatus);
     void setHidden(bool hidden);

@@ -218,7 +218,7 @@ public slots:
 
     void resetTextBlockFormat(int blockNumber);
     void resetTextBlockFormat(QTextBlock block);
-    void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status, QTextCursor &cursor,FormatCollection &formatCollection, bool onlyCheckboxAndLink);
+    void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status,FormatCollection &formatCollection, bool onlyCheckboxAndLink);
     void hideSymbols(QTextBlock &block,const QString &symbol);
     void hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
