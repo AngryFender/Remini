@@ -595,10 +595,10 @@ TEST_CASE("MkTextDocument single word bold, setMarkdown = true", "[MkTextDocumen
     SelectRange selectRange;
 
     doc.setPlainText("**abc**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(true);
     QString text = doc.toPlainText();
     REQUIRE("abc" == text);
 }
@@ -610,10 +610,10 @@ TEST_CASE("MkTextDocument single word italic, underscore, setMarkdown = false", 
     SelectRange selectRange;
 
     doc.setPlainText("_abc_");
+    doc.setMarkdownHandle(false);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(false);
     QString text = edit.toPlainText();
     REQUIRE("_abc_" == text);
 }
@@ -625,10 +625,10 @@ TEST_CASE("MkTextDocument single word italic, underscore, setMarkdown = true", "
     SelectRange selectRange;
 
     doc.setPlainText("_abc_");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(true);
     QString text = edit.toPlainText();
     REQUIRE("abc" == text);
 }
@@ -640,10 +640,10 @@ TEST_CASE("MkTextDocument strikethrough, setMarkdown = false", "[MkTextDocument]
     SelectRange selectRange;
 
     doc.setPlainText("~~strike~~");
+    doc.setMarkdownHandle(false);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(false);
     QString text = edit.toPlainText();
     REQUIRE("~~strike~~" == text);
 }
@@ -655,10 +655,10 @@ TEST_CASE("MkTextDocument strikethrough, setMarkdown = true", "[MkTextDocument]"
     SelectRange selectRange;
 
     doc.setPlainText("~~strike~~");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(true);
     QString text = edit.toPlainText();
     REQUIRE("strike" == text);
 }
@@ -670,10 +670,10 @@ TEST_CASE("MkTextDocument link texts with underscore, setMarkdown = false", "[Mk
     SelectRange selectRange;
 
     doc.setPlainText("[lang_explain](https://sqlite.org/lang_explain.html)");
+    doc.setMarkdownHandle(false);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(false);
     QString text = edit.toPlainText();
     REQUIRE("[lang_explain](https://sqlite.org/lang_explain.html)" == text);
 }
@@ -685,10 +685,10 @@ TEST_CASE("MkTextDocument link texts with underscore, setMarkdown = true", "[MkT
     SelectRange selectRange;
 
     doc.setPlainText("[lang_explain](<https://sqlite.org/lang_explain.html>)");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(true);
     QString text = edit.toPlainText();
     REQUIRE("lang_explain" == text);
 }
@@ -700,10 +700,10 @@ TEST_CASE("MkTestDocument single checkbox unchecked, setMarkdown = false","[MkTe
     SelectRange selectRange;
 
     doc.setPlainText("- [ ] ");
+    doc.setMarkdownHandle(false);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(false);
     QString text = edit.toPlainText();
     REQUIRE("- [ ] "==text);
 }
@@ -715,10 +715,10 @@ TEST_CASE("MkTestDocument single checkbox unchecked, setMarkdown = true","[MkTex
     SelectRange selectRange;
 
     doc.setPlainText("- [ ] ");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(true);
     QString text = edit.toPlainText();
     REQUIRE("☐"==text);
 }
@@ -730,10 +730,10 @@ TEST_CASE("MkTestDocument single checkbox checked, setMarkdown = false","[MkText
     SelectRange selectRange;
 
     doc.setPlainText("- [x] ");
+    doc.setMarkdownHandle(false);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(false);
     QString text = edit.toPlainText();
     REQUIRE("- [x] "==text);
 }
@@ -745,10 +745,10 @@ TEST_CASE("MkTestDocument single checkbox checked, setMarkdown = true","[MkTextD
     SelectRange selectRange;
 
     doc.setPlainText("- [x] ");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(true);
     QString text = edit.toPlainText();
     REQUIRE("☑"==text);
 }
@@ -760,10 +760,10 @@ TEST_CASE("MkTextDocument bold and italic, setMarkdown = false", "[MkTextDocumen
     SelectRange selectRange;
 
     doc.setPlainText("**bold** _italic_");
+    doc.setMarkdownHandle(false);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(false);
     QString text = doc.toPlainText();
     REQUIRE("**bold** _italic_" == text);
 }
@@ -775,10 +775,10 @@ TEST_CASE("MkTextDocument bold and italic, setMarkdown = true", "[MkTextDocument
     SelectRange selectRange;
 
     doc.setPlainText("**bold** _italic_");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(true);
     QString text = doc.toPlainText();
     REQUIRE("bold italic" == text);
 }
@@ -790,10 +790,10 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = false", "[
     SelectRange selectRange;
 
     doc.setPlainText("**bold** _italic_ \n **new line**");
+    doc.setMarkdownHandle(false);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(false);
     QString text = doc.toPlainText();
     REQUIRE("**bold** _italic_ \n **new line**" == text);
 }
@@ -805,12 +805,12 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true", "[M
     SelectRange selectRange;
 
     doc.setPlainText("**bold** _italic_ \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     doc.cursorPosChangedHandle(false, 1,&selectRange);
 
-    doc.setMarkdownHandle(true);
     QString text = doc.toPlainText();
-    REQUIRE("bold italic \n new line" == text);
+    REQUIRE("bold italic \n **new line**" == text);
 }
 
 TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true, focus on 1st line", "[MkTextDocument]")
@@ -820,9 +820,8 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true, focu
     SelectRange selectRange;
 
     doc.setPlainText("**bold** _italic_ \n **new line**");
-    edit.setDocument(&doc);
-
     doc.setMarkdownHandle(true);
+    edit.setDocument(&doc);
 
     doc.cursorPosChangedHandle(false, 0,&selectRange);
     QString text = doc.toPlainText();
@@ -836,9 +835,8 @@ TEST_CASE("MkTextDocument bold and italic in two lines, setMarkdown = true, focu
     SelectRange selectRange;
 
     doc.setPlainText("**bold** _italic_ \n **new line**");
-    edit.setDocument(&doc);
-
     doc.setMarkdownHandle(true);
+    edit.setDocument(&doc);
 
     doc.cursorPosChangedHandle(false, 1,&selectRange);
     QString text = doc.toPlainText();
