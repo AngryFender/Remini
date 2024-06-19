@@ -275,6 +275,11 @@ void ViewsHandler::connectDocument()
     QObject::connect(viewText,&MkEdit::undoStackRedoSignal,
                      currentDocument.data(),&MkTextDocument::undoStackRedo);
 
+    QObject::connect(currentDocument.data(),&MkTextDocument::connectCurosPos,
+                     viewText,&MkEdit::connectSignals);
+
+    QObject::connect(currentDocument.data(),&MkTextDocument::disconnectCursorPos,
+                     viewText,&MkEdit::disconnectSignals);
 }
 
 void ViewsHandler::disconnectDocument()
@@ -339,7 +344,11 @@ void ViewsHandler::disconnectDocument()
     QObject::disconnect(viewText,&MkEdit::undoStackRedoSignal,
                      currentDocument.data(),&MkTextDocument::undoStackRedo);
 
+    QObject::disconnect(currentDocument.data(),&MkTextDocument::connectCurosPos,
+                     viewText,&MkEdit::connectSignals);
 
+    QObject::disconnect(currentDocument.data(),&MkTextDocument::disconnectCursorPos,
+                     viewText,&MkEdit::disconnectSignals);
 }
 
 QString ViewsHandler::getFileContent(QFile& file)

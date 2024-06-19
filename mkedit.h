@@ -59,9 +59,6 @@ public:
     QString rawPlainText() const;
 
     void setFont(const QFont &font);
-    void connectSignals();
-    void disconnectSignals();
-
     void setMkState(bool enable);
     void updateMkState();
     bool getMkState();
@@ -136,6 +133,8 @@ public slots:
     void deleteContextMenu();
     void selectBlock();
     void cursorPositionChangedHandle();
+    void connectSignals();
+    void disconnectSignals();
 
 private slots:
     void fileSaveHandle();

@@ -142,6 +142,10 @@ public slots:
     void undoStackUndo();
     void undoStackRedo();
 
+signals:
+    void disconnectCursorPos();
+    void connectCurosPos();
+
  private:
     struct CheckingBlock{
         QTextBlock start;

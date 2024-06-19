@@ -1012,6 +1012,7 @@ void MkTextDocument::saveSingleRawBlockHandler(int blockNumber)
 
 void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
 {
+    emit disconnectCursorPos();
     if(disableMarkdownState){
         return;
     }
@@ -1125,11 +1126,13 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
     }
     this->selectRange.oldRawFirstBlock = selectRange.selectionFirstStartBlock;
     this->selectRange.oldRawEndBlock = selectRange.selectionEndBlock;
+    emit connectCurosPos();
 }
 
 void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const editSelectRange)
 {
     //hide raw text from old selection but dont hide blocks from current selection
+    emit disconnectCursorPos();
     int fontSize =this->defaultFont().pointSize();
     FormatCollection formatCollection(fontSize);
 
@@ -1147,9 +1150,12 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
             if(blockData)
             {
                 switch(blockData->getStatus()){
-                case BlockData::content: break;
+                case BlockData::content:
+                    setCodeBlockMargin(block,fontSize*5/4, fontSize, 0); break;
                 case BlockData::start:
-                case BlockData::end: hideSymbols(block, CODEBLOCK_SYMBOL);break;
+                case BlockData::end:
+                    hideSymbols(block, CODEBLOCK_SYMBOL);
+                    setCodeBlockMargin(block,fontSize*3/4, fontSize, 0); break;
                 }
                 continue;
             }
@@ -1175,6 +1181,7 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
             }
         }
     }
+    emit  connectCurosPos();
 }
 
 void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll, SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
