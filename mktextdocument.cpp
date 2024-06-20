@@ -1099,18 +1099,14 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
                             resetTextBlockFormat(block);
                             hideAllFormatSymbolsInTextBlock(block,formatData);
 
-                            if(!formatData->isHiddenFormatsEmpty()){
-                                for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
-                                {
-                                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection, false);
-                                }
+                            for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                            {
+                                applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection, false);
                             }
                         }else{
-                             if(!formatData->isHiddenFormatsEmpty()){
-                                for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
-                                {
-                                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection, true);
-                                }
+                            for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                            {
+                                applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection, true);
                             }
                         }
 
@@ -1172,11 +1168,9 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
                 formatData->setHidden(true);
                 hideAllFormatSymbolsInTextBlock(block,formatData);
 
-                if(!formatData->isHiddenFormatsEmpty()){
-                    for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
-                    {
-                        applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection, false);
-                    }
+                for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                {
+                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection, false);
                 }
             }
         }

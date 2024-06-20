@@ -114,11 +114,6 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol,
     addHiddenFormat(start, end, symbol.length(), status);
 }
 
-bool FormatData::isHiddenFormatsEmpty() const
-{
-    return hiddenFormats.empty();
-}
-
 bool FormatData::isEmpty() const
 {
     return positions.empty();

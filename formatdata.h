@@ -95,21 +95,16 @@ public:
     void addFormat(const int start, const int end, const QString& symbol, QString* linkText = nullptr);
 
     QVector<FragmentData*>::Iterator formats_begin() {return formats.begin();};
-    QVector<FragmentData*>::Iterator formats_next(QVector<FragmentData*>::Iterator it) {return it++;};
     QVector<FragmentData*>::Iterator formats_end() {return formats.end();};
     QVector<FragmentData*>::reverse_iterator formats_rbegin() {return formats.rbegin();};
     QVector<FragmentData*>::reverse_iterator formats_rend() {return formats.rend();};
 
     QVector<FragmentData*>::Iterator hiddenFormats_begin() {return hiddenFormats.begin();};
-    QVector<FragmentData*>::Iterator hiddenFormats_next(QVector<FragmentData*>::Iterator it) {return it++;};
     QVector<FragmentData*>::Iterator hiddenFormats_end() {return hiddenFormats.end();};
 
     QVector<PositionData*>::Iterator pos_begin() {return positions.begin();};
-    QVector<PositionData*>::Iterator pos_next(QVector<PositionData*>::Iterator it) {return it++;};
-    QVector<PositionData*>::Iterator pos_previous(QVector<PositionData*>::Iterator it) {return it--;};
     QVector<PositionData*>::Iterator pos_end() {return positions.end();};
 
-    bool isHiddenFormatsEmpty() const;
     bool isEmpty() const;
     bool isHidden() const;
     bool isFormatted() const;
