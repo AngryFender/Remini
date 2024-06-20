@@ -145,6 +145,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
+    disconnectSignals();
     undoData.editType = singleEdit;
     QString blockText;
     switch(event->key()){
@@ -152,7 +153,12 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
-    case Qt::Key_Down: setSelectionUsingArrowKeys(event->modifiers() == Qt::SHIFT);
+    case Qt::Key_Down:		connectSignals();
+                            setPreArrowKeys(event->modifiers()==Qt::SHIFT);
+                            QTextEdit::keyPressEvent(event);
+                            disconnectSignals();
+                            setPostArrowKeys(event->modifiers() == Qt::SHIFT);
+                            return;
     case Qt::Key_Control:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
     case Qt::Key_V:         if( event->modifiers() == Qt::CTRL) {pasteTextAction.trigger();return;}break;
@@ -181,7 +187,9 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
         undoData.editType = multiEdit;
     }
     clearMkEffects(undoData.editType);
+    connectSignals();
     QTextEdit::keyPressEvent(event);
+    disconnectSignals();
 
     switch(event->key()){
     case Qt::Key_Enter:
@@ -198,6 +206,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
 
     updateRawDocument();
     applyMkEffects();
+    connectSignals();
 }
 
 void MkEdit::keyReleaseEvent(QKeyEvent *event)
@@ -291,31 +300,17 @@ void MkEdit::showSelectionAfterRedo()
     QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
 }
 
-void MkEdit::setSelectionUsingArrowKeys(bool isShiftPressed)
+void MkEdit::setPreArrowKeys(bool isShiftPressed)
 {
     QTextCursor cursor = this->textCursor();
-    if(!isShiftPressed){
-        selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
-        selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
-        selectRange.hasSelection = false;
-        emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), &selectRange);
-        return;
-    }
-
-    if(!cursor.hasSelection()){
+    if(!cursor.hasSelection() && isShiftPressed){
         selectRange.selectionFirstStartBlock = cursor.blockNumber();
         selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
     }
 }
 
-void MkEdit::setPreArrowKeys(bool isShiftPressed)
-{
-
-}
-
 void MkEdit::setPostArrowKeys(bool isShiftPressed)
 {
-    disconnectSignals();
     QTextCursor cursor = this->textCursor();
     if(!isShiftPressed){
         selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
@@ -325,12 +320,6 @@ void MkEdit::setPostArrowKeys(bool isShiftPressed)
         connectSignals();
         return;
     }
-
-    if(!cursor.hasSelection()){
-        selectRange.selectionFirstStartBlock = cursor.blockNumber();
-        selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
-    }
-    connectSignals();
 }
 
 void MkEdit::restoreTextCursor(int blockNo, int posInBlock, bool hasSelection)
@@ -418,7 +407,6 @@ QRect MkEdit::getVisibleRect()
 
 void MkEdit::clearMkEffects(EditType editType)
 {
-    disconnectSignals();
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
 
     QTextCursor cursor = this->textCursor();
@@ -447,8 +435,6 @@ void MkEdit::clearMkEffects(EditType editType)
 
 void MkEdit::applyMkEffects(const bool scroll)
 {
-    disconnectSignals();
-
     QTextCursor cursor = this->textCursor();
     if(cursor.hasSelection()){
         selectRange.hasSelection = true;
@@ -470,7 +456,6 @@ void MkEdit::applyMkEffects(const bool scroll)
     if(!isTextCursorVisible()){
         this->ensureCursorVisible();
     }
-    connectSignals();
 }
 
 void MkEdit::updateRawDocument()

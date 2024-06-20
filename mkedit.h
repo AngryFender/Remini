@@ -120,7 +120,6 @@ protected:
     bool isMouseOnCheckBox(QMouseEvent *e);
     void showSelectionAfterUndo();
     void showSelectionAfterRedo();
-    void setSelectionUsingArrowKeys(bool isShiftPressed);
     void setPreArrowKeys(bool isShiftPressed);
     void setPostArrowKeys(bool isShiftPressed);
 
