@@ -125,6 +125,7 @@ protected:
 
     void restoreTextCursor(int blockNo, int posInBlock, bool hasSelection);
 
+    bool isDisconnectedViaHighPriority;
 public slots:
     void contextMenuHandler(QPoint pos);
     void undoContextMenu();
@@ -132,8 +133,8 @@ public slots:
     void deleteContextMenu();
     void selectBlock();
     void cursorPositionChangedHandle();
-    void connectSignals();
-    void disconnectSignals();
+    void connectSignals(bool override = false);
+    void disconnectSignals(bool override = false);
 
 private slots:
     void fileSaveHandle();

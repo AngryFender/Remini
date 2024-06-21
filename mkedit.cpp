@@ -11,6 +11,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     regexFolderFile.setPattern("[a-zA-Z]:[\\\\/](?:[^\\\\/]+[\\\\/])*([^\\\\/]+\\.*)");
     savedCharacterNumber = -1;
     isShiftKeyPressed = false;
+    isDisconnectedViaHighPriority = false;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     undoAction.setText("Undo         Ctrl+Z");
@@ -41,14 +42,14 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     penCodeBlock.setWidthF(1);
     penCodeBlock.setStyle(Qt::SolidLine);
 
-    connectSignals();
+    connectSignals(true);
     this->setUndoRedoEnabled(false);
     preUndoSetup();
 }
 
 void MkEdit::initialialCursorPosition()
 {
-    disconnectSignals();
+    disconnectSignals(true);
     QTextCursor cursor = this->textCursor();
     cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
     this->setTextCursor(cursor);
@@ -60,7 +61,7 @@ void MkEdit::initialialCursorPosition()
     int savedBlockNumber = cursor.blockNumber();
 
     emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , &selectRange);
-    connectSignals();
+    connectSignals(true);
 }
 
 void MkEdit::paintEvent(QPaintEvent *e)
@@ -145,7 +146,7 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
-    disconnectSignals();
+    disconnectSignals(true);
     undoData.editType = singleEdit;
     QString blockText;
     switch(event->key()){
@@ -153,10 +154,10 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
-    case Qt::Key_Down:		connectSignals();
+    case Qt::Key_Down:		connectSignals(true);
                             setPreArrowKeys(event->modifiers()==Qt::SHIFT);
                             QTextEdit::keyPressEvent(event);
-                            disconnectSignals();
+                            disconnectSignals(true);
                             setPostArrowKeys(event->modifiers() == Qt::SHIFT);
                             return;
     case Qt::Key_Control:
@@ -187,9 +188,9 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
         undoData.editType = multiEdit;
     }
     clearMkEffects(undoData.editType);
-    connectSignals();
+    connectSignals(true);
     QTextEdit::keyPressEvent(event);
-    disconnectSignals();
+    disconnectSignals(true);
 
     switch(event->key()){
     case Qt::Key_Enter:
@@ -206,7 +207,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
 
     updateRawDocument();
     applyMkEffects();
-    connectSignals();
+    connectSignals(true);
 }
 
 void MkEdit::keyReleaseEvent(QKeyEvent *event)
@@ -317,7 +318,6 @@ void MkEdit::setPostArrowKeys(bool isShiftPressed)
         selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
         selectRange.hasSelection = false;
         emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), &selectRange);
-        connectSignals();
         return;
     }
 }
@@ -524,13 +524,13 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         if(rect.contains(pointer)){
             int pos = (*it);
 
-            disconnectSignals();
+            disconnectSignals(true);
             undoData.scrollValue = this->verticalScrollBar()->sliderPosition();
             undoData.editType = EditType::checkbox;
             preUndoSetup();
             emit pushCheckBox(pos);
             fileSaveWithScroll();
-            connectSignals();
+            connectSignals(true);
 
             return true;
         }
@@ -556,16 +556,25 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
     return false;
 }
 
-void MkEdit::connectSignals()
+void MkEdit::connectSignals(bool override)
 {
+    if(this->isDisconnectedViaHighPriority && !override){
+        return;
+    }
+
+    isDisconnectedViaHighPriority = false;
     QObject::connect(this,&MkEdit::cursorPositionChanged,
                      this, &MkEdit::cursorPositionChangedHandle);
+
 }
 
-void MkEdit::disconnectSignals()
+void MkEdit::disconnectSignals(bool override)
 {
     QObject::disconnect(this,&MkEdit::cursorPositionChanged,
                      this, &MkEdit::cursorPositionChangedHandle);
+    if(override){
+        this->isDisconnectedViaHighPriority = true;
+    }
 }
 
 void MkEdit::contextMenuHandler(QPoint pos)
@@ -627,11 +636,11 @@ void MkEdit::selectBlock()
     cursor.setPosition(startPos);
     cursor.setPosition(endPos,QTextCursor::KeepAnchor);
 
-    disconnectSignals();
+    disconnectSignals(true);
     {
         this->setTextCursor(cursor);
     }
-    connectSignals();
+    connectSignals(true);
     copy();
 }
 
@@ -668,7 +677,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     int cursorPosInBlock = cursor.positionInBlock();
     bool hasSelection = cursor.hasSelection();
 
-    disconnectSignals();
+    disconnectSignals(true);
     emit checkIfCursorInBlock(isBlock,cursor);
 
     QString text = source->text();
@@ -734,7 +743,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
         this->ensureCursorVisible();
     }
 
-    connectSignals();
+    connectSignals(true);
 }
 
 void MkEdit::mousePressEvent(QMouseEvent *e)
@@ -898,9 +907,9 @@ void MkEdit::setKeywordColor(const QColor &color)
 
 void MkEdit::setDocument(QTextDocument *document)
 {
-    disconnectSignals();
+    disconnectSignals(true);
     QTextEdit::setDocument(document);
-    connectSignals();
+    connectSignals(true);
 }
 
 QString MkEdit::rawPlainText() const
@@ -1008,7 +1017,7 @@ void MkEdit::cursorPositionChangedHandle()
         selectRange.selectionEndPosInBlock = cursor.positionInBlock();
     }
 
-    disconnectSignals();
+    disconnectSignals(true);
     emit cursorPosChanged( textCursor().hasSelection(), textCursor().blockNumber(), &selectRange);
 
     //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
@@ -1034,5 +1043,5 @@ void MkEdit::cursorPositionChangedHandle()
         newCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
         this->setTextCursor(newCursor);
     }
-    connectSignals();
+    connectSignals(true);
 }

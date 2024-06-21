@@ -143,8 +143,8 @@ public slots:
     void undoStackRedo();
 
 signals:
-    void disconnectCursorPos();
-    void connectCurosPos();
+    void disconnectCursorPos(bool override = false);
+    void connectCurosPos(bool override = false);
 
  private:
     struct CheckingBlock{
