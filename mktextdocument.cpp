@@ -116,23 +116,26 @@ void MkTextDocument::cursorPosChangedHandle( bool hasSelection, int blockNumber,
     if(range){
         this->selectRange.hasSelection = range->hasSelection;
         if(range->hasSelection){
-            this->selectRange.startBlock = std::min(range->selectionFirstStartBlock, range->selectionEndBlock);
-            this->selectRange.endBlock = std::max(range->selectionFirstStartBlock, range->selectionEndBlock);
-            this->selectRange.rawFirstBlock = this->selectRange.startBlock;
-            this->selectRange.rawEndBlock = this->selectRange.endBlock;
+            this->selectRange.rawFirstBlock = std::min(range->selectionFirstStartBlock, range->selectionEndBlock);
+            this->selectRange.rawEndBlock   = std::max(range->selectionFirstStartBlock, range->selectionEndBlock);
+            this->selectRange.startBlock    = std::min(range->selectionFirstStartBlock, range->selectionEndBlock);
+            this->selectRange.endBlock      = std::max(range->selectionFirstStartBlock, range->selectionEndBlock);
         }else{
-            this->selectRange.startBlock = this->selectRange.endBlock = range->selectionFirstStartBlock;
-            this->selectRange.rawFirstBlock = this->selectRange.rawEndBlock = this->selectRange.startBlock;
+            this->selectRange.startBlock        = this->selectRange.endBlock    = range->selectionFirstStartBlock;
+            this->selectRange.rawFirstBlock     = this->selectRange.rawEndBlock = this->selectRange.startBlock;
+            this->selectRange.currentposInBlock = range->currentposInBlock;
+            this->selectRange.currentBlockNo    = range->currentBlockNo;
         }
     }
     hideMKSymbolsFromDrawingRect(blockNumber,false, range, true);
 
-    //hide raw text from old selection but dont hide blocks from current selection
-    //show raw text from current selection but check if its already being shown
-
-    this->selectRange.oldSelection = this->selectRange.hasSelection;
-    this->selectRange.oldRawFirstBlock = this->selectRange.startBlock;
-    this->selectRange.oldRawEndBlock = this->selectRange.endBlock;
+    //hideMKSymbolsFromPreviousSelectedBlocks(&this->selectRange);
+    //showMKSymbolsFromCurrentSelectedBlocks(&this->selectRange);
+    // if(range){
+    //     range->isCursorCaculated = this->selectRange.isCursorCaculated;
+    //     range->currentBlockNo    = this->selectRange.currentBlockNo;
+    //     range->currentposInBlock = this->selectRange.currentposInBlock;
+    // }
 }
 
 void MkTextDocument::removeAllMkDataHandle(int blockNo)
@@ -656,7 +659,7 @@ void MkTextDocument::showSymbols(QTextBlock &block, const QString &symbol)
 
 }
 
-void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * selectRange)
+void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * range)
 {
     QString textBlock = block.text();
     const int blockPos = block.position();
@@ -665,9 +668,9 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
         if(*cp == u'☑' || *cp == u'☐'){
             checkMarkPositions.removeAll(blockPos + index);
 
-            if(selectRange){
-                if(index < selectRange->currentposInBlock){
-                    selectRange->currentposInBlock--;
+            if(range){
+                if(index < range->currentposInBlock){
+                    range->currentposInBlock--;
                 }
             }
         }
@@ -688,9 +691,9 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
         int cursorPos = (*it)->getPos();
         int symbolLen = (*it)->getSymbol().length();
 
-        if(selectRange){
-            if(cursorPos <= selectRange->currentposInBlock){
-                selectRange->currentposInBlock = selectRange->currentposInBlock+symbolLen;
+        if(range){
+            if(cursorPos <= range->currentposInBlock){
+                range->currentposInBlock = range->currentposInBlock+symbolLen;
             }
         }
 
@@ -699,9 +702,9 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
         if((*it)->getSymbol() == LINK_SYMBOL_URL_START){
             int pos = (*it)->getPos();
 
-            if(selectRange){
-                if(pos< selectRange->currentposInBlock){
-                    selectRange->currentposInBlock = selectRange->currentposInBlock+formatData->getLinkUrl(pos).length();
+            if(range){
+                if(pos< range->currentposInBlock){
+                    range->currentposInBlock = range->currentposInBlock+formatData->getLinkUrl(pos).length();
                 }
             }
 
@@ -714,9 +717,9 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     cursor.insertText(textBlock);
     cursor.movePosition(QTextCursor::StartOfBlock);
 
-    if((selectRange)){
-        selectRange->isCursorCaculated = true;
-        selectRange->currentBlockNo = block.blockNumber();
+    if((range)){
+        range->isCursorCaculated = true;
+        range->currentBlockNo = block.blockNumber();
     }
 }
 
@@ -1009,7 +1012,7 @@ void MkTextDocument::saveSingleRawBlockHandler(int blockNumber)
     rawCursor.insertText(this->findBlockByNumber(blockNumber).text());
 }
 
-void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
+void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const range, const bool clearPushCheckBoxData)
 {
     emit disconnectCursorPos();
     if(disableMarkdownState){
@@ -1081,11 +1084,11 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
                 }
                 FormatData* formatData = dynamic_cast<FormatData*>(data);
                 if(formatData){
-                    if(blockNumber == currentBlockNumber || (currentBlockNumber >= selectRange.startBlock && currentBlockNumber <= selectRange.endBlock && editSelectRange)){
+                    if(blockNumber == currentBlockNumber || (currentBlockNumber >= selectRange.startBlock && currentBlockNumber <= selectRange.endBlock && range)){
                         if(formatData->isHidden()){
                             formatData->setHidden(false);
                             resetTextBlockFormat(block);
-                            showAllFormatSymbolsInTextBlock(block, formatData, editSelectRange);
+                            showAllFormatSymbolsInTextBlock(block, formatData, range);
                         }
                         for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
                         {
@@ -1110,7 +1113,7 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
                             }
                         }
 
-                        if(showAll || (currentBlockNumber >= selectRange.startBlock && currentBlockNumber <= selectRange.endBlock && editSelectRange)){
+                        if(showAll || (currentBlockNumber >= selectRange.startBlock && currentBlockNumber <= selectRange.endBlock && range)){
                             if(formatData->isHidden()){
                                 showAllFormatSymbolsInTextBlock(block, formatData);
                                 formatData->setHidden(false);
@@ -1132,10 +1135,10 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
     int fontSize =this->defaultFont().pointSize();
     FormatCollection formatCollection(fontSize);
 
+    QTextBlock block;
     for(int num = range->oldRawFirstBlock; num <= range->oldRawEndBlock; num++){
         if(!(num <= range->rawFirstBlock && num >= range->rawEndBlock)){
-            QTextBlock block = this->findBlockByNumber(num);
-
+            block = this->findBlockByNumber(num);
             QTextBlockUserData *data = block.userData();
             if(data == nullptr){
                 resetTextBlockFormat(block);
@@ -1178,53 +1181,58 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
     emit  connectCurosPos();
 }
 
-void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll, SelectRange * const editSelectRange, const bool clearPushCheckBoxData)
+void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const range)
 {
+    emit disconnectCursorPos();
     //hide raw text from old selection but dont hide blocks from current selection
     int fontSize =this->defaultFont().pointSize();
     FormatCollection formatCollection(fontSize);
     QTextBlock block;
 
-    QTextCursor cursor(this);
-    int blockNo = this->selectRange.rawFirstBlock;
-    while(blockNo <= this->selectRange.rawEndBlock){
-        if(!(blockNo <= this->selectRange.oldRawFirstBlock && blockNo >= this->selectRange.oldRawEndBlock)){
-            //todo: show mk symbols
-
-            block = this->findBlockByNumber(blockNo);
-            cursor.setPosition(block.position(),QTextCursor::MoveAnchor);
-            cursor.movePosition(QTextCursor::StartOfBlock,QTextCursor::MoveAnchor);
-            cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
-            cursor.insertText(this->rawDocument.findBlockByNumber(block.blockNumber()).text());
-
-            identifyUserData(block);
+    for(int num = range->rawFirstBlock; num <= range->rawEndBlock; num++){
+        if(!(num <= range->oldRawFirstBlock && num >= range->oldRawEndBlock)){
+            block = this->findBlockByNumber(num);
             QTextBlockUserData *data = block.userData();
             if(data == nullptr){
-                blockNo++;
+                resetTextBlockFormat(block);
                 continue;
             }
 
-            resetTextBlockFormat(block);
+            BlockData * blockData = dynamic_cast<BlockData*>(data);
+            if(blockData){
+                resetTextBlockFormat(block);
+                switch(blockData->getStatus()){
+                case BlockData::content:  setCodeBlockMargin(block,fontSize*5/4, fontSize, 0); break;
+                case BlockData::start:    setCodeBlockMargin(block,fontSize*3/4, fontSize, fontSize); 	showSymbols(block, CODEBLOCK_SYMBOL); break;
+                case BlockData::end:      setCodeBlockMargin(block,fontSize*3/4, fontSize, 0); 			showSymbols(block, CODEBLOCK_SYMBOL); break;
+                }
+                continue;
+            }
 
             LineData* lineData = dynamic_cast<LineData*>(data);
             if(lineData){
                 lineData->setDraw(false);
                 showSymbols(block, lineData->getSymbol());
-                blockNo++;
                 continue;
             }
 
             FormatData* formatData = dynamic_cast<FormatData*>(data);
-            if(formatData){
+            if(formatData && formatData->isHidden()){
                 formatData->setHidden(false);
-                for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                resetTextBlockFormat(block);
+
+                showAllFormatSymbolsInTextBlock(block, formatData, range);
+                for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
                 {
-                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection, false);
+                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection,false);
                 }
             }
         }
-        blockNo++;
     }
+    range->oldSelection = range->hasSelection;
+    range->oldRawFirstBlock = range->rawFirstBlock;
+    range->oldRawEndBlock = range->rawEndBlock;
+    emit  connectCurosPos();
 }
 
 void MkTextDocument::pushCheckBoxHandle(const int position)

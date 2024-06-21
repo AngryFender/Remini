@@ -228,7 +228,7 @@ signals:
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void showSymbols(QTextBlock &block,const QString &symbol);
-    void showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * selectRange = nullptr);
+    void showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * range = nullptr);
     void showSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void extractSymbolsInBlock(QTextBlock &block, QString &result);
@@ -241,9 +241,9 @@ signals:
     int numberListGetSpaces(const QString &text);
     QString numberListGetNextNumber(const QString &text);
 
-    void hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
+    void hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const range, const bool clearPushCheckBoxData = true);
     void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const range);
-    void showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
+    void showMKSymbolsFromCurrentSelectedBlocks(SelectRange * const range);
 
 };
 
