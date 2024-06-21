@@ -578,7 +578,7 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     if(end>=block.length()){
         endPoint = block.length()-1;
     }
-    QTextCursor cursor(block);
+    QTextCursor cursor(this);
     cursor.setPosition(startPoint);
     cursor.setPosition(endPoint, QTextCursor::KeepAnchor);
     cursor.mergeCharFormat(*format);
@@ -1135,16 +1135,17 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
     for(int num = range->oldRawFirstBlock; num <= range->oldRawEndBlock; num++){
         if(!(num <= range->rawFirstBlock && num >= range->rawEndBlock)){
             QTextBlock block = this->findBlockByNumber(num);
-            resetTextBlockFormat(block);
 
             QTextBlockUserData *data = block.userData();
             if(data == nullptr){
+                resetTextBlockFormat(block);
                 continue;
             }
 
             BlockData* blockData = dynamic_cast<BlockData*>(data);
             if(blockData)
             {
+                resetTextBlockFormat(block);
                 switch(blockData->getStatus()){
                 case BlockData::content:  setCodeBlockMargin(block,fontSize*5/4, fontSize, 0); break;
                 case BlockData::start:    setCodeBlockMargin(block,fontSize*3/4, fontSize, fontSize); 	hideSymbols(block, CODEBLOCK_SYMBOL); break;
@@ -1155,6 +1156,7 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
 
             LineData* lineData = dynamic_cast<LineData*>(data);
             if(lineData){
+                resetTextBlockFormat(block);
                 lineData->setDraw(true);
                 hideSymbols(block, lineData->getSymbol());
                 continue;
@@ -1162,6 +1164,7 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
 
             FormatData* formatData = dynamic_cast<FormatData*>(data);
             if(formatData && !formatData->isHidden()){
+                resetTextBlockFormat(block);
                 formatData->setHidden(true);
                 hideAllFormatSymbolsInTextBlock(block,formatData);
 
