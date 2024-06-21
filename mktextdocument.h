@@ -242,7 +242,7 @@ signals:
     QString numberListGetNextNumber(const QString &text);
 
     void hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
-    void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const editSelectRange);
+    void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const range);
     void showMKSymbolsFromCurrentSelectedBlocks(int blockNumber, bool showAll,SelectRange * const editSelectRange, const bool clearPushCheckBoxData = true);
 
 };

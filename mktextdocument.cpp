@@ -503,7 +503,6 @@ void MkTextDocument::setCodeBlockMargin(QTextBlock &block, int leftMargin,int ri
 {
     QTextCursor cursor(block);
     QTextBlockFormat blockFormat = cursor.blockFormat();
-    blockFormat = cursor.blockFormat();
     blockFormat.setLeftMargin(leftMargin);
     blockFormat.setRightMargin(rightMargin);
     blockFormat.setTopMargin(topMargin);
@@ -1039,7 +1038,8 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
                 if(blockData->getStatus()==BlockData::start)
                 {
                     checkBlock.start = block;
-                    setCodeBlockMargin(block, fontSize*3/4, fontSize, fontSize);
+                    QTextBlock tb = this->findBlockByNumber(currentBlockNumber);
+                    setCodeBlockMargin(tb, fontSize*3/4, fontSize, fontSize);
                 }
                 else if(blockData->getStatus()==BlockData::end)
                 {
@@ -1125,15 +1125,15 @@ void MkTextDocument::hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,
     emit connectCurosPos();
 }
 
-void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const editSelectRange)
+void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const range)
 {
     //hide raw text from old selection but dont hide blocks from current selection
     emit disconnectCursorPos();
     int fontSize =this->defaultFont().pointSize();
     FormatCollection formatCollection(fontSize);
 
-    for(int num = this->selectRange.oldRawFirstBlock; num <= this->selectRange.oldRawEndBlock; num++){
-        if(!(num <= this->selectRange.rawFirstBlock && num >= this->selectRange.rawEndBlock)){
+    for(int num = range->oldRawFirstBlock; num <= range->oldRawEndBlock; num++){
+        if(!(num <= range->rawFirstBlock && num >= range->rawEndBlock)){
             QTextBlock block = this->findBlockByNumber(num);
             resetTextBlockFormat(block);
 
@@ -1146,12 +1146,9 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
             if(blockData)
             {
                 switch(blockData->getStatus()){
-                case BlockData::content:
-                    setCodeBlockMargin(block,fontSize*5/4, fontSize, 0); break;
-                case BlockData::start:
-                case BlockData::end:
-                    hideSymbols(block, CODEBLOCK_SYMBOL);
-                    setCodeBlockMargin(block,fontSize*3/4, fontSize, 0); break;
+                case BlockData::content:  setCodeBlockMargin(block,fontSize*5/4, fontSize, 0); break;
+                case BlockData::start:    setCodeBlockMargin(block,fontSize*3/4, fontSize, fontSize); 	hideSymbols(block, CODEBLOCK_SYMBOL); break;
+                case BlockData::end:      setCodeBlockMargin(block,fontSize*3/4, fontSize, 0); 			hideSymbols(block, CODEBLOCK_SYMBOL); break;
                 }
                 continue;
             }
