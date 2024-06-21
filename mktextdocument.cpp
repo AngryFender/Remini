@@ -176,6 +176,10 @@ void MkTextDocument::identifyUserData()
     checkMarkPositions.clear();
     linkPositions.clear();
 
+    QList<BlockData*> codeBlockBody;
+    int startBlock;
+    BlockData *code;
+
     bool openBlock = false;
     for(QTextBlock block = this->begin(); block != this->end(); block = block.next()){
         block.setUserData(nullptr);
@@ -183,17 +187,30 @@ void MkTextDocument::identifyUserData()
         if(matchCodeBlock.hasMatch()){
             if(!openBlock){
                 openBlock = true;
-                block.setUserData(new BlockData(BlockData::start));
+                code = new BlockData(BlockData::start);
+                startBlock = block.blockNumber();
+                block.setUserData(code);
+                codeBlockBody.append(code);
             }
             else{
                 openBlock = false;
-                block.setUserData(new BlockData(BlockData::end));
+                code = new BlockData(BlockData::end);
+                block.setUserData(code);
+                codeBlockBody.append(code);
+
+                foreach (auto codeBlock, codeBlockBody) {
+                    codeBlock->setStartBlock(startBlock);
+                    codeBlock->setEndBlock(block.blockNumber());
+                }
+                codeBlockBody.clear();
             }
             continue;
         }
 
         if(openBlock){
-            block.setUserData(new BlockData(BlockData::content));
+            code = new BlockData(BlockData::content);
+            block.setUserData(code);
+            codeBlockBody.append(code);
             continue;
         }
 
@@ -1150,10 +1167,18 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
             {
                 resetTextBlockFormat(block);
                 switch(blockData->getStatus()){
-                case BlockData::content:  setCodeBlockMargin(block,fontSize*5/4, fontSize, 0); break;
+                case BlockData::content:  setCodeBlockMargin(block,fontSize*5/3, fontSize, 0); break;
                 case BlockData::start:    setCodeBlockMargin(block,fontSize*3/4, fontSize, fontSize); 	hideSymbols(block, CODEBLOCK_SYMBOL); break;
                 case BlockData::end:      setCodeBlockMargin(block,fontSize*3/4, fontSize, 0); 			hideSymbols(block, CODEBLOCK_SYMBOL); break;
                 }
+
+                //also hide start and end of the codeBlock
+                QTextBlock startCode = this->findBlockByNumber(blockData->getStartBlock());
+                hideSymbols(startCode, CODEBLOCK_SYMBOL);
+
+                QTextBlock endCode = this->findBlockByNumber(blockData->getEndBlock());
+                hideSymbols(endCode,CODEBLOCK_SYMBOL);
+
                 continue;
             }
 
@@ -1202,10 +1227,17 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
             if(blockData){
                 resetTextBlockFormat(block);
                 switch(blockData->getStatus()){
-                case BlockData::content:  setCodeBlockMargin(block,fontSize*5/4, fontSize, 0); break;
+                case BlockData::content:  setCodeBlockMargin(block,fontSize*5/3, fontSize, 0); break;
                 case BlockData::start:    setCodeBlockMargin(block,fontSize*3/4, fontSize, fontSize); 	showSymbols(block, CODEBLOCK_SYMBOL); break;
                 case BlockData::end:      setCodeBlockMargin(block,fontSize*3/4, fontSize, 0); 			showSymbols(block, CODEBLOCK_SYMBOL); break;
                 }
+
+                //also show start and end of the codeBlock
+                QTextBlock startCode = this->findBlockByNumber(blockData->getStartBlock());
+                showSymbols(startCode, CODEBLOCK_SYMBOL);
+
+                QTextBlock endCode = this->findBlockByNumber(blockData->getEndBlock());
+                showSymbols(endCode,CODEBLOCK_SYMBOL);
                 continue;
             }
 

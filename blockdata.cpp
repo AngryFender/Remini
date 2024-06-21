@@ -29,3 +29,23 @@ bool BlockData::isHidden()
 {
     return hidden;
 }
+
+void BlockData::setStartBlock(const int start)
+{
+    this->startBlock = start;
+}
+
+void BlockData::setEndBlock(const int end)
+{
+    this->endBlock = end;
+}
+
+int BlockData::getStartBlock() const
+{
+    return this->startBlock;
+}
+
+int BlockData::getEndBlock() const
+{
+    return this->endBlock;
+}

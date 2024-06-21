@@ -21,9 +21,15 @@ public:
     void setHidden(bool hidden);
     bool isHidden();
 
+    void setStartBlock(const int start);
+    void setEndBlock(const int end);
+    int getStartBlock() const;
+    int getEndBlock() const;
 private:
     statusID status;
     bool hidden;
+    int startBlock;
+    int endBlock;
 };
 
 #endif // BLOCKDATA_H
