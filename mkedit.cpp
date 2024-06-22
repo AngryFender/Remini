@@ -58,9 +58,7 @@ void MkEdit::initialialCursorPosition()
     this->update();
     this->verticalScrollBar()->setSliderPosition(0);
 
-    int savedBlockNumber = cursor.blockNumber();
-
-    emit cursorPosChanged( textCursor().hasSelection(), savedBlockNumber , &selectRange);
+    emit cursorPosChanged(&selectRange);
     connectSignals(true);
 }
 
@@ -161,8 +159,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Down:		connectSignals(true);
                             setPreArrowKeys(event->modifiers()==Qt::SHIFT);
                             QTextEdit::keyPressEvent(event);
-                            disconnectSignals(true);
-                            setPostArrowKeys(event->modifiers() == Qt::SHIFT);
+                            setPostArrowKeys(event->modifiers() == Qt::SHIFT, event->key() == Qt::Key_Left);
                             return;
     case Qt::Key_Control:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
@@ -181,7 +178,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
     case Qt::Key_Backspace: blockText = this->document()->findBlockByNumber(textCursor().blockNumber()).text();
-                            if((textCursor().positionInBlock() == 0) || (blockText.right(3)=="```")){
+                            if((textCursor().positionInBlock() == 0) || (blockText.left(3)=="```")){
                                 undoData.editType = multiEdit;
                             }
                             break;
@@ -211,7 +208,6 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
 
     updateRawDocument();
     applyMkEffects();
-    connectSignals(true);
 }
 
 void MkEdit::keyReleaseEvent(QKeyEvent *event)
@@ -231,50 +227,45 @@ void MkEdit::showSelectionAfterUndo(){
     SelectRange range = mkDoc->getUndoSelectRange();
 
     QTextCursor textCursor = this->textCursor();
-    int currentBlockNo = -1;
     if(range.hasSelection){
         selectRange.hasSelection = true;
         selectRange.selectionFirstStartBlock = range.selectionFirstStartBlock;
         selectRange.selectionFirstStartPosInBlock = range.selectionFirstStartPosInBlock;
         selectRange.selectionEndBlock = range.selectionEndBlock;
         selectRange.selectionEndPosInBlock = range.selectionEndPosInBlock;
-        currentBlockNo = range.selectionEndBlock;
     }else{
-        currentBlockNo = range.currentBlockNo;
         selectRange.hasSelection = false;
+        selectRange.currentBlockNo = range.currentBlockNo;
+        selectRange.currentposInBlock = range.currentposInBlock;
     }
 
-    QObject::disconnect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
-    {
-        //first show all the Markdown symbols in the editor
-        emit cursorPosChanged( range.hasSelection, currentBlockNo, &selectRange);
+    //first show all the Markdown symbols in the editor
+    emit cursorPosChanged(&selectRange);
 
-        if(range.hasSelection){
-            int startInDoc = this->document()->findBlockByNumber(range.selectionFirstStartBlock).position() + range.selectionFirstStartPosInBlock;
-            int endInDoc   = this->document()->findBlockByNumber(range.selectionEndBlock).position() + range.selectionEndPosInBlock;
-            textCursor.clearSelection();
-            textCursor.setPosition(startInDoc);
-            textCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
-        }else{
-            int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
-            textCursor.setPosition(cursorPos);
-        }
-
-        //highlight the selection
-        this->setTextCursor(textCursor);
-
-        //ensure the textcursor is visible
-        this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
-        if(!isTextCursorVisible()){
-            this->ensureCursorVisible();
-        }
-
-        if(range.isCheckBox){
-            this->verticalScrollBar()->setSliderPosition(range.scrollValue);
-        }
-
+    if(range.hasSelection){
+        int startInDoc = this->document()->findBlockByNumber(range.selectionFirstStartBlock).position() + range.selectionFirstStartPosInBlock;
+        int endInDoc   = this->document()->findBlockByNumber(range.selectionEndBlock).position() + range.selectionEndPosInBlock;
+        textCursor.clearSelection();
+        textCursor.setPosition(startInDoc);
+        textCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
+    }else{
+        int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
+        textCursor.setPosition(cursorPos);
     }
-    QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
+
+    //highlight the selection
+    this->setTextCursor(textCursor);
+
+    //ensure the textcursor is visible
+    this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
+    if(!isTextCursorVisible()){
+        this->ensureCursorVisible();
+    }
+
+    if(range.isCheckBox){
+        this->verticalScrollBar()->setSliderPosition(range.scrollValue);
+    }
+
 }
 
 void MkEdit::showSelectionAfterRedo()
@@ -286,23 +277,17 @@ void MkEdit::showSelectionAfterRedo()
     SelectRange range = mkDoc->getRedoSelectRange();
 
     QTextCursor textCursor = this->textCursor();
-    int currentBlockNo = range.currentBlockNo;
 
-    QObject::disconnect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
-    {
-        //first show all the Markdown symbols in the editor
-        emit cursorPosChanged( false, currentBlockNo, &range);
+    //first show all the Markdown symbols in the editor
+    emit cursorPosChanged(&range);
 
-        int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
-        textCursor.setPosition(cursorPos);
-        this->setTextCursor(textCursor);
+    int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
+    textCursor.setPosition(cursorPos);
+    this->setTextCursor(textCursor);
 
-        if(range.isCheckBox){
-            this->verticalScrollBar()->setSliderPosition(range.scrollValue);
-        }
-
+    if(range.isCheckBox){
+        this->verticalScrollBar()->setSliderPosition(range.scrollValue);
     }
-    QObject::connect(this,&MkEdit::cursorPositionChanged,this,&MkEdit::cursorPositionChangedHandle);
 }
 
 void MkEdit::setPreArrowKeys(bool isShiftPressed)
@@ -314,16 +299,22 @@ void MkEdit::setPreArrowKeys(bool isShiftPressed)
     }
 }
 
-void MkEdit::setPostArrowKeys(bool isShiftPressed)
+void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed)
 {
+    disconnectSignals(true);
     QTextCursor cursor = this->textCursor();
     if(!isShiftPressed){
         selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
         selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
         selectRange.hasSelection = false;
-        emit cursorPosChanged( selectRange.hasSelection, cursor.blockNumber(), &selectRange);
-        return;
+        emit cursorPosChanged(&selectRange);
+
+        if(!isLeftArrowPressed){
+            cursor.setPosition(this->textCursor().block().position() + selectRange.selectionFirstStartPosInBlock);
+        }
+        this->setTextCursor(cursor);
     }
+    connectSignals(true);
 }
 
 void MkEdit::restoreTextCursor(int blockNo, int posInBlock, bool hasSelection)
@@ -441,21 +432,11 @@ void MkEdit::clearMkEffects(EditType editType)
 
 void MkEdit::applyMkEffects(const bool scroll)
 {
-    QTextCursor cursor = this->textCursor();
-    if(cursor.hasSelection()){
-        selectRange.hasSelection = true;
-        selectRange.startBlock = cursor.selectionStart();
-        selectRange.endBlock = cursor.selectionEnd();
-    }else{
-        selectRange.hasSelection = false;
-        selectRange.currentBlockNo = selectRange.oldBlockNo;
-    }
-
     switch(undoData.editType){
-    case singleEdit: emit applyMkSingleBlock(this->textCursor().blockNumber(), &selectRange); break;
+    case singleEdit: 	emit applyMkSingleBlock(this->textCursor().blockNumber()); break;
     case checkbox:
     case enterPressed:
-    case multiEdit: emit applyAllMkData(this->textCursor().blockNumber(), undoData.selectAll, &selectRange); break;
+    case multiEdit: 	emit applyAllMkData(this->textCursor().blockNumber()); break;
     }
 
     QTextCursor cursor = this->textCursor();
@@ -575,7 +556,6 @@ void MkEdit::connectSignals(bool override)
     isDisconnectedViaHighPriority = false;
     QObject::connect(this,&MkEdit::cursorPositionChanged,
                      this, &MkEdit::cursorPositionChangedHandle);
-
 }
 
 void MkEdit::disconnectSignals(bool override)
@@ -746,7 +726,7 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
     emit saveRawDocument();
     postUndoSetup();
     emit fileSaveRaw();
-    emit applyAllMkData( this->textCursor().blockNumber(), undoData.selectAll, &selectRange);
+    emit applyAllMkData(this->textCursor().blockNumber());
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){
@@ -1028,7 +1008,7 @@ void MkEdit::cursorPositionChangedHandle()
     }
 
     disconnectSignals(true);
-    emit cursorPosChanged( textCursor().hasSelection(), textCursor().blockNumber(), &selectRange);
+    emit cursorPosChanged(&selectRange);
 
     //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
     if(!cursor.hasSelection() && selectRange.isCursorCaculated){

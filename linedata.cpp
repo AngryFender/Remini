@@ -4,6 +4,7 @@ LineData::LineData()
 {
     status = horizontalLine;
     draw = true;
+    hidden = false;
 }
 
 LineData::statusID LineData::getStatus() const

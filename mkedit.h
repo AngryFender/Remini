@@ -135,7 +135,7 @@ protected:
     void showSelectionAfterUndo();
     void showSelectionAfterRedo();
     void setPreArrowKeys(bool isShiftPressed);
-    void setPostArrowKeys(bool isShiftPressed);
+    void setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed);
 
     void restoreTextCursor(int blockNo, int posInBlock, bool hasSelection);
 
@@ -155,7 +155,7 @@ private slots:
     void diableMarkdown_internal();
     void lineWrapHandler();
 signals:
-    void cursorPosChanged(bool hasSelection, int blockNumber, SelectRange *selectRange);
+    void cursorPosChanged(SelectRange * const selectRange);
     void fileSaveRaw();
     void enterKeyPressed(int blockNumber);
     void quoteLeftKeyPressed(int blockNumber,bool &success);
@@ -168,8 +168,8 @@ signals:
     void saveDoubleRawBlock(int firstBlockNumber, int secondBlockNumber);
 
     void removeAllMkData(int currentBlockNo);
-    void applyAllMkData(int blockNumber, bool showAll, SelectRange *range);
-    void applyMkSingleBlock(int blockNumber, SelectRange *range);
+    void applyAllMkData(int blockNumber);
+    void applyMkSingleBlock(int blockNumber);
     void blockColorChanged(const QColor& color);
     void syntaxColorUpdate(HighlightColor& colors);
 
@@ -183,7 +183,7 @@ signals:
 
     void pushCheckBox(int position);
     void pushLink(int position);
-    void autoInsertSymbol(const int position);
+    void autoInsertSymbol(const int position, int &newPosition);
     void setMarkdownStatus(bool state);
     void cursorUpdate(const int blockNo, const int characterPos);
     void checkIfCursorInBlock(bool &isBlock, QTextCursor &cursor);

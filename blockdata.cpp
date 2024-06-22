@@ -3,11 +3,13 @@
 BlockData::BlockData()
 {
     status = content;
+    hidden = false;
 }
 
 BlockData::BlockData(const statusID status)
 {
     this->status = status;
+    hidden = false;
 }
 
 BlockData::statusID BlockData::getStatus() const

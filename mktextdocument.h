@@ -77,10 +77,8 @@ struct SelectRange{
     bool isCursorCaculated  = false;
     bool isFirstMousePress  = false;
     int scrollValue;
-    int rawFirstBlock 		= NO_SELECTION_POS;
-    int rawEndBlock 		= NO_SELECTION_POS;
-    int oldRawFirstBlock 	= NO_SELECTION_POS;
-    int oldRawEndBlock 		= NO_SELECTION_POS;
+    QSet<int> hideBlocks;
+    QSet<int> showBlocks;
 };
 
 struct RawBlockInfo{
@@ -119,10 +117,10 @@ public:
     QTextDocument* getRawDocument();
 
 public slots:
-    void cursorPosChangedHandle(bool hasSelection, int blockNumber, SelectRange * range);
+    void cursorPosChangedHandle(SelectRange * const range);
     void removeAllMkDataHandle(int blockNo);
-    void applyAllMkDataHandle(int blockNumber, bool showAll, SelectRange*range);
-    void applyMkSingleBlockHandle(int blockNumber, SelectRange*range);
+    void applyAllMkDataHandle(int blockNumber);
+    void applyMkSingleBlockHandle(int blockNumber);
     void enterKeyPressedHandle(int blockNumber);
     void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
     void checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid);
