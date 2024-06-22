@@ -51,6 +51,12 @@ TEST_CASE("MkEdit move cursor to the middle of the characters of first Markdown 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
 
+    QObject::connect(&doc,&MkTextDocument::connectCurosPos,
+                     &edit,&MkEdit::connectSignals);
+
+    QObject::connect(&doc,&MkTextDocument::disconnectCursorPos,
+                     &edit,&MkEdit::disconnectSignals);
+
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(newLinePos);
     edit.setTextCursor(cursor);
@@ -590,7 +596,7 @@ TEST_CASE("MkEdit using tab to insert links symbols ", "[MkEdit]")
                      &doc,&MkTextDocument::undoStackRedo);
 
     QObject::connect(&edit,&MkEdit::autoInsertSymbol,
-                     &doc,&MkTextDocument::autoInsertSymobolHandle);
+                     &doc,&MkTextDocument::autoInsertSymbolHandle);
 
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(2);
@@ -631,7 +637,7 @@ TEST_CASE("MkEdit undo after using tab to insert links symbols ", "[MkEdit]")
                      &doc,&MkTextDocument::undoStackRedo);
 
     QObject::connect(&edit,&MkEdit::autoInsertSymbol,
-                     &doc,&MkTextDocument::autoInsertSymobolHandle);
+                     &doc,&MkTextDocument::autoInsertSymbolHandle);
 
     QTextCursor cursor = edit.textCursor();
     cursor.setPosition(2);
@@ -794,7 +800,7 @@ TEST_CASE("MkEdit selection check for undo after typing inside bold format then 
     int initialPos = 4; //**bo
 
     doc.setPlainText("**bold**\n*italic*");
-    //doc.setMarkdownHandle(true);
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -819,6 +825,9 @@ TEST_CASE("MkEdit selection check for undo after typing inside bold format then 
                      &doc,&MkTextDocument::saveRawDocumentHandler);
 
     QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
 
@@ -1274,10 +1283,17 @@ TEST_CASE("MkEdit type inside link format in 2nd line then check if the cursor i
 
 
     doc.setPlainText("**bold** \n **new line**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
                      &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&doc,&MkTextDocument::connectCurosPos,
+                     &edit,&MkEdit::connectSignals);
+
+    QObject::connect(&doc,&MkTextDocument::disconnectCursorPos,
+                     &edit,&MkEdit::disconnectSignals);
 
     QObject::connect(&edit,&MkEdit::removeAllMkData,
                      &doc,&MkTextDocument::removeAllMkDataHandle);
@@ -1287,6 +1303,8 @@ TEST_CASE("MkEdit type inside link format in 2nd line then check if the cursor i
 
 
     QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
     edit.keyPressEvent(keyPressEvent.data());
@@ -1349,7 +1367,7 @@ TEST_CASE("MkEdit checkbox mouse click with undo/redo", "[MkEdit]")
     QRect combineRect(0, 0, firstRect.width() + 10, firstRect.height() + secondRect.height() + 10 );
 
     // apply markdown formats and update checkbox positions from screen to text cursor position
-    doc.applyAllMkDataHandle(3, false, nullptr);
+    doc.applyAllMkDataHandle(3);
 
     int countCheckBoxes = 0;
     for(auto it = doc.checkMarkPosBegin(); it!= doc.checkMarkPosEnd(); it++){
@@ -1395,6 +1413,7 @@ TEST_CASE("MkEdit press backspace in the first position of the text block, undo/
     MkTextDocument doc;
     MkEdit edit;
     doc.setPlainText("**bold**\n *italic*");
+    doc.setMarkdownHandle(true);
     int initialPos = 9;
 
     edit.setDocument(&doc);
@@ -1428,9 +1447,13 @@ TEST_CASE("MkEdit press backspace in the first position of the text block, undo/
 
 
     QTextCursor cursor = edit.textCursor();
-    cursor.setPosition(initialPos);
+    cursor.setPosition(1);
     edit.setTextCursor(cursor);
     QString text = edit.toPlainText();
+
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+    text = edit.toPlainText();
     REQUIRE("bold\n *italic*" == text);
 
     QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress,Qt::Key_Backspace, Qt::NoModifier));
@@ -1455,6 +1478,7 @@ TEST_CASE("MkEdit create code block with ```, undo/redo", "[MkEdit]")
     MkTextDocument doc;
     MkEdit edit;
 
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -1513,6 +1537,7 @@ TEST_CASE("MkEdit pressing enter after creating code block with ```, undo/redo",
     MkTextDocument doc;
     MkEdit edit;
 
+    //doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -1664,6 +1689,7 @@ TEST_CASE("MkEdit pressing delete as the end of the text block, undo/redo", "[Mk
     MkEdit edit;
 
     doc.setPlainText("**bold**\n*italic*");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     int initialPosition = 8;
 
@@ -1698,6 +1724,9 @@ TEST_CASE("MkEdit pressing delete as the end of the text block, undo/redo", "[Mk
                      &doc,&MkTextDocument::quoteLeftKeyPressedHandle);
 
     QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+
     cursor.setPosition(initialPosition, QTextCursor::MoveAnchor);
     edit.setTextCursor(cursor);
 
@@ -1728,6 +1757,7 @@ TEST_CASE("MkEdit pressing backspace to delele the code block symbols, undo/redo
     MkEdit edit;
 
     doc.setPlainText("```\n```");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
     int initialPosition = 3;
     int secondPosition = 7;
@@ -1763,6 +1793,9 @@ TEST_CASE("MkEdit pressing backspace to delele the code block symbols, undo/redo
                      &doc,&MkTextDocument::quoteLeftKeyPressedHandle);
 
     QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+
     cursor.setPosition(initialPosition, QTextCursor::MoveAnchor);
     edit.setTextCursor(cursor);
     QString text = edit.toPlainText();
