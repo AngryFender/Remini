@@ -244,6 +244,8 @@ signals:
     void hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const range, const bool clearPushCheckBoxData = true);
     void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const range);
     void showMKSymbolsFromCurrentSelectedBlocks(SelectRange * const range);
+    void showHideCodeBlock(BlockData *data, bool hide, int fontSize);
+
 
 };
 

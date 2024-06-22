@@ -1166,19 +1166,10 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
             if(blockData)
             {
                 resetTextBlockFormat(block);
-                switch(blockData->getStatus()){
-                case BlockData::content:  setCodeBlockMargin(block,fontSize*5/3, fontSize, 0); break;
-                case BlockData::start:    setCodeBlockMargin(block,fontSize*3/4, fontSize, fontSize); 	hideSymbols(block, CODEBLOCK_SYMBOL); break;
-                case BlockData::end:      setCodeBlockMargin(block,fontSize*3/4, fontSize, 0); 			hideSymbols(block, CODEBLOCK_SYMBOL); break;
+                showHideCodeBlock(blockData, true, fontSize);
+                if(blockData->getStatus()==BlockData::content){
+                    setCodeBlockMargin(block,fontSize*5/3, fontSize, 0);
                 }
-
-                //also hide start and end of the codeBlock
-                QTextBlock startCode = this->findBlockByNumber(blockData->getStartBlock());
-                hideSymbols(startCode, CODEBLOCK_SYMBOL);
-
-                QTextBlock endCode = this->findBlockByNumber(blockData->getEndBlock());
-                hideSymbols(endCode,CODEBLOCK_SYMBOL);
-
                 continue;
             }
 
@@ -1226,18 +1217,10 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
             BlockData * blockData = dynamic_cast<BlockData*>(data);
             if(blockData){
                 resetTextBlockFormat(block);
-                switch(blockData->getStatus()){
-                case BlockData::content:  setCodeBlockMargin(block,fontSize*5/3, fontSize, 0); break;
-                case BlockData::start:    setCodeBlockMargin(block,fontSize*3/4, fontSize, fontSize); 	showSymbols(block, CODEBLOCK_SYMBOL); break;
-                case BlockData::end:      setCodeBlockMargin(block,fontSize*3/4, fontSize, 0); 			showSymbols(block, CODEBLOCK_SYMBOL); break;
+                showHideCodeBlock(blockData,false,fontSize);
+                if(blockData->getStatus() == BlockData::content){
+                    setCodeBlockMargin(block,fontSize*5/3, fontSize, 0);
                 }
-
-                //also show start and end of the codeBlock
-                QTextBlock startCode = this->findBlockByNumber(blockData->getStartBlock());
-                showSymbols(startCode, CODEBLOCK_SYMBOL);
-
-                QTextBlock endCode = this->findBlockByNumber(blockData->getEndBlock());
-                showSymbols(endCode,CODEBLOCK_SYMBOL);
                 continue;
             }
 
@@ -1265,6 +1248,48 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
     range->oldRawFirstBlock = range->rawFirstBlock;
     range->oldRawEndBlock = range->rawEndBlock;
     emit  connectCurosPos();
+}
+
+void MkTextDocument::showHideCodeBlock(BlockData *data, bool hide, int fontSize)
+{
+    QTextBlock startCode = this->findBlockByNumber(data->getStartBlock());
+    QTextBlock endCode = this->findBlockByNumber(data->getEndBlock());
+
+    if(hide){
+        BlockData *startBlockData = dynamic_cast<BlockData*>(startCode.userData());
+        if(startBlockData){
+            setCodeBlockMargin(startCode,fontSize*3/4, fontSize, fontSize);
+            if(!startBlockData->isHidden()){
+                hideSymbols(startCode, CODEBLOCK_SYMBOL);
+                startBlockData->setHidden(true);
+            }
+        }
+        BlockData *endBlockData = dynamic_cast<BlockData*>(endCode.userData());
+        if(endBlockData){
+            setCodeBlockMargin(endCode,fontSize*3/4, fontSize, 0);
+            if(!endBlockData->isHidden()){
+                hideSymbols(endCode,CODEBLOCK_SYMBOL);
+                endBlockData->setHidden(true);
+            }
+        }
+    }else{
+        BlockData *startBlockData = dynamic_cast<BlockData*>(startCode.userData());
+        if(startBlockData && startBlockData->isHidden()){
+            setCodeBlockMargin(startCode,fontSize*3/4, fontSize, fontSize);
+            if(startBlockData->isHidden()){
+                showSymbols(startCode, CODEBLOCK_SYMBOL);
+                startBlockData->setHidden(false);
+            }
+        }
+        BlockData *endBlockData = dynamic_cast<BlockData*>(endCode.userData());
+        if(endBlockData && endBlockData->isHidden()){
+            showSymbols(endCode,CODEBLOCK_SYMBOL);
+            if(endBlockData->isHidden()){
+                endBlockData->setHidden(false);
+                setCodeBlockMargin(endCode,fontSize*3/4, fontSize, 0);
+            }
+        }
+    }
 }
 
 void MkTextDocument::pushCheckBoxHandle(const int position)
