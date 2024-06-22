@@ -1353,7 +1353,7 @@ void MkTextDocument::pushLinkHandle(const int position)
     }
 }
 
-void MkTextDocument::autoInsertSymobolHandle(const int position)
+void MkTextDocument::autoInsertSymbolHandle(const int position, int &newPosition)
 {
     QTextCursor cursor(this);
     cursor.setPosition(position);
@@ -1368,10 +1368,12 @@ void MkTextDocument::autoInsertSymobolHandle(const int position)
         cursor.insertText(unCheckSymbol);
     }else if(text == "link" || text == "lk"){
         cursor.insertText(QString(LINK_SYMBOL_TITLE_START)+QString(LINK_SYMBOL_MID) + QString(LINK_SYMBOL_URL_END));
+        cursor.setPosition(cursor.position()-2);
     }else{
         cursor.setPosition(position);
         cursor.insertText("    ");
     }
+    newPosition = cursor.positionInBlock();
 }
 
 void MkTextDocument::setMarkdownHandle(bool state)

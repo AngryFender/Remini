@@ -134,7 +134,7 @@ public slots:
 
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int position);
-    void autoInsertSymobolHandle(const int position);
+    void autoInsertSymbolHandle(const int position, int &newPosition );
     void setMarkdownHandle(bool state);
     void cursorUpdateHandle(const int blockNo, const int characterNo);
 

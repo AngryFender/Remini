@@ -359,7 +359,9 @@ void MkEdit::smartSelectionSetup()
 
 void MkEdit::tabKeyPressed()
 {
-    emit autoInsertSymbol(this->textCursor().position());
+    int newPosition;
+    emit autoInsertSymbol(this->textCursor().position(), newPosition);
+    selectRange.currentposInBlock = newPosition;
 }
 
 void MkEdit::preUndoSetup()
@@ -455,6 +457,10 @@ void MkEdit::applyMkEffects(const bool scroll)
     case enterPressed:
     case multiEdit: emit applyAllMkData(this->textCursor().blockNumber(), undoData.selectAll, &selectRange); break;
     }
+
+    QTextCursor cursor = this->textCursor();
+    cursor.setPosition(this->document()->findBlockByNumber(this->selectRange.currentBlockNo).position() + this->selectRange.currentposInBlock);
+    this->setTextCursor(cursor);
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){

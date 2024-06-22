@@ -261,7 +261,7 @@ void ViewsHandler::connectDocument()
                      currentDocument.data(),&MkTextDocument::pushLinkHandle);
 
     QObject::connect(viewText,&MkEdit::autoInsertSymbol,
-                     currentDocument.data(),&MkTextDocument::autoInsertSymobolHandle);
+                     currentDocument.data(),&MkTextDocument::autoInsertSymbolHandle);
 
     QObject::connect(viewText,&MkEdit::cursorUpdate,
                      currentDocument.data(),&MkTextDocument::cursorUpdateHandle);
@@ -330,7 +330,7 @@ void ViewsHandler::disconnectDocument()
                         currentDocument.data(),&MkTextDocument::pushLinkHandle);
 
     QObject::disconnect(viewText,&MkEdit::autoInsertSymbol,
-                        currentDocument.data(),&MkTextDocument::autoInsertSymobolHandle);
+                        currentDocument.data(),&MkTextDocument::autoInsertSymbolHandle);
 
     QObject::disconnect(viewText,&MkEdit::cursorUpdate,
                      currentDocument.data(),&MkTextDocument::cursorUpdateHandle);
