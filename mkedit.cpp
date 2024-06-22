@@ -146,7 +146,11 @@ void MkEdit::wheelEvent(QWheelEvent *e)
 
 void MkEdit::keyPressEvent(QKeyEvent *event)
 {
-    disconnectSignals(true);
+    Connector connector(
+        std::bind(&MkEdit::disconnectSignals,this,std::placeholders::_1),
+        std::bind(&MkEdit::connectSignals,this,std::placeholders::_1)
+    );
+
     undoData.editType = singleEdit;
     QString blockText;
     switch(event->key()){

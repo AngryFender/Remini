@@ -17,6 +17,20 @@
 #define FILE_SAVE_TIMEOUT 300
 #define BLOCKRADIUS 4
 
+class Connector{
+public:
+    Connector(std::function<void(bool)> disconnectSignals, std::function<void(bool)> connectSignals):connectSignals(connectSignals){
+        disconnectSignals(true);
+    }
+    ~Connector(){
+        connectSignals(true);
+    }
+
+private:
+    std::function<void(bool)> connectSignals;
+
+};
+
 class MkEdit : public QTextEdit
 {
     Q_OBJECT
