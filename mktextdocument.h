@@ -62,14 +62,10 @@ private:
 
 #define NO_SELECTION_POS -1
 struct SelectRange{
-    int startBlock      = NO_SELECTION_POS;
-    int endBlock        = NO_SELECTION_POS;
     bool hasSelection 	= false;
-    bool oldSelection 	= false;
     bool isCheckBox 	= false;
     int currentposInBlock      = NO_SELECTION_POS;
     int currentBlockNo         = NO_SELECTION_POS;
-    int oldBlockNo             = NO_SELECTION_POS;
     int selectionFirstStartBlock = NO_SELECTION_POS;
     int selectionFirstStartPosInBlock = NO_SELECTION_POS;
     int selectionEndBlock 			  = NO_SELECTION_POS;
@@ -239,7 +235,6 @@ signals:
     int numberListGetSpaces(const QString &text);
     QString numberListGetNextNumber(const QString &text);
 
-    void hideMKSymbolsFromDrawingRect(int blockNumber, bool showAll,SelectRange * const range, const bool clearPushCheckBoxData = true);
     void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const range);
     void showMKSymbolsFromCurrentSelectedBlocks(SelectRange * const range);
     void showHideCodeBlock(BlockData *data, bool hide, int fontSize);
