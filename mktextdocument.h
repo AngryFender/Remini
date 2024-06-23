@@ -216,7 +216,8 @@ signals:
 
     void resetTextBlockFormat(int blockNumber);
     void resetTextBlockFormat(QTextBlock block);
-    void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status,FormatCollection &formatCollection, bool onlyCheckboxAndLink);
+    void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status,FormatCollection &formatCollection);
+    void applyCheckBoxLinkEffect(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
     void hideSymbols(QTextBlock &block,const QString &symbol);
     void hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
@@ -238,7 +239,6 @@ signals:
     void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const range);
     void showMKSymbolsFromCurrentSelectedBlocks(SelectRange * const range);
     void showHideCodeBlock(BlockData *data, bool hide, int fontSize);
-
 
 };
 

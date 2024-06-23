@@ -571,7 +571,7 @@ void MkTextDocument::resetTextBlockFormat(QTextBlock block)
     cursor.setCharFormat(format);
 }
 
-void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status, FormatCollection &formatCollection, bool onlyCheckboxAndLink)
+void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status, FormatCollection &formatCollection)
 {
     QTextCharFormat *format = nullptr;
 
@@ -583,38 +583,42 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     case FragmentData::HEADING2:{format = formatCollection.getHeading2(); end = block.length()-1; break;}
     case FragmentData::HEADING3:{format = formatCollection.getHeading3(); end = block.length()-1; break;}
     case FragmentData::CHECKED_END:
-    case FragmentData::UNCHECKED_END:{
-        const int position = block.position() + start;
-        if(!checkMarkPositions.contains(position)){
-            checkMarkPositions.append(position);
-        }
-        break;
-    }
-    case FragmentData::LINK_TITLE:{
-        format = formatCollection.getLink();
-        const int startingPosition = block.position() + start;
-        const int endingPosition = block.position() + end;
-        QPair<int,int> linePosition(startingPosition, endingPosition);
-        if(!linkPositions.contains(linePosition)){
-            linkPositions.append(linePosition);
-        }
-        break;}
-
+    case FragmentData::UNCHECKED_END: break;
+    case FragmentData::LINK_TITLE: format = formatCollection.getLink(); break;
     default:break;
     }
 
-    if(!format || onlyCheckboxAndLink)
+    if(format == nullptr){
         return;
+    }
 
     int startPoint = block.position()+start;
     int endPoint = block.position()+end;
     if(end>=block.length()){
         endPoint = block.length()-1;
     }
+
     QTextCursor cursor(this);
     cursor.setPosition(startPoint);
     cursor.setPosition(endPoint, QTextCursor::KeepAnchor);
     cursor.mergeCharFormat(*format);
+}
+
+void MkTextDocument::applyCheckBoxLinkEffect(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status)
+{
+    if( status == FragmentData::CHECKED_END || status == FragmentData::UNCHECKED_END ){
+        const int position = block.position() + start;
+        if(!checkMarkPositions.contains(position)){
+            checkMarkPositions.append(position);
+        }
+    }else if(status == FragmentData::LINK_TITLE){
+        const int startingPosition = block.position() + start;
+        const int endingPosition = block.position() + end;
+        QPair<int,int> linePosition(startingPosition, endingPosition);
+        if(!linkPositions.contains(linePosition)){
+            linkPositions.append(linePosition);
+        }
+    }
 }
 
 void MkTextDocument::hideSymbols(QTextBlock &block,const QString &symbol)
@@ -1050,6 +1054,7 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
     FormatCollection formatCollection(fontSize);
 
     QSet<int> hiddenBlocks;
+    QSet<int> checkBoxLinkBlocks;
     QTextBlock block;
     foreach (int num, range->hideBlocks) {
         if(!range->showBlocks.contains(num)){
@@ -1089,9 +1094,23 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
 
                 for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
                 {
-                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection, false);
+                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
+                    if((*it)->getStatus() == FragmentData::CHECKED_END || (*it)->getStatus() == FragmentData::UNCHECKED_END ||  (*it)->getStart() == FragmentData::LINK_TITLE){
+                        checkBoxLinkBlocks.insert(num);
+                    }
                 }
             }
+        }
+    }
+
+    foreach(int num,checkBoxLinkBlocks){
+        block = this->findBlockByNumber(num);
+        QTextBlockUserData *data = block.userData();
+        FormatData* formatData = dynamic_cast<FormatData*>(data);
+
+        for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+        {
+            applyCheckBoxLinkEffect(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
         }
     }
 
@@ -1146,7 +1165,7 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
                 showAllFormatSymbolsInTextBlock(block, formatData, range);
                 for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
                 {
-                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection,false);
+                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
                 }
             }
         }
