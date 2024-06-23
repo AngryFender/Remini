@@ -5,6 +5,15 @@
 #include <QScopedPointer>
 #include <QTest>
 
+namespace Catch {
+template<>
+struct StringMaker<QString> {
+    static std::string convert(const QString& qStr) {
+        return qStr.toStdString();
+    }
+};
+}
+
 TEST_CASE("MkEdit simple text", "[MkEdit]")
 {
     MkEdit edit;
