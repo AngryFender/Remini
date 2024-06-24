@@ -1095,7 +1095,7 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
                 for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
                 {
                     applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
-                    if((*it)->getStatus() == FragmentData::CHECKED_END || (*it)->getStatus() == FragmentData::UNCHECKED_END ||  (*it)->getStart() == FragmentData::LINK_TITLE){
+                    if((*it)->getStatus() == FragmentData::CHECKED_END || (*it)->getStatus() == FragmentData::UNCHECKED_END ||  (*it)->getStatus() == FragmentData::LINK_TITLE){
                         checkBoxLinkBlocks.insert(num);
                     }
                 }
