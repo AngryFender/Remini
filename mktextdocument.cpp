@@ -709,14 +709,8 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
             }
         }
 
-        QVector<QPair<int, int>>::iterator it = linkPositions.begin();
-        while (it != linkPositions.end()) {
-            if (it->first == (blockPos + index)) {
-                it = linkPositions.erase(it);
-            } else {
-                ++it;
-            }
-        }
+        auto newEnd = std::remove_if(linkPositions.begin(), linkPositions.end(),[blockPos,index](const QPair<int,int> &pair){ return pair.first == (blockPos+index);});
+        linkPositions.erase(newEnd, linkPositions.end());
         index++;
     }
 
