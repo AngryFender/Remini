@@ -150,7 +150,6 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     );
 
     undoData.editType = singleEdit;
-    QString blockText;
     switch(event->key()){
     case Qt::Key_Shift: isShiftKeyPressed = true;
     case Qt::Key_Up:
@@ -177,11 +176,11 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
-    case Qt::Key_Backspace: blockText = this->document()->findBlockByNumber(textCursor().blockNumber()).text();
+    case Qt::Key_Backspace:{
+                            QString blockText = this->textCursor().block().text();
                             if((textCursor().positionInBlock() == 0) || (blockText.left(3)=="```")){
                                 undoData.editType = multiEdit;
-                            }
-                            break;
+                            } break;}
     case Qt::Key_QuoteLeft: undoData.editType = multiEdit; break;
     }
 
@@ -415,11 +414,19 @@ void MkEdit::clearMkEffects(EditType editType)
         emit removeAllMkData(this->textCursor().blockNumber());
     }
 
+    int oldStartPosition = document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock;
+    oldStartPosition = (oldStartPosition < 0)? 0 : oldStartPosition;
+    oldStartPosition = (oldStartPosition < document()->characterCount())? oldStartPosition : document()->characterCount()-1;
+
+    int oldEndPosition = this->document()->findBlockByNumber(blockNumber).position() + posInBlock;
+    oldEndPosition = (oldEndPosition < 0)? 0 : oldEndPosition;
+    oldEndPosition = (oldEndPosition < document()->characterCount())? oldEndPosition : document()->characterCount()-1;
+
     if(hasSelection){
-        cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
-        cursor.setPosition(this->document()->findBlockByNumber(blockNumber).position() + posInBlock, QTextCursor::KeepAnchor);
+        cursor.setPosition(oldStartPosition);
+        cursor.setPosition(oldEndPosition, QTextCursor::KeepAnchor);
     }else{
-        cursor.setPosition(this->document()->findBlockByNumber(blockNumber).position() + posInBlock);
+        cursor.setPosition(oldEndPosition);
     }
 
     this->setTextCursor(cursor);
@@ -440,8 +447,12 @@ void MkEdit::applyMkEffects(const bool scroll)
     }
 
     QTextCursor cursor = this->textCursor();
-    cursor.setPosition(this->document()->findBlockByNumber(this->selectRange.currentBlockNo).position() + this->selectRange.currentposInBlock);
-    this->setTextCursor(cursor);
+    int newPosition = this->document()->findBlockByNumber(this->selectRange.currentBlockNo).position() + this->selectRange.currentposInBlock;
+    newPosition = (newPosition < 0) ? 0: newPosition;
+    if(newPosition < 0 ||newPosition<this->document()->characterCount() ){
+        cursor.setPosition(newPosition);
+        this->setTextCursor(cursor);
+    }
 
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){

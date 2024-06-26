@@ -212,9 +212,6 @@ signals:
     void composeOnlyLinkSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result);
 
     void setCodeBlockMargin(QTextBlock &block, int leftMargin=0,int rightMargin =0, int topMargin = 0);
-    void stripUserData();
-
-    void resetTextBlockFormat(int blockNumber);
     void resetTextBlockFormat(QTextBlock block);
     void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status,FormatCollection &formatCollection);
     void applyCheckBoxLinkEffect(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);

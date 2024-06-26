@@ -542,32 +542,12 @@ void MkTextDocument::setCodeBlockMargin(QTextBlock &block, int leftMargin,int ri
     cursor.setBlockFormat(blockFormat);
 }
 
-void MkTextDocument::stripUserData()
-{
-    for(QTextBlock tBlock = this->begin(); tBlock != this->end(); tBlock = tBlock.next()){
-        tBlock.setUserData(nullptr);
-        QTextCursor cursor(tBlock);
-        QTextBlockFormat format;
-        cursor.setBlockFormat(format);
-    }
-}
-
-void MkTextDocument::resetTextBlockFormat(int blockNumber)
-{
-    QTextBlock block = this->findBlockByNumber(blockNumber);
-    QTextCursor cursor(block);
-    QTextCharFormat format;
-    cursor.setPosition(block.position());
-    cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
-    cursor.setCharFormat(format);
-}
-
 void MkTextDocument::resetTextBlockFormat(QTextBlock block)
 {
     QTextCursor cursor(block);
     QTextCharFormat format;
     cursor.setPosition(block.position());
-    cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
+    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     cursor.setCharFormat(format);
 }
 
