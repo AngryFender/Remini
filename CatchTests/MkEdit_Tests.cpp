@@ -1831,3 +1831,146 @@ TEST_CASE("MkEdit pressing backspace to delele the code block symbols, undo/redo
     text = edit.toPlainText();
     REQUIRE("```\n```" == text);
 }
+
+TEST_CASE("MkEdit check cursor position after pressing enter to extend list in another line, undo/redo", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+
+    doc.setPlainText("- ");
+    doc.setMarkdownHandle(true);
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QObject::connect(&edit,&MkEdit::quoteLeftKeyPressed,
+                     &doc,&MkTextDocument::quoteLeftKeyPressedHandle);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(2);
+    edit.setTextCursor(cursor);
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+
+    text = edit.toPlainText();
+    REQUIRE("- \n- " == text);
+
+    int currentCursorPos = edit.textCursor().positionInBlock();
+    REQUIRE(currentCursorPos == 2);
+
+    QScopedPointer<QKeyEvent> undoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier));
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("- " == text);
+
+    currentCursorPos = edit.textCursor().positionInBlock();
+    REQUIRE(currentCursorPos == 2);
+
+    QScopedPointer<QKeyEvent> redoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier));
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("- \n- " == text);
+
+    currentCursorPos = edit.textCursor().positionInBlock();
+    REQUIRE(currentCursorPos == 2);
+}
+
+TEST_CASE("MkEdit check cursor position after pressing enter to extend checkbox in another line, undo/redo", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+
+    doc.setPlainText("- [ ]  ");
+    doc.setMarkdownHandle(true);
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QObject::connect(&edit,&MkEdit::quoteLeftKeyPressed,
+                     &doc,&MkTextDocument::quoteLeftKeyPressedHandle);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+
+    cursor.setPosition(7);
+    edit.setTextCursor(cursor);
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+
+    text = edit.toPlainText();
+    REQUIRE("☐ \n- [ ]  " == text);
+
+    int currentCursorPos = edit.textCursor().positionInBlock();
+    REQUIRE(currentCursorPos == 7);
+
+    QScopedPointer<QKeyEvent> undoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier));
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("- [ ]  " == text);
+
+    currentCursorPos = edit.textCursor().positionInBlock();
+    REQUIRE(currentCursorPos == 7);
+
+    QScopedPointer<QKeyEvent> redoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier));
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("☐ \n- [ ]  " == text);
+
+    currentCursorPos = edit.textCursor().positionInBlock();
+    REQUIRE(currentCursorPos == 7);
+}
