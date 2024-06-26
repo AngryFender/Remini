@@ -157,7 +157,7 @@ private slots:
 signals:
     void cursorPosChanged(SelectRange * const selectRange);
     void fileSaveRaw();
-    void enterKeyPressed(int blockNumber);
+    void enterKeyPressed(int blockNumber, int &newCursorPos);
     void quoteLeftKeyPressed(int blockNumber,bool &success);
     void checkRightClockOnCodeBlock(int blockNumber, bool &valid);
     void selectBlockCopy(int blockNumber, int &startPos, int &endPos);

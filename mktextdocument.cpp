@@ -811,9 +811,9 @@ BlockData* MkTextDocument::checkValidCodeBlock(QTextBlock &block)
     return nullptr;
 }
 
-void MkTextDocument::enterKeyPressedHandle(int blockNumber)
+void MkTextDocument::enterKeyPressedHandle(int blockNumber, int &newCursorPos)
 {
-    numberListDetect(blockNumber);
+    numberListDetect(blockNumber, newCursorPos);
 }
 
 void MkTextDocument::quoteLeftKeyPressedHandle(int blockNumber,bool &success)
@@ -1352,9 +1352,9 @@ void MkTextDocument::resetFormatLocation()
     locLinkTitle.reset();
 }
 
-void MkTextDocument::numberListDetect(int blockNumber)
+void MkTextDocument::numberListDetect(int blockNumber, int &newCursorPosition)
 {
-    QTextCursor editCursor(this->findBlockByNumber(blockNumber));
+    QTextCursor cursor(this->findBlockByNumber(blockNumber));
     QTextBlock currentBlock = this->findBlockByNumber(blockNumber-1);
     QString lineText = currentBlock.text();
 
@@ -1369,40 +1369,37 @@ void MkTextDocument::numberListDetect(int blockNumber)
 
     if(matchNumbering.hasMatch()){
         int spaces = numberListGetSpaces(matchNumbering.captured(0));
-        editCursor.insertText(QString("").leftJustified(spaces,' '));
-        editCursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
-        return;
+        cursor.insertText(QString("").leftJustified(spaces,' '));
+        cursor.insertText(numberListGetNextNumber(matchNumbering.captured(0)));
     }else if(matchBulletCheckBox.hasMatch()){
         int spaces = numberListGetSpaces(matchBulletPoint.captured(0));
-        editCursor.insertText(QString("").leftJustified(spaces,' '));
+        cursor.insertText(QString("").leftJustified(spaces,' '));
         if(matchCheckBox.captured(0).contains("x")){
-            editCursor.insertText("- - [x]  ");
+            cursor.insertText("- - [x]  ");
         }else{
-            editCursor.insertText("- - [ ]  ");
+            cursor.insertText("- - [ ]  ");
         }
-        return;
     }else if(matchCheckBox.hasMatch()){
         int spaces = numberListGetSpaces(matchBulletPoint.captured(0));
-        editCursor.insertText(QString("").leftJustified(spaces,' '));
+        cursor.insertText(QString("").leftJustified(spaces,' '));
         if(matchCheckBox.captured(0).contains("x")){
-            editCursor.insertText("- [x]  ");
+            cursor.insertText("- [x]  ");
         }else{
-            editCursor.insertText("- [ ]  ");
+            cursor.insertText("- [ ]  ");
         }
-        return;
     }else if(matchBulletPoint.hasMatch()){
         int spaces = numberListGetSpaces(matchBulletPoint.captured(0));
-        editCursor.insertText(QString("").leftJustified(spaces,' '));
-        editCursor.insertText("- ");
-        return;
+        cursor.insertText(QString("").leftJustified(spaces,' '));
+        cursor.insertText("- ");
     }
     else{
         QTextCharFormat format;
         format.setFontPointSize(this->defaultFont().pointSize());
-        editCursor.movePosition(QTextCursor::EndOfBlock);
-        editCursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor);
-        editCursor.setCharFormat(format);
+        cursor.movePosition(QTextCursor::EndOfBlock);
+        cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor);
+        cursor.setCharFormat(format);
     }
+    newCursorPosition = cursor.positionInBlock();
 }
 
 int MkTextDocument::numberListGetSpaces(const QString &text)

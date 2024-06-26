@@ -194,7 +194,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
 
     switch(event->key()){
     case Qt::Key_Enter:
-    case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber());
+    case Qt::Key_Return:    emit enterKeyPressed(this->textCursor().blockNumber(), this->selectRange.currentposInBlock);
     case Qt::Key_Space:     fileSaveNow(); return;
     case Qt::Key_QuoteLeft: quoteLeftKey();
     case Qt::Key_Delete:    if( undoData.editType != EditType::singleEdit){ fileSaveNow(); return;}
