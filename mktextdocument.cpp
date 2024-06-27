@@ -117,7 +117,8 @@ void MkTextDocument::cursorPosChangedHandle(SelectRange * const range)
         int start;
         int end;
 
-        this->selectRange.hasSelection = range->hasSelection;
+        this->selectRange.isCursorCaculated = range->isCursorCaculated;
+        this->selectRange.hasSelection      = range->hasSelection;
         if(range->hasSelection){
             start = std::min(range->selectionFirstStartBlock, range->selectionEndBlock);
             end   = std::max(range->selectionFirstStartBlock, range->selectionEndBlock);
