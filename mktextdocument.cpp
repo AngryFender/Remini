@@ -574,10 +574,7 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     }
 
     int startPoint = block.position()+start;
-    int endPoint = block.position()+end;
-    if(end>=block.length()){
-        endPoint = block.length()-1;
-    }
+    int endPoint = (end>=block.length())? block.length()-1:block.position()+end;
 
     QTextCursor cursor(this);
     cursor.setPosition(startPoint);
@@ -1032,7 +1029,7 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
     QSet<int> checkBoxLinkBlocks;
     QTextBlock block;
     foreach (int num, range->hideBlocks) {
-        if(!range->showBlocks.contains(num)){
+        if(range->showBlocks.find(num) == range->showBlocks.end()){
             hiddenBlocks.insert(num);
             block = this->findBlockByNumber(num);
             QTextBlockUserData *data = block.userData();
@@ -1090,7 +1087,7 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
     }
 
     foreach(int num, hiddenBlocks){
-        range->hideBlocks.remove(num);
+        range->hideBlocks.erase(num);
     }
 
     emit  connectCurosPos();
@@ -1105,7 +1102,7 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
     QTextBlock block;
 
     foreach(int num, range->showBlocks){
-        if(!range->hideBlocks.contains(num)){
+        if(range->hideBlocks.find(num)==range->hideBlocks.end()){
             range->hideBlocks.insert(num);
             block = this->findBlockByNumber(num);
             QTextBlockUserData *data = block.userData();

@@ -19,6 +19,7 @@
 #include <QTextEdit>
 #include <QUndoCommand>
 #include <QUndoStack>
+#include <set>
 
 
 #define MAXIMUM_FONT_SIZE 30
@@ -73,8 +74,8 @@ struct SelectRange{
     bool isCursorCaculated  = false;
     bool isFirstMousePress  = false;
     int scrollValue;
-    QSet<int> hideBlocks;
-    QSet<int> showBlocks;
+    std::set<int> hideBlocks;
+    std::set<int> showBlocks;
 };
 
 struct RawBlockInfo{
