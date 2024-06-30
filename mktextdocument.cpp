@@ -1032,6 +1032,10 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
         if(range->showBlocks.find(num) == range->showBlocks.end()){
             hiddenBlocks.insert(num);
             block = this->findBlockByNumber(num);
+            if(!block.isValid()){
+                continue;
+            }
+
             QTextBlockUserData *data = block.userData();
             if(data == nullptr){
                 resetTextBlockFormat(block);
@@ -1105,6 +1109,10 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
         if(range->hideBlocks.find(num)==range->hideBlocks.end()){
             range->hideBlocks.insert(num);
             block = this->findBlockByNumber(num);
+            if(!block.isValid()){
+                continue;
+            }
+
             QTextBlockUserData *data = block.userData();
             if(data == nullptr){
                 resetTextBlockFormat(block);
