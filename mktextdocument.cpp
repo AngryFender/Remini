@@ -1398,13 +1398,6 @@ void MkTextDocument::numberListDetect(int blockNumber, int &newCursorPosition)
         cursor.insertText(QString("").leftJustified(spaces,' '));
         cursor.insertText("- ");
     }
-    else{
-        QTextCharFormat format;
-        format.setFontPointSize(this->defaultFont().pointSize());
-        cursor.movePosition(QTextCursor::EndOfBlock);
-        cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor);
-        cursor.setCharFormat(format);
-    }
     newCursorPosition = cursor.positionInBlock();
 }
 
