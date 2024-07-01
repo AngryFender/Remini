@@ -154,11 +154,11 @@ void MkTextDocument::applyAllMkDataHandle(int blockNumber)
     identifyUserData();
 
     this->selectRange.showBlocks.clear();
+    this->selectRange.hideBlocks.clear();
     for(int num = 0; num < this->blockCount(); num++){
         this->selectRange.hideBlocks.insert(num);
     }
     hideMKSymbolsFromPreviousSelectedBlocks(&this->selectRange);
-
 
     this->selectRange.showBlocks.insert(blockNumber);
     showMKSymbolsFromCurrentSelectedBlocks(&this->selectRange);
