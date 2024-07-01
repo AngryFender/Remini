@@ -1974,3 +1974,93 @@ TEST_CASE("MkEdit check cursor position after pressing enter to extend checkbox 
     currentCursorPos = edit.textCursor().positionInBlock();
     REQUIRE(currentCursorPos == 7);
 }
+
+TEST_CASE("MkEdit cursor position after pressing enter", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    doc.setPlainText("enter\n\n\n");
+    doc.setMarkdownHandle(true);
+    int initialPos = 5;
+
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier));
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("enter\n\n\n\n" == text);
+
+    cursor = edit.textCursor();
+    REQUIRE(cursor.position() == 6);
+
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("enter\n\n\n\n\n" == text);
+
+    cursor = edit.textCursor();
+    REQUIRE(cursor.position() == 7);
+
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("enter\n\n\n\n\n\n" == text);
+
+    cursor = edit.textCursor();
+    REQUIRE(cursor.position() == 8);
+
+    QScopedPointer<QKeyEvent> undoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier));
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("enter\n\n\n\n\n" == text);
+
+    cursor = edit.textCursor();
+    REQUIRE(cursor.position() == 7);
+
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("enter\n\n\n\n" == text);
+
+    cursor = edit.textCursor();
+    REQUIRE(cursor.position() == 6);
+
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("enter\n\n\n" == text);
+
+    cursor = edit.textCursor();
+    REQUIRE(cursor.position() == 5);
+}
+
