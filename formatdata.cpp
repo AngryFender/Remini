@@ -206,7 +206,9 @@ void FormatData::addHiddenFormat(const int start, const int end, const int lengt
     if(!hiddenFormats.empty()){
         accumulate = hiddenFormats.last()->getAccumulate();
     }
+
     int begin = start-accumulate;
+    begin =(begin<0)? start-length: begin;
     int last = end-accumulate-length;
 
     if(linkText && status == FragmentData::LINK_URL){

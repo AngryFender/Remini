@@ -298,6 +298,15 @@ void MkTextDocument::formatAllLines(const QTextDocument &original, MkTextDocumen
         cursor.insertText(blockText);
     }
 }
+
+void MkTextDocument::resetAllLoc()
+{
+    locItalicA.reset();
+    locItalicU.reset();
+    locBoldA.reset();
+    locBoldU.reset();
+    locCheck.reset();
+}
 void MkTextDocument::identifyFormatData(QTextBlock &block)
 {
     resetFormatLocation();
@@ -330,6 +339,7 @@ void MkTextDocument::identifyFormatData(QTextBlock &block)
                     locLink.end = index1;
                     QString linkText = textLink.mid(locLink.start+2, (locLink.end-locLink.start-1));
                     insertFormatLinkData(locLinkTitle,locLink, index1, index2, index3 , formatData, test, &linkText);
+                    resetAllLoc();
                 }
             }else{
 
@@ -393,8 +403,10 @@ void MkTextDocument::insertFormatData(FormatLocation &loc, int &index1, int &ind
     }else{
         loc.end = index1;
         if(loc.end-loc.start>1){
+            loc.start = (loc.start < 1)? 0 : loc.start;
             formatData->addFormat(loc.start, loc.end, test);
             loc.reset();
+            resetAllLoc();
         }
     }
     incrementIndexes(index1, index2,index3, test.size());

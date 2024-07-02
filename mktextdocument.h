@@ -200,6 +200,7 @@ signals:
     void identifyUserData(QTextBlock &block);
     void formatAllLines(const QTextDocument &original, MkTextDocument &formatted);
 
+    void resetAllLoc();
     void identifyFormatData(QTextBlock &block);
     void insertHeadingData( const QString &text, int &index1, FormatData *formatData);
     void insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
