@@ -559,8 +559,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         linkTextWidth = (linkEnd - linkStart) * averageCharacterWidth;
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
-            int pos = linkStart;
-            emit pushLink(pos);
+            emit pushLink(std::get<0>(*it),std::get<1>(*it));
             return true;
         }
     }

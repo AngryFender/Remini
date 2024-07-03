@@ -1273,9 +1273,9 @@ void MkTextDocument::pushCheckBoxHandle(const int position)
     cursorRaw.insertText(rawString);
 }
 
-void MkTextDocument::pushLinkHandle(const int position)
+void MkTextDocument::pushLinkHandle(const int blockNo, const int posInBlock)
 {
-    QTextBlock block = findBlock(position);
+    QTextBlock block = findBlockByNumber(blockNo);
     QTextBlockUserData* data =block.userData();
     FormatData* formatData = dynamic_cast<FormatData*>(data);
 
@@ -1284,7 +1284,7 @@ void MkTextDocument::pushLinkHandle(const int position)
 
     for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
     {
-        if((*it)->getStatus() == FragmentData::LINK_TITLE){
+        if((*it)->getStatus() == FragmentData::LINK_TITLE && (*it)->getStart() == posInBlock){
             const QString *link =formatData->getHiddenLinkUrl((*it)->getStart());
             if(link){
                 QDesktopServices::openUrl(QUrl(*link));

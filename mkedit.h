@@ -182,7 +182,7 @@ signals:
     void keywordColorChanged(const QColor &color);
 
     void pushCheckBox(int position);
-    void pushLink(int position);
+    void pushLink(int blockNo, int posInBlock);
     void autoInsertSymbol(const int position, int &newPosition);
     void setMarkdownStatus(bool state);
     void cursorUpdate(const int blockNo, const int characterPos);
