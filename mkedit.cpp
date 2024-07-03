@@ -545,17 +545,21 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
     }
 
     int linkTextWidth = 0;
+    int linkStart, linkEnd;
     for(auto it = mkDoc->linkPosBegin(); it!= mkDoc->linkPosEnd(); ++it){
-        if((*it).first >last ||(*it).second >last ){
+        linkStart = this->document()->findBlockByNumber(std::get<0>(*it)).position() + std::get<1>(*it);
+        linkEnd   = this->document()->findBlockByNumber(std::get<0>(*it)).position() + std::get<2>(*it);
+
+        if(linkStart >last ||linkEnd >last ){
             continue;
         }
-        cursor.setPosition((*it).first);
+        cursor.setPosition(linkStart);
 
         rect = this->cursorRect(cursor);
-        linkTextWidth = ((*it).second - (*it).first) * averageCharacterWidth;
+        linkTextWidth = (linkEnd - linkStart) * averageCharacterWidth;
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
-            int pos = (*it).first;
+            int pos = linkStart;
             emit pushLink(pos);
             return true;
         }
@@ -811,16 +815,20 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
     }
 
     int linkTextWidth = 0;
+    int linkStart, linkEnd;
     int averageCharacterWidth = metrics.horizontalAdvance("t");
 
     for(auto it = mkDoc->linkPosBegin(); it!= mkDoc->linkPosEnd(); ++it){
-        if((*it).first >last ||(*it).second >last ){
+        linkStart = this->document()->findBlockByNumber(std::get<0>(*it)).position() + std::get<1>(*it);
+        linkEnd   = this->document()->findBlockByNumber(std::get<0>(*it)).position() + std::get<2>(*it);
+
+        if(linkStart >last || linkEnd >last ){
             continue;
         }
-        cursor.setPosition((*it).first);
+        cursor.setPosition(linkStart);
 
         rect = this->cursorRect(cursor);
-        linkTextWidth = ((*it).second - (*it).first) * averageCharacterWidth;
+        linkTextWidth = (linkEnd - linkStart) * averageCharacterWidth;
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
             this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);

@@ -101,8 +101,8 @@ public:
     QVector<QPair<int,int>>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
     QVector<QPair<int,int>>::const_iterator checkMarkPosEnd(){return checkMarkPositions.cend();};
 
-    QVector<QPair<int, int>>::const_iterator linkPosBegin(){return linkPositions.cbegin();};
-    QVector<QPair<int, int>>::const_iterator linkPosEnd(){return linkPositions.cend();};
+    QVector<std::tuple<int,int,int>>::const_iterator linkPosBegin(){return linkPositions.cbegin();};
+    QVector<std::tuple<int,int,int>>::const_iterator linkPosEnd(){return linkPositions.cend();};
 
     void setFilePath(const QString &filePath);
     void setFileName(const QString &fileName);
@@ -186,8 +186,8 @@ signals:
 
     QUndoStack undoStack;
 
-    QVector<QPair<int, int>> linkPositions;
     QVector<QPair<int, int>> checkMarkPositions;
+    QVector<std::tuple<int,int,int>> linkPositions;
 
     QColor linkColor;
     bool disableMarkdownState;

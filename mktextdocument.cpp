@@ -684,7 +684,6 @@ void MkTextDocument::showSymbols(QTextBlock &block, const QString &symbol)
 void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * range)
 {
     QString textBlock = block.text();
-    const int blockPos = block.position();
     const int blockNo = block.blockNumber();
     QPair<int,int> checkPos;
     int index = 0;
@@ -699,7 +698,7 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
             }
         }
 
-        auto newEnd = std::remove_if(linkPositions.begin(), linkPositions.end(),[blockPos,index](const QPair<int,int> &pair){ return pair.first == (blockPos+index);});
+        auto newEnd = std::remove_if(linkPositions.begin(), linkPositions.end(),[blockNo,index](const std::tuple<int,int,int> &linkPos){ return (std::get<0>(linkPos) == blockNo && std::get<1>(linkPos)== index);});
         linkPositions.erase(newEnd, linkPositions.end());
         index++;
     }
