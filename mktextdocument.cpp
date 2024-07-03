@@ -597,16 +597,14 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
 void MkTextDocument::applyCheckBoxLinkEffect(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status)
 {
     if( status == FragmentData::CHECKED_END || status == FragmentData::UNCHECKED_END ){
-        const int position = block.position() + start;
-        if(!checkMarkPositions.contains(position)){
-            checkMarkPositions.append(position);
+        const QPair<int,int> checkPos(block.blockNumber(), start);
+        if(!checkMarkPositions.contains(checkPos)){
+            checkMarkPositions.append(checkPos);
         }
     }else if(status == FragmentData::LINK_TITLE){
-        const int startingPosition = block.position() + start;
-        const int endingPosition = block.position() + end;
-        QPair<int,int> linePosition(startingPosition, endingPosition);
-        if(!linkPositions.contains(linePosition)){
-            linkPositions.append(linePosition);
+        const std::tuple<int,int,int> linkPos(block.blockNumber(), start, end);
+        if(!linkPositions.contains(linkPos)){
+            linkPositions.append(linkPos);
         }
     }
 }
@@ -687,11 +685,13 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
 {
     QString textBlock = block.text();
     const int blockPos = block.position();
-     int index = 0;
+    const int blockNo = block.blockNumber();
+    QPair<int,int> checkPos;
+    int index = 0;
     for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
         if(*cp == u'☑' || *cp == u'☐'){
-            checkMarkPositions.removeAll(blockPos + index);
-
+            checkPos.first = blockNo; checkPos.second = index;
+            checkMarkPositions.removeAll(checkPos);
             if(range){
                 if(index < range->currentposInBlock){
                     range->currentposInBlock--;

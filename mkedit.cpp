@@ -521,22 +521,22 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
     int last = this->document()->lastBlock().position()+this->document()->lastBlock().length();
 
     QTextCursor cursor(this->textCursor());
+    int checkPos;
     QRect rect;
     for(auto it = mkDoc->checkMarkPosBegin(); it!= mkDoc->checkMarkPosEnd(); it++){
-        if((*it>last)){
+        checkPos = this->document()->findBlockByNumber((*it).first).position() + (*it).second;
+        if(checkPos>last){
             continue;
         }
-        cursor.setPosition(*it);
+        cursor.setPosition(checkPos);
         rect = this->cursorRect(cursor);
         rect.setWidth(width);
         if(rect.contains(pointer)){
-            int pos = (*it);
-
             disconnectSignals(true);
             undoData.scrollValue = this->verticalScrollBar()->sliderPosition();
             undoData.editType = EditType::checkbox;
             preUndoSetup();
-            emit pushCheckBox(pos);
+            emit pushCheckBox(checkPos);
             fileSaveWithScroll();
             connectSignals(true);
 
@@ -795,11 +795,13 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
 
     QTextCursor cursor(this->textCursor());
     QRect rect;
+    int checkPos;
     for(auto it = mkDoc->checkMarkPosBegin(); it!= mkDoc->checkMarkPosEnd(); it++){
-        if((*it>last)){
+        checkPos = this->document()->findBlockByNumber((*it).first).position() + (*it).second;
+        if((checkPos>last)){
             continue;
         }
-        cursor.setPosition(*it);
+        cursor.setPosition(checkPos);
         rect = this->cursorRect(cursor);
         rect.setWidth(width);
         if(rect.contains(pointer)){

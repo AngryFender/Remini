@@ -98,8 +98,8 @@ public:
     const SelectRange &getRedoSelectRange() const;
     void clear() override;
 
-    QVector<int>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
-    QVector<int>::const_iterator checkMarkPosEnd(){return checkMarkPositions.cend();};
+    QVector<QPair<int,int>>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
+    QVector<QPair<int,int>>::const_iterator checkMarkPosEnd(){return checkMarkPositions.cend();};
 
     QVector<QPair<int, int>>::const_iterator linkPosBegin(){return linkPositions.cbegin();};
     QVector<QPair<int, int>>::const_iterator linkPosEnd(){return linkPositions.cend();};
@@ -186,8 +186,8 @@ signals:
 
     QUndoStack undoStack;
 
-    QVector<int> checkMarkPositions;
     QVector<QPair<int, int>> linkPositions;
+    QVector<QPair<int, int>> checkMarkPositions;
 
     QColor linkColor;
     bool disableMarkdownState;
