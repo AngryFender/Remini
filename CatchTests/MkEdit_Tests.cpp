@@ -1760,7 +1760,78 @@ TEST_CASE("MkEdit pressing delete as the end of the text block, undo/redo", "[Mk
     REQUIRE("**bold***italic*" == text);
 }
 
-TEST_CASE("MkEdit pressing backspace to delele the code block symbols, undo/redo", "[MkEdit]")
+TEST_CASE("MkEdit pressing backspace with ctrl to delete the code block symbols, undo/redo", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+
+    doc.setPlainText("this\nis\ngreat\n\n\n");
+    doc.setMarkdownHandle(true);
+    edit.setDocument(&doc);
+    int initialPosition = 7;
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QObject::connect(&edit,&MkEdit::quoteLeftKeyPressed,
+                     &doc,&MkTextDocument::quoteLeftKeyPressedHandle);
+
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+
+    cursor.setPosition(initialPosition, QTextCursor::MoveAnchor);
+    edit.setTextCursor(cursor);
+    QString text = edit.toPlainText();
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Backspace, Qt::ControlModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+
+    text = edit.toPlainText();
+    REQUIRE("this\n\ngreat\n\n\n" == text);
+
+    cursor = edit.textCursor();
+    int newPosition = cursor.position();
+    REQUIRE( 5 == newPosition);
+
+    cursor.setPosition(6);
+    edit.setTextCursor(cursor);
+    keyPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Delete, Qt::ControlModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("this\n\n\n\n\n" == text);
+
+    cursor = edit.textCursor();
+    newPosition = cursor.position();
+    REQUIRE( 6 == newPosition);
+}
+
+TEST_CASE("MkEdit pressing backspace to delete the code block symbols, undo/redo", "[MkEdit]")
 {
     MkTextDocument doc;
     MkEdit edit;
