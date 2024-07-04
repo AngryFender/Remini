@@ -1,6 +1,7 @@
 #ifndef FORMATDATA_H
 #define FORMATDATA_H
 
+#include <QBitArray>
 #include <QTextBlockUserData>
 #include <QVector>
 
@@ -124,6 +125,9 @@ public:
     void setFormatted(bool state);
     void sortAscendingPos();
 
+    void setMaskSize(const int size);
+    const QBitArray &getMask();
+
     static bool sortAscendingStartPos(const PositionData* f1, const PositionData* f2)
     {
         return(f1->getPos() < f2->getPos());
@@ -138,6 +142,7 @@ private:
     QVector<PositionData*> positions;
     QMap<int, QString*> linkMap;
     QMap<int, QString*> linkMapHidden;
+    QBitArray mask;
     QString originalText;
     bool hidden;
     bool formatted;

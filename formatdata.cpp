@@ -190,6 +190,16 @@ void FormatData::sortAscendingPos()
     std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
 }
 
+void FormatData::setMaskSize(const int size)
+{
+    mask.resize(size);
+}
+
+const QBitArray& FormatData::getMask()
+{
+    return mask;
+}
+
 QString FormatData::getOriginalText() const
 {
     return originalText;
