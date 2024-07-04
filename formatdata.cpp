@@ -66,36 +66,43 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol,
         formats.append(new FragmentData(start,end,FragmentData::HEADING1));
         addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING1);
         positions.append(new PositionData(0,symbol));
+        mask.setBit(0,true);
         return;
     }else if(symbol == HEADING2_SYMBOL){
         formats.append(new FragmentData(start,end,FragmentData::HEADING2));
         addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING2);
         positions.append(new PositionData(0,symbol));
+        mask.setBit(0,true);
         return;
     }else if(symbol == HEADING3_SYMBOL){
         formats.append(new FragmentData(start,end,FragmentData::HEADING3));
         addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING3);
         positions.append(new PositionData(0,symbol));
+        mask.setBit(0,true);
         return;
     }else if (symbol == CHECKED_SYMBOL_END){
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,CHECKED_SYMBOL_END));
         addHiddenFormat(start, end, 3, FragmentData::CHECKED_END);
+        addMaskBit(start,CHECK_SYMBOL_START,end,CHECKED_SYMBOL_END);
         return;
     }else if (symbol == UNCHECKED_SYMBOL_END){
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,UNCHECKED_SYMBOL_END));
         addHiddenFormat(start, end, 3, FragmentData::UNCHECKED_END);
+        addMaskBit(start,CHECK_SYMBOL_START,end,UNCHECKED_SYMBOL_END);
         return;
     }else if (symbol == LINK_SYMBOL_TITLE_END){
         positions.append(new PositionData(start,LINK_SYMBOL_TITLE_START));
         positions.append(new PositionData(end, LINK_SYMBOL_TITLE_END));
         addHiddenFormat(start, end, symbol.length(), FragmentData::LINK_TITLE, linkText);
+        addMaskBit(start,LINK_SYMBOL_TITLE_START,end,LINK_SYMBOL_TITLE_END);
         return;
     }else if (symbol == LINK_SYMBOL_URL_END){
         positions.append(new PositionData(start,LINK_SYMBOL_URL_START));
         positions.append(new PositionData(end,LINK_SYMBOL_URL_END));
         addHiddenFormat(start, end, symbol.length(), FragmentData::LINK_URL, linkText);
+        addMaskBitForLinkContent(start,end,LINK_SYMBOL_URL_END);
         return;
     }
     else if(symbol == BOLD_SYMBOL_A || symbol == BOLD_SYMBOL_U){
@@ -110,6 +117,7 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol,
     formats.append(new FragmentData(start,end,status));
     positions.append(new PositionData(start,symbol));
     positions.append(new PositionData(end,symbol));
+    addMaskBit(start,symbol,end,symbol);
 
     addHiddenFormat(start, end, symbol.length(), status);
 }
