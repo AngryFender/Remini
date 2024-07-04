@@ -315,6 +315,8 @@ void MkTextDocument::identifyFormatData(QTextBlock &block)
     QString textLink = text;
     QString test;
 
+    formatData->setMaskSize(block.text().size());
+
     int index1 = 0; insertHeadingData(text, index1, formatData);
     int index2 = index1+1;
     int index3 = index2+1;
