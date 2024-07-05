@@ -147,6 +147,8 @@ private:
     bool hidden;
     bool formatted;
     void addHiddenFormat(const int start,const int end, const int length,const FragmentData::FormatSymbol status, QString*linkText = nullptr);
+    void addMaskBit(const int start, const QString &startSymbol, const int end, const QString &endSymbol);
+    void addMaskBitForLinkContent(const int start, const int end, const QString &endSymbol);
 };
 
 #endif // FORMATDATA_H
