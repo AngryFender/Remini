@@ -282,3 +282,26 @@ void FragmentData::setStatus(FormatSymbol status)
     this->status = status;
 }
 
+void FormatData::addMaskBit(const int start,const QString &startSymbol,const int end,const QString &endSymbol)
+{
+    int startLen = startSymbol.length();
+    int endLen = startSymbol.length();
+
+    for(int i = start; i < (startLen+start); ++i){
+        mask.setBit(i,true);
+    }
+
+    for(int j = end; j < (endLen+end); ++j){
+        mask.setBit(j,true);
+    }
+}
+
+void FormatData::addMaskBitForLinkContent(const int start, const int end, const QString &endSymbol)
+{
+    int endLen = endSymbol.length();
+
+    for(int i = start; i < (endLen+end); ++i){
+        mask.setBit(i,true);
+    }
+}
+
