@@ -1173,10 +1173,32 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
                 formatData->setHidden(false);
                 resetTextBlockFormat(block);
 
-                showAllFormatSymbolsInTextBlock(block, formatData, range);
-                for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
-                {
-                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
+                bool isPosInBlockAtMax = (range->currentposInBlock == (block.length()-1))? true: false;
+
+                removeCheckBoxLinkMousePosition(block,formatData,range);
+
+                //insert block from raw document
+                QTextCursor cursor(this);
+                cursor.beginEditBlock();
+                cursor.setPosition(block.position());
+                cursor.movePosition(QTextCursor::StartOfBlock);
+                cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+                QString line = rawDocument.findBlockByNumber(block.blockNumber()).text();
+                cursor.insertText(line);
+                cursor.endEditBlock();
+
+                identifyFormatData(block);
+
+                FormatData * newData = dynamic_cast<FormatData*>(block.userData());
+                if(newData){
+                    for(QVector<FragmentData*>::Iterator it = newData->formats_begin(); it < newData->formats_end(); it++)
+                    {
+                        applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
+                    }
+
+                    range->isCursorCaculated = true;
+                    range->currentBlockNo = block.blockNumber();
+                    range->currentposInBlock = (isPosInBlockAtMax)? block.length()-1: newData->getCalculatedCursorPos(range->currentposInBlock);
                 }
             }
         }
