@@ -84,13 +84,13 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol,
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,CHECKED_SYMBOL_END));
         addHiddenFormat(start, end, 3, FragmentData::CHECKED_END);
-        addMaskBit(start,CHECK_SYMBOL_START,end,CHECKED_SYMBOL_END);
+        addMaskBit(start,CHECK_SYMBOL_START,end-1,CHECKED_SYMBOL_END);
         return;
     }else if (symbol == UNCHECKED_SYMBOL_END){
         positions.append(new PositionData(start,CHECK_SYMBOL_START));
         positions.append(new PositionData(end,UNCHECKED_SYMBOL_END));
         addHiddenFormat(start, end, 3, FragmentData::UNCHECKED_END);
-        addMaskBit(start,CHECK_SYMBOL_START,end,UNCHECKED_SYMBOL_END);
+        addMaskBit(start,CHECK_SYMBOL_START,end-1,UNCHECKED_SYMBOL_END);
         return;
     }else if (symbol == LINK_SYMBOL_TITLE_END){
         positions.append(new PositionData(start,LINK_SYMBOL_TITLE_START));
