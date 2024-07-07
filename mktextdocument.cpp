@@ -742,6 +742,24 @@ void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatDa
     }
 }
 
+void MkTextDocument::removeCheckBoxLinkMousePosition(QTextBlock &block, FormatData *formatData, SelectRange *range)
+{
+    QString textBlock = block.text();
+    const int blockNo = block.blockNumber();
+    QPair<int,int> checkPos;
+    int index = 0;
+    for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
+        if(*cp == u'☑' || *cp == u'☐'){
+            checkPos.first = blockNo; checkPos.second = index;
+            checkMarkPositions.removeAll(checkPos);
+        }
+
+        auto newEnd = std::remove_if(linkPositions.begin(), linkPositions.end(),[blockNo,index](const std::tuple<int,int,int> &linkPos){ return (std::get<0>(linkPos) == blockNo && std::get<1>(linkPos)== index);});
+        linkPositions.erase(newEnd, linkPositions.end());
+        index++;
+    }
+}
+
 void MkTextDocument::showSymbolsAtPos(QString &text, int pos, const QString &symbol)
 {
     if(symbol == CHECKED_SYMBOL_END ||symbol == UNCHECKED_SYMBOL_END){
