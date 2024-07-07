@@ -218,6 +218,29 @@ void FormatData::setOriginalText(const QString &originalText)
     this->originalText = originalText;
 }
 
+int FormatData::getCalculatedCursorPos(const int posInBlock)
+{
+    if(posInBlock>=mask.count()){
+        return posInBlock;
+    }
+
+    int addedCharacters(0);
+    int dynamicPosInBock = posInBlock;
+    for(int i = 0; i <= (dynamicPosInBock); ++i){
+
+        if(dynamicPosInBock >= mask.count()){
+            break;
+        }
+
+        if(mask[i]){
+            addedCharacters++;
+            dynamicPosInBock++;
+        }
+
+    }
+    return posInBlock+addedCharacters;
+}
+
 void FormatData::addHiddenFormat(const int start, const int end, const int length, const FragmentData::FormatSymbol status, QString*linkText )
 {
     int accumulate = 0;

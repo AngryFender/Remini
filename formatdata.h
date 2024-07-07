@@ -136,6 +136,7 @@ public:
     QString getOriginalText() const;
     void setOriginalText(const QString &newOriginalText);
 
+    int getCalculatedCursorPos(const int posInBlock);
 private:
     QVector<FragmentData*> formats;
     QVector<FragmentData*> hiddenFormats;
