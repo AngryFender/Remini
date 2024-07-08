@@ -29,7 +29,7 @@ class FormatCollection{
 public:
     FormatCollection(int fontSize){
 
-        linkColor.setRgb(51,102,204);
+        linkColor.setRgb(50,118,254);
 
         bold.setFontWeight(QFont::ExtraBold);
         italic.setFontItalic(true);
