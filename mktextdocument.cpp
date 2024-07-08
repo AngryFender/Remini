@@ -1178,14 +1178,11 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
                 removeCheckBoxLinkMousePosition(block,formatData,range);
 
                 //insert block from raw document
-                QTextCursor cursor(this);
-                cursor.beginEditBlock();
-                cursor.setPosition(block.position());
+                QTextCursor cursor(block);
                 cursor.movePosition(QTextCursor::StartOfBlock);
                 cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
                 QString line = rawDocument.findBlockByNumber(block.blockNumber()).text();
                 cursor.insertText(line);
-                cursor.endEditBlock();
 
                 identifyFormatData(block);
 
