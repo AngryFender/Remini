@@ -742,12 +742,25 @@ void MkEdit::insertFromMimeData(const QMimeData *source)
             QTextEdit::insertFromMimeData(source);
         }
     }
+    //save the update cursor position
+    this->selectRange.currentBlockNo = textCursor().blockNumber();
+    this->selectRange.currentposInBlock = textCursor().positionInBlock();
 
     emit saveRawDocument();
     postUndoSetup();
     emit fileSaveRaw();
     emit applyAllMkData(this->textCursor().blockNumber());
 
+    //restore the saved cursor position
+    cursor = this->textCursor();
+    int newPosition = this->document()->findBlockByNumber(this->selectRange.currentBlockNo).position() + this->selectRange.currentposInBlock;
+    newPosition = (newPosition < 0) ? 0: newPosition;
+    if(newPosition < 0 ||newPosition<this->document()->characterCount() ){
+        cursor.setPosition(newPosition);
+        this->setTextCursor(cursor);
+    }
+
+    //ensure the cursor is always visible
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
     if(!isTextCursorVisible()){
         this->ensureCursorVisible();
