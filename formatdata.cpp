@@ -171,6 +171,11 @@ const QString *FormatData::getHiddenLinkUrl(int key) const
     return linkMapHidden.value(key);
 }
 
+const QString *FormatData::getLinkUrlFromTitleStart(int key) const
+{
+    return linkUrlMap.value(key);
+}
+
 void FormatData::insertLinkText(int key, QString *linkText)
 {
     linkMap.insert(key, linkText);
