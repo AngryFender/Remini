@@ -246,6 +246,24 @@ int FormatData::getCalculatedCursorPos(const int posInBlock)
     return posInBlock+addedCharacters;
 }
 
+void FormatData::addHiddenFormat(const int start, const int end, const FragmentData::FormatSymbol &status,const QString &linkText)
+{
+    int begin(0), last(0), hiddenBits(0);
+    for(int x = 0; x <= start; ++x){
+        hiddenBits = (mask[x])? hiddenBits+1: hiddenBits;
+    }
+
+    begin = start - hiddenBits;
+    last  = end - hiddenBits;
+    qDebug()<<"start"<<start<<"end"<<end<<"hiddenBit"<<hiddenBits<<"begin"<<begin<<"last"<<last;
+
+    if(!linkText.isEmpty() && status == FragmentData::LINK_TITLE){
+        linkMapHidden.insert(begin, new QString(linkText));
+    }
+
+    hiddenFormats.append(new FragmentData(begin,last,status));
+}
+
 void FormatData::addHiddenFormat(const int start, const int end, const int length, const FragmentData::FormatSymbol status, QString*linkText )
 {
     int accumulate = 0;
