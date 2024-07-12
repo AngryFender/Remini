@@ -216,6 +216,7 @@ signals:
     void setCodeBlockMargin(QTextBlock &block, int leftMargin=0,int rightMargin =0, int topMargin = 0);
     void resetTextBlockFormat(QTextBlock block);
     void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status,FormatCollection &formatCollection);
+    void applyCheckBoxLinkEffect(FormatData *data, QTextBlock &block, QTextCursor &cursor);
     void applyCheckBoxLinkEffect(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
     void hideSymbols(QTextBlock &block,const QString &symbol);
     void hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);

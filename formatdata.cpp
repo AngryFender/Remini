@@ -64,67 +64,65 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol,
     FragmentData::FormatSymbol status = FragmentData::BOLD ;
     if(symbol == HEADING1_SYMBOL){
         formats.append(new FragmentData(start,end,FragmentData::HEADING1));
-        addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING1);
-        positions.append(new PositionData(0,symbol));
         mask.setBit(0,true);
+        mask.setBit(1,true);
         return;
     }else if(symbol == HEADING2_SYMBOL){
         formats.append(new FragmentData(start,end,FragmentData::HEADING2));
-        addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING2);
-        positions.append(new PositionData(0,symbol));
         mask.setBit(0,true);
+        mask.setBit(1,true);
+        mask.setBit(2,true);
         return;
     }else if(symbol == HEADING3_SYMBOL){
         formats.append(new FragmentData(start,end,FragmentData::HEADING3));
-        addHiddenFormat(start, end, symbol.length(), FragmentData::HEADING3);
-        positions.append(new PositionData(0,symbol));
         mask.setBit(0,true);
+        mask.setBit(1,true);
+        mask.setBit(2,true);
+        mask.setBit(3,true);
         return;
     }else if (symbol == CHECKED_SYMBOL_END){
-        positions.append(new PositionData(start,CHECK_SYMBOL_START));
-        positions.append(new PositionData(end,CHECKED_SYMBOL_END));
-        addHiddenFormat(start, end, 3, FragmentData::CHECKED_END);
-        addMaskBit(start,CHECK_SYMBOL_START,end-1,CHECKED_SYMBOL_END);
+        formats.append(new FragmentData(start,end,FragmentData::CHECKED_END));
+        for(int x = start; x < end; ++x){
+            mask.setBit(x,true);
+        }
         return;
     }else if (symbol == UNCHECKED_SYMBOL_END){
-        positions.append(new PositionData(start,CHECK_SYMBOL_START));
-        positions.append(new PositionData(end,UNCHECKED_SYMBOL_END));
-        addHiddenFormat(start, end, 3, FragmentData::UNCHECKED_END);
-        addMaskBit(start,CHECK_SYMBOL_START,end-1,UNCHECKED_SYMBOL_END);
+        formats.append(new FragmentData(start,end,FragmentData::UNCHECKED_END));
+        for(int x = start; x < end; ++x){
+            mask.setBit(x,true);
+        }
         return;
     }else if (symbol == LINK_SYMBOL_TITLE_END){
-        positions.append(new PositionData(start,LINK_SYMBOL_TITLE_START));
-        positions.append(new PositionData(end, LINK_SYMBOL_TITLE_END));
-        addHiddenFormat(start, end, symbol.length(), FragmentData::LINK_TITLE, linkText);
+        formats.append(new FragmentData(start+1,end,FragmentData::LINK_TITLE));
         addMaskBit(start,LINK_SYMBOL_TITLE_START,end,LINK_SYMBOL_TITLE_END);
+        if(linkText){
+            linkUrlMap.insert(start+1, new QString(*linkText));
+        }
         return;
     }else if (symbol == LINK_SYMBOL_URL_END){
-        positions.append(new PositionData(start,LINK_SYMBOL_URL_START));
-        positions.append(new PositionData(end,LINK_SYMBOL_URL_END));
-        addHiddenFormat(start, end, symbol.length(), FragmentData::LINK_URL, linkText);
-        addMaskBitForLinkContent(start,end,LINK_SYMBOL_URL_END);
+        for(int x = start; x < (end + symbol.length()); ++x){
+            mask.setBit(x,true);
+        }
         return;
     }
     else if(symbol == BOLD_SYMBOL_A || symbol == BOLD_SYMBOL_U){
         status = FragmentData::BOLD;
+        formats.append(new FragmentData(start+2,end,status));
     }else if(symbol == ITALIC_SYMBOL_A || symbol == ITALIC_SYMBOL_U){
         status = FragmentData::ITALIC;
+        formats.append(new FragmentData(start+1,end,status));
     }else if (symbol == STRIKETHROUGH_SYMBOL){
         status = FragmentData::STRIKETHROUGH;
+        formats.append(new FragmentData(start+2,end,status));
     }else if (symbol == CHECK_SYMBOL_START){
         return;
     }
-    formats.append(new FragmentData(start,end,status));
-    positions.append(new PositionData(start,symbol));
-    positions.append(new PositionData(end,symbol));
     addMaskBit(start,symbol,end,symbol);
-
-    addHiddenFormat(start, end, symbol.length(), status);
 }
 
 bool FormatData::isEmpty() const
 {
-    return positions.empty();
+    return formats.empty();
 }
 
 bool FormatData::isHidden() const

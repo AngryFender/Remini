@@ -382,8 +382,18 @@ void MkTextDocument::identifyFormatData(QTextBlock &block)
     }
 
     if(!formatData->isEmpty()){
+        for(auto it = formatData->formats_begin(); it != formatData->formats_end(); ++it){
+            if((*it)->getStatus() == FragmentData::LINK_TITLE){
+                const QString *linkText = formatData->getLinkUrlFromTitleStart((*it)->getStart());
+                if(linkText){
+                    formatData->addHiddenFormat((*it)->getStart(),(*it)->getEnd(), FragmentData::LINK_TITLE,*linkText);
+                }
+            }else if((*it)->getStatus() == FragmentData::CHECKED_END ||
+                       (*it)->getStatus() == FragmentData::UNCHECKED_END){
+                formatData->addHiddenFormat((*it)->getEnd(),(*it)->getEnd()+1,(*it)->getStatus(),NULL);
+            }
+        }
         block.setUserData(formatData);
-        formatData->sortAscendingPos();
     }
 }
 
@@ -416,8 +426,8 @@ void MkTextDocument::insertFormatData(FormatLocation &loc, int &index1, int &ind
 
 void MkTextDocument::insertFormatCheckBoxData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test)
 {
-    loc.end = index1;
-    if(loc.end-loc.start==3){
+    loc.end = index3;
+    if(loc.end-loc.start==5){
         formatData->addFormat(loc.start, loc.end, test);
         loc.reset();
     }
@@ -594,6 +604,39 @@ void MkTextDocument::applyMkFormat(QTextBlock &block, int start, int end, Fragme
     cursor.setPosition(startPoint);
     cursor.setPosition(endPoint, QTextCursor::KeepAnchor);
     cursor.mergeCharFormat(*format);
+}
+
+void MkTextDocument::applyCheckBoxLinkEffect(FormatData *data, QTextBlock &block, QTextCursor &cursor)
+{
+    for(QVector<FragmentData*>::Iterator it = data->hiddenFormats_begin(); it < data->hiddenFormats_end(); it++)
+    {
+        if((*it)->getStatus() == FragmentData::CHECKED_END ||
+            (*it)->getStatus() == FragmentData::UNCHECKED_END) {
+
+            // Add check mark position for mouse to hover and click
+            const QPair<int,int> checkPos(block.blockNumber(), (*it)->getStart());
+            if(!checkMarkPositions.contains(checkPos)){
+                checkMarkPositions.append(checkPos);
+            }
+
+            // Insert the unicode character for checked box or unchecked box
+            cursor.setPosition(block.position() + (*it)->getStart());
+            cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
+
+            if((*it)->getStatus() == FragmentData::CHECKED_END){
+                cursor.insertText(CHECKED_PIC);
+            }else{
+                cursor.insertText(UNCHECKED_PIC);
+            }
+
+        }else if((*it)->getStatus() == FragmentData::LINK_TITLE){
+            // Add link position for mouse to hover and click
+            const std::tuple<int,int,int> linkPos(block.blockNumber(), (*it)->getStart(),(*it)->getEnd());
+            if(!linkPositions.contains(linkPos)){
+                linkPositions.append(linkPos);
+            }
+        }
+    }
 }
 
 void MkTextDocument::applyCheckBoxLinkEffect(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status)
@@ -1057,7 +1100,6 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
     FormatCollection formatCollection(fontSize);
 
     QSet<int> hiddenBlocks;
-    QSet<int> checkBoxLinkBlocks;
     QTextBlock block;
     foreach (int num, range->hideBlocks) {
         if(range->showBlocks.find(num) == range->showBlocks.end()){
@@ -1095,29 +1137,30 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
 
             FormatData* formatData = dynamic_cast<FormatData*>(data);
             if(formatData && !formatData->isHidden()){
-                resetTextBlockFormat(block);
+                //resetTextBlockFormat(block);
                 formatData->setHidden(true);
-                hideAllFormatSymbolsInTextBlock(block,formatData);
 
-                for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
+                for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
                 {
                     applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
-                    if((*it)->getStatus() == FragmentData::CHECKED_END || (*it)->getStatus() == FragmentData::UNCHECKED_END ||  (*it)->getStatus() == FragmentData::LINK_TITLE){
-                        checkBoxLinkBlocks.insert(num);
+                }
+
+                const QBitArray &mask(formatData->getMask());
+                if(block.text().size() != mask.size())
+                    continue;
+
+                QTextCursor cursor(block);
+                cursor.movePosition(QTextCursor::EndOfBlock);
+                for(int index = mask.size()-1; index >= 0; --index){
+                    if(mask[index]){
+                        cursor.deletePreviousChar();
+                    }else{
+                        cursor.movePosition(QTextCursor::PreviousCharacter);
                     }
                 }
-            }
-        }
-    }
 
-    foreach(int num,checkBoxLinkBlocks){
-        block = this->findBlockByNumber(num);
-        QTextBlockUserData *data = block.userData();
-        FormatData* formatData = dynamic_cast<FormatData*>(data);
-
-        for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
-        {
-            applyCheckBoxLinkEffect(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus());
+                applyCheckBoxLinkEffect(formatData, block, cursor);
+           }
         }
     }
 
@@ -1248,10 +1291,6 @@ void MkTextDocument::showHideCodeBlock(BlockData *data, bool hide, int fontSize)
 
 void MkTextDocument::pushCheckBoxHandle(const int position)
 {
-    QTextCursor cursor(this);
-    cursor.setPosition(position);
-    cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
-
     QTextBlock block = findBlock(position);
     int blockNo = block.blockNumber();
     QTextBlockUserData* data =block.userData();
@@ -1260,56 +1299,56 @@ void MkTextDocument::pushCheckBoxHandle(const int position)
     if(!formatData)
         return;
 
-    int linePosition = position - block.position();
+    // Calcutate the raw position of Check box in the block
+    int renderedPosInBlock = position - block.position();
+    int rawPosInBlock = renderedPosInBlock;
+    const QBitArray &mask = formatData->getMask();
+    for(int x = 0; x <= rawPosInBlock; ++x){
+        if(mask[x]){
+            ++rawPosInBlock;
+        }
+    }
 
-    int index1 = 0;
+    // replace the checked and unchecked symbols in the raw text
+    // replace the checked and unchecked unicode in the rendered text
+    int startOfCheckBoxInBlock = rawPosInBlock - 5;
+    QString rawText = this->rawDocument.findBlockByNumber(blockNo).text();
+    QTextCursor cursor(this);
+    cursor.setPosition(position);
+    cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
+
     for(QVector<FragmentData*>::Iterator it = formatData->hiddenFormats_begin(); it < formatData->hiddenFormats_end(); it++)
     {
         if((*it)->getStatus() == FragmentData::CHECKED_END){
-                if((*it)->getStart() == linePosition){
-                    (*it)->setStatus(FragmentData::UNCHECKED_END);
-                    cursor.insertText(UNCHECKED_PIC);
-                    break;
+            if((*it)->getStart() == renderedPosInBlock){
+                int replaceStartPos = rawText.indexOf("- [x]",startOfCheckBoxInBlock);
+                if(replaceStartPos != -1){
+                    rawText.replace(replaceStartPos, 5, "- [ ]");
                 }
-                index1++;
+                (*it)->setStatus(FragmentData::UNCHECKED_END);
+                cursor.insertText(UNCHECKED_PIC);
+                break;
+            }
         }else if((*it)->getStatus() == FragmentData::UNCHECKED_END){
-
-                if((*it)->getStart() == linePosition){
-                    (*it)->setStatus(FragmentData::CHECKED_END);
-                    cursor.insertText(CHECKED_PIC);
-                    break;
+            if((*it)->getStart() == renderedPosInBlock){
+                int replaceStartPos = rawText.indexOf("- [ ]",startOfCheckBoxInBlock);
+                if(replaceStartPos != -1){
+                    rawText.replace(replaceStartPos, 5, "- [x]");
                 }
-                index1++;
+
+                (*it)->setStatus(FragmentData::CHECKED_END);
+                cursor.insertText(CHECKED_PIC);
+                break;
+            }
         }
     }
 
-    int index2 = 0;
-
-    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it != formatData->pos_end(); ++it)
-    {
-        if((*it)->getSymbol()== CHECKED_SYMBOL_END){
-                if(index2 == index1){
-                    (*it)->setSymbol(UNCHECKED_SYMBOL_END);
-                }
-                index2++;
-        }else if((*it)->getSymbol()== UNCHECKED_SYMBOL_END){
-                if(index2 == index1){
-                    (*it)->setSymbol(CHECKED_SYMBOL_END);
-                }
-                index2++;
-        }
-    }
-
-    //update the pushing checking actions on the raw document as well
-    QTextBlock rawBlock(block);
-    QString rawString;
-    extractSymbolsInBlock(rawBlock, rawString);
-
+    // Update the raw document as well
     QTextCursor cursorRaw(&rawDocument);
     cursorRaw.setPosition(rawDocument.findBlockByLineNumber(blockNo).position());
     cursorRaw.movePosition(QTextCursor::StartOfBlock);
     cursorRaw.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-    cursorRaw.insertText(rawString);
+    cursorRaw.insertText(rawText);
 }
 
 void MkTextDocument::pushLinkHandle(const int blockNo, const int posInBlock)
