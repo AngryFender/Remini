@@ -52,11 +52,6 @@ FormatData::~FormatData()
 
     qDeleteAll(linkMapHidden);
     linkMapHidden.clear();
-
-    for(auto pos:positions){
-        delete pos;
-    }
-    positions.clear();
 }
 
 void FormatData::addFormat(const int start, const int end,const QString &symbol, QString* linkText)
@@ -145,10 +140,6 @@ void FormatData::setFormatted(bool state)
     this->formatted = state;
 }
 
-int FormatData::positionsCount() const{
-    return positions.count();
-}
-
 int FormatData::getFormatCounts() const
 {
     return formats.count();
@@ -177,28 +168,6 @@ const QString *FormatData::getLinkUrlFromTitleStart(int key) const
 void FormatData::insertLinkText(int key, QString *linkText)
 {
     linkMap.insert(key, linkText);
-}
-
-void FormatData::clearAllLinkMapt()
-{
-    qDeleteAll(linkMap);
-    linkMap.clear();
-}
-
-void FormatData::clearAllLinkMapHidden()
-{
-    qDeleteAll(linkMapHidden);
-    linkMapHidden.clear();
-}
-
-void FormatData::clearElementLinkMapHidden(int key)
-{
-    linkMapHidden.remove(key);
-}
-
-void FormatData::sortAscendingPos()
-{
-    std::sort(positions.begin(), positions.end(),sortAscendingStartPos);
 }
 
 void FormatData::setMaskSize(const int size)
@@ -253,52 +222,12 @@ void FormatData::addHiddenFormat(const int start, const int end, const FragmentD
 
     begin = start - hiddenBits;
     last  = end - hiddenBits;
-    qDebug()<<"start"<<start<<"end"<<end<<"hiddenBit"<<hiddenBits<<"begin"<<begin<<"last"<<last;
 
     if(!linkText.isEmpty() && status == FragmentData::LINK_TITLE){
         linkMapHidden.insert(begin, new QString(linkText));
     }
 
     hiddenFormats.append(new FragmentData(begin,last,status));
-}
-
-void FormatData::addHiddenFormat(const int start, const int end, const int length, const FragmentData::FormatSymbol status, QString*linkText )
-{
-    int accumulate = 0;
-    if(!hiddenFormats.empty()){
-        accumulate = hiddenFormats.last()->getAccumulate();
-    }
-
-    int begin = start-accumulate;
-    begin =(begin<0)? start-length: begin;
-    int last = end-accumulate-length;
-
-    if(linkText && status == FragmentData::LINK_URL){
-        linkMap.insert(start,new QString(*linkText));
-        accumulate+=(linkText->length());
-    }
-
-    if(status == FragmentData::CHECKED_END ||status == FragmentData::UNCHECKED_END){
-        accumulate += CHECKED_FULL_COUNT;
-    }else if(status == FragmentData::HEADING1){
-        accumulate += HEADING1_SYMBOL_COUNT;
-        begin = last = 0;
-    }else if(status == FragmentData::HEADING2){
-        accumulate += HEADING2_SYMBOL_COUNT;
-        begin = last = 0;
-    }else if(status == FragmentData::HEADING3){
-        accumulate += HEADING3_SYMBOL_COUNT;
-        begin = last = 0;
-    }
-    else{
-        accumulate = accumulate+2*length;
-    }
-
-    if(linkText && status == FragmentData::LINK_TITLE){
-        linkMapHidden.insert(begin, new QString(*linkText));
-    }
-
-    hiddenFormats.append(new FragmentData(begin,last,status,accumulate));
 }
 
 int FragmentData::getStart() const
@@ -314,11 +243,6 @@ int FragmentData::getEnd() const
 FragmentData::FormatSymbol FragmentData::getStatus() const
 {
     return status;
-}
-
-int FragmentData::getAccumulate() const
-{
-    return accumulate;
 }
 
 void FragmentData::setStatus(FormatSymbol status)

@@ -50,23 +50,13 @@ public:
         this->end = end;
         this->status = status;
     }
-    FragmentData(const int start,const int end,const FormatSymbol status,const int accumulate){
-        this->start = start;
-        this->end = end;
-        this->status = status;
-        this->accumulate = accumulate;
-    }
-
     int getStart() const;
     int getEnd() const;
     FormatSymbol getStatus() const;
-    int getAccumulate() const;
-
     void setStatus(FormatSymbol status);
 private:
     int start;
     int end;
-    int accumulate;
     FormatSymbol status;
 };
 
@@ -104,13 +94,9 @@ public:
     QVector<FragmentData*>::Iterator hiddenFormats_begin() {return hiddenFormats.begin();};
     QVector<FragmentData*>::Iterator hiddenFormats_end() {return hiddenFormats.end();};
 
-    QVector<PositionData*>::Iterator pos_begin() {return positions.begin();};
-    QVector<PositionData*>::Iterator pos_end() {return positions.end();};
-
     bool isEmpty() const;
     bool isHidden() const;
     bool isFormatted() const;
-    int positionsCount() const;
     int getFormatCounts() const;
     int hiddenFormatsCount() const;
     const QString &getLinkUrl(int key) const;
@@ -119,21 +105,11 @@ public:
 
     void insertLinkText(int key, QString * linkText);
 
-    void clearAllLinkMapt();
-    void clearAllLinkMapHidden();
-    void clearElementLinkMapHidden(int key);
-
     void setHidden(bool hide);
     void setFormatted(bool state);
-    void sortAscendingPos();
 
     void setMaskSize(const int size);
     const QBitArray &getMask();
-
-    static bool sortAscendingStartPos(const PositionData* f1, const PositionData* f2)
-    {
-        return(f1->getPos() < f2->getPos());
-    }
 
     QString getOriginalText() const;
     void setOriginalText(const QString &newOriginalText);
@@ -142,7 +118,6 @@ public:
 private:
     QVector<FragmentData*> formats;
     QVector<FragmentData*> hiddenFormats;
-    QVector<PositionData*> positions;
     QMap<int, QString*> linkMap;
     QMap<int, QString*> linkMapHidden;
     QMap<int, QString*> linkUrlMap;
@@ -150,7 +125,6 @@ private:
     QString originalText;
     bool hidden;
     bool formatted;
-    void addHiddenFormat(const int start,const int end, const int length,const FragmentData::FormatSymbol status, QString*linkText = nullptr);
     void addMaskBit(const int start, const QString &startSymbol, const int end, const QString &endSymbol);
     void addMaskBitForLinkContent(const int start, const int end, const QString &endSymbol);
 };
