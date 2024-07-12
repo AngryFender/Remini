@@ -666,38 +666,6 @@ void MkTextDocument::hideSymbols(QTextBlock &block,const QString &symbol)
     editCursor.insertText(textBlock);
 }
 
-void MkTextDocument::hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData)
-{
-    QString textBlock = block.text();
-    bool isLink = false;
-    int linkEnd = 0, linkStart = 0;
-
-    const QString *symbol;
-    int symbolPos = -1;
-    for(QVector<PositionData*>::Iterator it = formatData->pos_end()-1; it >= formatData->pos_begin(); it--)
-    {
-        symbol = &(*it)->getSymbol();
-        symbolPos = (*it)->getPos();
-        hideSymbolsAtPos(textBlock, symbolPos, *symbol);
-
-        if(*symbol == LINK_SYMBOL_URL_END){
-            isLink = true;
-            linkEnd = symbolPos-2;
-        }
-
-        if(*symbol == LINK_SYMBOL_URL_START || isLink){
-            linkStart = symbolPos;
-            textBlock.remove(linkStart, linkEnd-linkStart);
-            isLink = false;
-        }
-    }
-
-    QTextCursor cursor(block);
-    cursor.movePosition(QTextCursor::StartOfBlock);
-    cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
-    cursor.insertText(textBlock);
-}
-
 void MkTextDocument::hideSymbolsAtPos(QString &text, int pos, const QString &symbol)
 {
     text.remove(pos,symbol.length());
@@ -726,65 +694,6 @@ void MkTextDocument::showSymbols(QTextBlock &block, const QString &symbol)
 
 }
 
-void MkTextDocument::showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * range)
-{
-    QString textBlock = block.text();
-    const int blockNo = block.blockNumber();
-    QPair<int,int> checkPos;
-    int index = 0;
-    for(QString::Iterator cp = textBlock.begin(); cp != textBlock.end(); cp++){
-        if(*cp == u'☑' || *cp == u'☐'){
-            checkPos.first = blockNo; checkPos.second = index;
-            checkMarkPositions.removeAll(checkPos);
-            if(range){
-                if(index < range->currentposInBlock){
-                    range->currentposInBlock--;
-                }
-            }
-        }
-
-        auto newEnd = std::remove_if(linkPositions.begin(), linkPositions.end(),[blockNo,index](const std::tuple<int,int,int> &linkPos){ return (std::get<0>(linkPos) == blockNo && std::get<1>(linkPos)== index);});
-        linkPositions.erase(newEnd, linkPositions.end());
-        index++;
-    }
-
-    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-    {
-        int cursorPos = (*it)->getPos();
-        int symbolLen = (*it)->getSymbol().length();
-
-        if(range){
-            if(cursorPos <= range->currentposInBlock){
-                range->currentposInBlock = range->currentposInBlock+symbolLen;
-            }
-        }
-
-        showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
-
-        if((*it)->getSymbol() == LINK_SYMBOL_URL_START){
-            int pos = (*it)->getPos();
-
-            if(range){
-                if(pos< range->currentposInBlock){
-                    range->currentposInBlock = range->currentposInBlock+formatData->getLinkUrl(pos).length();
-                }
-            }
-
-            textBlock.insert(pos+2,formatData->getLinkUrl(pos));
-        }
-    }
-    QTextCursor cursor(block);
-    cursor.movePosition(QTextCursor::StartOfBlock);
-    cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
-    cursor.insertText(textBlock);
-    cursor.movePosition(QTextCursor::StartOfBlock);
-
-    if((range)){
-        range->isCursorCaculated = true;
-        range->currentBlockNo = block.blockNumber();
-    }
-}
-
 void MkTextDocument::removeCheckBoxLinkMousePosition(QTextBlock &block, FormatData *formatData, SelectRange *range)
 {
     QString textBlock = block.text();
@@ -809,49 +718,6 @@ void MkTextDocument::showSymbolsAtPos(QString &text, int pos, const QString &sym
         text.remove(pos,1);
     }
     text.insert(pos,symbol);
-}
-
-void MkTextDocument::extractSymbolsInBlock(QTextBlock &block, QString &result)
-{
-    QTextBlockUserData* data =block.userData();
-    if(data == nullptr){
-        return;
-    }
-
-    BlockData* blockData = dynamic_cast<BlockData*>(data);
-    if(blockData)
-    {
-        if(blockData->getStatus()!=BlockData::content)
-        {
-            showSymbols(block, CODEBLOCK_SYMBOL);
-        }
-    }
-    else{
-        LineData* lineData = dynamic_cast<LineData*>(data);
-        if(lineData){
-            lineData->setDraw(false);
-            showSymbols(block, lineData->getSymbol());
-        }
-        FormatData* formatData = dynamic_cast<FormatData*>(data);
-        if(formatData){
-            showFormatSymbolsInTextBlock(block, formatData, result);
-        }
-    }
-}
-
-void MkTextDocument::showFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, QString &result)
-{
-    QString textBlock = block.text();
-    for(QVector<PositionData*>::Iterator it = formatData->pos_begin(); it < formatData->pos_end(); it++)
-    {
-        showSymbolsAtPos(textBlock, (*it)->getPos(), (*it)->getSymbol());
-
-        if((*it)->getSymbol() == LINK_SYMBOL_URL_START){
-            int pos = (*it)->getPos();
-            textBlock.insert(pos+2,formatData->getLinkUrl(pos));
-        }
-    }
-    result = textBlock;
 }
 
 void MkTextDocument::autoCompleteCodeBlock(int blockNumber ,bool &success)

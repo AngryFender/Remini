@@ -219,16 +219,11 @@ signals:
     void applyCheckBoxLinkEffect(FormatData *data, QTextBlock &block, QTextCursor &cursor);
     void applyCheckBoxLinkEffect(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status);
     void hideSymbols(QTextBlock &block,const QString &symbol);
-    void hideAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData);
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
     void showSymbols(QTextBlock &block,const QString &symbol);
-    void showAllFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, SelectRange * range = nullptr);
     void removeCheckBoxLinkMousePosition(QTextBlock &block, FormatData *formatData, SelectRange * range = nullptr);
     void showSymbolsAtPos(QString &text, int pos, const QString &symbol);
-
-    void extractSymbolsInBlock(QTextBlock &block, QString &result);
-    void showFormatSymbolsInTextBlock(QTextBlock &block, FormatData *formatData, QString &result);
 
     void autoCompleteCodeBlock(int blockNumber,bool &success);
     BlockData* checkValidCodeBlock(QTextBlock &block);
