@@ -2197,3 +2197,56 @@ TEST_CASE("MkEdit cursor position after pasting from clipboard", "[MkEdit]")
     cursor = edit.textCursor();
     REQUIRE(cursor.position() == initialPos);
 }
+
+TEST_CASE("MkEdit link counts", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+
+    doc.setPlainText("[google](<www.google.com>) [yahoo](<www.yahoo.com>)");
+    doc.setMarkdownHandle(true);
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::pushCheckBox,
+                     &doc,&MkTextDocument::pushCheckBoxHandle);
+
+
+    QAbstractTextDocumentLayout* layout = doc.documentLayout();
+    QTextBlock block1 = doc.findBlockByNumber(0);
+    QTextBlock block2 = doc.findBlockByNumber(1);
+
+    QRectF firstRect = layout->blockBoundingRect(block1);
+    QRectF secondRect = layout->blockBoundingRect(block2);
+    QRect combineRect(0, 0, firstRect.width() + 10, firstRect.height() + secondRect.height() + 10 );
+
+    int countLinks = 0;
+    for(auto it = doc.linkPosBegin(); it!= doc.linkPosEnd(); it++){
+        countLinks++;
+    }
+    REQUIRE(countLinks == 2);
+}
+
