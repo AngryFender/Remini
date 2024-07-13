@@ -2135,3 +2135,65 @@ TEST_CASE("MkEdit cursor position after pressing enter", "[MkEdit]")
     REQUIRE(cursor.position() == 5);
 }
 
+TEST_CASE("MkEdit cursor position after pasting from clipboard", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    doc.setPlainText("random line\nYou want my ? You can have it! I left everything I gathered together in one place. Now you just have to find it.\n\n");
+    doc.setMarkdownHandle(true);
+    int initialPos = 24;
+
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText("treasure");
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_V, Qt::ControlModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+
+    QString text = edit.toPlainText();
+    REQUIRE("random line\nYou want my treasure? You can have it! I left everything I gathered together in one place. Now you just have to find it.\n\n" == text);
+
+    int currentPositionOfTextCursorInBlock = edit.textCursor().positionInBlock();
+    REQUIRE(currentPositionOfTextCursorInBlock == 20);
+
+    QScopedPointer<QKeyEvent> undoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier));
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("random line\nYou want my ? You can have it! I left everything I gathered together in one place. Now you just have to find it.\n\n" == text);
+
+    cursor = edit.textCursor();
+    REQUIRE(cursor.position() == initialPos);
+}
