@@ -1541,6 +1541,72 @@ TEST_CASE("MkEdit create code block with ```, undo/redo", "[MkEdit]")
     REQUIRE("```\n```" == text);
 }
 
+TEST_CASE("MkEdit press backspace in the first position of the text block with text cursor position", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    doc.setPlainText("**bold**\n*italic*\n");
+    doc.setMarkdownHandle(true);
+    int initialPos = 18;
+
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+
+    cursor.setPosition(16);
+    edit.setTextCursor(cursor);
+
+    QString text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n" == text);
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress,Qt::Key_Backspace, Qt::NoModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\n*italic*" == text);
+
+    cursor = edit.textCursor();
+
+    REQUIRE(cursor.blockNumber() == 1);
+    REQUIRE(cursor.positionInBlock() == 8);
+
+    edit.keyPressEvent(keyPressEvent.data());
+    edit.keyPressEvent(keyPressEvent.data());
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\n*ital" == text);
+    REQUIRE(cursor.positionInBlock() == 5);
+}
+
 TEST_CASE("MkEdit pressing enter after creating code block with ```, undo/redo", "[MkEdit]")
 {
     MkTextDocument doc;
