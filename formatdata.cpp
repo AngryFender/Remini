@@ -1,34 +1,5 @@
 #include "formatdata.h"
 
-PositionData::PositionData(const int position, const QString &symbol){
-    this->position = position;
-    this->symbol = symbol;
-    this->hidden = false;
-}
-
-int PositionData::getPos() const{
-    return position;
-}
-
-const QString &PositionData::getSymbol() const{
-    return symbol;
-}
-
-bool PositionData::isHidden() const
-{
-    return hidden;
-}
-
-void PositionData::setHidden(const bool hide)
-{
-    this->hidden = hide;
-}
-
-void PositionData::setSymbol(const QString &symbol)
-{
-    this->symbol = symbol;
-}
-
 FormatData::FormatData()
 {
     hidden = false;

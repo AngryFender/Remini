@@ -60,23 +60,6 @@ private:
     FormatSymbol status;
 };
 
-class PositionData{
-public:
-    PositionData(const int position, const QString &symbol);
-
-    int getPos() const;
-    const QString &getSymbol() const;
-
-    bool isHidden() const;
-    void setHidden(const bool hide);
-    void setSymbol(const QString &symbol);
-
-private:
-    int position;
-    QString symbol;
-    bool hidden;
-};
-
 class FormatData : public QTextBlockUserData
 {
 public:
