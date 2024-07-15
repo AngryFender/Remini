@@ -178,7 +178,7 @@ void MkTextDocument::applyMkSingleBlockHandle(int blockNumber)
             block.setUserData(lineData);
         }
         identifyFormatData(block);
-        this->selectRange.hideBlocks.insert(blockNumber);
+        this->selectRange.hideBlocks.erase(blockNumber);
         hideMKSymbolsFromPreviousSelectedBlocks(&this->selectRange);
         this->selectRange.showBlocks.insert(blockNumber);
         showMKSymbolsFromCurrentSelectedBlocks(&this->selectRange);
@@ -1003,12 +1003,13 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
 
             FormatData* formatData = dynamic_cast<FormatData*>(data);
             if(formatData && !formatData->isHidden()){
-                //resetTextBlockFormat(block);
                 formatData->setHidden(true);
 
-                for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
-                {
-                    applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
+                if(!formatData->isFormatted()){
+                    for(QVector<FragmentData*>::Iterator it = formatData->formats_begin(); it < formatData->formats_end(); it++)
+                    {
+                        applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
+                    }
                 }
 
                 const QBitArray &mask(formatData->getMask());
@@ -1078,12 +1079,9 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
             }
 
             FormatData* formatData = dynamic_cast<FormatData*>(data);
-            if(formatData && formatData->isHidden()){
-                formatData->setHidden(false);
-                resetTextBlockFormat(block);
-
+            if(formatData){
                 bool isPosInBlockAtMax = (range->currentposInBlock == (block.length()-1))? true: false;
-
+                resetTextBlockFormat(block);
                 removeCheckBoxLinkMousePosition(block,formatData,range);
 
                 //insert block from raw document
@@ -1092,10 +1090,10 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
                 cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
                 QString line = rawDocument.findBlockByNumber(block.blockNumber()).text();
                 cursor.insertText(line);
-
                 identifyFormatData(block);
 
                 FormatData * newData = dynamic_cast<FormatData*>(block.userData());
+                newData->setFormatted(true);
                 if(newData){
                     for(QVector<FragmentData*>::Iterator it = newData->formats_begin(); it < newData->formats_end(); it++)
                     {
@@ -1267,7 +1265,6 @@ void MkTextDocument::setMarkdownHandle(bool state)
     if(disableMarkdownState){
         this->setPlainText(this->rawDocument.toPlainText());
     }else{
-        //hideMKSymbolsFromDrawingRect(-1,false,nullptr,false);
         for(int num = 0; num < this->blockCount(); num++){
             this->selectRange.hideBlocks.insert(num);
         }
