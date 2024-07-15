@@ -101,16 +101,14 @@ void MkEdit::paintEvent(QPaintEvent *e)
             }else{
                 LineData* lineData = dynamic_cast<LineData*>(data);
                 if(lineData){
-                    if(lineData->getStatus() == LineData::horizontalLine && lineData->getDraw()){
-                        int lineX1 = this->x();
-                        int lineY1 = block.layout()->position().y()+fontSize-scrollPos;
-                        int lineX2 = this->x()+widthCodeBlock;
+                    int lineX1 = this->x();
+                    int lineY1 = block.layout()->position().y()+fontSize-scrollPos;
+                    int lineX2 = this->x()+widthCodeBlock;
 
-                        painter.save();
-                        painter.setPen(whitePen);
-                        painter.drawLine(lineX1,lineY1,lineX2,lineY1);
-                        painter.restore();
-                    }
+                    painter.save();
+                    painter.setPen(whitePen);
+                    painter.drawLine(lineX1,lineY1,lineX2,lineY1);
+                    painter.restore();
                 }
             }
         }
@@ -673,7 +671,7 @@ void MkEdit::blockColor(const QColor &color)
 
         whitePen.setColor(Qt::gray);
         whitePen.setCapStyle(Qt::RoundCap);
-        whitePen.setWidth(2);
+        whitePen.setWidth(1);
 
         update();
     }
