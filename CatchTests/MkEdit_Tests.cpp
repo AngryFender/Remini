@@ -673,6 +673,7 @@ TEST_CASE("MkEdit type inside bold format then check if the cursor is at the rig
     QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
 
     doc.setPlainText("**bold**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -686,6 +687,8 @@ TEST_CASE("MkEdit type inside bold format then check if the cursor is at the rig
 
 
     QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
     edit.keyPressEvent(keyPressEvent.data());
@@ -708,6 +711,7 @@ TEST_CASE("MkEdit undo after typing inside bold format then check if the cursor 
     QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
 
     doc.setPlainText("**bold**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -729,6 +733,8 @@ TEST_CASE("MkEdit undo after typing inside bold format then check if the cursor 
                      &doc,&MkTextDocument::undoStackRedo);
 
     QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
     edit.keyPressEvent(keyPressEvent.data());
@@ -755,6 +761,7 @@ TEST_CASE("MkEdit redo after undo after typing inside bold format then check if 
     QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Any, Qt::NoModifier, QString("p")));
 
     doc.setPlainText("**bold**");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -779,6 +786,8 @@ TEST_CASE("MkEdit redo after undo after typing inside bold format then check if 
                      &doc,&MkTextDocument::saveRawDocumentHandler);
 
     QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
     edit.keyPressEvent(keyPressEvent.data());
@@ -1151,6 +1160,7 @@ TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
     int initialPos = 4; //**bo
 
     doc.setPlainText("**bold**\n*italic*\n~~crossed~~");
+    doc.setMarkdownHandle(true);
     edit.setDocument(&doc);
 
     QObject::connect(&edit,&MkEdit::cursorPosChanged,
@@ -1175,6 +1185,8 @@ TEST_CASE("MkEdit selection check after double undo", "[MkEdit]")
                      &doc,&MkTextDocument::saveRawDocumentHandler);
 
     QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
     cursor.setPosition(initialPos);
     edit.setTextCursor(cursor);
 

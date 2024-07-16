@@ -1079,7 +1079,7 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
             }
 
             FormatData* formatData = dynamic_cast<FormatData*>(data);
-            if(formatData && formatData->isHidden()){
+            if(formatData){
                 bool isPosInBlockAtMax = (range->currentposInBlock == (block.length()-1))? true: false;
                 resetTextBlockFormat(block);
                 removeCheckBoxLinkMousePosition(block,formatData,range);
