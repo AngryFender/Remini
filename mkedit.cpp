@@ -153,8 +153,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
-    case Qt::Key_Down:		connectSignals(true);
-                            setPreArrowKeys(event->modifiers()==Qt::SHIFT);
+    case Qt::Key_Down:      setPreArrowKeys(event->modifiers()==Qt::SHIFT);
                             QTextEdit::keyPressEvent(event);
                             setPostArrowKeys(event->modifiers() == Qt::SHIFT, event->key() == Qt::Key_Left);
                             return;
@@ -307,16 +306,24 @@ void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed)
     disconnectSignals(true);
     QTextCursor cursor = this->textCursor();
     if(!isShiftPressed){
-        selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= cursor.blockNumber();
-        selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= cursor.positionInBlock();
+        selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= selectRange.currentBlockNo    = cursor.blockNumber();
+        selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= selectRange.currentposInBlock = cursor.positionInBlock();
         selectRange.hasSelection = false;
         emit cursorPosChanged(&selectRange);
 
-        if(!isLeftArrowPressed){
-            cursor.setPosition(this->textCursor().block().position() + selectRange.selectionFirstStartPosInBlock);
-        }
+        cursor.setPosition(this->textCursor().block().position() + selectRange.selectionFirstStartPosInBlock);
+        this->setTextCursor(cursor);
+    }else{
+        selectRange.selectionEndBlock 		= selectRange.currentBlockNo    = cursor.blockNumber();
+        selectRange.selectionEndPosInBlock 	= selectRange.currentposInBlock = cursor.positionInBlock();
+        selectRange.hasSelection = true;
+        emit cursorPosChanged(&selectRange);
+
+        cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
+        cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionEndBlock).position() + selectRange.selectionEndPosInBlock,QTextCursor::KeepAnchor);
         this->setTextCursor(cursor);
     }
+
     connectSignals(true);
 }
 
