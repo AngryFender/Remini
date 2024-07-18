@@ -1048,7 +1048,10 @@ void MkEdit::cursorPositionChangedHandle()
         selectRange.selectionEndPosInBlock = cursor.positionInBlock();
     }
 
-    disconnectSignals(true);
+    Connector connector(
+        std::bind(&MkEdit::disconnectSignals,this,std::placeholders::_1),
+        std::bind(&MkEdit::connectSignals,this,std::placeholders::_1)
+    );
     emit cursorPosChanged(&selectRange);
 
     if(!isCalcuatedForStartPos && selectRange.selectionFirstStartBlock == selectRange.currentBlockNo && !isShiftKeyPressed){
@@ -1072,5 +1075,4 @@ void MkEdit::cursorPositionChangedHandle()
         cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position()+selectRange.currentposInBlock);
         this->setTextCursor(cursor);
     }
-    connectSignals(true);
 }
