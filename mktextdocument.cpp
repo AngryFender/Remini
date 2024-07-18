@@ -117,7 +117,6 @@ void MkTextDocument::cursorPosChangedHandle(SelectRange * const range)
         int start;
         int end;
 
-        this->selectRange.isCursorCaculated = range->isCursorCaculated;
         this->selectRange.hasSelection      = range->hasSelection;
         if(range->hasSelection){
             start = std::min(range->selectionFirstStartBlock, range->selectionEndBlock);
@@ -136,7 +135,6 @@ void MkTextDocument::cursorPosChangedHandle(SelectRange * const range)
         hideMKSymbolsFromPreviousSelectedBlocks(&this->selectRange);
         showMKSymbolsFromCurrentSelectedBlocks(&this->selectRange);
 
-        range->isCursorCaculated = this->selectRange.isCursorCaculated;
         range->currentBlockNo    = this->selectRange.currentBlockNo;
         range->currentposInBlock = this->selectRange.currentposInBlock;
     }
@@ -1104,11 +1102,8 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
                     }
 
                     if(isHidden){
-                        range->isCursorCaculated = true;
                         range->currentBlockNo = block.blockNumber();
                         range->currentposInBlock = (isPosInBlockAtMax)? block.length()-1: newData->getCalculatedCursorPos(range->currentposInBlock);
-                    }else{
-                         range->isCursorCaculated = false;
                     }
                 }
             }

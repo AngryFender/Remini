@@ -71,7 +71,6 @@ struct SelectRange{
     int selectionFirstStartPosInBlock = NO_SELECTION_POS;
     int selectionEndBlock 			  = NO_SELECTION_POS;
     int selectionEndPosInBlock        = NO_SELECTION_POS;
-    bool isCursorCaculated  = false;
     bool isFirstMousePress  = false;
     int scrollValue;
     std::set<int> hideBlocks;

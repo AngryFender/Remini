@@ -1027,7 +1027,6 @@ void MkEdit::cursorPositionChangedHandle()
     if(selectRange.isFirstMousePress && !isShiftKeyPressed){
         isCalcuatedForStartPos = false;
         selectRange.isFirstMousePress = false;
-        selectRange.isCursorCaculated = false;
         if(!cursor.hasSelection()){
             selectRange.selectionFirstStartBlock = cursor.blockNumber();
             selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
@@ -1040,7 +1039,6 @@ void MkEdit::cursorPositionChangedHandle()
         selectRange.hasSelection = false;
         selectRange.currentBlockNo = cursor.blockNumber();
         selectRange.currentposInBlock = cursor.positionInBlock();
-        selectRange.isCursorCaculated = false;
 
         selectRange.selectionEndBlock = selectRange.selectionFirstStartBlock;
         selectRange.selectionEndPosInBlock = selectRange.selectionFirstStartPosInBlock;
