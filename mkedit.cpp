@@ -1051,10 +1051,6 @@ void MkEdit::cursorPositionChangedHandle()
     disconnectSignals(true);
     emit cursorPosChanged(&selectRange);
 
-    //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
-    cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position()+selectRange.currentposInBlock);
-    this->setTextCursor(cursor);
-
     if(!isCalcuatedForStartPos && selectRange.selectionFirstStartBlock == selectRange.currentBlockNo && !isShiftKeyPressed){
         isCalcuatedForStartPos = true;
         selectRange.selectionFirstStartBlock = selectRange.currentBlockNo;
@@ -1071,6 +1067,10 @@ void MkEdit::cursorPositionChangedHandle()
         newCursor.setPosition(startInDoc);
         newCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
         this->setTextCursor(newCursor);
+    }else{
+        //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
+        cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position()+selectRange.currentposInBlock);
+        this->setTextCursor(cursor);
     }
     connectSignals(true);
 }
