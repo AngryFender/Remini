@@ -185,9 +185,9 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
         undoData.editType = multiEdit;
     }
     clearMkEffects(undoData.editType);
-    connectSignals(true);
     QTextEdit::keyPressEvent(event);
-    disconnectSignals(true);
+    selectRange.currentBlockNo    = textCursor().blockNumber();
+    selectRange.currentposInBlock = textCursor().positionInBlock();
 
     switch(event->key()){
     case Qt::Key_Enter:
@@ -202,7 +202,6 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
                                 return;
                             }break;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
-
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterUndo(); return;}break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterRedo(); return;}break;
     default: break;
@@ -1055,10 +1054,8 @@ void MkEdit::cursorPositionChangedHandle()
     emit cursorPosChanged(&selectRange);
 
     //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
-    if(!cursor.hasSelection() && selectRange.isCursorCaculated){
-        cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position()+selectRange.currentposInBlock);
-        this->setTextCursor(cursor);
-    }
+    cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position()+selectRange.currentposInBlock);
+    this->setTextCursor(cursor);
 
     if(!isCalcuatedForStartPos && selectRange.selectionFirstStartBlock == selectRange.currentBlockNo && !isShiftKeyPressed){
         isCalcuatedForStartPos = true;

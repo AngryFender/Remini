@@ -127,7 +127,9 @@ void MkTextDocument::cursorPosChangedHandle(SelectRange * const range)
             this->selectRange.currentBlockNo    = range->currentBlockNo;
             start = end = range->currentBlockNo;
         }
+
         for(int num = start; num <= end; num++){
+            this->selectRange.hideBlocks.erase(num);
             this->selectRange.showBlocks.insert(num);
         }
 
@@ -1081,6 +1083,7 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
             FormatData* formatData = dynamic_cast<FormatData*>(data);
             if(formatData){
                 bool isPosInBlockAtMax = (range->currentposInBlock == (block.length()-1))? true: false;
+                bool isHidden = formatData->isHidden();
                 resetTextBlockFormat(block);
                 removeCheckBoxLinkMousePosition(block,formatData,range);
 
@@ -1100,9 +1103,13 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
                         applyMkFormat(block, (*it)->getStart(), (*it)->getEnd(), (*it)->getStatus(), formatCollection);
                     }
 
-                    range->isCursorCaculated = true;
-                    range->currentBlockNo = block.blockNumber();
-                    range->currentposInBlock = (isPosInBlockAtMax)? block.length()-1: newData->getCalculatedCursorPos(range->currentposInBlock);
+                    if(isHidden){
+                        range->isCursorCaculated = true;
+                        range->currentBlockNo = block.blockNumber();
+                        range->currentposInBlock = (isPosInBlockAtMax)? block.length()-1: newData->getCalculatedCursorPos(range->currentposInBlock);
+                    }else{
+                         range->isCursorCaculated = false;
+                    }
                 }
             }
         }
