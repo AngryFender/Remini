@@ -91,6 +91,7 @@ public:
     void setPlainText(const QString &text);
     void setUndoRedoText(const QString &text);
     void setUndoRedoText(const int blockNo,const QString &text);
+    void setUndoEnterPressedText(const int blockNo,const QString &text);
     void setUndoSelectRange(const SelectRange range);
     void setRedoSelectRange(const int blockNo, const int posInBlock, const bool isCheckBox, const int scrollValue);
     const SelectRange &getUndoSelectRange() const;
