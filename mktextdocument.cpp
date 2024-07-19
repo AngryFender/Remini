@@ -51,6 +51,16 @@ void MkTextDocument::setUndoEnterPressedText(const int blockNo, const QString &t
     cursor.select(QTextCursor::BlockUnderCursor);
     cursor.deleteChar();
     cursor.deleteChar();
+
+    QTextCursor rawCursor(&rawDocument);
+    rawCursor.setPosition(findBlockByNumber(blockNo).position());
+    rawCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+    rawCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    rawCursor.insertText(text);
+    rawCursor.movePosition(QTextCursor::NextBlock);
+    rawCursor.select(QTextCursor::BlockUnderCursor);
+    rawCursor.deleteChar();
+    rawCursor.deleteChar();
 }
 void MkTextDocument::setUndoSelectRange(const SelectRange range)
 {
