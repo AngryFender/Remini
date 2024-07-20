@@ -12,6 +12,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     savedCharacterNumber = -1;
     isShiftKeyPressed = false;
     isDisconnectedViaHighPriority = false;
+    undoData.viewSelectRangeStore = &undoRedoSelectRange;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     undoAction.setText("Undo         Ctrl+Z");
@@ -221,12 +222,7 @@ void MkEdit::keyReleaseEvent(QKeyEvent *event)
 }
 
 void MkEdit::showSelectionAfterUndo(){
-    MkTextDocument *mkDoc = dynamic_cast<MkTextDocument*>(this->document());
-    if(nullptr == mkDoc){
-        return ;
-    }
-    SelectRange range = mkDoc->getUndoSelectRange();
-
+    SelectRange &range = undoRedoSelectRange;
     QTextCursor textCursor = this->textCursor();
     if(range.hasSelection){
         selectRange.hasSelection = true;
@@ -266,17 +262,11 @@ void MkEdit::showSelectionAfterUndo(){
     if(range.isCheckBox){
         this->verticalScrollBar()->setSliderPosition(range.scrollValue);
     }
-
 }
 
 void MkEdit::showSelectionAfterRedo()
 {
-    MkTextDocument *mkDoc = dynamic_cast<MkTextDocument*>(this->document());
-    if(nullptr == mkDoc){
-        return ;
-    }
-    SelectRange range = mkDoc->getRedoSelectRange();
-
+    SelectRange &range = undoRedoSelectRange;
     QTextCursor textCursor = this->textCursor();
 
     //first show all the Markdown symbols in the editor

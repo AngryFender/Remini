@@ -93,6 +93,7 @@ protected:
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
     SelectRange selectRange;
+    SelectRange undoRedoSelectRange;
     bool isCalcuatedForStartPos;
     bool isCursorChangedHandleTriggered;
     bool isShiftKeyPressed;

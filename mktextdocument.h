@@ -92,10 +92,6 @@ public:
     void setUndoRedoText(const QString &text);
     void setUndoRedoText(const int blockNo,const QString &text);
     void setUndoEnterPressedText(const int blockNo,const QString &text);
-    void setUndoSelectRange(const SelectRange range);
-    void setRedoSelectRange(const int blockNo, const int posInBlock, const bool isCheckBox, const int scrollValue);
-    const SelectRange &getUndoSelectRange() const;
-    const SelectRange &getRedoSelectRange() const;
     void clear() override;
 
     QVector<QPair<int,int>>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
@@ -256,6 +252,7 @@ struct UndoData{
     bool selectAll;
     int scrollValue;
     SelectRange oldSelectRange;
+    SelectRange *viewSelectRangeStore;
     QString oldBlock;
     QString newBlock;
     EditType editType;
@@ -283,6 +280,7 @@ private:
     QString oldText;
     bool isConstructorRedo;
     SelectRange oldSelectRange;
+    SelectRange *viewSelectRangeStore;
 };
 
 

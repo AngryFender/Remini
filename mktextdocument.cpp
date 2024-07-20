@@ -62,28 +62,6 @@ void MkTextDocument::setUndoEnterPressedText(const int blockNo, const QString &t
     rawCursor.deleteChar();
     rawCursor.deleteChar();
 }
-void MkTextDocument::setUndoSelectRange(const SelectRange range)
-{
-    this->undoSelectRange = range;
-}
-
-void MkTextDocument::setRedoSelectRange(const int blockNo, const int posInBlock, const bool isCheckBox, const int scrollValue)
-{
-    this->redoSelectRange.currentBlockNo = blockNo;
-    this->redoSelectRange.currentposInBlock = posInBlock;
-    this->redoSelectRange.isCheckBox = isCheckBox;
-    this->redoSelectRange.scrollValue = scrollValue;
-}
-
-const SelectRange &MkTextDocument::getUndoSelectRange() const
-{
-    return this->undoSelectRange;
-}
-
-const SelectRange &MkTextDocument::getRedoSelectRange() const
-{
-    return this->redoSelectRange;
-}
 
 void MkTextDocument::clear()
 {
@@ -1405,6 +1383,7 @@ EditCommand::EditCommand(UndoData &data)
     this->scrollValue = data.scrollValue;
     isConstructorRedo = true;
     this->oldSelectRange = data.oldSelectRange;
+    this->viewSelectRangeStore = data.viewSelectRangeStore;
     this->blockNo = data.blockNo;
     this->posInBlock = data.posInBlock;
     this->editType = data.editType;
@@ -1433,7 +1412,7 @@ void EditCommand::undo()
     case enterPressed:
     case multiEdit: doc->setUndoRedoText(oldText); break;
     }
-    doc->setUndoSelectRange(this->oldSelectRange);
+    *viewSelectRangeStore = oldSelectRange;
 }
 
 void EditCommand::redo()
@@ -1453,6 +1432,9 @@ void EditCommand::redo()
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, this->posInBlock);
 
         this->view->setTextCursor(cursor);
-        doc->setRedoSelectRange(this->blockNo, this->posInBlock,  this->oldSelectRange.isCheckBox, this->oldSelectRange.scrollValue );
+        viewSelectRangeStore->currentBlockNo = this->blockNo;
+        viewSelectRangeStore->currentposInBlock = this->posInBlock;
+        viewSelectRangeStore->isCheckBox = this->oldSelectRange.isCheckBox;
+        viewSelectRangeStore->scrollValue = this->oldSelectRange.scrollValue;
     }
 }
