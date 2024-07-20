@@ -243,6 +243,7 @@ enum EditType{
 
 struct UndoData{
     QTextEdit *view;
+    EditType *viewEditTypeStore;
     QTextDocument *doc;
     QString text;
     int blockNo;
@@ -268,6 +269,7 @@ public:
 
 private:
     QTextEdit *view;
+    EditType *viewEditTypeStore;
     MkTextDocument *doc;
     QString text;
     QString oldBlock;

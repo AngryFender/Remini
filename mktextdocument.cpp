@@ -38,6 +38,12 @@ void MkTextDocument::setUndoRedoText(const int blockNo, const QString &text)
     cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     cursor.insertText(text);
+
+    QTextCursor rawCursor(&rawDocument);
+    rawCursor.setPosition(findBlockByNumber(blockNo).position());
+    rawCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+    rawCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    rawCursor.insertText(text);
 }
 
 void MkTextDocument::setUndoEnterPressedText(const int blockNo, const QString &text)
@@ -1379,6 +1385,7 @@ QString MkTextDocument::numberListGetNextNumber(const QString &text)
 EditCommand::EditCommand(UndoData &data)
 {
     this->view = data.view;
+    this->viewEditTypeStore = data.viewEditTypeStore;
     this->doc = dynamic_cast<MkTextDocument*>(data.doc);
     this->scrollValue = data.scrollValue;
     isConstructorRedo = true;
@@ -1412,6 +1419,7 @@ void EditCommand::undo()
     case enterPressed:
     case multiEdit: doc->setUndoRedoText(oldText); break;
     }
+    *viewEditTypeStore = editType;
     *viewSelectRangeStore = oldSelectRange;
 }
 
@@ -1427,6 +1435,7 @@ void EditCommand::redo()
         case multiEdit: doc->setUndoRedoText(text); break;
         }
 
+        *this->viewEditTypeStore = editType;
         QTextCursor cursor = this->view->textCursor();
         cursor.setPosition(this->view->document()->findBlockByNumber(this->blockNo).position());
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, this->posInBlock);

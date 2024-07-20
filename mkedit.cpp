@@ -12,6 +12,7 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     savedCharacterNumber = -1;
     isShiftKeyPressed = false;
     isDisconnectedViaHighPriority = false;
+    undoData.viewEditTypeStore = &undoRedoEditType;
     undoData.viewSelectRangeStore = &undoRedoSelectRange;
 
     this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -203,8 +204,28 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
                                 return;
                             }break;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {emit undoStackUndoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterUndo(); return;}break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {emit undoStackRedoSignal(); undoData.undoRedoSkip = true; fileSaveNow();showSelectionAfterRedo(); return;}break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {
+                                emit undoStackUndoSignal();
+                                undoData.editType = (undoData.viewEditTypeStore? *undoData.viewEditTypeStore: multiEdit);
+                                undoData.undoRedoSkip = true;
+                                fileSaveTimer.stop();
+                                postUndoSetup();
+                                emit fileSaveRaw();
+                                applyMkEffects();
+                                showSelectionAfterUndo();
+                                return;
+                            }break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {
+                                emit undoStackRedoSignal();
+                                undoData.editType = (undoData.viewEditTypeStore? *undoData.viewEditTypeStore: multiEdit);
+                                undoData.undoRedoSkip = true;
+                                fileSaveTimer.stop();
+                                postUndoSetup();
+                                emit fileSaveRaw();
+                                applyMkEffects();
+                                showSelectionAfterRedo();
+                                return;
+                            }break;
     default: break;
     }
 
@@ -437,7 +458,7 @@ void MkEdit::clearMkEffects(EditType editType)
     fileSaveTimer.start();
 }
 
-void MkEdit::applyMkEffects(const bool scroll)
+void MkEdit::applyMkEffects()
 {
     switch(undoData.editType){
     case singleEdit: 	emit applyMkSingleBlock(this->textCursor().blockNumber()); break;

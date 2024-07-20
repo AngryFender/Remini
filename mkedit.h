@@ -90,6 +90,8 @@ protected:
     QPen whitePen;
     int savedCharacterNumber;
     UndoData undoData;
+    EditType undoRedoEditType;
+
     HighlightColor syntaxColor;
     QTimer fileSaveTimer;
     SelectRange selectRange;
@@ -125,7 +127,7 @@ protected:
 
     QRect getVisibleRect();
     void clearMkEffects(EditType editType = EditType::singleEdit);
-    void applyMkEffects(const bool scroll = true);
+    void applyMkEffects();
 
     void updateRawDocument();
     void fileSaveNow();
