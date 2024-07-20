@@ -14,8 +14,6 @@
 #include <linedata.h>
 #include <formatdata.h>
 #include <QAbstractTextDocumentLayout>
-#include <QQueue>
-#include <QMutex>
 #include <QTextEdit>
 #include <QUndoCommand>
 #include <QUndoStack>
@@ -272,17 +270,15 @@ private:
     QTextEdit *view;
     EditType *viewEditTypeStore;
     MkTextDocument *doc;
-    QString text;
-    QString oldBlock;
-    QString newBlock;
+    QString redoText;
+    QString undoText;
     int blockNo;
     int posInBlock;
     int scrollValue;
     EditType editType;
 
-    QString oldText;
     bool isConstructorRedo;
-    SelectRange oldSelectRange;
+    SelectRange undoSelectRange;
     SelectRange *viewSelectRangeStore;
 };
 

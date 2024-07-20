@@ -389,12 +389,7 @@ void MkEdit::tabKeyPressed()
 void MkEdit::preUndoSetup()
 {
     MkTextDocument * mkDoc = dynamic_cast<MkTextDocument*>(this->document());
-    if(nullptr == mkDoc){
-        undoData.oldText = this->document()->toPlainText();
-    }else{
-        undoData.oldText = mkDoc->getRawDocument()->toPlainText();
-    }
-
+    undoData.oldText            = (mkDoc?mkDoc->getRawDocument()->toPlainText(): document()->toPlainText());
     undoData.view               = this;
     undoData.doc                = this->document();
     undoData.undoRedoSkip       = false;
@@ -408,17 +403,8 @@ void MkEdit::preUndoSetup()
 
 void MkEdit::postUndoSetup()
 {
-
-    MkTextDocument * mkDoc = dynamic_cast<MkTextDocument*>(this->document());
-    if(nullptr == mkDoc){
-        undoData.text = this->document()->toPlainText();
-    }else{
-        undoData.text = mkDoc->getRawDocument()->toPlainText();
-    }
-
     undoData.blockNo 	= this->textCursor().blockNumber();
     undoData.posInBlock = this->textCursor().positionInBlock();
-    undoData.newBlock   = this->document()->findBlockByNumber(this->textCursor().blockNumber()).text();
 
     if(!undoData.undoRedoSkip){
         EditCommand *edit = new EditCommand(undoData);

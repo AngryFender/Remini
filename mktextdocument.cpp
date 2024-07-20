@@ -1396,25 +1396,25 @@ EditCommand::EditCommand(UndoData &data)
     this->doc = dynamic_cast<MkTextDocument*>(data.doc);
     this->scrollValue = data.scrollValue;
     isConstructorRedo = true;
-    this->oldSelectRange = data.oldSelectRange;
+    this->undoSelectRange = data.oldSelectRange;
     this->viewSelectRangeStore = data.viewSelectRangeStore;
     this->blockNo = data.blockNo;
     this->posInBlock = data.posInBlock;
     this->editType = data.editType;
-    this->oldSelectRange.scrollValue = data.scrollValue;
-    this->oldBlock = data.oldBlock;
+    this->undoSelectRange.scrollValue = data.scrollValue;
 
     switch(editType){
     case undoRedo: return;
     case singleEdit:
-        this->newBlock = data.newBlock;
-        this->oldBlock = data.oldBlock;
-        this->oldSelectRange.isCheckBox = false;
+        this->undoText = data.oldBlock;
+        this->redoText = data.doc->findBlockByNumber(data.blockNo).text();
+        this->undoSelectRange.isCheckBox = false;
         break;
-    case checkbox:  this->oldSelectRange.isCheckBox = true;
+    case checkbox:  this->undoSelectRange.isCheckBox = true;
     case enterPressed:
-    case multiEdit: this->oldText = data.oldText;
-        this->text = data.text;
+    case multiEdit:
+        this->undoText = data.oldText;
+        this->redoText = (doc? doc->getRawDocument()->toPlainText(): data.doc->toPlainText());
         break;
     }
 }
@@ -1423,13 +1423,13 @@ void EditCommand::undo()
 {
     switch(editType){
     case undoRedo: return;
-    case singleEdit: doc->setUndoRedoText(oldSelectRange.currentBlockNo, this->oldBlock); break;
+    case singleEdit: doc->setUndoRedoText(undoSelectRange.currentBlockNo, this->undoText); break;
     case checkbox:
     case enterPressed:
-    case multiEdit: doc->setUndoRedoText(oldText); break;
+    case multiEdit: doc->setUndoRedoText(undoText); break;
     }
     *viewEditTypeStore = editType;
-    *viewSelectRangeStore = oldSelectRange;
+    *viewSelectRangeStore = undoSelectRange;
 }
 
 void EditCommand::redo()
@@ -1439,10 +1439,10 @@ void EditCommand::redo()
     }else{
         switch(editType){
         case undoRedo: return;
-        case singleEdit: doc->setUndoRedoText(this->blockNo, this->newBlock);break;
+        case singleEdit: doc->setUndoRedoText(this->blockNo, this->redoText);break;
         case checkbox:
         case enterPressed:
-        case multiEdit: doc->setUndoRedoText(text); break;
+        case multiEdit: doc->setUndoRedoText(redoText); break;
         }
 
         *this->viewEditTypeStore = editType;
@@ -1450,7 +1450,7 @@ void EditCommand::redo()
         viewSelectRangeStore->hasSelection = false;
         viewSelectRangeStore->currentBlockNo = this->blockNo;
         viewSelectRangeStore->currentposInBlock = this->posInBlock;
-        viewSelectRangeStore->isCheckBox = this->oldSelectRange.isCheckBox;
-        viewSelectRangeStore->scrollValue = this->oldSelectRange.scrollValue;
+        viewSelectRangeStore->isCheckBox = this->undoSelectRange.isCheckBox;
+        viewSelectRangeStore->scrollValue = this->undoSelectRange.scrollValue;
     }
 }
