@@ -192,8 +192,8 @@ signals:
     void checkIfCursorInBlock(bool &isBlock, QTextCursor &cursor);
 
     void undoStackPushSignal(QUndoCommand *);
-    void undoStackUndoSignal();
-    void undoStackRedoSignal();
+    void undoStackUndoSignal(bool &success);
+    void undoStackRedoSignal(bool &success);
     void undoStackClear();
     void escapeFocus(QWidget*view);
 };

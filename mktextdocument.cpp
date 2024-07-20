@@ -40,7 +40,7 @@ void MkTextDocument::setUndoRedoText(const int blockNo, const QString &text)
     cursor.insertText(text);
 
     QTextCursor rawCursor(&rawDocument);
-    rawCursor.setPosition(findBlockByNumber(blockNo).position());
+    rawCursor.setPosition(rawDocument.findBlockByNumber(blockNo).position());
     rawCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
     rawCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     rawCursor.insertText(text);
@@ -59,7 +59,7 @@ void MkTextDocument::setUndoEnterPressedText(const int blockNo, const QString &t
     cursor.deleteChar();
 
     QTextCursor rawCursor(&rawDocument);
-    rawCursor.setPosition(findBlockByNumber(blockNo).position());
+    rawCursor.setPosition(rawDocument.findBlockByNumber(blockNo).position());
     rawCursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
     rawCursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     rawCursor.insertText(text);
@@ -164,6 +164,7 @@ void MkTextDocument::applyAllMkDataHandle(int blockNumber)
     for(int num = 0; num < this->blockCount(); num++){
         this->selectRange.hideBlocks.insert(num);
     }
+    this->selectRange.hideBlocks.erase(blockNumber);
     hideMKSymbolsFromPreviousSelectedBlocks(&this->selectRange);
 
     this->selectRange.showBlocks.insert(blockNumber);
@@ -1293,14 +1294,20 @@ void MkTextDocument::undoStackPush(QUndoCommand *edit)
     undoStack.push(edit);
 }
 
-void MkTextDocument::undoStackUndo()
+void MkTextDocument::undoStackUndo(bool &success)
 {
-    undoStack.undo();
+    if(undoStack.canUndo()){
+        undoStack.undo();
+        success = true;
+    }
 }
 
-void MkTextDocument::undoStackRedo()
+void MkTextDocument::undoStackRedo(bool &success)
 {
-    undoStack.redo();
+    if(undoStack.canRedo()){
+        undoStack.redo();
+        success = true;
+    }
 }
 
 void MkTextDocument::resetFormatLocation()
@@ -1398,6 +1405,7 @@ EditCommand::EditCommand(UndoData &data)
     this->oldBlock = data.oldBlock;
 
     switch(editType){
+    case undoRedo: return;
     case singleEdit:
         this->newBlock = data.newBlock;
         this->oldBlock = data.oldBlock;
@@ -1414,6 +1422,7 @@ EditCommand::EditCommand(UndoData &data)
 void EditCommand::undo()
 {
     switch(editType){
+    case undoRedo: return;
     case singleEdit: doc->setUndoRedoText(oldSelectRange.currentBlockNo, this->oldBlock); break;
     case checkbox:
     case enterPressed:
@@ -1429,6 +1438,7 @@ void EditCommand::redo()
         isConstructorRedo = false;
     }else{
         switch(editType){
+        case undoRedo: return;
         case singleEdit: doc->setUndoRedoText(this->blockNo, this->newBlock);break;
         case checkbox:
         case enterPressed:
@@ -1436,11 +1446,8 @@ void EditCommand::redo()
         }
 
         *this->viewEditTypeStore = editType;
-        QTextCursor cursor = this->view->textCursor();
-        cursor.setPosition(this->view->document()->findBlockByNumber(this->blockNo).position());
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, this->posInBlock);
 
-        this->view->setTextCursor(cursor);
+        viewSelectRangeStore->hasSelection = false;
         viewSelectRangeStore->currentBlockNo = this->blockNo;
         viewSelectRangeStore->currentposInBlock = this->posInBlock;
         viewSelectRangeStore->isCheckBox = this->oldSelectRange.isCheckBox;

@@ -173,8 +173,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Enter:
     case Qt::Key_Return:    undoData.editType = multiEdit; break;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
-    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
-    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.editType = multiEdit;}break;
+    case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {undoData.editType = undoRedo;undoData.undoRedoSkip = true;}break;
+    case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {undoData.editType = undoRedo;undoData.undoRedoSkip = true;}break;
     case Qt::Key_Backspace:{
                             QString blockText = this->textCursor().block().text();
                             if((textCursor().positionInBlock() == 0) || (blockText.left(3)=="```")){
@@ -183,8 +183,12 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_QuoteLeft: undoData.editType = multiEdit; break;
     }
 
-    if(textCursor().hasSelection()){
-        undoData.editType = multiEdit;
+    if(textCursor().hasSelection() && undoData.editType != undoRedo){
+        if(selectRange.selectionFirstStartBlock == selectRange.selectionEndBlock){
+            undoData.editType = singleEdit;
+        }else{
+            undoData.editType = multiEdit;
+        }
     }
     clearMkEffects(undoData.editType);
     QTextEdit::keyPressEvent(event);
@@ -205,25 +209,31 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
                             }break;
     case Qt::Key_D:         if( event->modifiers() == Qt::CTRL) {emit duplicateLine(this->textCursor().blockNumber());; fileSaveNow(); return;}break;
     case Qt::Key_Z:         if( event->modifiers() == Qt::CTRL) {
-                                emit undoStackUndoSignal();
-                                undoData.editType = (undoData.viewEditTypeStore? *undoData.viewEditTypeStore: multiEdit);
-                                undoData.undoRedoSkip = true;
-                                fileSaveTimer.stop();
-                                postUndoSetup();
-                                emit fileSaveRaw();
-                                applyMkEffects();
-                                showSelectionAfterUndo();
+                                bool success = false;
+                                emit undoStackUndoSignal(success);
+                                if(success){
+                                    undoData.editType = (undoData.viewEditTypeStore? *undoData.viewEditTypeStore: multiEdit);
+                                    undoData.undoRedoSkip = true;
+                                    fileSaveTimer.stop();
+                                    postUndoSetup();
+                                    emit fileSaveRaw();
+                                    applyMkEffects();
+                                    showSelectionAfterUndo();
+                                }
                                 return;
                             }break;
     case Qt::Key_Y:         if( event->modifiers() == Qt::CTRL) {
-                                emit undoStackRedoSignal();
-                                undoData.editType = (undoData.viewEditTypeStore? *undoData.viewEditTypeStore: multiEdit);
-                                undoData.undoRedoSkip = true;
-                                fileSaveTimer.stop();
-                                postUndoSetup();
-                                emit fileSaveRaw();
-                                applyMkEffects();
-                                showSelectionAfterRedo();
+                                bool success = false;
+                                emit undoStackRedoSignal(success);
+                                if(success){
+                                    undoData.editType = (undoData.viewEditTypeStore? *undoData.viewEditTypeStore: multiEdit);
+                                    undoData.undoRedoSkip = true;
+                                    fileSaveTimer.stop();
+                                    postUndoSetup();
+                                    emit fileSaveRaw();
+                                    applyMkEffects();
+                                    showSelectionAfterRedo();
+                                }
                                 return;
                             }break;
     default: break;
@@ -288,14 +298,15 @@ void MkEdit::showSelectionAfterUndo(){
 void MkEdit::showSelectionAfterRedo()
 {
     SelectRange &range = undoRedoSelectRange;
-    QTextCursor textCursor = this->textCursor();
+    int currentBlock = range.currentBlockNo;
+    int pos = range.currentposInBlock;
 
     //first show all the Markdown symbols in the editor
     emit cursorPosChanged(&range);
 
-    int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
-    textCursor.setPosition(cursorPos);
-    this->setTextCursor(textCursor);
+    QTextCursor cursor = this->textCursor();
+    cursor.setPosition(this->document()->findBlockByNumber(currentBlock).position()+pos);
+    this->setTextCursor(cursor);
 
     if(range.isCheckBox){
         this->verticalScrollBar()->setSliderPosition(range.scrollValue);
@@ -425,6 +436,9 @@ QRect MkEdit::getVisibleRect()
 void MkEdit::clearMkEffects(EditType editType)
 {
     undoData.scrollValue = this->verticalScrollBar()->sliderPosition(); //this is important
+    if(editType == undoRedo){
+        return;
+    }
 
     QTextCursor cursor = this->textCursor();
     int blockNumber = cursor.blockNumber();
@@ -461,6 +475,7 @@ void MkEdit::clearMkEffects(EditType editType)
 void MkEdit::applyMkEffects()
 {
     switch(undoData.editType){
+    case undoRedo: break;
     case singleEdit: 	emit applyMkSingleBlock(this->textCursor().blockNumber()); break;
     case checkbox:
     case enterPressed:
@@ -484,6 +499,7 @@ void MkEdit::applyMkEffects()
 void MkEdit::updateRawDocument()
 {
     switch(undoData.editType){
+    case EditType::undoRedo: break;
     case EditType::singleEdit:
         if(undoData.oldSelectRange.currentBlockNo == this->textCursor().blockNumber()){
             emit saveSingleRawBlock(textCursor().blockNumber()); return;

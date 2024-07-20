@@ -130,8 +130,8 @@ public slots:
     void cursorUpdateHandle(const int blockNo, const int characterNo);
 
     void undoStackPush(QUndoCommand *edit);
-    void undoStackUndo();
-    void undoStackRedo();
+    void undoStackUndo(bool &success);
+    void undoStackRedo(bool &success);
 
 signals:
     void disconnectCursorPos(bool override = false);
@@ -235,7 +235,8 @@ signals:
 };
 
 enum EditType{
-    singleEdit = 0,
+    undoRedo = 0,
+    singleEdit,
     checkbox,
     enterPressed,
     multiEdit,
