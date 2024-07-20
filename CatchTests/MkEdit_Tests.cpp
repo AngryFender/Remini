@@ -2383,3 +2383,121 @@ TEST_CASE("MkEdit link mouse click with undo/redo", "[MkEdit]")
     REQUIRE(pressedBlockNo == 0);
     REQUIRE(pressedPosInBlock == 7);
 }
+
+TEST_CASE("MkEdit raw document after multiple undo/redo", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    QChar paragraphSeparator(0x2029);
+
+    doc.setPlainText("**bold** *italic*\n**night** *day*");
+    doc.setMarkdownHandle(true);
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyMkSingleBlock,
+                     &doc,&MkTextDocument::applyMkSingleBlockHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QObject::connect(&edit,&MkEdit::quoteLeftKeyPressed,
+                     &doc,&MkTextDocument::quoteLeftKeyPressedHandle);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+    cursor.setPosition(9);
+    edit.setTextCursor(cursor);
+
+    for(int i = 0; i < 18; i ++){
+        QScopedPointer<QKeyEvent>  ShiftKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::ShiftModifier)) ;
+        edit.keyPressEvent(ShiftKeyPressEvent.data());
+    }
+
+    QString text = edit.textCursor().selectedText();
+    text.replace(paragraphSeparator, '\n');
+    REQUIRE("*italic*\n**night**" == text);
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress,Qt::Key_Backspace, Qt::NoModifier));
+    edit.keyPressEvent(keyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**  *day*" == text);
+
+    QScopedPointer<QKeyEvent> undoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier));
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold** *italic*\n**night** *day*" == text);
+    REQUIRE(edit.textCursor().position() == 27);
+
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold** *italic*\n**night** *day*" == text);
+    REQUIRE(edit.textCursor().position() == 27);
+
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold** *italic*\n**night** *day*" == text);
+    REQUIRE(edit.textCursor().position() == 27);
+
+    edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold** *italic*\n**night** *day*" == text);
+    REQUIRE(edit.textCursor().position() == 27);
+
+    text = doc.getRawDocument()->toPlainText();
+    REQUIRE("**bold** *italic*\n**night** *day*" == text);
+
+    QScopedPointer<QKeyEvent>  redoKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier)) ;
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**  *day*" == text);
+    REQUIRE(edit.textCursor().position() == 9);
+
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**  *day*" == text);
+    REQUIRE(edit.textCursor().position() == 9);
+
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**  *day*" == text);
+    REQUIRE(edit.textCursor().position() == 9);
+
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**  *day*" == text);
+    REQUIRE(edit.textCursor().position() == 9);
+
+    edit.keyPressEvent(redoKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("**bold**  *day*" == text);
+    REQUIRE(edit.textCursor().position() == 9);
+
+    text = doc.getRawDocument()->toPlainText();
+    REQUIRE("**bold**  *day*" == text);
+}
+
