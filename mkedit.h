@@ -101,6 +101,8 @@ protected:
     bool isShiftKeyPressed;
     bool showMarkDown;
 
+    bool isDisconnectedViaHighPriority;
+
     void quoteLeftKey();
     void smartSelectionSetup();
     void tabKeyPressed();
@@ -141,8 +143,8 @@ protected:
     void setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed);
 
     void restoreTextCursor(int blockNo, int posInBlock, bool hasSelection);
+    void postCursorPosChangedSignal();
 
-    bool isDisconnectedViaHighPriority;
 public slots:
     void contextMenuHandler(QPoint pos);
     void undoContextMenu();

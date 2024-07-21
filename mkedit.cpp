@@ -253,36 +253,11 @@ void MkEdit::keyReleaseEvent(QKeyEvent *event)
 }
 
 void MkEdit::showSelectionAfterUndo(){
-    SelectRange &range = undoRedoSelectRange;
-    QTextCursor textCursor = this->textCursor();
-    if(range.hasSelection){
-        selectRange.hasSelection = true;
-        selectRange.selectionFirstStartBlock = range.selectionFirstStartBlock;
-        selectRange.selectionFirstStartPosInBlock = range.selectionFirstStartPosInBlock;
-        selectRange.selectionEndBlock = range.selectionEndBlock;
-        selectRange.selectionEndPosInBlock = range.selectionEndPosInBlock;
-    }else{
-        selectRange.hasSelection = false;
-        selectRange.currentBlockNo = range.currentBlockNo;
-        selectRange.currentposInBlock = range.currentposInBlock;
-    }
+    selectRange = undoRedoSelectRange;
 
     //first show all the Markdown symbols in the editor
     emit cursorPosChanged(&selectRange);
-
-    if(range.hasSelection){
-        int startInDoc = this->document()->findBlockByNumber(range.selectionFirstStartBlock).position() + range.selectionFirstStartPosInBlock;
-        int endInDoc   = this->document()->findBlockByNumber(range.selectionEndBlock).position() + range.selectionEndPosInBlock;
-        textCursor.clearSelection();
-        textCursor.setPosition(startInDoc);
-        textCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
-    }else{
-        int cursorPos = this->document()->findBlockByNumber(range.currentBlockNo).position() + range.currentposInBlock ;
-        textCursor.setPosition(cursorPos);
-    }
-
-    //highlight the selection
-    this->setTextCursor(textCursor);
+    postCursorPosChangedSignal();
 
     //ensure the textcursor is visible
     this->verticalScrollBar()->setSliderPosition(undoData.scrollValue);
@@ -290,8 +265,8 @@ void MkEdit::showSelectionAfterUndo(){
         this->ensureCursorVisible();
     }
 
-    if(range.isCheckBox){
-        this->verticalScrollBar()->setSliderPosition(range.scrollValue);
+    if(selectRange.isCheckBox){
+        this->verticalScrollBar()->setSliderPosition(selectRange.scrollValue);
     }
 }
 
@@ -356,6 +331,32 @@ void MkEdit::restoreTextCursor(int blockNo, int posInBlock, bool hasSelection)
         cursor.setPosition(this->document()->findBlockByNumber(blockNo).position() + posInBlock);
     }
     this->setTextCursor(cursor);
+}
+
+void MkEdit::postCursorPosChangedSignal()
+{
+    QTextCursor cursor = this->textCursor();
+    if(!isCalcuatedForStartPos && selectRange.selectionFirstStartBlock == selectRange.currentBlockNo && !isShiftKeyPressed){
+        isCalcuatedForStartPos = true;
+        selectRange.selectionFirstStartBlock = selectRange.currentBlockNo;
+        selectRange.selectionFirstStartPosInBlock = selectRange.currentposInBlock;
+    }
+
+    //make sure selection works regardless of the formatting used
+    if(selectRange.hasSelection){
+        int startInDoc = this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock;
+        int endInDoc   = this->document()->findBlockByNumber(selectRange.selectionEndBlock).position() + selectRange.selectionEndPosInBlock;
+
+        QTextCursor newCursor = this->textCursor();
+        newCursor.clearSelection();
+        newCursor.setPosition(startInDoc);
+        newCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
+        this->setTextCursor(newCursor);
+    }else{
+        //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
+        cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position()+selectRange.currentposInBlock);
+        this->setTextCursor(cursor);
+    }
 }
 
 void MkEdit::quoteLeftKey()
@@ -1064,26 +1065,5 @@ void MkEdit::cursorPositionChangedHandle()
         std::bind(&MkEdit::connectSignals,this,std::placeholders::_1)
     );
     emit cursorPosChanged(&selectRange);
-
-    if(!isCalcuatedForStartPos && selectRange.selectionFirstStartBlock == selectRange.currentBlockNo && !isShiftKeyPressed){
-        isCalcuatedForStartPos = true;
-        selectRange.selectionFirstStartBlock = selectRange.currentBlockNo;
-        selectRange.selectionFirstStartPosInBlock = selectRange.currentposInBlock;
-    }
-
-    //make sure selection works regardless of the formatting used
-    if(selectRange.hasSelection){
-        int startInDoc = this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock;
-        int endInDoc   = this->document()->findBlockByNumber(selectRange.selectionEndBlock).position() + selectRange.selectionEndPosInBlock;
-
-        QTextCursor newCursor = this->textCursor();
-        newCursor.clearSelection();
-        newCursor.setPosition(startInDoc);
-        newCursor.setPosition(endInDoc,QTextCursor::KeepAnchor);
-        this->setTextCursor(newCursor);
-    }else{
-        //insert cursor inbetween the formatted words since after symbols are inserted the positions are shifted
-        cursor.setPosition(this->document()->findBlockByNumber(selectRange.currentBlockNo).position()+selectRange.currentposInBlock);
-        this->setTextCursor(cursor);
-    }
+    postCursorPosChangedSignal();
 }
