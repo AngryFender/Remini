@@ -217,7 +217,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
                                     fileSaveTimer.stop();
                                     postUndoSetup();
                                     emit fileSaveRaw();
-                                    applyMkEffects();
+                                    applyMkEffects(undoRedoSelectRange.currentBlockNo);
                                     showSelectionAfterUndo();
                                 }
                                 return;
@@ -231,7 +231,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
                                     fileSaveTimer.stop();
                                     postUndoSetup();
                                     emit fileSaveRaw();
-                                    applyMkEffects();
+                                    applyMkEffects(undoRedoSelectRange.currentBlockNo);
                                     showSelectionAfterRedo();
                                 }
                                 return;
@@ -240,7 +240,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     }
 
     updateRawDocument();
-    applyMkEffects();
+    applyMkEffects(textCursor().blockNumber());
 }
 
 void MkEdit::keyReleaseEvent(QKeyEvent *event)
@@ -298,14 +298,12 @@ void MkEdit::showSelectionAfterUndo(){
 void MkEdit::showSelectionAfterRedo()
 {
     SelectRange &range = undoRedoSelectRange;
-    int currentBlock = range.currentBlockNo;
-    int pos = range.currentposInBlock;
 
     //first show all the Markdown symbols in the editor
     emit cursorPosChanged(&range);
 
     QTextCursor cursor = this->textCursor();
-    cursor.setPosition(this->document()->findBlockByNumber(currentBlock).position()+pos);
+    cursor.setPosition(this->document()->findBlockByNumber(range.currentBlockNo).position()+range.currentposInBlock);
     this->setTextCursor(cursor);
 
     if(range.isCheckBox){
@@ -458,14 +456,14 @@ void MkEdit::clearMkEffects(EditType editType)
     fileSaveTimer.start();
 }
 
-void MkEdit::applyMkEffects()
+void MkEdit::applyMkEffects(const int blockNumber)
 {
     switch(undoData.editType){
     case undoRedo: break;
-    case singleEdit: 	emit applyMkSingleBlock(this->textCursor().blockNumber()); break;
+    case singleEdit: 	emit applyMkSingleBlock(blockNumber); break;
     case checkbox:
     case enterPressed:
-    case multiEdit: 	emit applyAllMkData(this->textCursor().blockNumber()); break;
+    case multiEdit: 	emit applyAllMkData(blockNumber); break;
     }
 
     QTextCursor cursor = this->textCursor();
@@ -504,7 +502,7 @@ void MkEdit::fileSaveNow()
     updateRawDocument();
     postUndoSetup();
     emit fileSaveRaw();
-    applyMkEffects();
+    applyMkEffects(textCursor().blockNumber());
 }
 
 void MkEdit::fileSaveWithScroll()

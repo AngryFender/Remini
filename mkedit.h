@@ -127,7 +127,7 @@ protected:
 
     QRect getVisibleRect();
     void clearMkEffects(EditType editType = EditType::singleEdit);
-    void applyMkEffects();
+    void applyMkEffects(const int blockNumber);
 
     void updateRawDocument();
     void fileSaveNow();
