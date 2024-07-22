@@ -12,6 +12,7 @@ QString ViewsHandler::getVaultPath()
     QSettings settings("Remini","Remini");
     settings.setPath(settings.IniFormat, settings.SystemScope, "config.ini");
     QString path = settings.value("vault").toString();
+    markdown = settings.value("markdown",true).toBool();
 
     QFile configAnotherFile(path);
     if(configAnotherFile.exists()){
@@ -74,7 +75,6 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     currentDocument->setPlainText(startupText);
     highlighter.setDocument(currentDocument.data());
     viewText->setDocument(currentDocument.data());
-    viewText->setMkState(true);
     viewTitle->setMinimumSize(10,30);
     initFontDefault();
 }
@@ -107,6 +107,7 @@ void ViewsHandler::initFontDefault()
     font.setPointSize(settings.value("fontsize",14).toInt());
     font.setStretch(settings.value("stretch",0).toInt());
     font.setWeight((QFont::Weight)settings.value("weight",1).toInt());
+
     updateUiSettingsHandler(font,true);
 }
 

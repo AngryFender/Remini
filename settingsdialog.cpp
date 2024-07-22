@@ -186,6 +186,7 @@ void SettingsDialog::saveSettingsHandler()
     settings.setValue("fontsize",font.pointSize());
     settings.setValue("stretch",font.stretch());
     settings.setValue("weight",font.weight());
+    settings.setValue("markdown",mkState);
 }
 
 void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)

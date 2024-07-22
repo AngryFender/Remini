@@ -56,6 +56,11 @@ private:
         initViews(ui);
         initConnection();
         textSearchWorker.moveToThread(&searchThread);
+        QCoreApplication::setApplicationName("Remini");
+        QSettings settings("Remini","Remini");
+        markdown = settings.value("markdown",true).toBool();
+        viewText->setMarkdownStatus(markdown);
+        viewText->setMkState(markdown);
         viewTitle->setText("Startup Tips");
 
     }
@@ -108,6 +113,7 @@ private:
     QMap<QString, QSharedPointer<MkTextDocument>> recentFileDocumentMap;
     QString currentFilePath;
     QString vaultPath;
+    bool markdown;
 signals:
     void load_text(QString text);
     void clear_text();
