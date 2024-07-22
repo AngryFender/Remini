@@ -159,6 +159,14 @@ void MkTextDocument::applyAllMkDataHandle(int blockNumber)
 
     identifyUserData();
 
+    if(disableMarkdownState){
+        for(int num = 0; num < this->blockCount(); num++){
+            this->selectRange.showBlocks.insert(num);
+        }
+        showMKSymbolsFromCurrentSelectedBlocks(&this->selectRange);
+        return;
+    }
+
     this->selectRange.showBlocks.clear();
     this->selectRange.hideBlocks.clear();
     for(int num = 0; num < this->blockCount(); num++){
@@ -972,6 +980,11 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
     int fontSize =this->defaultFont().pointSize();
     FormatCollection formatCollection(fontSize);
 
+    if(disableMarkdownState){
+        range->hideBlocks.clear();
+        return;
+    }
+
     QSet<int> hiddenBlocks;
     QTextBlock block;
     foreach (int num, range->hideBlocks) {
@@ -1117,6 +1130,12 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
         }
     }
     range->showBlocks.clear();
+
+
+    if(disableMarkdownState){
+        range->hideBlocks.clear();
+        return;
+    }
     emit  connectCurosPos();
 }
 
@@ -1273,6 +1292,11 @@ void MkTextDocument::setMarkdownHandle(bool state)
 
     if(disableMarkdownState){
         this->setPlainText(this->rawDocument.toPlainText());
+        for(int num = 0; num < this->blockCount(); num++){
+            this->selectRange.showBlocks.insert(num);
+        }
+
+        showMKSymbolsFromCurrentSelectedBlocks(&this->selectRange);
     }else{
         for(int num = 0; num < this->blockCount(); num++){
             this->selectRange.hideBlocks.insert(num);
