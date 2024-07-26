@@ -120,6 +120,7 @@ public slots:
     void smartSelectionHandle(int blockNumber, QTextCursor &cursor);
     void saveRawDocumentHandler();
     void saveSingleRawBlockHandler(int blockNumber);
+    void saveEnterPressRawBlockHandler(int blockNumber, QString text);
 
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int blockNo, const int posInBlock);

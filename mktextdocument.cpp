@@ -973,6 +973,15 @@ void MkTextDocument::saveSingleRawBlockHandler(int blockNumber)
     rawCursor.insertText(this->findBlockByNumber(blockNumber).text());
 }
 
+void MkTextDocument::saveEnterPressRawBlockHandler(int blockNumber, QString text)
+{
+    QTextCursor rawCursor(&this->rawDocument);
+    rawCursor.setPosition(this->rawDocument.findBlockByNumber(blockNumber).position());
+    rawCursor.movePosition(QTextCursor::StartOfBlock,QTextCursor::MoveAnchor);
+    rawCursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+    rawCursor.insertText(text);
+}
+
 void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const range)
 {
     //hide raw text from old selection but dont hide blocks from current selection
