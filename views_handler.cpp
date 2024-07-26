@@ -249,6 +249,9 @@ void ViewsHandler::connectDocument()
     QObject::connect(viewText,&MkEdit::saveSingleRawBlock,
                      currentDocument.data(),&MkTextDocument::saveSingleRawBlockHandler);
 
+    QObject::connect(viewText,&MkEdit::saveEnterPressedRawBlock,
+                     currentDocument.data(),&MkTextDocument::saveEnterPressRawBlockHandler);
+
     QObject::connect(viewText,&MkEdit::saveRawDocument,
                      currentDocument.data(),&MkTextDocument::saveRawDocumentHandler);
 
@@ -311,6 +314,9 @@ void ViewsHandler::disconnectDocument()
 
     QObject::disconnect(viewText,&MkEdit::saveSingleRawBlock,
                      currentDocument.data(),&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::disconnect(viewText,&MkEdit::saveEnterPressedRawBlock,
+                     currentDocument.data(),&MkTextDocument::saveEnterPressRawBlockHandler);
 
     QObject::disconnect(viewText,&MkEdit::saveRawDocument,
                      currentDocument.data(),&MkTextDocument::saveRawDocumentHandler);

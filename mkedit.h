@@ -171,6 +171,7 @@ signals:
     void saveRawDocument();
     void saveSingleRawBlock(int blockNumber);
     void saveDoubleRawBlock(int firstBlockNumber, int secondBlockNumber);
+    void saveEnterPressedRawBlock(int blockNumber, QString text);
 
     void removeAllMkData(int currentBlockNo);
     void applyAllMkData(int blockNumber);
