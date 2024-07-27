@@ -2213,6 +2213,70 @@ TEST_CASE("MkEdit cursor position after pressing enter", "[MkEdit]")
     REQUIRE(cursor.position() == 5);
 }
 
+TEST_CASE("MkEdit gui text and raw text after pressing enter multiple times", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    doc.setPlainText("**bold**\n*italic*\n[google](<www.google.com>)\n```c++\nvoid main(){};\n```\n\n- [ ]  \n- [ ]  \n- [x] \n- [x] ");
+    doc.setMarkdownHandle(true);
+
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveEnterPressedRawBlock,
+                     &doc,&MkTextDocument::saveEnterPressRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QScopedPointer<QKeyEvent> keyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier));
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(0);
+    edit.setTextCursor(cursor);
+
+    QScopedPointer<QKeyEvent>  ShiftKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::NoModifier)) ;
+    for(int i = 0; i < 18; i ++){
+        edit.keyPressEvent(ShiftKeyPressEvent.data());
+    }
+
+    edit.keyPressEvent(keyPressEvent.data());
+    QString text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\n[google](<www.google.com>)\nc++\nvoid main(){};\n\n\n☐ \n☐ \n☑\n☑" == text);
+
+    text = edit.rawPlainText();
+    REQUIRE("**bold**\n*italic*\n\n[google](<www.google.com>)\n```c++\nvoid main(){};\n```\n\n- [ ]  \n- [ ]  \n- [x] \n- [x] " == text);
+
+    // QScopedPointer<QKeyEvent> undoKeyPressEvent (new QKeyEvent(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier));
+    // edit.keyPressEvent(undoKeyPressEvent.data());
+    text = edit.toPlainText();
+    // REQUIRE("enter\n\n\n\n\n" == text);
+
+}
+
 TEST_CASE("MkEdit cursor position after pasting from clipboard", "[MkEdit]")
 {
     MkTextDocument doc;
