@@ -200,7 +200,7 @@ signals:
     void insertHeadingData( const QString &text, int &index1, FormatData *formatData);
     void insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
     void insertFormatCheckBoxData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
-    void insertFormatLinkData(FormatLocation &locTitle, FormatLocation &locLink, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test, QString * linkText);
+    void insertFormatLinkData(FormatLocation &locTitle, FormatLocation &locLink, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test, const QString * linkUrl, const QString *linkTitle);
     void incrementIndexes(int &index1, int &index2, int &index3,const int size =1);
     bool convertCharacterToSymbol(const QChar &single, QString &text);
     void convertCharacterToCheckboxSymbol(const QChar &single, QString &text);

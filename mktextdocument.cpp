@@ -354,8 +354,9 @@ void MkTextDocument::identifyFormatData(QTextBlock &block)
             if(locLink.start != -1){
                 if(test == LINK_SYMBOL_URL_END){
                     locLink.end = index1;
-                    QString linkText = textLink.mid(locLink.start+2, (locLink.end-locLink.start-1));
-                    insertFormatLinkData(locLinkTitle,locLink, index1, index2, index3 , formatData, test, &linkText);
+                    const QString linkUrl = textLink.mid(locLink.start+2, (locLink.end-locLink.start-1));
+                    const QString linkTitle = textLink.mid(locLinkTitle.start+1, (locLink.start-locLinkTitle.start-2));
+                    insertFormatLinkData(locLinkTitle,locLink, index1, index2, index3 , formatData, test, &linkUrl, &linkTitle);
                     resetAllLoc();
                 }
             }else{
@@ -400,12 +401,13 @@ void MkTextDocument::identifyFormatData(QTextBlock &block)
         for(auto it = formatData->formats_begin(); it != formatData->formats_end(); ++it){
             if((*it)->getStatus() == FragmentData::LINK_TITLE){
                 const QString *linkText = formatData->getLinkUrlFromTitleStart((*it)->getStart());
+                const QString *linkTitle = formatData->getLinkTitleFromTitleStart((*it)->getStart());
                 if(linkText){
-                    formatData->addHiddenFormat((*it)->getStart(),(*it)->getEnd(), FragmentData::LINK_TITLE,*linkText);
+                    formatData->addHiddenFormat((*it)->getStart(),(*it)->getEnd(), FragmentData::LINK_TITLE,*linkText, *linkTitle);
                 }
             }else if((*it)->getStatus() == FragmentData::CHECKED_END ||
                        (*it)->getStatus() == FragmentData::UNCHECKED_END){
-                formatData->addHiddenFormat((*it)->getEnd(),(*it)->getEnd()+1,(*it)->getStatus(),NULL);
+                formatData->addHiddenFormat((*it)->getEnd(),(*it)->getEnd()+1,(*it)->getStatus(),NULL,NULL);
             }
         }
         block.setUserData(formatData);
@@ -449,12 +451,12 @@ void MkTextDocument::insertFormatCheckBoxData(FormatLocation &loc, int &index1, 
     incrementIndexes(index1, index2,index3, test.size());
 }
 
-void MkTextDocument::insertFormatLinkData(FormatLocation &locTitle, FormatLocation &locLink, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test, QString * linkText)
+void MkTextDocument::insertFormatLinkData(FormatLocation &locTitle, FormatLocation &locLink, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test, const QString * linkUrl, const QString *linkTitle)
 {
-    locLink.end = locLink.start + 2 + linkText->length() ;
+    locLink.end = locLink.start + 2 + linkUrl->length() ;
     if(locLink.end-locLink.start>3){
-        formatData->addFormat(locTitle.start, locTitle.end, QString(LINK_SYMBOL_TITLE_END),linkText);
-        formatData->addFormat(locLink.start, locLink.end, QString(LINK_SYMBOL_URL_END), linkText);
+        formatData->addFormat(locTitle.start, locTitle.end, QString(LINK_SYMBOL_TITLE_END),linkUrl,linkTitle);
+        formatData->addFormat(locLink.start, locLink.end, QString(LINK_SYMBOL_URL_END), linkUrl,linkTitle);
         locLink.reset();
         locTitle.reset();
     }

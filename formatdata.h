@@ -66,8 +66,8 @@ public:
     FormatData();
     ~FormatData();
 
-    void addFormat(const int start, const int end, const QString& symbol, QString* linkText = nullptr);
-    void addHiddenFormat(const int start, const int end, const FragmentData::FormatSymbol &status, const QString &linkText);
+    void addFormat(const int start, const int end, const QString& symbol, const QString* linkUrl = nullptr, const QString* linkTitle = nullptr);
+    void addHiddenFormat(const int start, const int end, const FragmentData::FormatSymbol &status, const QString &linkUrl, const QString &linkTitle);
 
     QVector<FragmentData*>::Iterator formats_begin() {return formats.begin();};
     QVector<FragmentData*>::Iterator formats_end() {return formats.end();};

@@ -31,7 +31,7 @@ FormatData::~FormatData()
     linkTitleMapHidden.clear();
 }
 
-void FormatData::addFormat(const int start, const int end,const QString &symbol, QString* linkText)
+void FormatData::addFormat(const int start, const int end, const QString &symbol, const QString* linkUrl, const QString *linkTitle)
 {
     FragmentData::FormatSymbol status = FragmentData::BOLD ;
     if(symbol == HEADING1_SYMBOL){
@@ -67,8 +67,9 @@ void FormatData::addFormat(const int start, const int end,const QString &symbol,
     }else if (symbol == LINK_SYMBOL_TITLE_END){
         formats.append(new FragmentData(start+1,end,FragmentData::LINK_TITLE));
         addMaskBit(start,LINK_SYMBOL_TITLE_START,end,LINK_SYMBOL_TITLE_END);
-        if(linkText){
-            linkUrlMap.insert(start+1, new QString(*linkText));
+        if(linkUrl && linkTitle){
+            linkUrlMap.insert(start+1, new QString(*linkUrl));
+            linkTitleMap.insert(start+1, new QString(*linkTitle));
         }
         return;
     }else if (symbol == LINK_SYMBOL_URL_END){
@@ -200,7 +201,7 @@ int FormatData::getCalculatedCursorPos(const int posInBlock)
     return posInBlock+addedCharacters;
 }
 
-void FormatData::addHiddenFormat(const int start, const int end, const FragmentData::FormatSymbol &status,const QString &linkText)
+void FormatData::addHiddenFormat(const int start, const int end, const FragmentData::FormatSymbol &status,const QString &linkUrl, const QString &linkTitle)
 {
     int begin(0), last(0), hiddenBits(0);
     for(int x = 0; x <= start; ++x){
@@ -210,8 +211,9 @@ void FormatData::addHiddenFormat(const int start, const int end, const FragmentD
     begin = start - hiddenBits;
     last  = end - hiddenBits;
 
-    if(!linkText.isEmpty() && status == FragmentData::LINK_TITLE){
-        linkMapHidden.insert(begin, new QString(linkText));
+    if(!linkUrl.isEmpty() && !linkTitle.isEmpty() && status == FragmentData::LINK_TITLE){
+        linkMapHidden.insert(begin, new QString(linkUrl));
+        linkTitleMapHidden.insert(begin, new QString(linkTitle));
     }
 
     hiddenFormats.append(new FragmentData(begin,last,status));
