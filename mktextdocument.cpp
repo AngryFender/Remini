@@ -648,7 +648,7 @@ void MkTextDocument::applyCheckBoxLinkEffect(FormatData *data, QTextBlock &block
 
         }else if((*it)->getStatus() == FragmentData::LINK_TITLE){
             // Add link position for mouse to hover and click
-            const std::tuple<int,int,int> linkPos(block.blockNumber(), (*it)->getStart(),(*it)->getEnd());
+            const std::tuple<int,int,int, const QString*> linkPos(block.blockNumber(), (*it)->getStart(),(*it)->getEnd(), data->getHiddenTitle((*it)->getStart()));
             if(!linkPositions.contains(linkPos)){
                 linkPositions.append(linkPos);
             }
@@ -708,7 +708,7 @@ void MkTextDocument::removeCheckBoxLinkMousePosition(QTextBlock &block, FormatDa
             checkMarkPositions.removeAll(checkPos);
         }
 
-        auto newEnd = std::remove_if(linkPositions.begin(), linkPositions.end(),[blockNo,index](const std::tuple<int,int,int> &linkPos){ return (std::get<0>(linkPos) == blockNo && std::get<1>(linkPos)== index);});
+        auto newEnd = std::remove_if(linkPositions.begin(), linkPositions.end(),[blockNo,index](const std::tuple<int,int,int,const QString*> &linkPos){ return (std::get<0>(linkPos) == blockNo && std::get<1>(linkPos)== index);});
         linkPositions.erase(newEnd, linkPositions.end());
         index++;
     }
