@@ -23,6 +23,12 @@ FormatData::~FormatData()
 
     qDeleteAll(linkMapHidden);
     linkMapHidden.clear();
+
+    qDeleteAll(linkTitleMap);
+    linkTitleMap.clear();
+
+    qDeleteAll(linkTitleMapHidden);
+    linkTitleMapHidden.clear();
 }
 
 void FormatData::addFormat(const int start, const int end,const QString &symbol, QString* linkText)
@@ -131,9 +137,19 @@ const QString *FormatData::getHiddenLinkUrl(int key) const
     return linkMapHidden.value(key);
 }
 
+const QString *FormatData::getHiddenTitle(int key) const
+{
+    return linkTitleMapHidden.value(key);
+}
+
 const QString *FormatData::getLinkUrlFromTitleStart(int key) const
 {
     return linkUrlMap.value(key);
+}
+
+const QString *FormatData::getLinkTitleFromTitleStart(int key) const
+{
+    return linkTitleMap.value(key);
 }
 
 void FormatData::insertLinkText(int key, QString *linkText)

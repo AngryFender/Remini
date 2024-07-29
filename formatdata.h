@@ -84,7 +84,9 @@ public:
     int hiddenFormatsCount() const;
     const QString &getLinkUrl(int key) const;
     const QString *getHiddenLinkUrl(int key) const;
+    const QString *getHiddenTitle(int key) const;
     const QString *getLinkUrlFromTitleStart(int key) const;
+    const QString *getLinkTitleFromTitleStart(int key) const;
 
     void insertLinkText(int key, QString * linkText);
 
@@ -103,7 +105,9 @@ private:
     QVector<FragmentData*> hiddenFormats;
     QMap<int, QString*> linkMap;
     QMap<int, QString*> linkMapHidden;
+    QMap<int, QString*> linkTitleMapHidden;
     QMap<int, QString*> linkUrlMap;
+    QMap<int, QString*> linkTitleMap;
     QBitArray mask;
     QString originalText;
     bool hidden;
