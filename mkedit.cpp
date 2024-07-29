@@ -533,7 +533,6 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
 
     QFontMetrics metrics(this->currentFont());
     int width = metrics.horizontalAdvance(CHECKED_PIC);
-    int averageCharacterWidth = metrics.horizontalAdvance("t");
     int last = this->document()->lastBlock().position()+this->document()->lastBlock().length();
 
     QTextCursor cursor(this->textCursor());
@@ -572,7 +571,7 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         cursor.setPosition(linkStart);
 
         rect = this->cursorRect(cursor);
-        linkTextWidth = (linkEnd - linkStart) * averageCharacterWidth;
+        linkTextWidth = metrics.horizontalAdvance(*std::get<3>(*it));
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
             emit pushLink(std::get<0>(*it),std::get<1>(*it));
@@ -844,7 +843,6 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
 
     int linkTextWidth = 0;
     int linkStart, linkEnd;
-    int averageCharacterWidth = metrics.horizontalAdvance("t");
 
     for(auto it = mkDoc->linkPosBegin(); it!= mkDoc->linkPosEnd(); ++it){
         linkStart = this->document()->findBlockByNumber(std::get<0>(*it)).position() + std::get<1>(*it);
@@ -856,7 +854,7 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
         cursor.setPosition(linkStart);
 
         rect = this->cursorRect(cursor);
-        linkTextWidth = (linkEnd - linkStart) * averageCharacterWidth;
+        linkTextWidth = metrics.horizontalAdvance(*std::get<3>(*it));
         rect.setWidth(linkTextWidth);
         if(rect.contains(pointer)){
             this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
