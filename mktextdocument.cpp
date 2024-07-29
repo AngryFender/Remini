@@ -654,21 +654,6 @@ void MkTextDocument::applyCheckBoxLinkEffect(FormatData *data, QTextBlock &block
     }
 }
 
-void MkTextDocument::applyCheckBoxLinkEffect(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status)
-{
-    if( status == FragmentData::CHECKED_END || status == FragmentData::UNCHECKED_END ){
-        const QPair<int,int> checkPos(block.blockNumber(), start);
-        if(!checkMarkPositions.contains(checkPos)){
-            checkMarkPositions.append(checkPos);
-        }
-    }else if(status == FragmentData::LINK_TITLE){
-        const std::tuple<int,int,int> linkPos(block.blockNumber(), start, end);
-        if(!linkPositions.contains(linkPos)){
-            linkPositions.append(linkPos);
-        }
-    }
-}
-
 void MkTextDocument::hideSymbols(QTextBlock &block,const QString &symbol)
 {
     QString textBlock = block.text();
