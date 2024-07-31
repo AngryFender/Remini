@@ -89,14 +89,13 @@ void MkEdit::paintEvent(QPaintEvent *e)
             QTextBlock nextBlock = block.next();
             if(blockData){
                 if(blockData->getStatus()==BlockData::start){
-                    xBlock = this->x();
-                    yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4);
+                    xBlock = block.layout()->position().x();
+                    yBlock = block.layout()->position().y()-scrollPos - (fontSize*0.4) - block.blockFormat().topMargin()*0.8;
                 }
                 else{
                     if(blockData->getStatus()==BlockData::end
                         || (blockData->getStatus()==BlockData::content && layout->blockBoundingRect(nextBlock).bottom()>= (rect.bottom()+40))){
-                        int height = block.layout()->position().y() - yBlock + (fontSize*0.6)-scrollPos;
-
+                        int height = block.layout()->position().y() - yBlock + (fontSize*1.6)-scrollPos;
                         painter.drawRoundedRect(xBlock,yBlock,widthCodeBlock,height,BLOCKRADIUS,BLOCKRADIUS);
                     }
                 }
@@ -122,7 +121,7 @@ void MkEdit::paintEvent(QPaintEvent *e)
 void MkEdit::resizeEvent(QResizeEvent *event)
 {
     QTextEdit::resizeEvent(event);
-    widthCodeBlock = event->size().width()+2 - this->verticalScrollBar()->width()/2;
+    widthCodeBlock = event->size().width()- 2 - this->verticalScrollBar()->width()/2;
 }
 
 void MkEdit::wheelEvent(QWheelEvent *e)
