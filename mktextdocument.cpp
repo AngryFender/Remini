@@ -580,7 +580,25 @@ void MkTextDocument::setCodeBlockMargin(QTextBlock &block, int leftMargin,int ri
     QTextBlockFormat blockFormat = cursor.blockFormat();
     blockFormat.setLeftMargin(leftMargin);
     blockFormat.setRightMargin(rightMargin);
-    blockFormat.setTopMargin(topMargin);
+
+    if(topMargin){
+        QString content = block.text().mid(3);
+        if(!content.isEmpty()){
+            blockFormat.setTopMargin(topMargin);
+            blockFormat.setBottomMargin(topMargin*2/3);
+        }
+        QTextCursor previousBlockCursor(block.previous());
+        if(block.isValid()){
+            QTextBlockFormat previousBlockFormat = previousBlockCursor.blockFormat();
+            previousBlockFormat.setLineHeight(topMargin,QTextBlockFormat::LineDistanceHeight);
+            previousBlockCursor.setBlockFormat(previousBlockFormat);
+        }
+        block.next();
+    }
+
+    if(bottomMargin){
+        blockFormat.setBottomMargin(bottomMargin);
+    }
     cursor.setBlockFormat(blockFormat);
 }
 
