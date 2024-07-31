@@ -1021,7 +1021,7 @@ void MkTextDocument::hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const
                 resetTextBlockFormat(block);
                 showHideCodeBlock(blockData, true, fontSize);
                 if(blockData->getStatus()==BlockData::content){
-                    setCodeBlockMargin(block,fontSize*5/3, fontSize, 0);
+                    setCodeBlockMargin(block,fontSize*10/3, fontSize, 0);
                 }
                 continue;
             }
@@ -1099,7 +1099,7 @@ void MkTextDocument::showMKSymbolsFromCurrentSelectedBlocks( SelectRange * const
                 resetTextBlockFormat(block);
                 showHideCodeBlock(blockData,false,fontSize);
                 if(blockData->getStatus() == BlockData::content){
-                    setCodeBlockMargin(block,fontSize*5/3, fontSize, 0);
+                    setCodeBlockMargin(block,fontSize*10/3, fontSize, 0);
                 }
                 continue;
             }
@@ -1161,7 +1161,8 @@ void MkTextDocument::showHideCodeBlock(BlockData *data, bool hide, int fontSize)
     if(hide){
         BlockData *startBlockData = dynamic_cast<BlockData*>(startCode.userData());
         if(startBlockData){
-            setCodeBlockMargin(startCode,fontSize*3/4, fontSize, fontSize);
+
+            setCodeBlockMargin(startCode,fontSize*7/4, fontSize, fontSize);
             if(!startBlockData->isHidden()){
                 hideSymbols(startCode, CODEBLOCK_SYMBOL);
                 startBlockData->setHidden(true);
@@ -1169,7 +1170,7 @@ void MkTextDocument::showHideCodeBlock(BlockData *data, bool hide, int fontSize)
         }
         BlockData *endBlockData = dynamic_cast<BlockData*>(endCode.userData());
         if(endBlockData){
-            setCodeBlockMargin(endCode,fontSize*3/4, fontSize, 0);
+            setCodeBlockMargin(endCode,fontSize*7/4, fontSize, 0, fontSize);
             if(!endBlockData->isHidden()){
                 hideSymbols(endCode,CODEBLOCK_SYMBOL);
                 endBlockData->setHidden(true);
@@ -1178,7 +1179,7 @@ void MkTextDocument::showHideCodeBlock(BlockData *data, bool hide, int fontSize)
     }else{
         BlockData *startBlockData = dynamic_cast<BlockData*>(startCode.userData());
         if(startBlockData && startBlockData->isHidden()){
-            setCodeBlockMargin(startCode,fontSize*3/4, fontSize, fontSize);
+            setCodeBlockMargin(startCode,fontSize*7/4, fontSize, fontSize);
             if(startBlockData->isHidden()){
                 showSymbols(startCode, CODEBLOCK_SYMBOL);
                 startBlockData->setHidden(false);
@@ -1189,7 +1190,7 @@ void MkTextDocument::showHideCodeBlock(BlockData *data, bool hide, int fontSize)
             showSymbols(endCode,CODEBLOCK_SYMBOL);
             if(endBlockData->isHidden()){
                 endBlockData->setHidden(false);
-                setCodeBlockMargin(endCode,fontSize*3/4, fontSize, 0);
+                setCodeBlockMargin(endCode,fontSize*7/4, fontSize, 0, fontSize);
             }
         }
     }
