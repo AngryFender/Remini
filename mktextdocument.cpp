@@ -574,7 +574,7 @@ void MkTextDocument::composeOnlyLinkSymbolCombination(int length, const QString 
     }
 }
 
-void MkTextDocument::setCodeBlockMargin(QTextBlock &block, int leftMargin,int rightMargin, int topMargin)
+void MkTextDocument::setCodeBlockMargin(QTextBlock &block, int leftMargin,int rightMargin, int topMargin, int bottomMargin)
 {
     QTextCursor cursor(block);
     QTextBlockFormat blockFormat = cursor.blockFormat();
