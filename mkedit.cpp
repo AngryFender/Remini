@@ -569,12 +569,15 @@ bool MkEdit::isMouseOnCheckBox(QMouseEvent *e)
         }
         cursor.setPosition(linkStart);
 
-        rect = this->cursorRect(cursor);
-        linkTextWidth = metrics.horizontalAdvance(*std::get<3>(*it));
-        rect.setWidth(linkTextWidth);
-        if(rect.contains(pointer)){
-            emit pushLink(std::get<0>(*it),std::get<1>(*it));
-            return true;
+        const QString *linkTitle= std::get<3>(*it);
+        if(linkTitle && !linkTitle->isEmpty()){
+            linkTextWidth = metrics.horizontalAdvance(*linkTitle);
+            rect = this->cursorRect(cursor);
+            rect.setWidth(linkTextWidth);
+            if(rect.contains(pointer)){
+                emit pushLink(std::get<0>(*it),std::get<1>(*it));
+                return true;
+            }
         }
     }
 
@@ -852,12 +855,15 @@ void MkEdit::mouseMoveEvent(QMouseEvent *e)
         }
         cursor.setPosition(linkStart);
 
-        rect = this->cursorRect(cursor);
-        linkTextWidth = metrics.horizontalAdvance(*std::get<3>(*it));
-        rect.setWidth(linkTextWidth);
-        if(rect.contains(pointer)){
-            this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
-            return;
+        const QString *linkTitle= std::get<3>(*it);
+        if(linkTitle && !linkTitle->isEmpty()){
+            linkTextWidth = metrics.horizontalAdvance(*linkTitle);
+            rect = this->cursorRect(cursor);
+            rect.setWidth(linkTextWidth);
+            if(rect.contains(pointer)){
+                this->viewport()->setCursor(Qt::CursorShape::PointingHandCursor);
+                return;
+            }
         }
     }
 
