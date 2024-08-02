@@ -45,7 +45,6 @@ class MkEdit : public QTextEdit
 
 public:
     explicit MkEdit(QWidget *parent = nullptr);
-    void initialialCursorPosition();
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event)override;
     void keyReleaseEvent(QKeyEvent *event)override;

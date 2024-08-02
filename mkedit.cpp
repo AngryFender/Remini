@@ -49,21 +49,6 @@ MkEdit::MkEdit(QWidget *parent):QTextEdit(parent){
     preUndoSetup();
 }
 
-void MkEdit::initialialCursorPosition()
-{
-    disconnectSignals(true);
-    QTextCursor cursor = this->textCursor();
-    cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
-    this->setTextCursor(cursor);
-    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    this->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    this->update();
-    this->verticalScrollBar()->setSliderPosition(0);
-
-    emit cursorPosChanged(&selectRange);
-    connectSignals(true);
-}
-
 void MkEdit::paintEvent(QPaintEvent *e)
 {
     QPainter painter(viewport());
