@@ -396,7 +396,6 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
 
         currentDocument->setDefaultFont(fontBase);
         viewText->setFont(fontBase);
-        connectDocument();
         currentDocument->setPlainText(fullContent);
 
         currentDocument->setFilePath(fileInfo.absoluteFilePath());
@@ -404,8 +403,16 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         viewTitle->setText(currentDocument->getFileName());
 
         viewText->setDocument(currentDocument.data());
-        viewText->initialialCursorPosition();
-        viewText->updateMkState();								//after connectDocuments();
+        connectDocument();
+        viewText->updateMkState();   							//before connectDocuments();
+
+        QTextCursor cursor = viewText->textCursor();
+        cursor.movePosition(QTextCursor::End,QTextCursor::MoveAnchor);
+        viewText->setTextCursor(cursor);
+        cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::MoveAnchor);
+        viewText->setTextCursor(cursor);
+        viewText->verticalScrollBar()->setSliderPosition(0);
+        viewText->setFocus();
         return NEW_DOCUMENT;
     }else{
 
@@ -415,10 +422,14 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         viewText->setDocument(currentDocument.data());
 
 
+        viewText->updateMkState();   							//before connectDocuments();
+        connectDocument();
+
         QTextCursor cursor = viewText->textCursor();
         QTextBlock block = currentDocument->findBlockByNumber(this->currentDocument->getBlockNo());
         cursor.setPosition(block.position());
         cursor.movePosition(QTextCursor::StartOfBlock,QTextCursor::MoveAnchor);
+        viewText->setTextCursor(cursor);
 
         const int characterNo = this->currentDocument->getCharacterNo();
         for(int rep = 0; rep < characterNo; ++rep){
@@ -426,9 +437,7 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         }
         currentDocument->setDefaultFont(fontBase);
         viewText->setFont(fontBase);
-        connectDocument();
         viewText->setTextCursor(cursor);
-        viewText->updateMkState();   							//after connectDocuments();
         return OLD_DOCUMENT;
     }
 }
