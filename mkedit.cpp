@@ -136,6 +136,8 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     undoData.editType = singleEdit;
     switch(event->key()){
     case Qt::Key_Shift: isShiftKeyPressed = true;
+    case Qt::Key_PageDown:
+    case Qt::Key_PageUp:
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
