@@ -809,11 +809,79 @@ TEST_CASE("MkEdit redo after undo after typing inside bold format then check if 
     REQUIRE("**bopld**" == text);
 }
 
+TEST_CASE("MkEdit check textcursor position for key_up and key_down presses", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    int initialPos = 4; //**bo
+
+    doc.setPlainText("**bold**\n*italic*");
+    doc.setMarkdownHandle(true);
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyMkSingleBlock,
+                     &doc,&MkTextDocument::applyMkSingleBlockHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+
+    cursor.setPosition(initialPos);
+    edit.setTextCursor(cursor);
+
+    QScopedPointer<QKeyEvent> keyDownPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Down, Qt::NoModifier)) ;
+    edit.keyPressEvent(keyDownPressEvent.data());
+
+    QString text = edit.toPlainText();
+    REQUIRE("bold\n*italic*" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == initialPos);
+
+    QScopedPointer<QKeyEvent> keyUpPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier)) ;
+    edit.keyPressEvent(keyUpPressEvent.data());
+
+    text = edit.toPlainText();
+    REQUIRE("**bold**\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == initialPos);
+
+    keyDownPressEvent.reset(new QKeyEvent(QEvent::KeyPress, Qt::Key_Down, Qt::ShiftModifier));
+    edit.keyPressEvent(keyDownPressEvent.data());
+
+    text = edit.toPlainText();
+    REQUIRE("**bold**\n*italic*" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == initialPos);
+}
+
 TEST_CASE("MkEdit check shown symbol for page_up and page_down keys", "[MkEdit]")
 {
     MkTextDocument doc;
     MkEdit edit;
-    QChar paragraphSeparator(0x2029);
     int initialPos = 4; //**bo
 
     doc.setPlainText("**bold**\n*italic*");
