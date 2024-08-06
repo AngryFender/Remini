@@ -138,8 +138,8 @@ protected:
     bool isMouseOnCheckBox(QMouseEvent *e);
     void showSelectionAfterUndo();
     void showSelectionAfterRedo();
-    void setPreArrowKeys(bool isShiftPressed);
-    void setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed);
+    void setPreArrowKeys(const bool isShiftPressed);
+    void setPostArrowKeys(const bool isShiftPressed, const bool isLeftArrowPressed, const bool isUpOrDownArrowPressed);
 
     void restoreTextCursor(int blockNo, int posInBlock, bool hasSelection);
     void postCursorPosChangedSignal();

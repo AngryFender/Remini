@@ -143,7 +143,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Left:
     case Qt::Key_Down:      setPreArrowKeys(event->modifiers()==Qt::SHIFT);
                             QTextEdit::keyPressEvent(event);
-                            setPostArrowKeys(event->modifiers() == Qt::SHIFT, event->key() == Qt::Key_Left);
+                            setPostArrowKeys(event->modifiers() == Qt::SHIFT, event->key() == Qt::Key_Left,event->key() == Qt::Key_Up || event->key() == Qt::Key_Down);
                             return;
     case Qt::Key_Control:
     case Qt::Key_Alt:       QTextEdit::keyPressEvent(event);return;
@@ -272,16 +272,17 @@ void MkEdit::showSelectionAfterRedo()
     }
 }
 
-void MkEdit::setPreArrowKeys(bool isShiftPressed)
+void MkEdit::setPreArrowKeys(const bool isShiftPressed)
 {
     QTextCursor cursor = this->textCursor();
     if(!cursor.hasSelection() && isShiftPressed){
         selectRange.selectionFirstStartBlock = cursor.blockNumber();
         selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
     }
+    selectRange.arrowPosInBlock = cursor.positionInBlock();
 }
 
-void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed)
+void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed, const bool isUpOrDownArrowPressed)
 {
     disconnectSignals(true);
     QTextCursor cursor = this->textCursor();
@@ -291,7 +292,9 @@ void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed)
         selectRange.hasSelection = false;
         emit cursorPosChanged(&selectRange);
 
-        cursor.setPosition(this->textCursor().block().position() + selectRange.selectionFirstStartPosInBlock);
+        selectRange.arrowPosInBlock = isUpOrDownArrowPressed? selectRange.arrowPosInBlock : selectRange.selectionFirstStartPosInBlock;
+        selectRange.arrowPosInBlock = (selectRange.arrowPosInBlock >textCursor().block().text().length())? textCursor().block().text().length(): selectRange.arrowPosInBlock;
+        cursor.setPosition(this->textCursor().block().position() + selectRange.arrowPosInBlock);
         this->setTextCursor(cursor);
     }else{
         selectRange.selectionEndBlock 		= selectRange.currentBlockNo    = cursor.blockNumber();
@@ -299,8 +302,11 @@ void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed)
         selectRange.hasSelection = true;
         emit cursorPosChanged(&selectRange);
 
+        selectRange.arrowPosInBlock = isUpOrDownArrowPressed? selectRange.arrowPosInBlock : selectRange.selectionEndPosInBlock;
+        selectRange.arrowPosInBlock = (selectRange.arrowPosInBlock >textCursor().block().text().length())? textCursor().block().text().length(): selectRange.arrowPosInBlock;
+
         cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionFirstStartBlock).position() + selectRange.selectionFirstStartPosInBlock);
-        cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionEndBlock).position() + selectRange.selectionEndPosInBlock,QTextCursor::KeepAnchor);
+        cursor.setPosition(this->document()->findBlockByNumber(selectRange.selectionEndBlock).position() + selectRange.arrowPosInBlock,QTextCursor::KeepAnchor);
         this->setTextCursor(cursor);
     }
 
