@@ -279,7 +279,8 @@ void MkEdit::setPreArrowKeys(const bool isShiftPressed)
         selectRange.selectionFirstStartBlock = cursor.blockNumber();
         selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
     }
-    selectRange.arrowPosInBlock = cursor.positionInBlock();
+
+    selectRange.arrowPosInBlock = cursor.positionInBlock()? cursor.positionInBlock() : selectRange.arrowPosInBlock;
 }
 
 void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed, const bool isUpOrDownArrowPressed)
@@ -292,9 +293,11 @@ void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed, cons
         selectRange.hasSelection = false;
         emit cursorPosChanged(&selectRange);
 
-        selectRange.arrowPosInBlock = isUpOrDownArrowPressed? selectRange.arrowPosInBlock : selectRange.selectionFirstStartPosInBlock;
-        selectRange.arrowPosInBlock = (selectRange.arrowPosInBlock >textCursor().block().text().length())? textCursor().block().text().length(): selectRange.arrowPosInBlock;
-        cursor.setPosition(this->textCursor().block().position() + selectRange.arrowPosInBlock);
+        int arrowPosInBlock;
+        arrowPosInBlock = isUpOrDownArrowPressed? selectRange.arrowPosInBlock : selectRange.selectionFirstStartPosInBlock;
+        arrowPosInBlock = (arrowPosInBlock >textCursor().block().text().length())? textCursor().block().text().length(): arrowPosInBlock;
+        arrowPosInBlock = cursor.positionInBlock()? arrowPosInBlock: 0;
+        cursor.setPosition(this->textCursor().block().position() + arrowPosInBlock);
         this->setTextCursor(cursor);
     }else{
         selectRange.selectionEndBlock 		= selectRange.currentBlockNo    = cursor.blockNumber();
