@@ -296,7 +296,7 @@ void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed, cons
         int arrowPosInBlock;
         arrowPosInBlock = isUpOrDownArrowPressed? selectRange.arrowPosInBlock : selectRange.selectionFirstStartPosInBlock;
         arrowPosInBlock = (arrowPosInBlock >textCursor().block().text().length())? textCursor().block().text().length(): arrowPosInBlock;
-        arrowPosInBlock = cursor.positionInBlock()? arrowPosInBlock: 0;
+        arrowPosInBlock = (textCursor().block().text().length()>0)? arrowPosInBlock: 0;
         cursor.setPosition(this->textCursor().block().position() + arrowPosInBlock);
         this->setTextCursor(cursor);
     }else{
