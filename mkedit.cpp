@@ -141,7 +141,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Up:
     case Qt::Key_Right:
     case Qt::Key_Left:
-    case Qt::Key_Down:      setPreArrowKeys(event->modifiers()==Qt::SHIFT);
+    case Qt::Key_Down:      setPreArrowKeys(event->modifiers()==Qt::SHIFT,event->key() == Qt::Key_Up || event->key() == Qt::Key_Down);
                             QTextEdit::keyPressEvent(event);
                             setPostArrowKeys(event->modifiers() == Qt::SHIFT, event->key() == Qt::Key_Left,event->key() == Qt::Key_Up || event->key() == Qt::Key_Down);
                             return;
@@ -179,7 +179,7 @@ void MkEdit::keyPressEvent(QKeyEvent *event)
     clearMkEffects(undoData.editType);
     QTextEdit::keyPressEvent(event);
     selectRange.currentBlockNo    = textCursor().blockNumber();
-    selectRange.currentposInBlock = textCursor().positionInBlock();
+    selectRange.currentposInBlock = selectRange.arrowPosInBlock = textCursor().positionInBlock();
 
     switch(event->key()){
     case Qt::Key_Enter:
@@ -272,7 +272,7 @@ void MkEdit::showSelectionAfterRedo()
     }
 }
 
-void MkEdit::setPreArrowKeys(const bool isShiftPressed)
+void MkEdit::setPreArrowKeys(const bool isShiftPressed, const bool isUpOrDownArrowPressed)
 {
     QTextCursor cursor = this->textCursor();
     if(!cursor.hasSelection() && isShiftPressed){
@@ -280,10 +280,10 @@ void MkEdit::setPreArrowKeys(const bool isShiftPressed)
         selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
     }
 
-    selectRange.arrowPosInBlock = cursor.positionInBlock()? cursor.positionInBlock() : selectRange.arrowPosInBlock;
+    selectRange.arrowPosInBlock = isUpOrDownArrowPressed && cursor.positionInBlock()<selectRange.arrowPosInBlock ? selectRange.arrowPosInBlock: cursor.positionInBlock() ;
 }
 
-void MkEdit::setPostArrowKeys(bool isShiftPressed, bool isLeftArrowPressed, const bool isUpOrDownArrowPressed)
+void MkEdit::setPostArrowKeys(const bool isShiftPressed, const bool isLeftArrowPressed, const bool isUpOrDownArrowPressed)
 {
     disconnectSignals(true);
     QTextCursor cursor = this->textCursor();
