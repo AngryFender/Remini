@@ -303,6 +303,12 @@ void MkEdit::setPostArrowKeys(const bool isShiftPressed, const bool isLeftArrowP
             arrowPosInBlock = (textCursor().block().text().length()==0)? 0 : arrowPosInBlock;
             cursor.setPosition(this->textCursor().block().position() + arrowPosInBlock);
             this->setTextCursor(cursor);
+        }else{
+            if(!isUpOrDownArrowPressed){
+                int arrowPosInBlock = selectRange.arrowPosInBlock = selectRange.selectionFirstStartPosInBlock;
+                cursor.setPosition(this->textCursor().block().position() + arrowPosInBlock);
+                this->setTextCursor(cursor);
+            }
         }
     }else{
         selectRange.selectionEndBlock 		= selectRange.currentBlockNo    = cursor.blockNumber();
