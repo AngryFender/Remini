@@ -63,6 +63,7 @@ private:
 struct SelectRange{
     bool hasSelection 	= false;
     bool isCheckBox 	= false;
+    int arrowBlock      = NO_SELECTION_POS;
     int arrowPosInBlock = NO_SELECTION_POS;
     int currentposInBlock      = NO_SELECTION_POS;
     int currentBlockNo         = NO_SELECTION_POS;

@@ -280,6 +280,7 @@ void MkEdit::setPreArrowKeys(const bool isShiftPressed, const bool isUpOrDownArr
         selectRange.selectionFirstStartPosInBlock = cursor.positionInBlock();
     }
 
+    selectRange.arrowBlock = cursor.blockNumber() ;
     selectRange.arrowPosInBlock = isUpOrDownArrowPressed && cursor.positionInBlock()<selectRange.arrowPosInBlock ? selectRange.arrowPosInBlock: cursor.positionInBlock() ;
 }
 
@@ -292,13 +293,17 @@ void MkEdit::setPostArrowKeys(const bool isShiftPressed, const bool isLeftArrowP
         selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= selectRange.currentposInBlock = cursor.positionInBlock();
         selectRange.hasSelection = false;
         emit cursorPosChanged(&selectRange);
-
-        int arrowPosInBlock;
-        arrowPosInBlock = isUpOrDownArrowPressed? selectRange.arrowPosInBlock : selectRange.selectionFirstStartPosInBlock;
-        arrowPosInBlock = (arrowPosInBlock >textCursor().block().text().length())? textCursor().block().text().length(): arrowPosInBlock;
-        arrowPosInBlock = (textCursor().block().text().length()>0)? arrowPosInBlock: 0;
-        cursor.setPosition(this->textCursor().block().position() + arrowPosInBlock);
+        cursor.setPosition(this->textCursor().block().position() + selectRange.selectionFirstStartPosInBlock);
         this->setTextCursor(cursor);
+
+        if(selectRange.arrowBlock != textCursor().blockNumber()){
+            int arrowPosInBlock;
+            arrowPosInBlock = isUpOrDownArrowPressed? selectRange.arrowPosInBlock : selectRange.selectionFirstStartPosInBlock;
+            arrowPosInBlock = (arrowPosInBlock >= textCursor().block().text().length())? textCursor().block().text().length(): arrowPosInBlock;
+            arrowPosInBlock = (textCursor().block().text().length()==0)? 0 : arrowPosInBlock;
+            cursor.setPosition(this->textCursor().block().position() + arrowPosInBlock);
+            this->setTextCursor(cursor);
+        }
     }else{
         selectRange.selectionEndBlock 		= selectRange.currentBlockNo    = cursor.blockNumber();
         selectRange.selectionEndPosInBlock 	= selectRange.currentposInBlock = cursor.positionInBlock();
