@@ -2694,3 +2694,112 @@ TEST_CASE("MkEdit raw document after multiple undo/redo", "[MkEdit]")
     REQUIRE("**bold**  *day*" == text);
 }
 
+TEST_CASE("MkEdit arrows and cursor position", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    doc.setPlainText("**bold**\n*italic*\n\nnormal\n**bold**\nnormal again\n*italic*");
+    doc.setMarkdownHandle(true);
+
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyMkSingleBlock,
+                     &doc,&MkTextDocument::applyMkSingleBlockHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(1);
+    edit.setTextCursor(cursor);
+    cursor.setPosition(0);
+    edit.setTextCursor(cursor);
+    QString text = edit.toPlainText();
+    REQUIRE("**bold**\nitalic\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 0);
+
+    QScopedPointer<QKeyEvent>  downKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Down, Qt::NoModifier)) ;
+    edit.keyPressEvent(downKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\n*italic*\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 0);
+
+    edit.keyPressEvent(downKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 0);
+
+    edit.keyPressEvent(downKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 0);
+
+    edit.keyPressEvent(downKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\n**bold**\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 0);
+
+    edit.keyPressEvent(downKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 0);
+
+    edit.keyPressEvent(downKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\nbold\nnormal again\n*italic*" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 0);
+
+    QScopedPointer<QKeyEvent> homeKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_End, Qt::NoModifier)) ;
+    edit.keyPressEvent(homeKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\nbold\nnormal again\n*italic*" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 8);
+
+    QScopedPointer<QKeyEvent> upKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier)) ;
+    edit.keyPressEvent(upKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 8);
+
+    edit.keyPressEvent(upKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\n**bold**\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 8);
+
+    edit.keyPressEvent(upKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 6);
+
+    edit.keyPressEvent(upKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\nitalic\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 0);
+
+    edit.keyPressEvent(upKeyPressEvent.data());
+    text = edit.toPlainText();
+    REQUIRE("bold\n*italic*\n\nnormal\nbold\nnormal again\nitalic" == text);
+    REQUIRE(edit.textCursor().positionInBlock() == 8);
+
+}
