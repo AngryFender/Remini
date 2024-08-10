@@ -2803,3 +2803,67 @@ TEST_CASE("MkEdit arrows and cursor position", "[MkEdit]")
     REQUIRE(edit.textCursor().positionInBlock() == 8);
 
 }
+
+TEST_CASE("MkEdit check formats of the 1st block when selected texts are deleted in other blocks", "[MkEdit]")
+{
+    MkTextDocument doc;
+    MkEdit edit;
+    doc.setPlainText("**bold**\n*italic*\n[google](<www.google.com>)\n```c++\nvoid main(){};\n```\n\n- [ ]  \n- [ ]  \n- [x] \n- [x] ");
+    doc.setMarkdownHandle(true);
+
+    edit.setDocument(&doc);
+
+    QObject::connect(&edit,&MkEdit::cursorPosChanged,
+                     &doc,&MkTextDocument::cursorPosChangedHandle);
+
+    QObject::connect(&edit,&MkEdit::removeAllMkData,
+                     &doc,&MkTextDocument::removeAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::applyAllMkData,
+                     &doc,&MkTextDocument::applyAllMkDataHandle);
+
+    QObject::connect(&edit,&MkEdit::undoStackPushSignal,
+                     &doc,&MkTextDocument::undoStackPush);
+
+    QObject::connect(&edit,&MkEdit::undoStackUndoSignal,
+                     &doc,&MkTextDocument::undoStackUndo);
+
+    QObject::connect(&edit,&MkEdit::undoStackRedoSignal,
+                     &doc,&MkTextDocument::undoStackRedo);
+
+    QObject::connect(&edit,&MkEdit::saveSingleRawBlock,
+                     &doc,&MkTextDocument::saveSingleRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveEnterPressedRawBlock,
+                     &doc,&MkTextDocument::saveEnterPressRawBlockHandler);
+
+    QObject::connect(&edit,&MkEdit::saveRawDocument,
+                     &doc,&MkTextDocument::saveRawDocumentHandler);
+
+    QObject::connect(&edit,&MkEdit::enterKeyPressed,
+                     &doc,&MkTextDocument::enterKeyPressedHandle);
+
+
+    QTextCursor cursor = edit.textCursor();
+    cursor.setPosition(0);
+    edit.setTextCursor(cursor);
+    cursor.setPosition(13);
+    edit.setTextCursor(cursor);
+
+    QScopedPointer<QKeyEvent>  ShiftKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::ShiftModifier)) ;
+    for(int i = 0; i < 70; i ++){
+        edit.keyPressEvent(ShiftKeyPressEvent.data());
+    }
+
+    QScopedPointer<QKeyEvent>  backSpaceKeyPressEvent(new QKeyEvent(QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier)) ;
+    edit.keyPressEvent(backSpaceKeyPressEvent.data());
+
+    cursor.setPosition(3);
+    edit.setTextCursor(cursor);
+
+    QString text= edit.toPlainText();
+
+    QTextCharFormat format = edit.textCursor().charFormat();
+    REQUIRE(format.fontWeight() == QFont::ExtraBold);
+
+}
