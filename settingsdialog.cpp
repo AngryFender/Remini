@@ -180,13 +180,15 @@ void SettingsDialog::saveSettingsHandler()
     if(ui->cmb_mkState->currentText() == "Enabled"){
         mkState = true;
     }
-    emit updateUiSettings(font, mkState);
 
     settings.setValue("font",font.family());
     settings.setValue("fontsize",font.pointSize());
     settings.setValue("stretch",font.stretch());
     settings.setValue("weight",font.weight());
     settings.setValue("markdown",mkState);
+    settings.setValue("vaultPath",ui->edit_vaultRootPath->text());
+
+    emit updateUiSettings(font, mkState);
 }
 
 void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)

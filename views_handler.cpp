@@ -469,6 +469,9 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
 
 void ViewsHandler::updateUiSettingsHandler(const QFont &font, const bool mkState)
 {
+    QSettings settings("Remini","Remini");
+    QString vaultPath = settings.value("vaultPath").toString();
+
     fontBase = font;
     viewText->setFont(fontBase);
     viewText->setMkState(mkState);
