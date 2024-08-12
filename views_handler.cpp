@@ -492,6 +492,12 @@ void ViewsHandler::updateUiSettingsHandler(const QFont &font, const bool mkState
     viewTextSearchEdit->setFont(fontView);
     viewTextSearchTree->setFont(fontView);
     settingsDialog->setFont(fontView);
+
+    initTreeView(vaultPath);
+    setVaultPath(vaultPath);
+
+    recentFilesList->clear();
+    recentFileCursorMap.clear();
 }
 
 void ViewsHandler::fileSaveRawHandle()
@@ -674,6 +680,10 @@ QString ViewsHandler::setVaultPathHandler()
 
     recentFilesList->clear();
     recentFileCursorMap.clear();
+
+    QSettings settings("Remini","Remini");
+    settings.setValue("VaultPath", newPath);
+
     return newPath;
     //recentFileDocumentMap.clear();
 }
