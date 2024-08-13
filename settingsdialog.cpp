@@ -199,6 +199,15 @@ void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)
 
 void SettingsDialog::show(const QString &vaultPath, const QFont &font, const bool markdownState)
 {
+    QSettings settings("Remini","Remini");
+    QString vaultRootPath = settings.value("vaultPath", QDir::currentPath()).toString();
+    QString fontFamily = settings.value("font", "Cascadia Mono").toString();
+    int fontSize = settings.value("fontsize", 11).toInt();
+    bool markdown = settings.value("markdown", true).toBool();
+    int stretch = settings.value("stretch",5).toInt();
+    int weight = settings.value("weight", 2).toInt();
+
+
     ui->edit_vaultRootPath->setText(vaultPath);
     if(markdownState){
         ui->cmb_mkState->setCurrentIndex(0);
