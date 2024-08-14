@@ -1027,11 +1027,9 @@ void MkEdit::fileSaveHandle()
 
 void MkEdit::diableMarkdown_internal()
 {
-    if("Disable Markdown" ==disableMarkdown.text()){
-        setMkState(false);
-    }else{
-        setMkState(true);
-    }
+    QSettings settings("Remini","Remini");
+    bool markdownStatus = settings.value("markdown",true).toBool();
+    setMkState(!markdownStatus);
 }
 
 void MkEdit::lineWrapHandler()

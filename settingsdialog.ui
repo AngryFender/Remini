@@ -16,10 +16,25 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QFormLayout" name="formLayout">
+     <property name="horizontalSpacing">
+      <number>0</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>5</number>
+     </property>
+     <property name="leftMargin">
+      <number>13</number>
+     </property>
+     <property name="rightMargin">
+      <number>11</number>
+     </property>
+     <property name="bottomMargin">
+      <number>7</number>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="lbl_vaultRootPath">
        <property name="text">
-        <string>Vault Root Path</string>
+        <string>Vault Root Path </string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -140,7 +155,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </layout>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="lbl_markdown">
        <property name="text">
         <string>Markdown</string>
        </property>
