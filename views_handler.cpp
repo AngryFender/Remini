@@ -645,7 +645,7 @@ void ViewsHandler::displayTextSearchedFilePosition(QString &filePath,int searchT
 
 void ViewsHandler::showSettingsBtn()
 {
-    settingsDialog->show(vaultPath, viewText->font(), viewText->getMkState());
+    settingsDialog->show();
 }
 
 void ViewsHandler::fileRenamedHandler(const QString& newName, const QString &oldName, const QModelIndex& index)

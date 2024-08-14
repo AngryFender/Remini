@@ -44,7 +44,7 @@ private slots:
     void saveSettingsHandler();
 public slots:
     void syntaxColorUpdateHandler(HighlightColor &colors);
-    void show(const QString &vaultPath, const QFont &font, const bool markdownState);
+    void show();
 private:
     Ui::SettingsDialog *ui;
     HighlightColor previewColors;

@@ -14,8 +14,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     previewHighligher.setDocument(&this->previewDocument) ;
     ui->txt_preview->setDocument(&this->previewDocument);
 
-    ui->cmb_mkState->addItem("Enabled");
     ui->cmb_mkState->addItem("Disabled");
+    ui->cmb_mkState->addItem("Enabled");
 
     ui->cmb_theme->addItem("Light Theme");
     ui->cmb_theme->addItem("Dark Theme");
@@ -91,6 +91,7 @@ void SettingsDialog::setFont(const QFont &font)
     ui->edit_vaultRootPath->setFont(font);
     ui->lbl_vaultRootPath->setFont(font);
     ui->btn_vaultRootPath->setFont(font);
+    ui->lbl_markdown->setFont(font);
     ui->lbl_theme->setFont(font);
     ui->cmb_theme->setFont(font);
     ui->lbl_weight->setFont(font);
@@ -197,28 +198,22 @@ void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)
     emit syntaxColorUpdate(previewColors);
 }
 
-void SettingsDialog::show(const QString &vaultPath, const QFont &font, const bool markdownState)
+void SettingsDialog::show()
 {
     QSettings settings("Remini","Remini");
-    QString vaultRootPath = settings.value("vaultPath", QDir::currentPath()).toString();
     QString fontFamily = settings.value("font", "Cascadia Mono").toString();
     int fontSize = settings.value("fontsize", 11).toInt();
     bool markdown = settings.value("markdown", true).toBool();
-    int stretch = settings.value("stretch",5).toInt();
-    int weight = settings.value("weight", 2).toInt();
+    int stretch = settings.value("stretch", QFont::Unstretched).toInt();
+    int weight = settings.value("weight", QFont::Normal).toInt();
+    vaultRootPath = settings.value("vaultPath", QDir::currentPath()).toString();
+    ui->cmb_mkState->setCurrentIndex(markdown);
+    ui->edit_vaultRootPath->setText(vaultRootPath);
+    ui->cmb_font->setCurrentIndex(ui->cmb_font->findText(fontFamily));
+    ui->ledit_font_size->setText(QString::number(fontSize));
 
-
-    ui->edit_vaultRootPath->setText(vaultPath);
-    if(markdownState){
-        ui->cmb_mkState->setCurrentIndex(0);
-    }else{
-        ui->cmb_mkState->setCurrentIndex(1);
-    }
-    ui->cmb_font->setCurrentIndex(ui->cmb_font->findText(font.family()));
-    ui->ledit_font_size->setText(QString::number(font.pointSize()));
-
-    int index_weight = 0;
-    switch(font.weight()){
+    int index_weight;
+    switch(weight){
     case QFont::Thin: index_weight = 0;break;
     case QFont::Light:index_weight = 1;break;
     case QFont::Normal:index_weight = 2;break;
@@ -227,12 +222,12 @@ void SettingsDialog::show(const QString &vaultPath, const QFont &font, const boo
     case QFont::Bold:index_weight = 5;break;
     case QFont::ExtraBold:index_weight = 6;break;
     case QFont::Black:index_weight = 7;break;
-    default: break;
+    default: index_weight = 2;
     }
     ui->cmb_weight->setCurrentIndex(index_weight);
 
     int index_stretch = 0;
-    switch(font.stretch()){
+    switch(stretch){
     case QFont::AnyStretch:index_stretch = 0;break;
     case QFont::UltraCondensed:index_stretch = 1;break;
     case QFont::ExtraCondensed:index_stretch = 2;break;
@@ -243,10 +238,12 @@ void SettingsDialog::show(const QString &vaultPath, const QFont &font, const boo
     case QFont::Expanded:index_stretch = 7;break;
     case QFont::ExtraExpanded:index_stretch = 8;break;
     case QFont::UltraExpanded:index_stretch = 9;break;
-    default: break;
+    default: index_stretch = 6;
     }
     ui->cmb_stretch->setCurrentIndex(index_stretch);
 
+    QFont font(fontFamily, fontSize, weight);
+    font.setStretch(stretch);
     ui->txt_preview->setFont(font);
     ui->txt_preview->update();
     QDialog::show();
