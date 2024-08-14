@@ -1,4 +1,5 @@
 #include <QElapsedTimer>
+#include <QSettings>
 #include "blockdata.h"
 #include "linedata.h"
 #include "mkedit.h"
@@ -121,6 +122,9 @@ void MkEdit::wheelEvent(QWheelEvent *e)
                 this->zoomOut();
         }
         this->ensureCursorVisible();
+
+        QSettings settings("Remini","Remini");
+        settings.setValue("fontsize",this->currentFont().pointSizeF());
     }else{
         QTextEdit::wheelEvent(e);
     }
