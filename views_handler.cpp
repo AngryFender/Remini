@@ -378,6 +378,16 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
     //disconnect signals from old current document
     disconnectDocument();
 
+    QSettings settings("Remini","Remini");
+    QString fontFamily = settings.value("font", "Cascadia Mono").toString();
+    int fontSize = settings.value("fontsize", 11).toInt();
+    bool markdown = settings.value("markdown", true).toBool();
+    int stretch = settings.value("stretch", QFont::Unstretched).toInt();
+    int weight = settings.value("weight", QFont::Normal).toInt();
+
+    QFont font(fontFamily,fontSize,weight,false);
+    font.setStretch(stretch);
+
     //set the cursor position of the current document
     QTextCursor cursor = viewText->textCursor();
     currentDocument->setCursorPos(cursor.blockNumber(),cursor.positionInBlock()) ;
@@ -394,8 +404,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         const QScopedPointer<QFile> file = QScopedPointer<QFile>(new QFile(filePath));
         const QString fullContent = getFileContent(*file.get());
 
-        currentDocument->setDefaultFont(fontBase);
-        viewText->setFont(fontBase);
+        currentDocument->setDefaultFont(font);
+        viewText->setFont(font);
         currentDocument->setPlainText(fullContent);
 
         currentDocument->setFilePath(fileInfo.absoluteFilePath());
@@ -404,7 +414,7 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
 
         viewText->setDocument(currentDocument.data());
         connectDocument();
-        viewText->updateMkState();   							//before connectDocuments();
+        viewText->setMarkdownStatus(markdown);   							//after connectDocuments();
 
         QTextCursor cursor = viewText->textCursor();
         cursor.movePosition(QTextCursor::End,QTextCursor::MoveAnchor);
@@ -421,8 +431,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         viewTitle->setText(currentDocument->getFileName());
         viewText->setDocument(currentDocument.data());
 
+        viewText->setMarkdownStatus(markdown);   							//before connectDocuments();
 
-        viewText->updateMkState();   							//before connectDocuments();
         connectDocument();
 
         QTextCursor cursor = viewText->textCursor();
@@ -435,8 +445,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         for(int rep = 0; rep < characterNo; ++rep){
             cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
         }
-        currentDocument->setDefaultFont(fontBase);
-        viewText->setFont(fontBase);
+        currentDocument->setDefaultFont(font);
+        viewText->setFont(font);
         viewText->setTextCursor(cursor);
         return OLD_DOCUMENT;
     }
