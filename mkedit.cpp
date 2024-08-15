@@ -982,8 +982,6 @@ QString MkEdit::rawPlainText() const
 
 void MkEdit::setMkState(bool enable)
 {
-    showMarkDown = enable;
-
     if(enable){
         disableMarkdown.setText("Disable Markdown");
         emit setMarkdownStatus(true);
@@ -991,16 +989,8 @@ void MkEdit::setMkState(bool enable)
         disableMarkdown.setText("Enable Markdown");
         emit setMarkdownStatus(false);
     }
-}
-
-void MkEdit::updateMkState()
-{
-    setMkState(showMarkDown);
-}
-
-bool MkEdit::getMkState()
-{
-    return showMarkDown;
+    QSettings settings("Remini","Remini");
+    settings.setValue("markdown",enable);
 }
 
 void MkEdit::setFont(const QFont &font)
