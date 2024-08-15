@@ -108,7 +108,7 @@ void ViewsHandler::initFontDefault()
     font.setStretch(settings.value("stretch",0).toInt());
     font.setWeight((QFont::Weight)settings.value("weight",1).toInt());
 
-    updateUiSettingsHandler(font,true);
+    updateUiSettingsHandler(font);
 }
 
 void ViewsHandler::initConnection()
@@ -431,10 +431,10 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         viewTitle->setText(currentDocument->getFileName());
         viewText->setDocument(currentDocument.data());
 
-        viewText->setMkState(markdown);   							//before connectDocuments();
 
         connectDocument();
 
+        viewText->setMkState(markdown);   							//before connectDocuments();
         QTextCursor cursor = viewText->textCursor();
         QTextBlock block = currentDocument->findBlockByNumber(this->currentDocument->getBlockNo());
         cursor.setPosition(block.position());
@@ -477,14 +477,15 @@ void ViewsHandler::fileDisplay(const QModelIndex& index)
     }
 }
 
-void ViewsHandler::updateUiSettingsHandler(const QFont &font, const bool mkState)
+void ViewsHandler::updateUiSettingsHandler(const QFont &font)
 {
     QSettings settings("Remini","Remini");
     QString vaultPath = settings.value("vaultPath").toString();
+    bool markdown = settings.value("markdown", true).toBool();
 
     fontBase = font;
     viewText->setFont(fontBase);
-    viewText->setMkState(mkState);
+    viewText->setMkState(markdown);
 
     QFont fontTitle = font;
     fontTitle.setPointSize(fontBase.pointSize()*2);

@@ -177,19 +177,14 @@ void SettingsDialog::saveSettingsHandler()
     QSettings settings("Remini","Remini");
     const QFont font = ui->txt_preview->font();
 
-    bool mkState = false;
-    if(ui->cmb_mkState->currentText() == "Enabled"){
-        mkState = true;
-    }
-
     settings.setValue("font",font.family());
     settings.setValue("fontsize",font.pointSize());
     settings.setValue("stretch",font.stretch());
     settings.setValue("weight",font.weight());
-    settings.setValue("markdown",mkState);
+    settings.setValue("markdown",ui->cmb_mkState->currentIndex());
     settings.setValue("vaultPath",ui->edit_vaultRootPath->text());
 
-    emit updateUiSettings(font, mkState);
+    emit updateUiSettings(font);
 }
 
 void SettingsDialog::syntaxColorUpdateHandler(HighlightColor &colors)

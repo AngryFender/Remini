@@ -34,7 +34,7 @@ public:
     
 signals:
     void syntaxColorUpdate(HighlightColor &colors);
-    void updateUiSettings(const QFont &font, const bool mkState);
+    void updateUiSettings(const QFont &font);
 private slots:
     void executeFolderDialog();
     void updateFontHandler(const QFont &f);
