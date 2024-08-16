@@ -374,6 +374,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
 {
     if (!fileInfo.isFile())
         return NOT_DOCUMENT;
+    //set the cursor position of the current document
+    currentDocument->setCursorPos(viewText->textCursor().blockNumber(),viewText->textCursor().positionInBlock()) ;
 
     //disconnect signals from old current document
     disconnectDocument();
@@ -388,9 +390,6 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
     QFont font(fontFamily,fontSize,weight,false);
     font.setStretch(stretch);
 
-    //set the cursor position of the current document
-    QTextCursor cursor = viewText->textCursor();
-    currentDocument->setCursorPos(cursor.blockNumber(),cursor.positionInBlock()) ;
 
     //set current document to textview
     const QString &filePath = fileInfo.absoluteFilePath();
@@ -426,27 +425,28 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         return NEW_DOCUMENT;
     }else{
 
-        currentDocument->setFilePath(fileInfo.absoluteFilePath());
+        currentDocument.data()->setFilePath(fileInfo.absoluteFilePath());
         highlighter.setDocument(currentDocument.data());
-        viewTitle->setText(currentDocument->getFileName());
+        viewTitle->setText(currentDocument.data()->getFileName());
         viewText->setDocument(currentDocument.data());
 
 
-        connectDocument();
-
         viewText->setMkState(markdown);   							//before connectDocuments();
+        connectDocument();
+        currentDocument->setDefaultFont(font);
+        viewText->setFont(font);
+
         QTextCursor cursor = viewText->textCursor();
-        QTextBlock block = currentDocument->findBlockByNumber(this->currentDocument->getBlockNo());
+        QTextBlock block = currentDocument->findBlockByNumber(this->currentDocument.data()->getBlockNo());
         cursor.setPosition(block.position());
         cursor.movePosition(QTextCursor::StartOfBlock,QTextCursor::MoveAnchor);
         viewText->setTextCursor(cursor);
 
-        const int characterNo = this->currentDocument->getCharacterNo();
+        cursor = viewText->textCursor();
+        const int characterNo = this->currentDocument.data()->getCharacterNo();
         for(int rep = 0; rep < characterNo; ++rep){
             cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor);
         }
-        currentDocument->setDefaultFont(font);
-        viewText->setFont(font);
         viewText->setTextCursor(cursor);
         return OLD_DOCUMENT;
     }
