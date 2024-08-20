@@ -79,8 +79,13 @@ void ViewsHandler::initViews(Ui::MainWindow &ui)
     initFontDefault();
 }
 
-void ViewsHandler::initTreeView(QString path)
+bool ViewsHandler::initTreeView(QString path)
 {
+    //ignore if the path is already set
+    if(modelTree.rootPath()==path){
+        return false;
+    }
+
     modelTree.setReadOnly(false);
     modelTree.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
     if(path.isEmpty()){
@@ -97,6 +102,7 @@ void ViewsHandler::initTreeView(QString path)
     {
         viewTree->setColumnHidden(column,true);
     }
+    return true;
 }
 
 void ViewsHandler::initFontDefault()
@@ -504,11 +510,10 @@ void ViewsHandler::updateUiSettingsHandler(const QFont &font)
     viewTextSearchTree->setFont(fontView);
     settingsDialog->setFont(fontView);
 
-    initTreeView(vaultPath);
-    setVaultPath(vaultPath);
-
-    recentFilesList->clear();
-    recentFileCursorMap.clear();
+    if(initTreeView(vaultPath)){
+        recentFilesList->clear();
+        recentFileCursorMap.clear();
+    }
 }
 
 void ViewsHandler::fileSaveRawHandle()
@@ -686,12 +691,10 @@ QString ViewsHandler::setVaultPathHandler()
         QStringList list = dialog.selectedFiles();
         newPath = list.first();
     }
-    initTreeView(newPath);
-    setVaultPath(newPath);
-
-    recentFilesList->clear();
-    recentFileCursorMap.clear();
-
+    if(initTreeView(newPath)){
+        recentFilesList->clear();
+        recentFileCursorMap.clear();
+    }
     QSettings settings("Remini","Remini");
     settings.setValue("VaultPath", newPath);
 

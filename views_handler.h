@@ -94,7 +94,7 @@ private:
     void setVaultPath(QString& path);
 
     void initViews(Ui::MainWindow &ui);
-    void initTreeView(QString path = NULL);
+    bool initTreeView(QString path = NULL);
     void initFontDefault();
     void initConnection();
     void connectDocument();
