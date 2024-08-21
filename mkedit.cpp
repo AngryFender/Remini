@@ -989,8 +989,6 @@ void MkEdit::setMkState(bool enable)
         disableMarkdown.setText("Enable Markdown");
         emit setMarkdownStatus(false);
     }
-    QSettings settings("Remini","Remini");
-    settings.setValue("markdown",enable);
 }
 
 void MkEdit::setFont(const QFont &font)
@@ -1020,6 +1018,7 @@ void MkEdit::diableMarkdown_internal()
     QSettings settings("Remini","Remini");
     bool markdownStatus = settings.value("markdown",true).toBool();
     setMkState(!markdownStatus);
+    settings.setValue("markdown",!markdownStatus);
 }
 
 void MkEdit::lineWrapHandler()

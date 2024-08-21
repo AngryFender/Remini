@@ -59,7 +59,6 @@ private:
         QCoreApplication::setApplicationName("Remini");
         QSettings settings("Remini","Remini");
         markdown = settings.value("markdown",true).toBool();
-        viewText->setMarkdownStatus(markdown);
         viewText->setMkState(markdown);
         viewTitle->setText("Startup Tips");
 
