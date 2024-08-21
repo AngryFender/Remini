@@ -418,8 +418,8 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         viewTitle->setText(currentDocument->getFileName());
 
         viewText->setDocument(currentDocument.data());
+        currentDocument.data()->setMarkdownHandle(markdown);
         connectDocument();
-        viewText->setMkState(markdown);   							//after connectDocuments();
 
         QTextCursor cursor = viewText->textCursor();
         cursor.movePosition(QTextCursor::End,QTextCursor::MoveAnchor);
@@ -436,8 +436,7 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
         viewTitle->setText(currentDocument.data()->getFileName());
         viewText->setDocument(currentDocument.data());
 
-
-        viewText->setMkState(markdown);   							//before connectDocuments();
+        currentDocument.data()->setMarkdownHandle(markdown);
         connectDocument();
         currentDocument->setDefaultFont(font);
         viewText->setFont(font);
