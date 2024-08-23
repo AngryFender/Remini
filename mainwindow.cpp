@@ -5,7 +5,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    win = &WindowApi::instance();
     ui->setupUi(this);
     setup_views(this, *ui);
 
@@ -37,9 +36,11 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this,&MainWindow::sendFocusToNavigationView,
                      view_handler.get(),&ViewsHandler::sendFocusToNavigationViewHandler);
 
+#ifdef _WIN32
+    win = &WindowApi::instance();
     QObject::connect(win, &WindowApi::showApp,
                      this,&MainWindow::showHideApp);
-
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -99,6 +100,7 @@ void MainWindow::recentFilesHandler(bool show)
 
 void MainWindow::showHideApp()
 {
+#ifdef _WIN32
     if(this->isMinimized()){
         this->showNormal();
     }else{
@@ -109,6 +111,7 @@ void MainWindow::showHideApp()
             this->showNormal();
         }
     }
+#endif
 }
 
 void MainWindow::shiftTimerHandle()

@@ -38,8 +38,9 @@ private:
         lightThemeState,
         darkThemeState,
     };
-
+#ifdef _WIN32
     WindowApi * win;
+#endif
     QTimer *rightShiftTimer;
     QTimer *leftShiftTimer;
     Ui::MainWindow *ui;
