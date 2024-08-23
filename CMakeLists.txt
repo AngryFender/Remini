@@ -49,10 +49,15 @@ set(PROJECT_SOURCES
         settingsdialog.h
         settingsdialog.cpp
         settingsdialog.ui
+    )
+
+if(WIN32)
+    list(APPEND PROJECT_SOURCES
         iwindowapi.h
         windowapi.h
         windowapi.cpp
     )
+endif()
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Remini
