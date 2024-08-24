@@ -381,7 +381,7 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
     if (!fileInfo.isFile())
         return NOT_DOCUMENT;
     //set the cursor position of the current document
-    currentDocument->setCursorPos(viewText->textCursor().blockNumber(),viewText->textCursor().positionInBlock()) ;
+    currentDocument.data()->setCursorPos(viewText->textCursor().blockNumber(),viewText->textCursor().positionInBlock()) ;
 
     //disconnect signals from old current document
     disconnectDocument();
@@ -443,7 +443,10 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
 
         QTextCursor cursor = viewText->textCursor();
         QTextBlock block = currentDocument->findBlockByNumber(this->currentDocument.data()->getBlockNo());
+
         cursor.setPosition(block.position());
+        viewText->setTextCursor(cursor);
+
         cursor.movePosition(QTextCursor::StartOfBlock,QTextCursor::MoveAnchor);
         viewText->setTextCursor(cursor);
 
