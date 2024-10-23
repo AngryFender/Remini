@@ -3,7 +3,7 @@
 
 #include <QTextBlockUserData>
 
-#define HORIZONTALLINE_SYMBOL "---"
+#define HORIZONTALLINE_SYMBOL "^---$"
 
 class LineData : public QTextBlockUserData
 {
