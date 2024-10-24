@@ -199,6 +199,7 @@ signals:
 
     void resetAllLoc();
     void identifyFormatData(QTextBlock &block);
+    void identifyUnicode(QString &line);
     void insertHeadingData( const QString &text, int &index1, FormatData *formatData);
     void insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
     void insertFormatCheckBoxData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);

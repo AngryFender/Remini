@@ -414,6 +414,11 @@ void MkTextDocument::identifyFormatData(QTextBlock &block)
     }
 }
 
+void MkTextDocument::identifyUnicode(QString &line)
+{
+
+}
+
 void MkTextDocument::insertHeadingData( const QString &text, int &index1, FormatData *formatData)
 {
     if(HEADING1_SYMBOL == text.left(HEADING1_SYMBOL_COUNT)){
