@@ -49,6 +49,8 @@ set(PROJECT_SOURCES
         settingsdialog.h
         settingsdialog.cpp
         settingsdialog.ui
+        togglebutton.h
+        togglebutton.cpp
     )
 
 if(WIN32)
