@@ -293,7 +293,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="BtnReadOnly">
+             <widget class="ToggleButton" name="BtnReadOnly">
               <property name="maximumSize">
                <size>
                 <width>100</width>
@@ -378,7 +378,12 @@
   <customwidget>
    <class>NavigationView</class>
    <extends>QTreeView</extends>
-   <header location="global">navigationview.h</header>
+   <header>navigationview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ToggleButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">togglebutton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
