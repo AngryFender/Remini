@@ -1,8 +1,8 @@
 #include "togglebutton.h"
 
-ToggleButton::ToggleButton(QWidget *parent)
+ToggleButton::ToggleButton(QWidget *parent):QAbstractButton(parent), animation(new QPropertyAnimation(this,"pos",this))
 {
-
+    animation->setDuration(200);
 }
 
 void ToggleButton::keyPressEvent(QKeyEvent *e)

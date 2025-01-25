@@ -3,10 +3,15 @@
 
 #include <QAbstractButton>
 #include <QObject>
+#include <QPropertyAnimation>
 #include <QWidget>
 
 class ToggleButton : public QAbstractButton
 {
+private:
+    bool state;
+    QPropertyAnimation *animation = nullptr;
+    QBrush track, circle, brush;
 public:
     ToggleButton(QWidget * parent);
 
