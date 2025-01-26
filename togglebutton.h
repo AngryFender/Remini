@@ -11,6 +11,7 @@ class ToggleButton : public QAbstractButton
 private:
     bool state;
     QPropertyAnimation *animation = nullptr;
+
     QBrush track, circle, brush;
 public:
     ToggleButton(QWidget * parent);
