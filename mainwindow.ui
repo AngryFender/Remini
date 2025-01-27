@@ -294,9 +294,15 @@
             </item>
             <item>
              <widget class="ToggleButton" name="BtnReadOnly">
+              <property name="minimumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
-                <width>100</width>
+                <width>30</width>
                 <height>30</height>
                </size>
               </property>
