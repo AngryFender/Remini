@@ -6,7 +6,7 @@ ToggleButton::ToggleButton(QWidget *parent):QAbstractButton(parent), animation(n
     state = false;
     animation->setDuration(200);
     brush.setStyle(Qt::SolidPattern);
-    brush.setColor(QColorConstants::Cyan);
+    brush.setColor(QColor("#2492ff"));
 }
 
 void ToggleButton::keyPressEvent(QKeyEvent *e)
@@ -29,6 +29,12 @@ void ToggleButton::mousePressEvent(QMouseEvent *e)
     state = !state;
 }
 
+void ToggleButton::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    state = !state;
+    QWidget::mouseDoubleClickEvent(event);
+}
+
 void ToggleButton::mouseReleaseEvent(QMouseEvent *e)
 {
 
@@ -37,6 +43,7 @@ void ToggleButton::mouseReleaseEvent(QMouseEvent *e)
 void ToggleButton::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
+    p.setPen(Qt::NoPen);
     p.setBrush(state? brush:Qt::gray);
     p.setRenderHint(QPainter::Antialiasing, true);
     p.drawRoundedRect(QRect(5,height()/2,width()-2* 3, height()/3), 4,5);

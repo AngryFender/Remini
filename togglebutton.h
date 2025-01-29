@@ -13,6 +13,7 @@ private:
     QPropertyAnimation *animation = nullptr;
 
     QBrush track, circle, brush;
+    QPoint cirlePoint;
 public:
     ToggleButton(QWidget * parent);
 
@@ -20,6 +21,7 @@ public:
     void keyReleaseEvent(QKeyEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void paintEvent(QPaintEvent *e) override;
 
