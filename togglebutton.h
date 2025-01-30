@@ -8,6 +8,7 @@
 
 class ToggleButton : public QAbstractButton
 {
+    Q_OBJECT
 private:
     bool state;
     QPropertyAnimation *animation = nullptr;
@@ -25,6 +26,8 @@ public:
     void mouseReleaseEvent(QMouseEvent *e) override;
     void paintEvent(QPaintEvent *e) override;
 
+signals:
+    void toggleState(bool state);
 };
 
 #endif // TOGGLEBUTTON_H

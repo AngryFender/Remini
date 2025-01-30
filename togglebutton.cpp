@@ -27,12 +27,15 @@ void ToggleButton::mouseMoveEvent(QMouseEvent *e)
 void ToggleButton::mousePressEvent(QMouseEvent *e)
 {
     state = !state;
+    emit toggleState(state);
+    this->update();
 }
 
 void ToggleButton::mouseDoubleClickEvent(QMouseEvent *event)
 {
     state = !state;
-    QWidget::mouseDoubleClickEvent(event);
+    emit toggleState(state);
+    this->update();
 }
 
 void ToggleButton::mouseReleaseEvent(QMouseEvent *e)
