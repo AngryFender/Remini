@@ -42,6 +42,7 @@ void ViewsHandler::setVaultPath(QString &path)
 
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
+    viewToggleBtnEdit = ui.BtnReadOnly;
     frameSearchFileTree = ui.uiFrameFileTree;
     frameSearchTextTree = ui.uiFrameSearchTree;
     viewTextSearchEdit = ui.uiSearchText;
@@ -290,6 +291,10 @@ void ViewsHandler::connectDocument()
 
     QObject::connect(currentDocument.data(),&MkTextDocument::disconnectCursorPos,
                      viewText,&MkEdit::disconnectSignals);
+
+    QObject::connect(viewToggleBtnEdit,&ToggleButton::toggleState,
+                     viewText,&MkEdit::setEditState);
+
 }
 
 void ViewsHandler::disconnectDocument()

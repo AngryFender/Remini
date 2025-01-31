@@ -15,6 +15,7 @@
 #include "ui_mainwindow.h"
 #include "recentfilesdialog.h"
 #include "settingsdialog.h"
+#include "togglebutton.h"
 
 #define NAVIGATION_RATIO 100
 #define EDITOR_RAIO 200
@@ -87,6 +88,7 @@ private:
     QLineEdit *viewTextSearchEdit;
     NavigationView *viewTextSearchTree;
     QLabel *viewTextSearchCount;
+    ToggleButton *viewToggleBtnEdit ;
     
     QFont fontBase;
     QString getVaultPath();

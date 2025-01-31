@@ -615,6 +615,12 @@ void MkEdit::disconnectSignals(bool override)
     }
 }
 
+void MkEdit::setEditState(bool edit)
+{
+    this->setReadOnly(edit);
+    this->update();
+}
+
 void MkEdit::contextMenuHandler(QPoint pos)
 {
     contextMenuPos = pos;

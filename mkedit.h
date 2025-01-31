@@ -150,6 +150,7 @@ public slots:
     void cursorPositionChangedHandle();
     void connectSignals(bool override = false);
     void disconnectSignals(bool override = false);
+    void setEditState(bool edit = false);
 
 private slots:
     void fileSaveHandle();
