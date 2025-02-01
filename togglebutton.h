@@ -13,7 +13,7 @@ private:
     bool state;
     QPropertyAnimation *animation = nullptr;
 
-    QBrush track, circle, brush;
+    QBrush trackEdit, circleEdit, trackReadonly, circleReadonly;
     QPoint cirlePoint;
 public:
     ToggleButton(QWidget * parent);

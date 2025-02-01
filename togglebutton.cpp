@@ -3,10 +3,21 @@
 
 ToggleButton::ToggleButton(QWidget *parent):QAbstractButton(parent), animation(new QPropertyAnimation(this,"pos",this))
 {
-    state = false;
+    state = true;
     animation->setDuration(200);
-    brush.setStyle(Qt::SolidPattern);
-    brush.setColor(QColor("#2492ff"));
+
+    trackEdit.setStyle(Qt::SolidPattern);
+    trackEdit.setColor("#b3d9ff");
+
+    trackReadonly.setStyle(Qt::SolidPattern);
+    trackReadonly.setColor("#a0a0a4");
+
+    circleEdit.setStyle(Qt::SolidPattern);
+    circleEdit.setColor("#2492ff");
+
+    circleReadonly.setStyle(Qt::SolidPattern);
+    circleReadonly.setColor("#eaeaf0");
+
 }
 
 void ToggleButton::keyPressEvent(QKeyEvent *e)
@@ -47,12 +58,11 @@ void ToggleButton::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
     p.setPen(Qt::NoPen);
-    p.setBrush(state? brush:Qt::gray);
+    p.setBrush(state? trackEdit: trackReadonly);
     p.setRenderHint(QPainter::Antialiasing, true);
     p.drawRoundedRect(QRect(5,height()/2,width()-2* 3, height()/3), 4,5);
 
-    p.setBrush(circle);
-    p.setBrush(state? brush:Qt::gray);
+    p.setBrush(state? circleEdit: circleReadonly);
     p.setRenderHint(QPainter::Antialiasing, true);
 
     if(state){
