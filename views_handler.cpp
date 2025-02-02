@@ -43,6 +43,8 @@ void ViewsHandler::setVaultPath(QString &path)
 void ViewsHandler::initViews(Ui::MainWindow &ui)
 {
     viewToggleBtnEdit = ui.BtnReadOnly;
+    viewToggleBtnEdit->setChecked(true);
+
     frameSearchFileTree = ui.uiFrameFileTree;
     frameSearchTextTree = ui.uiFrameSearchTree;
     viewTextSearchEdit = ui.uiSearchText;

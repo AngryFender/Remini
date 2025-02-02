@@ -28,6 +28,9 @@ public:
 
 signals:
     void toggleState(bool state);
+
+public slots:
+    void setChecked(bool state);
 };
 
 #endif // TOGGLEBUTTON_H

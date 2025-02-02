@@ -70,7 +70,9 @@ void ToggleButton::paintEvent(QPaintEvent *e)
     }else{
         p.drawEllipse(QPoint(12,height()/3*2),7,7);
     }
+}
 
-
-
+void ToggleButton::setChecked(bool state)
+{
+    this->state = state;
 }
