@@ -110,7 +110,7 @@ public:
     QTextDocument* getRawDocument();
 
 public slots:
-    void cursorPosChangedHandle(SelectRange * const range);
+    void cursorPosChangedHandle(SelectRange * const range, const bool readOnly = false);
     void removeAllMkDataHandle(int blockNo);
     void applyAllMkDataHandle(int blockNumber);
     void applyMkSingleBlockHandle(int blockNumber);

@@ -117,9 +117,9 @@ QTextDocument *MkTextDocument::getRawDocument()
     return &rawDocument;
 }
 
-void MkTextDocument::cursorPosChangedHandle(SelectRange * const range)
+void MkTextDocument::cursorPosChangedHandle(SelectRange * const range, const bool readOnly)
 {
-    if(range){
+    if(range && !readOnly){
         int start;
         int end;
 

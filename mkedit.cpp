@@ -246,7 +246,7 @@ void MkEdit::showSelectionAfterUndo(){
     selectRange = undoRedoSelectRange;
 
     //first show all the Markdown symbols in the editor
-    emit cursorPosChanged(&selectRange);
+    emit cursorPosChanged(&selectRange, this->isReadOnly());
     postCursorPosChangedSignal();
 
     //ensure the textcursor is visible
@@ -265,7 +265,7 @@ void MkEdit::showSelectionAfterRedo()
     SelectRange &range = undoRedoSelectRange;
 
     //first show all the Markdown symbols in the editor
-    emit cursorPosChanged(&range);
+    emit cursorPosChanged(&range, this->isReadOnly());
 
     QTextCursor cursor = this->textCursor();
     cursor.setPosition(this->document()->findBlockByNumber(range.currentBlockNo).position()+range.currentposInBlock);
@@ -296,7 +296,7 @@ void MkEdit::setPostArrowKeys(const bool isShiftPressed, const bool isLeftArrowP
         selectRange.selectionFirstStartBlock 		= selectRange.selectionEndBlock 		= selectRange.currentBlockNo    = cursor.blockNumber();
         selectRange.selectionFirstStartPosInBlock 	= selectRange.selectionEndPosInBlock 	= selectRange.currentposInBlock = cursor.positionInBlock();
         selectRange.hasSelection = false;
-        emit cursorPosChanged(&selectRange);
+        emit cursorPosChanged(&selectRange, this->isReadOnly());
         cursor.setPosition(this->textCursor().block().position() + selectRange.selectionFirstStartPosInBlock);
         this->setTextCursor(cursor);
 
@@ -318,7 +318,7 @@ void MkEdit::setPostArrowKeys(const bool isShiftPressed, const bool isLeftArrowP
         selectRange.selectionEndBlock 		= selectRange.currentBlockNo    = cursor.blockNumber();
         selectRange.selectionEndPosInBlock 	= selectRange.currentposInBlock = cursor.positionInBlock();
         selectRange.hasSelection = true;
-        emit cursorPosChanged(&selectRange);
+        emit cursorPosChanged(&selectRange,this->isReadOnly());
 
         selectRange.arrowPosInBlock = isUpOrDownArrowPressed? selectRange.arrowPosInBlock : selectRange.selectionEndPosInBlock;
         selectRange.arrowPosInBlock = (selectRange.arrowPosInBlock >textCursor().block().text().length())? textCursor().block().text().length(): selectRange.arrowPosInBlock;
@@ -1071,6 +1071,6 @@ void MkEdit::cursorPositionChangedHandle()
         std::bind(&MkEdit::disconnectSignals,this,std::placeholders::_1),
         std::bind(&MkEdit::connectSignals,this,std::placeholders::_1)
     );
-    emit cursorPosChanged(&selectRange);
+    emit cursorPosChanged(&selectRange,this->isReadOnly());
     postCursorPosChangedSignal();
 }

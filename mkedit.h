@@ -157,7 +157,7 @@ private slots:
     void diableMarkdown_internal();
     void lineWrapHandler();
 signals:
-    void cursorPosChanged(SelectRange * const selectRange);
+    void cursorPosChanged(SelectRange * const selectRange, const bool readOnly);
     void fileSaveRaw();
     void enterKeyPressed(int blockNumber, int &newCursorPos);
     void quoteLeftKeyPressed(int blockNumber,bool &success);
