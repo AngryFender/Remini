@@ -17,6 +17,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->cmb_mkState->addItem("Disabled");
     ui->cmb_mkState->addItem("Enabled");
 
+    ui->cmb_lineWrap->addItem("Disabled");
+    ui->cmb_lineWrap->addItem("Enabled");
+
     ui->cmb_theme->addItem("Light Theme");
     ui->cmb_theme->addItem("Dark Theme");
 
@@ -84,6 +87,8 @@ void SettingsDialog::setFont(const QFont &font)
 {
     ui->btn_dialog->setFont(font);
     ui->cmb_mkState->setFont(font);
+    ui->lbl_lineWrap->setFont(font);
+    ui->cmb_lineWrap->setFont(font);
     ui->cmb_font->setFont(font);
     ui->lbl_font->setFont(font);
     ui->lbl_font_size->setFont(font);
@@ -182,6 +187,7 @@ void SettingsDialog::saveSettingsHandler()
     settings.setValue("stretch",font.stretch());
     settings.setValue("weight",font.weight());
     settings.setValue("markdown",ui->cmb_mkState->currentIndex());
+    settings.setValue("linewrap",ui->cmb_lineWrap->currentIndex());
     settings.setValue("vaultPath",ui->edit_vaultRootPath->text());
 
     emit updateUiSettings(font);
@@ -199,10 +205,12 @@ void SettingsDialog::show()
     QString fontFamily = settings.value("font", "Cascadia Mono").toString();
     int fontSize = settings.value("fontsize", 11).toInt();
     bool markdown = settings.value("markdown", true).toBool();
+    bool linewrap = settings.value("linewrap", true).toBool();
     int stretch = settings.value("stretch", QFont::Unstretched).toInt();
     int weight = settings.value("weight", QFont::Normal).toInt();
     vaultRootPath = settings.value("vaultPath", QDir::currentPath()).toString();
     ui->cmb_mkState->setCurrentIndex(markdown);
+    ui->cmb_lineWrap->setCurrentIndex(linewrap);
     ui->edit_vaultRootPath->setText(vaultRootPath);
     ui->cmb_font->setCurrentIndex(ui->cmb_font->findText(fontFamily));
     ui->ledit_font_size->setText(QString::number(fontSize));
