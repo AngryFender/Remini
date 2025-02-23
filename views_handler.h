@@ -115,7 +115,6 @@ private:
     QString currentFilePath;
     QString vaultPath;
     bool markdown;
-    bool lineWrap;
 signals:
     void load_text(QString text);
     void clear_text();
