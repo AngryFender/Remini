@@ -1,9 +1,8 @@
 #include "togglebutton.h"
 #include <QPainter>
 
-ToggleButton::ToggleButton(QWidget *parent):QAbstractButton(parent), animation(new QPropertyAnimation(this,"pos",this))
+ToggleButton::ToggleButton(QWidget *parent):QAbstractButton(parent), state(true),animation(new QPropertyAnimation(this,"pos",this))
 {
-    state = true;
     animation->setDuration(200);
 
     trackEdit.setStyle(Qt::SolidPattern);

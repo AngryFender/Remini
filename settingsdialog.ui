@@ -65,51 +65,51 @@
      <item row="1" column="1">
       <widget class="QComboBox" name="cmb_theme"/>
      </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <widget class="QLabel" name="lbl_font">
        <property name="text">
         <string>Font </string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="QFontComboBox" name="cmb_font"/>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="lbl_font_size">
        <property name="text">
         <string>Font Size</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="7" column="0">
       <widget class="QLabel" name="lbl_stretch">
        <property name="text">
         <string>Stretch</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="7" column="1">
       <widget class="QComboBox" name="cmb_stretch"/>
      </item>
-     <item row="7" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="lbl_weight">
        <property name="text">
         <string>Weight</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="8" column="1">
       <widget class="QComboBox" name="cmb_weight"/>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="lbl_preview">
        <property name="text">
         <string>Preview</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QTextEdit" name="txt_preview">
        <property name="html">
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -123,7 +123,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
+     <item row="10" column="1">
       <widget class="QDialogButtonBox" name="btn_dialog">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -133,7 +133,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QLineEdit" name="ledit_font_size"/>
@@ -154,8 +154,21 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </item>
       </layout>
      </item>
-     <item row="2" column="1">
+     <item row="3" column="1">
       <widget class="QComboBox" name="cmb_mkState"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="lbl_lineWrap">
+       <property name="text">
+        <string>Line Wrap</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="cmb_lineWrap"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="ToggleButton" name="btn_linewrap" native="true"/>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="lbl_markdown">
@@ -164,20 +177,18 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="lbl_lineWrap">
-       <property name="text">
-        <string>Line Wrap</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QComboBox" name="cmb_lineWrap"/>
-     </item>
     </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ToggleButton</class>
+   <extends>QWidget</extends>
+   <header location="global">togglebutton.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
