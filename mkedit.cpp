@@ -1029,15 +1029,12 @@ void MkEdit::diableMarkdown_internal()
 
 void MkEdit::lineWrapHandler()
 {
-    QSettings settings("Remini","Remini");
     if("Enable line-wrap" == lineWrapAction.text()){
         this->setLineWrapMode(QTextEdit::WidgetWidth);
         lineWrapAction.setText("Disable line-wrap");
-        settings.setValue("linewrap",true);
     }else{
         this->setLineWrapMode(QTextEdit::NoWrap);
         lineWrapAction.setText("Enable line-wrap");
-        settings.setValue("linewrap",false);
     }
 }
 

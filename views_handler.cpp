@@ -400,12 +400,6 @@ ViewsHandler::DOCUMENT_STATUS ViewsHandler::setCurrentDocument(const QFileInfo &
     int stretch = settings.value("stretch", QFont::Unstretched).toInt();
     int weight = settings.value("weight", QFont::Normal).toInt();
 
-    if(settings.value("linewrap", true).toBool()){
-        viewText->setLineWrapMode(QTextEdit::WidgetWidth);
-    }else{
-        viewText->setLineWrapMode(QTextEdit::NoWrap);
-    }
-
     QFont font(fontFamily,fontSize,weight,false);
     font.setStretch(stretch);
 
@@ -503,12 +497,6 @@ void ViewsHandler::updateUiSettingsHandler(const QFont &font)
     QSettings settings("Remini","Remini");
     QString vaultPath = settings.value("vaultPath").toString();
     bool markdown = settings.value("markdown", true).toBool();
-
-    if(settings.value("linewrap", true).toBool()){
-        viewText->setLineWrapMode(QTextEdit::WidgetWidth);
-    }else{
-        viewText->setLineWrapMode(QTextEdit::NoWrap);
-    }
 
     fontBase = font;
     viewText->setFont(fontBase);
