@@ -852,3 +852,8 @@ void ViewsHandler::sendFocusToNavigationViewHandler()
         viewTextSearchTree->setFocus();
     }
 }
+
+void ViewsHandler::editLockHandle()
+{
+    viewToggleBtnEdit->setChecked(!viewToggleBtnEdit->getState());
+}

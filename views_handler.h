@@ -46,6 +46,7 @@ public slots:
     void startTextSearchInAllFilesHandle();
     void startFileSearchHandle();
     void sendFocusToNavigationViewHandler();
+    void editLockHandle();
 private:
     ViewsHandler(QWidget*parent,Ui::MainWindow &ui){
         firstDirectoryLoad = true;

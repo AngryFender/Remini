@@ -19,6 +19,11 @@ ToggleButton::ToggleButton(QWidget *parent):QAbstractButton(parent), state(true)
 
 }
 
+bool ToggleButton::getState() const
+{
+    return state;
+}
+
 void ToggleButton::keyPressEvent(QKeyEvent *e)
 {
 
@@ -74,4 +79,6 @@ void ToggleButton::paintEvent(QPaintEvent *e)
 void ToggleButton::setChecked(bool state)
 {
     this->state = state;
+    emit toggleState(state);
+    this->update();
 }

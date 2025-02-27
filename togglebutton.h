@@ -17,6 +17,7 @@ private:
     QPoint cirlePoint;
 public:
     ToggleButton(QWidget * parent);
+    bool getState() const;
 
     void keyPressEvent(QKeyEvent *e) override;
     void keyReleaseEvent(QKeyEvent *e) override;

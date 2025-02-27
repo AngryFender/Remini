@@ -54,6 +54,7 @@ private:
 
 signals:
     void openRecentFilesDialog(bool show);
+    void editLock();
     void startSearchAll();
     void startFileSearch();
     void sendFocusToNavigationView();

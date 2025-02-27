@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this,&MainWindow::sendFocusToNavigationView,
                      view_handler.get(),&ViewsHandler::sendFocusToNavigationViewHandler);
 
+    QObject::connect(this,&MainWindow::editLock,
+                     view_handler.get(),&ViewsHandler::editLockHandle);
+
 #ifdef _WIN32
     win = &WindowApi::instance();
     QObject::connect(win, &WindowApi::showApp,
@@ -89,7 +92,11 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
                     QApplication::setStyle(darkThemeStyle);
                 }
                 break;
-
+        case Qt::Key_L:{
+            if(event->modifiers() == Qt::AltModifier){
+                emit editLock();
+            }
+        }
     }
 }
 
