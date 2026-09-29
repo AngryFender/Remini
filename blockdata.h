@@ -8,23 +8,25 @@
 class BlockData : public QTextBlockUserData
 {
 public:
-    enum statusID{
+    enum statusID
+    {
         start,
         content,
         end
-    } ;
+    };
 
     BlockData();
     BlockData(const statusID status);
     statusID getStatus() const;
     void setStatus(statusID newStatus);
     void setHidden(bool hidden);
-    bool isHidden();
+    bool isHidden() const;
 
     void setStartBlock(const int start);
     void setEndBlock(const int end);
     int getStartBlock() const;
     int getEndBlock() const;
+
 private:
     statusID status;
     bool hidden;
@@ -32,4 +34,4 @@ private:
     int endBlock;
 };
 
-#endif // BLOCKDATA_H
+#endif  // BLOCKDATA_H

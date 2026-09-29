@@ -8,23 +8,40 @@ on:
 
 jobs:
   build:
+    # ---------------------------------------------------------------------
+    # IMPORTANT: do NOT use `windows-latest` here.
+    #
+    # As of late 2025 `windows-latest` points to the `windows-2025-vs2026`
+    # image, which ships MSVC 19.51. Qt 6.5.0's `qvarlengtharray.h` still
+    # uses `stdext::checked_array_iterator`, an API that was removed from
+    # newer MSVC STL versions, so every translation unit that includes a
+    # Qt header fails with:
+    #
+    #   error C3861: 'stdext': identifier not found
+    #   error C2065: 'stdext': undeclared identifier
+    #
+    # `windows-2022` runs VS 2022 (MSVC 19.4x), which is the toolchain
+    # Qt 6.5.0 was built and tested against.
+    # ---------------------------------------------------------------------
+    runs-on: windows-2022
 
-    runs-on: windows-latest
+    env:
+      QT_DIR: ${{ github.workspace }}\Remini\Qt\6.5.0\msvc2019_64
 
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@v1
-      
+      uses: actions/checkout@v4
+
     - name: Download catch.hpp and setup Environment Variable
+      shell: pwsh
       run: |
-        mkdir Catch2
-        cd Catch2
-        $url = "https://github.com/catchorg/Catch2/releases/download/v2.13.10/catch.hpp"
-        $output = "catch.hpp"
-        Invoke-WebRequest -Uri $url -OutFile $output
-        echo "CATCH_INCLUDE_DIR=$(Get-Location)" >> $env:GITHUB_ENV
+        New-Item -ItemType Directory -Force -Path catch2 | Out-Null
+        Invoke-WebRequest `
+          -Uri "https://github.com/catchorg/Catch2/releases/download/v2.13.10/catch.hpp" `
+          -OutFile catch2/catch.hpp
+        echo "CATCH_INCLUDE_DIR=$env:GITHUB_WORKSPACE" >> $env:GITHUB_ENV
         cd ..
-      
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
@@ -33,22 +50,41 @@ jobs:
         host: 'windows'
         target: 'desktop'
         arch: 'win64_msvc2019_64'
-        dir: '${{ github.workspace }}\Remini\' 
+        dir: '${{ github.workspace }}\Remini'
         cache: 'true'
         cache-key-prefix: 'install-qt-action'
         setup-python: 'false'
         tools: 'tools_cmake'
-        
+
     - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE=Release -B="Build" -DQt6_DIR="D:\a\Remini\Remini\Remini\Qt\6.5.0\msvc2019_64"
+      shell: pwsh
+      run: |
+        cmake -S . -B Build -DCMAKE_BUILD_TYPE=Release -DQt6_DIR="$env:QT_DIR"
 
     - name: Build the Qt project with CMake
-      run: cmake --build build --config Release
+      run: cmake --build Build --config Release
 
-    - name: Run test
+    - name: Deploy main executable
+      shell: pwsh
       run: |
-        echo "Workspace path is ${{ github.workspace }}"
-        cd D:\a\Remini\Remini\Build\CatchTests\Release\
-        ${{ github.workspace }}\Remini\Qt\6.5.0\msvc2019_64\bin\windeployqt.exe ReminiTests.exe
-        dir
-        .\ReminiTests.exe       
+        & "$env:QT_DIR\bin\windeployqt.exe" `
+          --no-translations `
+          "Build\Release\Remini.exe"
+
+    # ---------------------------------------------------------------------
+    # Test target name is `CatchTests` (defined in CatchTests/CMakeLists.txt
+    # via `project(CatchTests)` + `add_executable(${PROJECT_NAME} ...)`),
+    # NOT `ReminiTests`. `Remini` is the main application target.
+    #
+    # On the MSVC generator the binaries land in
+    #   Build/<target>/Release/<target>.exe
+    # hence the `Build\CatchTests\Release` working directory below.
+    # ---------------------------------------------------------------------
+    - name: Run tests
+      shell: pwsh
+      working-directory: ${{ github.workspace }}\Build\CatchTests\Release
+      run: |
+        Write-Host "Contents:"
+        Get-ChildItem
+        & "$env:QT_DIR\bin\windeployqt.exe" --no-translations CatchTests.exe
+        .\CatchTests.exe

@@ -2,10 +2,8 @@
 #ifndef APPEVENTFILTER_H
 #define APPEVENTFILTER_H
 
-
-#include <QObject>
 #include <QKeyEvent>
-
+#include <QObject>
 
 class AppEventFilter : public QObject
 {
@@ -13,14 +11,13 @@ class AppEventFilter : public QObject
 public:
     explicit AppEventFilter(QObject *parent = nullptr);
 
-    bool eventFilter(QObject *obj, QEvent *event)override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 signals:
     void openRecentFiles(bool show);
 
 private:
     bool altPressed;
-
 };
 
-#endif // APPEVENTFILTER_H
+#endif  // APPEVENTFILTER_H

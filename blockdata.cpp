@@ -1,53 +1,27 @@
 #include "blockdata.h"
 
 BlockData::BlockData()
+    : status(content), hidden(false), startBlock(0), endBlock(0)
 {
-    status = content;
-    hidden = false;
 }
 
 BlockData::BlockData(const statusID status)
+    : status(status), hidden(false), startBlock(0), endBlock(0)
 {
-    this->status = status;
-    hidden = false;
 }
 
-BlockData::statusID BlockData::getStatus() const
-{
-    return status;
-}
+BlockData::statusID BlockData::getStatus() const { return status; }
 
-void BlockData::setStatus(statusID newStatus)
-{
-    status = newStatus;
-}
+void BlockData::setStatus(statusID newStatus) { status = newStatus; }
 
-void BlockData::setHidden(bool hidden)
-{
-    this->hidden = hidden;
-}
+void BlockData::setHidden(bool hidden) { this->hidden = hidden; }
 
-bool BlockData::isHidden()
-{
-    return hidden;
-}
+bool BlockData::isHidden() const { return hidden; }
 
-void BlockData::setStartBlock(const int start)
-{
-    this->startBlock = start;
-}
+void BlockData::setStartBlock(const int start) { startBlock = start; }
 
-void BlockData::setEndBlock(const int end)
-{
-    this->endBlock = end;
-}
+void BlockData::setEndBlock(const int end) { endBlock = end; }
 
-int BlockData::getStartBlock() const
-{
-    return this->startBlock;
-}
+int BlockData::getStartBlock() const { return startBlock; }
 
-int BlockData::getEndBlock() const
-{
-    return this->endBlock;
-}
+int BlockData::getEndBlock() const { return endBlock; }

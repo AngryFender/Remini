@@ -1,13 +1,14 @@
 #ifndef HIGHLIGHTER_H
 #define HIGHLIGHTER_H
 
+#include <theme.h>
+
 #include <QObject>
+#include <QRegularExpression>
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
-#include <QRegularExpression>
-#include <QTextEdit>
 #include <QTextDocument>
-#include <theme.h>
+#include <QTextEdit>
 
 class Highlighter : public QSyntaxHighlighter
 {
@@ -17,12 +18,13 @@ public:
     explicit Highlighter(QObject *parent = nullptr);
 
 public slots:
-    void syntaxColorUpdateHandler(HighlightColor& colors);
+    void syntaxColorUpdateHandler(HighlightColor &colors);
     void updateSearchText(const QString &text);
+
 protected:
     void highlightBlock(const QString &text) override;
-private:
 
+private:
     struct HighlightingRule
     {
         QRegularExpression pattern;
@@ -59,4 +61,4 @@ private:
     void initColors();
 };
 
-#endif // HIGHLIGHTER_H
+#endif  // HIGHLIGHTER_H

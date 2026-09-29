@@ -1,57 +1,75 @@
 #ifndef MKEDIT_H
 #define MKEDIT_H
 
-#include <QObject>
-#include <QWidget>
-#include <QPainter>
-#include <Highlighter.h>
-#include <QRegularExpressionMatch>
-#include <QTextDocument>
+#include <QDragEnterEvent>
+#include <QInputMethodEvent>
+#include <QKeyEvent>
 #include <QMenu>
 #include <QMimeData>
-#include <QTimer>
-#include <mktextdocument.h>
+#include <QMouseEvent>
+#include <QObject>
+#include <QPainter>
+#include <QRegularExpressionMatch>
 #include <QScrollBar>
-#include <theme.h>
+#include <QTextDocument>
+#include <QTextEdit>
+#include <QTimer>
+#include <QWheelEvent>
+#include <QWidget>
+
+#include "highlighter.h"
+#include "mktextdocument.h"
+#include "theme.h"
 
 #define FILE_SAVE_TIMEOUT 300
 #define BLOCKRADIUS 4
 
-class Connector{
+class Connector
+{
 public:
-    Connector(std::function<void(bool)> disconnectSignals, std::function<void(bool)> connectSignals):connectSignals(connectSignals){
+    Connector(std::function<void(bool)> disconnectSignals,
+              std::function<void(bool)> connectSignals)
+        : connectSignals(connectSignals)
+    {
         disconnectSignals(true);
     }
-    ~Connector(){
-        connectSignals(true);
-    }
+    ~Connector() { connectSignals(true); }
 
 private:
     std::function<void(bool)> connectSignals;
-
 };
 
 class MkEdit : public QTextEdit
 {
     Q_OBJECT
-    Q_PROPERTY(QColor blockColor READ blockColor WRITE blockColor NOTIFY blockColorChanged)
-    Q_PROPERTY(QColor typeColor READ getTypeColor WRITE setTypeColor NOTIFY typeColorChanged)
-    Q_PROPERTY(QColor methodColor READ getMethodColor WRITE setMethodColor NOTIFY methodColorChanged)
-    Q_PROPERTY(QColor argumentColor READ getArgumentColor WRITE setArgumentColor NOTIFY argumentColorChanged)
-    Q_PROPERTY(QColor commentColor READ getCommentColor WRITE setCommentColor NOTIFY commentColorChanged)
-    Q_PROPERTY(QColor quoteColor READ getQuoteColor WRITE setQuoteColor NOTIFY quoteColorChanged)
-    Q_PROPERTY(QColor keywordColor READ getKeywordColor WRITE setKeywordColor NOTIFY keywordColorChanged)
-    Q_PROPERTY(QColor searchMatchColor READ getSearchMatchColor WRITE setSearchMatchColor NOTIFY searchMatchColorChanged)
+    Q_PROPERTY(QColor blockColor READ blockColor WRITE blockColor NOTIFY
+                   blockColorChanged)
+    Q_PROPERTY(QColor typeColor READ getTypeColor WRITE setTypeColor NOTIFY
+                   typeColorChanged)
+    Q_PROPERTY(QColor methodColor READ getMethodColor WRITE setMethodColor
+                   NOTIFY methodColorChanged)
+    Q_PROPERTY(QColor argumentColor READ getArgumentColor WRITE setArgumentColor
+                   NOTIFY argumentColorChanged)
+    Q_PROPERTY(QColor commentColor READ getCommentColor WRITE setCommentColor
+                   NOTIFY commentColorChanged)
+    Q_PROPERTY(QColor quoteColor READ getQuoteColor WRITE setQuoteColor NOTIFY
+                   quoteColorChanged)
+    Q_PROPERTY(QColor keywordColor READ getKeywordColor WRITE setKeywordColor
+                   NOTIFY keywordColorChanged)
+    Q_PROPERTY(QColor searchMatchColor READ getSearchMatchColor WRITE
+                   setSearchMatchColor NOTIFY searchMatchColorChanged)
 
 public:
     explicit MkEdit(QWidget *parent = nullptr);
+
     void paintEvent(QPaintEvent *event) override;
-    void keyPressEvent(QKeyEvent *event)override;
-    void keyReleaseEvent(QKeyEvent *event)override;
-    void resizeEvent(QResizeEvent *event)override;
-    void wheelEvent(QWheelEvent *e)override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void wheelEvent(QWheelEvent *e) override;
+
     QColor blockColor() const;
-    void blockColor(const QColor& color);
+    void blockColor(const QColor &color);
 
     QColor getTypeColor() const;
     QColor getMethodColor() const;
@@ -60,32 +78,36 @@ public:
     QColor getQuoteColor() const;
     QColor getSearchMatchColor() const;
     QColor getKeywordColor() const;
-    void setTypeColor(const QColor& color);
-    void setMethodColor(const QColor& color);
-    void setArgumentColor(const QColor& color);
-    void setCommentColor(const QColor& color);
-    void setQuoteColor(const QColor& color);
-    void setSearchMatchColor(const QColor& color);
-    void setKeywordColor(const QColor& color);
+    void setTypeColor(const QColor &color);
+    void setMethodColor(const QColor &color);
+    void setArgumentColor(const QColor &color);
+    void setCommentColor(const QColor &color);
+    void setQuoteColor(const QColor &color);
+    void setSearchMatchColor(const QColor &color);
+    void setKeywordColor(const QColor &color);
 
     void setDocument(QTextDocument *document);
     QString rawPlainText() const;
 
     void setFont(const QFont &font);
     void setMkState(bool enable);
+
 protected:
     void insertFromMimeData(const QMimeData *source) override;
     void mousePressEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
     void mouseDoubleClickEvent(QMouseEvent *e) override;
     void dragEnterEvent(QDragEnterEvent *e) override;
- private:
+    void inputMethodEvent(QInputMethodEvent *event) override;
+
+private:
     QColor codeBlockColor;
-    int widthCodeBlock;
+    int widthCodeBlock = 0;
     QBrush brushDefault;
     QPen penCodeBlock;
     QPen whitePen;
-    int savedCharacterNumber;
+    int savedCharacterNumber = -1;
+
     UndoData undoData;
     EditType undoRedoEditType;
 
@@ -93,11 +115,11 @@ protected:
     QTimer fileSaveTimer;
     SelectRange selectRange;
     SelectRange undoRedoSelectRange;
-    bool isCalcuatedForStartPos;
-    bool isCursorChangedHandleTriggered;
-    bool isShiftKeyPressed;
 
-    bool isDisconnectedViaHighPriority;
+    bool isCalcuatedForStartPos = false;
+    bool isCursorChangedHandleTriggered = false;
+    bool isShiftKeyPressed = false;
+    bool isDisconnectedViaHighPriority = false;
 
     void quoteLeftKey();
     void smartSelectionSetup();
@@ -135,8 +157,11 @@ protected:
     bool isMouseOnCheckBox(QMouseEvent *e);
     void showSelectionAfterUndo();
     void showSelectionAfterRedo();
-    void setPreArrowKeys(const bool isShiftPressed, const bool isUpOrDownArrowPressed);
-    void setPostArrowKeys(const bool isShiftPressed, const bool isLeftArrowPressed, const bool isUpOrDownArrowPressed);
+    void setPreArrowKeys(const bool isShiftPressed,
+                         const bool isUpOrDownArrowPressed);
+    void setPostArrowKeys(const bool isShiftPressed,
+                          const bool isLeftArrowPressed,
+                          const bool isUpOrDownArrowPressed);
 
     void restoreTextCursor(int blockNo, int posInBlock, bool hasSelection);
     void postCursorPosChangedSignal();
@@ -150,17 +175,22 @@ public slots:
     void cursorPositionChangedHandle();
     void connectSignals(bool override = false);
     void disconnectSignals(bool override = false);
-    void setEditState(bool edit = false);
+
+    // NOTE: default is `true` so a bare setEditState() call keeps the editor
+    // editable. The previous default of `false` would silently force
+    // read-only mode if the slot were ever invoked without an argument.
+    void setEditState(bool edit = true);
 
 private slots:
     void fileSaveHandle();
     void diableMarkdown_internal();
     void lineWrapHandler();
+
 signals:
-    void cursorPosChanged(SelectRange * const selectRange, const bool readOnly);
+    void cursorPosChanged(SelectRange *const selectRange, const bool readOnly);
     void fileSaveRaw();
     void enterKeyPressed(int blockNumber, int &newCursorPos);
-    void quoteLeftKeyPressed(int blockNumber,bool &success);
+    void quoteLeftKeyPressed(int blockNumber, bool &success);
     void checkRightClockOnCodeBlock(int blockNumber, bool &valid);
     void selectBlockCopy(int blockNumber, int &startPos, int &endPos);
     void duplicateLine(int blockNumber);
@@ -173,8 +203,9 @@ signals:
     void removeAllMkData(int currentBlockNo);
     void applyAllMkData(int blockNumber);
     void applyMkSingleBlock(int blockNumber);
-    void blockColorChanged(const QColor& color);
-    void syntaxColorUpdate(HighlightColor& colors);
+
+    void blockColorChanged(const QColor &color);
+    void syntaxColorUpdate(HighlightColor &colors);
 
     void typeColorChanged(const QColor &color);
     void methodColorChanged(const QColor &color);
@@ -191,11 +222,11 @@ signals:
     void cursorUpdate(const int blockNo, const int characterPos);
     void checkIfCursorInBlock(bool &isBlock, QTextCursor &cursor);
 
-    void undoStackPushSignal(QUndoCommand *);
+    void undoStackPushSignal(QUndoCommand *cmd);
     void undoStackUndoSignal(bool &success);
     void undoStackRedoSignal(bool &success);
     void undoStackClear();
-    void escapeFocus(QWidget*view);
+    void escapeFocus(QWidget *view);
 };
 
-#endif // MKEDIT_H
+#endif  // MKEDIT_H

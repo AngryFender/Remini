@@ -14,50 +14,58 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
-set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        views_handler.h
-        views_handler.cpp
-        mkedit.h
-        mkedit.cpp
-        highlighter.h
-        highlighter.cpp
-        mktextdocument.h
-        mktextdocument.cpp
-        blockdata.h
-        blockdata.cpp
-        linedata.h
-        linedata.cpp
-        theme.h
-        navigationview.h
-        navigationview.cpp
-        navigationmodel.h
-        navigationmodel.cpp
-        formatdata.h
-        formatdata.cpp
-        textsearchworker.h
-        textsearchworker.cpp
-        appeventfilter.h
-        appeventfilter.cpp
-        resources/icons.qrc
-        startuptext.h
-        recentfilesdialog.h
-        recentfilesdialog.cpp
-        settingsdialog.h
-        settingsdialog.cpp
-        settingsdialog.ui
-        togglebutton.h
-        togglebutton.cpp
-    )
+# X11 is required on Linux for the global-hotkey implementation.
+if(UNIX AND NOT APPLE)
+    find_package(X11 REQUIRED)
+endif()
 
+set(PROJECT_SOURCES
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    views_handler.h
+    views_handler.cpp
+    mkedit.h
+    mkedit.cpp
+    highlighter.h
+    highlighter.cpp
+    mktextdocument.h
+    mktextdocument.cpp
+    blockdata.h
+    blockdata.cpp
+    linedata.h
+    linedata.cpp
+    theme.h
+    navigationview.h
+    navigationview.cpp
+    navigationmodel.h
+    navigationmodel.cpp
+    formatdata.h
+    formatdata.cpp
+    textsearchworker.h
+    textsearchworker.cpp
+    appeventfilter.h
+    appeventfilter.cpp
+    resources/icons.qrc
+    startuptext.h
+    recentfilesdialog.h
+    recentfilesdialog.cpp
+    settingsdialog.h
+    settingsdialog.cpp
+    settingsdialog.ui
+    togglebutton.h
+    togglebutton.cpp
+
+    # Cross-platform: the .cpp contains #ifdef Q_OS_WIN / Q_OS_LINUX branches.
+    windowapi.h
+    windowapi.cpp
+)
+
+# Windows-only helper interface header.
 if(WIN32)
     list(APPEND PROJECT_SOURCES
         iwindowapi.h
-        windowapi.h
-        windowapi.cpp
     )
 endif()
 
@@ -65,19 +73,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Remini
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET Remini APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
         add_library(Remini SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(Remini
             ${PROJECT_SOURCES}
@@ -85,16 +86,20 @@ else()
     endif()
 endif()
 
-# Add the test directory to the build process
-add_subdirectory(CatchTests)
-
 target_link_libraries(Remini PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
-# Run the tests as part of the build process
+# Link X11 on Linux so windowapi.cpp can use XGrabKey / XGetInputFocus.
+if(UNIX AND NOT APPLE)
+    target_link_libraries(Remini PRIVATE X11::X11)
+endif()
+
+enable_testing()
+
+add_subdirectory(CatchTests)
+
 add_test(NAME CatchTests COMMAND CatchTests)
 
 set_target_properties(Remini PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE

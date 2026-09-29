@@ -1,8 +1,8 @@
 #define CATCH_CONFIG_RUNNER
-#include <catch2/catch.hpp>
-#include <QtGui/QGuiApplication>
 #include <QApplication>
 #include <QTextEdit>
+#include <QtGui/QGuiApplication>
+#include <catch2/catch.hpp>
 
 int main(int argc, char** argv)
 {

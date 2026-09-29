@@ -1,52 +1,53 @@
 #ifndef MKTEXTDOCUMENT_H
 #define MKTEXTDOCUMENT_H
 
-#include <QTextDocument>
-#include <QTextBlock>
+#include <blockdata.h>
+#include <formatdata.h>
+#include <linedata.h>
+
+#include <QAbstractTextDocumentLayout>
+#include <QDesktopServices>
 #include <QObject>
-#include <QRegularExpressionMatchIterator>
+#include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
 #include <QString>
 #include <QStringList>
-#include <QRegularExpression>
-#include <QDesktopServices>
-#include <blockdata.h>
-#include <linedata.h>
-#include <formatdata.h>
-#include <QAbstractTextDocumentLayout>
+#include <QTextBlock>
+#include <QTextDocument>
 #include <QTextEdit>
 #include <QUndoCommand>
 #include <QUndoStack>
 #include <set>
 
-
 #define MAXIMUM_FONT_SIZE 30
 #define MINIMUM_FONT_SIZE 7
 
-class FormatCollection{
+class FormatCollection
+{
 public:
-    FormatCollection(int fontSize){
-
-        linkColor.setRgb(50,118,254);
+    FormatCollection(int fontSize)
+    {
+        linkColor.setRgb(50, 118, 254);
 
         bold.setFontWeight(QFont::ExtraBold);
         italic.setFontItalic(true);
         strikethrough.setFontStrikeOut(true);
-        heading1.setFontPointSize(fontSize *1.5);
-        heading2.setFontPointSize(fontSize *1.30);
-        heading3.setFontPointSize(fontSize *1.15);
+        heading1.setFontPointSize(fontSize * 1.5);
+        heading2.setFontPointSize(fontSize * 1.30);
+        heading3.setFontPointSize(fontSize * 1.15);
         link.setFontUnderline(true);
         link.setUnderlineColor(linkColor);
         link.setForeground(linkColor);
     }
 
-    QTextCharFormat * getBold(){return &bold;};
-    QTextCharFormat * getItalic (){return &italic;};
-    QTextCharFormat * getStrikethrough(){return &strikethrough;};
-    QTextCharFormat * getHeading1(){return &heading1;};
-    QTextCharFormat * getHeading2(){return &heading2;};
-    QTextCharFormat * getHeading3(){return &heading3;};
-    QTextCharFormat * getLink(){return &link;};
+    QTextCharFormat *getBold() { return &bold; };
+    QTextCharFormat *getItalic() { return &italic; };
+    QTextCharFormat *getStrikethrough() { return &strikethrough; };
+    QTextCharFormat *getHeading1() { return &heading1; };
+    QTextCharFormat *getHeading2() { return &heading2; };
+    QTextCharFormat *getHeading3() { return &heading3; };
+    QTextCharFormat *getLink() { return &link; };
     QColor linkColor;
 
 private:
@@ -60,27 +61,29 @@ private:
 };
 
 #define NO_SELECTION_POS -1
-struct SelectRange{
-    bool hasSelection 	= false;
-    bool isCheckBox 	= false;
-    int arrowBlock      = NO_SELECTION_POS;
+struct SelectRange
+{
+    bool hasSelection = false;
+    bool isCheckBox = false;
+    int arrowBlock = NO_SELECTION_POS;
     int arrowPosInBlock = NO_SELECTION_POS;
-    int currentposInBlock      = NO_SELECTION_POS;
-    int currentBlockNo         = NO_SELECTION_POS;
+    int currentposInBlock = NO_SELECTION_POS;
+    int currentBlockNo = NO_SELECTION_POS;
     int selectionFirstStartBlock = NO_SELECTION_POS;
     int selectionFirstStartPosInBlock = NO_SELECTION_POS;
-    int selectionEndBlock 			  = NO_SELECTION_POS;
-    int selectionEndPosInBlock        = NO_SELECTION_POS;
-    bool isFirstMousePress  = false;
+    int selectionEndBlock = NO_SELECTION_POS;
+    int selectionEndPosInBlock = NO_SELECTION_POS;
+    bool isFirstMousePress = false;
     int scrollValue;
     std::set<int> hideBlocks;
     std::set<int> showBlocks;
 };
 
-struct RawBlockInfo{
+struct RawBlockInfo
+{
     bool hasSelection = false;
-    int rawFirstBlock  = NO_SELECTION_POS;
-    int rawEndBlock    = NO_SELECTION_POS;
+    int rawFirstBlock = NO_SELECTION_POS;
+    int rawEndBlock = NO_SELECTION_POS;
 };
 
 class MkTextDocument : public QTextDocument
@@ -90,32 +93,51 @@ public:
     explicit MkTextDocument(QObject *parent = nullptr);
     void setPlainText(const QString &text);
     void setUndoRedoText(const QString &text);
-    void setUndoRedoText(const int blockNo,const QString &text);
-    void setUndoEnterPressedText(const int blockNo,const QString &text);
+    void setUndoRedoText(const int blockNo, const QString &text);
+    void setUndoEnterPressedText(const int blockNo, const QString &text);
     void clear() override;
 
-    QVector<QPair<int,int>>::const_iterator checkMarkPosBegin(){return checkMarkPositions.cbegin();};
-    QVector<QPair<int,int>>::const_iterator checkMarkPosEnd(){return checkMarkPositions.cend();};
+    QVector<QPair<int, int>>::const_iterator checkMarkPosBegin()
+    {
+        return checkMarkPositions.cbegin();
+    };
+    QVector<QPair<int, int>>::const_iterator checkMarkPosEnd()
+    {
+        return checkMarkPositions.cend();
+    };
 
-    QVector<std::tuple<int,int,int,const QString*>>::const_iterator linkPosBegin(){return linkPositions.cbegin();};
-    QVector<std::tuple<int,int,int,const QString*>>::const_iterator linkPosEnd(){return linkPositions.cend();};
+    QVector<std::tuple<int, int, int, const QString *>>::const_iterator
+    linkPosBegin()
+    {
+        return linkPositions.cbegin();
+    };
+    QVector<std::tuple<int, int, int, const QString *>>::const_iterator
+    linkPosEnd()
+    {
+        return linkPositions.cend();
+    };
 
     void setFilePath(const QString &filePath);
     void setFileName(const QString &fileName);
     void setCursorPos(const int blockNo, const int characterNo);
-    int getBlockNo()const;
-    int getCharacterNo()const;
+    int getBlockNo() const;
+    int getCharacterNo() const;
     QString getFilePath() const;
     QString getFileName() const;
-    QTextDocument* getRawDocument();
+    QTextDocument *getRawDocument();
+
+    // Reveal every hidden markdown symbol in the document.
+    // Used when the user presses Ctrl+A so they can see / copy the raw text.
+    void revealAllMkSymbols();
 
 public slots:
-    void cursorPosChangedHandle(SelectRange * const range, const bool readOnly = false);
+    void cursorPosChangedHandle(SelectRange *const range,
+                                const bool readOnly = false);
     void removeAllMkDataHandle(int blockNo);
     void applyAllMkDataHandle(int blockNumber);
     void applyMkSingleBlockHandle(int blockNumber);
     void enterKeyPressedHandle(int blockNumber, int &newCursorPos);
-    void quoteLeftKeyPressedHandle(int blockNumber,bool &success);
+    void quoteLeftKeyPressedHandle(int blockNumber, bool &success);
     void checkRightClockOnCodeBlockHandle(int blockNumber, bool &valid);
     void selectBlockCopyHandle(int blockNumber, int &startPos, int &endPos);
     void duplicateLineHandle(int blockNumber);
@@ -126,7 +148,7 @@ public slots:
 
     void pushCheckBoxHandle(const int position);
     void pushLinkHandle(const int blockNo, const int posInBlock);
-    void autoInsertSymbolHandle(const int position, int &newPosition );
+    void autoInsertSymbolHandle(const int position, int &newPosition);
     void setMarkdownHandle(bool state);
     void cursorUpdateHandle(const int blockNo, const int characterNo);
 
@@ -138,19 +160,22 @@ signals:
     void disconnectCursorPos(bool override = false);
     void connectCurosPos(bool override = false);
 
- private:
-    struct CheckingBlock{
+private:
+    struct CheckingBlock
+    {
         QTextBlock start;
         QTextBlock end;
     };
 
-    struct FormatLocation{
+    struct FormatLocation
+    {
         int start = -1;
-        int end =-1;
+        int end = -1;
 
-        void reset(){
+        void reset()
+        {
             start = -1;
-            end =-1;
+            end = -1;
         }
     };
 
@@ -184,7 +209,7 @@ signals:
     QUndoStack undoStack;
 
     QVector<QPair<int, int>> checkMarkPositions;
-    QVector<std::tuple<int,int,int, const QString*>> linkPositions;
+    QVector<std::tuple<int, int, int, const QString *>> linkPositions;
 
     QColor linkColor;
     bool disableMarkdownState;
@@ -195,55 +220,77 @@ signals:
     void resetFormatLocation();
     void identifyUserData();
     void identifyUserData(QTextBlock &block);
-    void formatAllLines(const QTextDocument &original, MkTextDocument &formatted);
+    void formatAllLines(const QTextDocument &original,
+                        MkTextDocument &formatted);
 
     void resetAllLoc();
     void identifyFormatData(QTextBlock &block);
     void identifyUnicode(QString &line);
-    void insertHeadingData( const QString &text, int &index1, FormatData *formatData);
-    void insertFormatData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
-    void insertFormatCheckBoxData(FormatLocation &loc, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test);
-    void insertFormatLinkData(FormatLocation &locTitle, FormatLocation &locLink, int &index1, int &index2, int &index3, FormatData *formatData, const QString &test, const QString * linkUrl, const QString *linkTitle);
-    void incrementIndexes(int &index1, int &index2, int &index3,const int size =1);
+    void insertHeadingData(const QString &text, int &index1,
+                           FormatData *formatData);
+    void insertFormatData(FormatLocation &loc, int &index1, int &index2,
+                          int &index3, FormatData *formatData,
+                          const QString &test);
+    void insertFormatCheckBoxData(FormatLocation &loc, int &index1, int &index2,
+                                  int &index3, FormatData *formatData,
+                                  const QString &test);
+    void insertFormatLinkData(FormatLocation &locTitle, FormatLocation &locLink,
+                              int &index1, int &index2, int &index3,
+                              FormatData *formatData, const QString &test,
+                              const QString *linkUrl, const QString *linkTitle);
+    void incrementIndexes(int &index1, int &index2, int &index3,
+                          const int size = 1);
     bool convertCharacterToSymbol(const QChar &single, QString &text);
     void convertCharacterToCheckboxSymbol(const QChar &single, QString &text);
     bool convertCharacterToLinkSymbol(const QChar &single, QString &text);
-    void composeSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result);
-    void composeOnlyLinkSymbolCombination(int length, const QString &text, int &index1, int &index2, int &index3, QString &result);
+    void composeSymbolCombination(int length, const QString &text, int &index1,
+                                  int &index2, int &index3, QString &result);
+    void composeOnlyLinkSymbolCombination(int length, const QString &text,
+                                          int &index1, int &index2, int &index3,
+                                          QString &result);
 
-    void setCodeBlockMargin(QTextBlock &block, int leftMargin=0,int rightMargin =0, int topMargin = 0, int bottomMargin = 0);
+    void setCodeBlockMargin(QTextBlock &block, int leftMargin = 0,
+                            int rightMargin = 0, int topMargin = 0,
+                            int bottomMargin = 0);
     void resetTextBlockFormat(QTextBlock block);
-    void applyMkFormat(QTextBlock &block, int start, int end, FragmentData::FormatSymbol status,FormatCollection &formatCollection);
-    void applyCheckBoxLinkEffect(FormatData *data, QTextBlock &block, QTextCursor &cursor);
-    void hideSymbols(QTextBlock &block,const QString &symbol);
+    void applyMkFormat(QTextBlock &block, int start, int end,
+                       FragmentData::FormatSymbol status,
+                       FormatCollection &formatCollection);
+    void applyCheckBoxLinkEffect(FormatData *data, QTextBlock &block,
+                                 QTextCursor &cursor);
+    void hideSymbols(QTextBlock &block, const QString &symbol);
     void hideSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
-    void showSymbols(QTextBlock &block,const QString &symbol);
-    void removeCheckBoxLinkMousePosition(QTextBlock &block, FormatData *formatData, SelectRange * range = nullptr);
+    void showSymbols(QTextBlock &block, const QString &symbol);
+    void removeCheckBoxLinkMousePosition(QTextBlock &block,
+                                         FormatData *formatData,
+                                         SelectRange *range = nullptr);
     void showSymbolsAtPos(QString &text, int pos, const QString &symbol);
 
-    void autoCompleteCodeBlock(int blockNumber,bool &success);
-    BlockData* checkValidCodeBlock(QTextBlock &block);
+    void autoCompleteCodeBlock(int blockNumber, bool &success);
+    BlockData *checkValidCodeBlock(QTextBlock &block);
 
     void numberListDetect(int blockNumber, int &newCursorPosition);
     int numberListGetSpaces(const QString &text);
     QString numberListGetNextNumber(const QString &text);
 
-    void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange * const range);
-    void showMKSymbolsFromCurrentSelectedBlocks(SelectRange * const range);
+    void hideMKSymbolsFromPreviousSelectedBlocks(SelectRange *const range);
+    void showMKSymbolsFromCurrentSelectedBlocks(SelectRange *const range);
     void showHideCodeBlock(BlockData *data, bool hide, int fontSize);
-
 };
 
-enum EditType{
+enum EditType
+{
     undoRedo = 0,
     singleEdit,
+    multiDelete,  // ADD: multi-block deletion in one shot
     checkbox,
     enterPressed,
     multiEdit,
 };
 
-struct UndoData{
+struct UndoData
+{
     QTextEdit *view;
     EditType *viewEditTypeStore;
     QTextDocument *doc;
@@ -285,5 +332,4 @@ private:
     SelectRange *viewSelectRangeStore;
 };
 
-
-#endif // MKTEXTDOCUMENT_H
+#endif  // MKTEXTDOCUMENT_H

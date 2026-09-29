@@ -2,36 +2,30 @@
 #define TOGGLEBUTTON_H
 
 #include <QAbstractButton>
-#include <QObject>
-#include <QPropertyAnimation>
-#include <QWidget>
+#include <QBrush>
 
 class ToggleButton : public QAbstractButton
 {
     Q_OBJECT
-private:
-    bool state;
-    QPropertyAnimation *animation = nullptr;
-
-    QBrush trackEdit, circleEdit, trackReadonly, circleReadonly;
-    QPoint cirlePoint;
 public:
-    ToggleButton(QWidget * parent);
+    explicit ToggleButton(QWidget *parent = nullptr);
+
     bool getState() const;
 
-    void keyPressEvent(QKeyEvent *e) override;
-    void keyReleaseEvent(QKeyEvent *e) override;
-    void mouseMoveEvent(QMouseEvent *e) override;
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void paintEvent(QPaintEvent *e) override;
+public slots:
+    void setChecked(bool checked);
 
 signals:
     void toggleState(bool state);
 
-public slots:
-    void setChecked(bool state);
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private:
+    QBrush trackEdit;
+    QBrush trackReadonly;
+    QBrush circleEdit;
+    QBrush circleReadonly;
 };
 
-#endif // TOGGLEBUTTON_H
+#endif  // TOGGLEBUTTON_H

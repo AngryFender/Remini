@@ -2,16 +2,14 @@
 #ifndef TEXTSEARCHWORKER_H
 #define TEXTSEARCHWORKER_H
 
-
-#include <QObject>
-#include <QFile>
 #include <QDir>
-#include <QTextStream>
-#include <QTextDocument>
-#include <QTextCursor>
-#include <QStandardItemModel>
+#include <QFile>
 #include <QFileIconProvider>
-
+#include <QObject>
+#include <QStandardItemModel>
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QTextStream>
 
 class TextSearchWorker : public QObject
 {
@@ -24,6 +22,7 @@ public:
 
 public slots:
     void doWork();
+
 private:
     QStringList listPaths;
     QString text;
@@ -31,7 +30,9 @@ private:
     QStandardItemModel model;
     QFileIconProvider iconProvider;
 
-    void findAllMatches(int &matchCount,QStandardItem *item, int &row, QTextDocument &document, int startPosition, QString &text);
+    void findAllMatches(int &matchCount, QStandardItem *parentItem, int &row,
+                        QTextDocument &document, int startPosition,
+                        const QString &searchText);
     QString extractNeighbourWords(QTextDocument &document, int position);
 
 signals:
@@ -39,4 +40,4 @@ signals:
     void updateTextSearchView(QStandardItemModel *model, int matchCount);
 };
 
-#endif // TEXTSEARCHWORKER_H
+#endif  // TEXTSEARCHWORKER_H
